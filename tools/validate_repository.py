@@ -15,6 +15,35 @@ def tree_hashes(root):
     return {path.relative_to(root).as_posix(): sha256(path) for path in root.rglob("*") if path.is_file()}
 
 
+def validate_packaged_evidence(contract):
+    """核对追加证据与消费合同的身份，不将离线校验当作重新执行硬件验收。"""
+    record_path = repository_path(contract["speed_source_identity"])
+    evidence = record_path.parent
+    index = json.loads((evidence / "evidence.json").read_text(encoding="utf-8"))
+    for name, expected in index["files"].items():
+        path = (evidence / name).resolve()
+        if not path.is_relative_to(evidence.resolve()):
+            raise ValueError("packaged evidence path escapes its directory")
+        if path.stat().st_size != expected["bytes"] or sha256(path) != expected["sha256"]:
+            raise ValueError(f"packaged evidence checksum mismatch: {name}")
+    record = json.loads(record_path.read_text(encoding="utf-8"))
+    if (record["speed_commit"] != contract["speed_adapter"]["commit"]
+            or record["wheel_sha256"] != contract["wheel"]["sha256"]
+            or record["freetoken_materials_commit"] != contract["accepted_materials_commit"]):
+        raise ValueError("packaged evidence consumer identity mismatch")
+    for key in ("installer_validated", "clean_machine_validated", "normal_full_flash_next_validated"):
+        if record[key] != contract[key]:
+            raise ValueError(f"packaged evidence scope mismatch: {key}")
+    if contract["packaged_speed_validated"] is not True or record["staged_runtime_validated"] is not True:
+        raise ValueError("win1 packaged runtime acceptance is not recorded")
+    runs = json.loads((evidence / "packaged-models-summary.json").read_text(encoding="utf-8"))
+    expected_runs = {(profile, mode) for profile in ("qwen36", "qwen38", "flash-next") for mode in ("http", "backend")}
+    if len(runs) != 6 or {(run["profile"], run["mode"]) for run in runs} != expected_runs:
+        raise ValueError("packaged evidence lacks the six model runs")
+    if any(run["returncode"] != 0 or run["invalid_model"] != (run["profile"] == "flash-next") for run in runs):
+        raise ValueError("packaged evidence has a failed or incorrectly labelled model run")
+
+
 def main():
     profile, series = load_profile()
     lock = json.loads(repository_path(profile["upstream_lock"]).read_text(encoding="utf-8"))
@@ -68,13 +97,15 @@ def main():
             raise ValueError(f"Speed consumer contract mismatch: {key}")
     if contract["wheel"]["sha256"] != record["wheel_sha256"] or contract["kernel_cache"]["dll_count"] != len(specs):
         raise ValueError("Speed consumer artifact identity mismatch")
+    validate_packaged_evidence(contract)
     subprocess.run([sys.executable, "-B", str(ROOT / "tools/verify_materials.py"), str(artifacts)], check=True)
     for directory in ("build", "tools", "tests"):
         for path in (ROOT / directory).rglob("*.py"):
             ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     print(json.dumps({"official_files": len(original_hashes), "changed_files": len(changed),
                       "patches": len(series["patches"]), "split_equals_historical": True,
-                      "wheel_python_matches_prepared_source": True, "aot_count": len(specs), "verified": True}))
+                      "wheel_python_matches_prepared_source": True, "aot_count": len(specs),
+                      "packaged_acceptance_evidence_verified": True, "verified": True}))
 
 
 if __name__ == "__main__":

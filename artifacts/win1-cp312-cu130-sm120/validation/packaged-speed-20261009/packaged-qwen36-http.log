@@ -1,0 +1,254 @@
+C:\workspace\build\ftwin1-review-001\app\python\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+INFO silitok_speed.engine.scheduler: Scheduler started (thread=SilitokScheduler)
+INFO httpx: HTTP Request: GET http://testserver/v1/models "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task 7358fdfc-4394-4c8d-96ec-abf853587830 started (pipeline=chat)
+INFO silitok_speed.engine.resource: admission model=qwen3.6-35b-a3b.nvfp4-freetoken fits=True reject=False vram_need=13.42GB commit_need=39.19GB ram_need=25.77GB vram_free=23.95GB commit_avail=54.22GB ram_avail=54.34GB reasons= warnings=
+INFO silitok_speed.engine.models: Loading backend FreeTokenQwen36Backend for model qwen3.6-35b-a3b.nvfp4-freetoken (estimated VRAM: 13.42 GB, commit: 13.42 GB)
+INFO silitok_speed.engine.models: Backend FreeTokenQwen36Backend loaded for qwen3.6-35b-a3b.nvfp4-freetoken (current VRAM: 12.62 GB)
+INFO silitok_speed.engine.scheduler: Task 7358fdfc-4394-4c8d-96ec-abf853587830 completed
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task bb2da4a2-15f6-4bcf-9137-323559df3ee6 started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task bb2da4a2-15f6-4bcf-9137-323559df3ee6 completed
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 200 OK"
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 400 Bad Request"
+INFO httpx: HTTP Request: GET http://testserver/v1/status "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Scheduler stopped cleanly
+no balance_serve
+flashinfer not found, use triton for linux
+{
+  "admission_overrides": {
+    "commit_safety_gib": 8.0,
+    "host_commit_estimate_gib": null,
+    "vram_estimate_gib": null,
+    "vram_safety_gib": 2.0
+  },
+  "admission_probe": {
+    "allowed": true,
+    "current": {
+      "commit_available_bytes": 54420172800,
+      "ram_available_bytes": 54555578368,
+      "vram_free_bytes": 23951572992,
+      "vram_total_bytes": 25642467328
+    },
+    "headroom_after_safety": {
+      "commit_bytes": 6638661632,
+      "ram_bytes": 26638290944,
+      "vram_bytes": 8382316544
+    },
+    "reasons": [],
+    "required": {
+      "commit_peak_bytes": 13421772800,
+      "cpu_heap_peak_bytes": 25769803776,
+      "effective_commit_bytes": 39191576576,
+      "strict_commit_limit": true,
+      "vram_peak_bytes": 13421772800,
+      "weight_file_count": 3
+    },
+    "safety": {
+      "commit_bytes": 8589934592,
+      "ram_bytes": 2147483648,
+      "vram_bytes": 2147483648
+    },
+    "usable_total_vram_bytes": 23494983680,
+    "warnings": []
+  },
+  "cache_geometry": {
+    "moe_cache_size": 5070,
+    "num_mamba_slots": 8,
+    "num_pages": 8192,
+    "num_swa_pages": 0,
+    "page_size": 1,
+    "swa_page_size": 0
+  },
+  "invalid_expert_keep_layers": null,
+  "invalid_model": false,
+  "model_id": "qwen3.6-35b-a3b.nvfp4-freetoken",
+  "profile": "qwen36",
+  "quant": "nvfp4",
+  "registered": 1,
+  "resource_baselines": {
+    "engine_after_cuda_init": {
+      "captured_unix_ns": 1791530576601252600,
+      "commit_available_bytes": 55044816896,
+      "process_private_bytes": 1748910080,
+      "ram_available_bytes": 54729728000,
+      "torch_allocated_bytes": 0,
+      "torch_reserved_bytes": 0,
+      "vram_free_bytes": 23951572992,
+      "vram_total_bytes": 25642467328
+    },
+    "machine_after_cuda_init": {
+      "captured_unix_ns": 1791530576648938200,
+      "gpus": [
+        {
+          "driver_version": "610.88",
+          "index": 0,
+          "memory_free_bytes": 23310893056,
+          "memory_free_mib": 22231,
+          "memory_total_bytes": 25642926080,
+          "memory_total_mib": 24455,
+          "name": "NVIDIA GeForce RTX 5090 D v2",
+          "uuid": "GPU-269009f4-4be7-e30f-6810-1626a7cbf5b4"
+        }
+      ],
+      "source": "nvidia-smi"
+    },
+    "machine_before_engine": {
+      "captured_unix_ns": 1791530576237879300,
+      "gpus": [
+        {
+          "driver_version": "610.88",
+          "index": 0,
+          "memory_free_bytes": 23762829312,
+          "memory_free_mib": 22662,
+          "memory_total_bytes": 25642926080,
+          "memory_total_mib": 24455,
+          "name": "NVIDIA GeForce RTX 5090 D v2",
+          "uuid": "GPU-269009f4-4be7-e30f-6810-1626a7cbf5b4"
+        }
+      ],
+      "source": "nvidia-smi"
+    }
+  },
+  "status": {
+    "gpu": {
+      "cuda_capability": [
+        12,
+        0
+      ],
+      "name": "NVIDIA GeForce RTX 5090 D v2"
+    },
+    "loaded_backends": [
+      {
+        "backend_class": "FreeTokenQwen36Backend",
+        "commit_delta_bytes": 34736332800,
+        "commit_delta_gb": 34.74,
+        "idle": true,
+        "model_id": "qwen3.6-35b-a3b.nvfp4-freetoken",
+        "private_delta_bytes": 106496,
+        "private_delta_gb": 0.0,
+        "refcount": 0,
+        "state": "loaded",
+        "vram_bytes": 12618563584,
+        "vram_gb": 12.62,
+        "weight_files": [
+          "C:\\workspace\\models\\qwen3.6-35b-a3b.nvfp4-modelscope\\model-00001-of-00003.safetensors",
+          "C:\\workspace\\models\\qwen3.6-35b-a3b.nvfp4-modelscope\\model-00002-of-00003.safetensors",
+          "C:\\workspace\\models\\qwen3.6-35b-a3b.nvfp4-modelscope\\model-00003-of-00003.safetensors"
+        ]
+      }
+    ],
+    "queue": {
+      "depth": 0,
+      "running": 0
+    },
+    "ram": {
+      "available_bytes": 34355445760,
+      "available_gb": 34.36,
+      "total_bytes": 66197110784,
+      "total_gb": 66.2,
+      "used_bytes": 31841665024,
+      "used_gb": 31.84
+    },
+    "recent_durations": {},
+    "resources": {
+      "commit": {
+        "available_bytes": 19471147008,
+        "available_gb": 19.47,
+        "limit_bytes": 70357860352,
+        "limit_gb": 70.36,
+        "used_bytes": 50886713344,
+        "used_gb": 50.89
+      },
+      "pagefile": {
+        "allocated_bytes": 4160749568,
+        "allocated_gb": 4.16,
+        "current_bytes": 0,
+        "current_gb": 0.0,
+        "peak_bytes": 0,
+        "peak_gb": 0.0
+      },
+      "process": {
+        "private_bytes": 2575224832,
+        "private_gb": 2.58,
+        "virtual_bytes": 2575224832,
+        "virtual_gb": 2.58,
+        "working_set_bytes": 969400320,
+        "working_set_gb": 0.97
+      },
+      "ram": {
+        "available_bytes": 34355445760,
+        "available_gb": 34.36,
+        "total_bytes": 66197110784,
+        "total_gb": 66.2
+      },
+      "vram": {
+        "free_bytes": 23951572992,
+        "free_gb": 23.95,
+        "torch_allocated_bytes": 0,
+        "torch_allocated_gb": 0.0,
+        "torch_reserved_bytes": 0,
+        "torch_reserved_gb": 0.0,
+        "total_bytes": 25642467328,
+        "total_gb": 25.64
+      }
+    },
+    "started": true,
+    "task_service": {
+      "error_code": null,
+      "staged_bytes": 0,
+      "status": "ready"
+    },
+    "tasks": {
+      "queued": [],
+      "running": []
+    },
+    "uptime_seconds": 28.93,
+    "vram": {
+      "free_gb": 13.02,
+      "total_bytes": 25642467328,
+      "total_gb": 25.64,
+      "used_bytes": 12618563584,
+      "used_gb": 12.62
+    }
+  },
+  "stream": {
+    "chunks": 31,
+    "done_events": 1,
+    "finish_reason": "stop",
+    "status_code": 200,
+    "text_prefix": "Local inference is a statistical technique that estimates causal effects by comparing treated units to their most similar untreated counterparts within a specif",
+    "tpot_seconds": 2.559259344168283e-06,
+    "ttft_seconds": 0.6693716000008862,
+    "usage": {
+      "completion_tokens": 28,
+      "prompt_tokens": 20,
+      "total_tokens": 48
+    }
+  },
+  "sync": {
+    "finish_reason": "stop",
+    "status_code": 200,
+    "text_prefix": "Local inference is a statistical technique that estimates causal effects by comparing treated units to their most similar untreated counterparts within a specif",
+    "usage": {
+      "completion_tokens": 28,
+      "prompt_tokens": 20,
+      "total_tokens": 48
+    },
+    "wall_seconds": 28.171848699988914
+  },
+  "unsupported_field": {
+    "code": "unsupported_feature",
+    "message": "Model 'qwen3.6-35b-a3b.nvfp4-freetoken' does not support request field 'presence_penalty' in its current release.",
+    "param": "presence_penalty",
+    "retryable": false,
+    "type": "invalid_request_error"
+  },
+  "wall_seconds": 33.56115550000686,
+  "worker_pids": [
+    2196,
+    4432
+  ],
+  "worker_pids_gone": true
+}

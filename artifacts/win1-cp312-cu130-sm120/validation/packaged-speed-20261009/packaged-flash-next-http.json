@@ -1,0 +1,327 @@
+{
+  "admission_overrides": {
+    "commit_safety_gib": 1.0,
+    "host_commit_estimate_gib": 32.0,
+    "vram_estimate_gib": 16.0,
+    "vram_safety_gib": 2.0
+  },
+  "admission_probe": {
+    "allowed": true,
+    "current": {
+      "commit_available_bytes": 54695657472,
+      "ram_available_bytes": 54898651136,
+      "vram_free_bytes": 23951572992,
+      "vram_total_bytes": 25642467328
+    },
+    "headroom_after_safety": {
+      "commit_bytes": 2082308096,
+      "ram_bytes": 18391429120,
+      "vram_bytes": 4624220160
+    },
+    "reasons": [],
+    "required": {
+      "commit_peak_bytes": 17179869184,
+      "cpu_heap_peak_bytes": 34359738368,
+      "effective_commit_bytes": 51539607552,
+      "strict_commit_limit": true,
+      "vram_peak_bytes": 17179869184,
+      "weight_file_count": 94
+    },
+    "safety": {
+      "commit_bytes": 1073741824,
+      "ram_bytes": 2147483648,
+      "vram_bytes": 2147483648
+    },
+    "usable_total_vram_bytes": 23494983680,
+    "warnings": []
+  },
+  "cache_geometry": {
+    "moe_cache_size": 1024,
+    "num_mamba_slots": 8,
+    "num_pages": 128,
+    "num_swa_pages": 0,
+    "page_size": 64,
+    "swa_page_size": 0
+  },
+  "invalid_expert_keep_layers": 20,
+  "invalid_model": true,
+  "model_id": "qwen3.8-flash-next.nvfp4-freetoken-INVALID-alias20",
+  "profile": "flash-next",
+  "quant": "nvfp4",
+  "registered": 1,
+  "resource_baselines": {
+    "engine_after_cuda_init": {
+      "captured_unix_ns": 1791530720108706600,
+      "commit_available_bytes": 54936870912,
+      "process_private_bytes": 1749950464,
+      "ram_available_bytes": 54632792064,
+      "torch_allocated_bytes": 0,
+      "torch_reserved_bytes": 0,
+      "vram_free_bytes": 23951572992,
+      "vram_total_bytes": 25642467328
+    },
+    "machine_after_cuda_init": {
+      "captured_unix_ns": 1791530720140373600,
+      "gpus": [
+        {
+          "driver_version": "610.88",
+          "index": 0,
+          "memory_free_bytes": 23318233088,
+          "memory_free_mib": 22238,
+          "memory_total_bytes": 25642926080,
+          "memory_total_mib": 24455,
+          "name": "NVIDIA GeForce RTX 5090 D v2",
+          "uuid": "GPU-269009f4-4be7-e30f-6810-1626a7cbf5b4"
+        }
+      ],
+      "source": "nvidia-smi"
+    },
+    "machine_before_engine": {
+      "captured_unix_ns": 1791530719761025000,
+      "gpus": [
+        {
+          "driver_version": "610.88",
+          "index": 0,
+          "memory_free_bytes": 23771217920,
+          "memory_free_mib": 22670,
+          "memory_total_bytes": 25642926080,
+          "memory_total_mib": 24455,
+          "name": "NVIDIA GeForce RTX 5090 D v2",
+          "uuid": "GPU-269009f4-4be7-e30f-6810-1626a7cbf5b4"
+        }
+      ],
+      "source": "nvidia-smi"
+    }
+  },
+  "status": {
+    "gpu": {
+      "cuda_capability": [
+        12,
+        0
+      ],
+      "name": "NVIDIA GeForce RTX 5090 D v2"
+    },
+    "loaded_backends": [
+      {
+        "backend_class": "FreeTokenQwen36Backend",
+        "commit_delta_bytes": 46679957504,
+        "commit_delta_gb": 46.68,
+        "idle": true,
+        "model_id": "qwen3.8-flash-next.nvfp4-freetoken-INVALID-alias20",
+        "private_delta_bytes": 32768,
+        "private_delta_gb": 0.0,
+        "refcount": 0,
+        "state": "loaded",
+        "vram_bytes": 14266925056,
+        "vram_gb": 14.27,
+        "weight_files": [
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00000-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00000-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00000-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00000-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00001-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00001-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00001-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00001-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00002-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00002-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00002-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00002-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00003-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00003-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00003-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00003-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00004-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00004-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00004-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00004-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00005-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00005-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00005-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00005-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00006-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00006-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00006-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00006-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00007-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00007-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00007-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00007-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00008-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00008-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00008-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00008-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00009-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00009-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00009-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00009-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00010-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00010-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00010-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00010-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00011-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00011-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00011-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00011-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00012-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00012-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00012-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00012-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00013-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00013-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00013-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00013-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00014-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00014-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00014-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00014-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00015-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00015-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00015-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00015-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00016-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00016-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00016-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00016-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00017-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00017-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00017-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00017-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00018-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00018-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00018-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00018-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00019-experts-0000-0127.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00019-experts-0128-0255.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00019-experts-0256-0383.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\layer-00019-experts-0384-0511.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\model-bf16-00001.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\model-bf16-00010.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\model-bf16-00011.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\model-bf16-00012.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\model-plefp8-00000.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\model-plefp8-00001.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\model-plefp8-00002.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\model-plefp8-00003.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\model-plefp8-00004.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\model-plefp8-00005.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\model-plefp8-00006.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\model-plefp8-00007.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\model-plefp8-00008.safetensors",
+          "C:\\workspace\\models\\qwen3.8-flash-next.nvfp4-radixark-alias40-experiment\\model-plefp8-00009.safetensors"
+        ]
+      }
+    ],
+    "queue": {
+      "depth": 0,
+      "running": 0
+    },
+    "ram": {
+      "available_bytes": 24357515264,
+      "available_gb": 24.36,
+      "total_bytes": 66197110784,
+      "total_gb": 66.2,
+      "used_bytes": 41839595520,
+      "used_gb": 41.84
+    },
+    "recent_durations": {},
+    "resources": {
+      "commit": {
+        "available_bytes": 7601582080,
+        "available_gb": 7.6,
+        "limit_bytes": 70357860352,
+        "limit_gb": 70.36,
+        "used_bytes": 62756278272,
+        "used_gb": 62.76
+      },
+      "pagefile": {
+        "allocated_bytes": 4160749568,
+        "allocated_gb": 4.16,
+        "current_bytes": 7180288,
+        "current_gb": 0.01,
+        "peak_bytes": 6291456,
+        "peak_gb": 0.01
+      },
+      "process": {
+        "private_bytes": 2579038208,
+        "private_gb": 2.58,
+        "virtual_bytes": 2579038208,
+        "virtual_gb": 2.58,
+        "working_set_bytes": 973709312,
+        "working_set_gb": 0.97
+      },
+      "ram": {
+        "available_bytes": 24357515264,
+        "available_gb": 24.36,
+        "total_bytes": 66197110784,
+        "total_gb": 66.2
+      },
+      "vram": {
+        "free_bytes": 23951572992,
+        "free_gb": 23.95,
+        "torch_allocated_bytes": 0,
+        "torch_allocated_gb": 0.0,
+        "torch_reserved_bytes": 0,
+        "torch_reserved_gb": 0.0,
+        "total_bytes": 25642467328,
+        "total_gb": 25.64
+      }
+    },
+    "started": true,
+    "task_service": {
+      "error_code": null,
+      "staged_bytes": 0,
+      "status": "ready"
+    },
+    "tasks": {
+      "queued": [],
+      "running": []
+    },
+    "uptime_seconds": 73.95,
+    "vram": {
+      "free_gb": 11.38,
+      "total_bytes": 25642467328,
+      "total_gb": 25.64,
+      "used_bytes": 14266925056,
+      "used_gb": 14.27
+    }
+  },
+  "stream": {
+    "chunks": 14,
+    "done_events": 1,
+    "finish_reason": "stop",
+    "status_code": 200,
+    "text_prefix": "The local inference is a single sentence about local inference.",
+    "tpot_seconds": 2.8700000257231294e-06,
+    "ttft_seconds": 1.8567057000036584,
+    "usage": {
+      "completion_tokens": 11,
+      "prompt_tokens": 20,
+      "total_tokens": 31
+    }
+  },
+  "sync": {
+    "finish_reason": "stop",
+    "status_code": 200,
+    "text_prefix": "The local inference is a single sentence about local inference.",
+    "usage": {
+      "completion_tokens": 11,
+      "prompt_tokens": 20,
+      "total_tokens": 31
+    },
+    "wall_seconds": 71.50458350000554
+  },
+  "unsupported_field": {
+    "code": "unsupported_feature",
+    "message": "Model 'qwen3.8-flash-next.nvfp4-freetoken-INVALID-alias20' does not support request field 'presence_penalty' in its current release.",
+    "param": "presence_penalty",
+    "retryable": false,
+    "type": "invalid_request_error"
+  },
+  "wall_seconds": 147.10486759999185,
+  "worker_pids": [
+    18400,
+    19464
+  ],
+  "worker_pids_gone": true
+}

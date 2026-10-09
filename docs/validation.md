@@ -1,8 +1,8 @@
 # 已有验证与验收边界
 
-本页归纳此前本机实际执行的结果；原始文件见 [validation/](../artifacts/win1-cp312-cu130-sm120/validation/)，身份与范围见 [build-record](../artifacts/win1-cp312-cu130-sm120/build-record.json) 和 [validation-summary](../artifacts/win1-cp312-cu130-sm120/validation-summary.json)。
+本页分别保留初轮源码验证和最终随包验收。原始文件见 [validation/](../artifacts/win1-cp312-cu130-sm120/validation/)，初轮身份见 [build-record](../artifacts/win1-cp312-cu130-sm120/build-record.json) 和 [validation-summary](../artifacts/win1-cp312-cu130-sm120/validation-summary.json)，最终结果见 [packaged-speed-20261009](../artifacts/win1-cp312-cu130-sm120/validation/packaged-speed-20261009/)。
 
-本机：Windows，RTX 5090 D v2 24GB，SM120，物理内存约 61.65 GiB；Python 3.12.13 / Torch 2.11.0+cu130。当前这些结果来自 Speed 源码 worker，未进行完整新版安装包验收。
+本机：Windows，RTX 5090 D v2 24GB，SM120，物理内存约 61.65 GiB；源码/构建 Python 3.12.13 / Torch 2.11.0+cu130。下面初轮结果来自 Speed 源码 worker；后续已验收随包 embedded Python 3.12.10，但没有生成安装器或换到干净机器。
 
 ## 两个历史模型
 
@@ -43,7 +43,7 @@ HTTP smoke 总时长约 42.45 / 24.63 秒，包含加载、请求与卸载，不
 
 ## 代码与依赖验证
 
-Speed 定向回归 124 项通过。扩展 discovery 有 6 项失败：旧视频 safetensors 夹具与 backend 隔离断言；同解释器下在原打包基线复跑得到相同失败，原始日志保留。没有将其记为通过，也没有扩大本次改动范围去修视频路径。
+初轮 Speed 定向回归 124 项通过。扩展 discovery 有 6 项失败：旧视频 safetensors 夹具与 backend 隔离断言；同解释器下在原打包基线复跑得到相同失败，原始日志保留。没有将其记为通过，也没有扩大本次改动范围去修视频路径。
 
 完整独立 SourceVenv 的 stager 审计：101 个发行包、31,452 个 owned 文件，0 missing、0 editable。自检、pip check、native 模块、Torch/TVM/Triton 与 26 项缓存库存已验证。
 
@@ -54,8 +54,26 @@ Speed 定向回归 124 项通过。扩展 discovery 有 6 项失败：旧视频 
 ## 尚未完成
 
 - 正常、完整专家权重的 Flash Next 正确模型运行与性能。
-- 新 Speed 业务模块完整编译、安装器产出。
-- 目标 embedded Python、干净 PATH 与干净机器安装验收。
+- 安装器产出及安装 / 运行 / 卸载。
+- 干净机器安装验收；同一本机清理外部 Python/CUDA 路径的随包运行已通过。
 - 长时间、多请求、稳定性能 A/B 与完整生产回归。
 
 下一版材料应分别登记 `built`、`native_validated`、`speed_source_validated`、`packaged_validated` 等实际阶段证据，不能从工具编译成功自动推断所有阶段通过。
+
+## 最终 Speed 打包与随包三模型验收（2026-10-09）
+
+最终 Speed 提交 [808003f0efc70e7f43226e5d1e8c32b3704405cb](https://github.com/siltok-ai/siltok-speed/commit/808003f0efc70e7f43226e5d1e8c32b3704405cb)，分支 `feat/freetoken-win1-flash-next`，相对原打包基线只有一个提交。其使用材料 commit `12bdf743bbf4725fc25468204313cb2f43733758` 的现有 win1 wheel / 26 DLL，本轮没有重建或追加 FreeToken 补丁。
+
+199 项定向单元 / 合同 / 打包回归通过。完整 Windows `build.ps1 -SkipInstaller` 重新编译 208 个 Speed 模块，重建并 GPU 验证 H3、收集应用依赖、验证 FreeToken native/cache、输出 runtime manifest 和 requirements lock，产物零 `.pyc`。没有生成或安装 Inno 安装器。
+
+控制脚本使用随包 Python `-I -B`，清理外部 Python/CUDA/INVALID 环境变量，PATH 只保留 app Python 和 Windows 系统目录。工具执行前预载并检查包内编译后的 Speed、FreeToken / `_row_store`，避免工具的源码路径插入造成 Speed 源码回退。六组身份记录均保留了编译 manifest；208 个源码 SHA 与最终待提交 worktree 全部相符。
+
+| 模型 | 两组实际运行 | 两轮32输出token诊断TPS中位数 | 取消收尾 |
+| --- | --- | --- | --- |
+| Qwen3.6-35B-A3B NVFP4 | HTTP/SSE 与 backend 全部通过 | 164.32 | 30.25ms |
+| Qwen3.8-27B NVFP4 | HTTP/SSE 与 backend 全部通过 | 57.85 | 50.82ms |
+| Flash Next NVFP4 INVALID-alias20 | 执行链路通过，语义无效 | 38.19 | 63.34ms |
+
+三个模型均完成同步/SSE、usage/EOS、非法字段400、短/长请求、取消后同worker复用与进程退出。旧两模型输出正常；本轮没有重做此前的全部算术/thinking样例。Flash Next仍是20物理/48逻辑专家层与SSD PLE，仅用于执行与性能验证。短样本TPS不能当作稳定性能A/B或完整模型性能；本轮没有重新监测RSS峰值，不把此前31.05GiB数据记为本次打包实测。
+
+按用户要求，打包发生在最终提交之前，所以 build manifest 真实记录原基线 commit 加 `dirty=true`。逐模块 SHA、最终 commit/tree 和材料 SHA共同绑定证据，不改写成提交后重建。报告、命令、六组运行与身份、打包/测试日志及文件SHA索引见 [封存说明](../artifacts/win1-cp312-cu130-sm120/validation/packaged-speed-20261009/README.md)。目录中的本机路径是历史证据，不是新机器的构建输入。

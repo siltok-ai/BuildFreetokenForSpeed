@@ -93,7 +93,8 @@ Windows IO、MSVC build 等通用适配可考虑向上游贡献，从而减小�
 | 编译 | native `.pyd`、26 DLL、工具链 / ABI / cache 合同 | Windows producer + preflight |
 | 原生行为 | row-store 数值、SSD IO、同步 / wait、专家分配与资源 | 需要目标设备实测 |
 | Speed 源码运行 | 老模型 + 新模型相应范围、同步 / SSE / reasoning / cancel / worker 退出 | 本次已做，证据保留 |
-| 完整发布 | Speed 编译、embedded / 干净 PATH、安装器、干净机器 | 本次尚未做 |
+| 随包运行目录 | Speed 编译、embedded Python / 干净 PATH、随包 native/cache、三模型实际运行 | 已完成，见 [证据](../artifacts/win1-cp312-cu130-sm120/validation/packaged-speed-20261009/) |
+| 安装发布 | 安装器安装 / 运行 / 卸载、干净机器 | 尚未做 |
 
 修性能需同硬件、同完整权重、同输入长度与 batch 的 A/B；INVALID-alias 不能与正确模型直接比较。新 shape 必须经过真实加载和生成，库存 / import 检查不能发现所有缺项；本次 dense 两个遗漏是具体例子。
 
@@ -106,6 +107,8 @@ CI 可以提前发现 hash 漂移、源码误改、patch 失效和制品混用�
 每份 release 建议包含 wheel、完整 kernel-cache 压缩包、逐文件 SHA、构建 profile / commit、补丁身份、工具链和验收报告。发布版本绑定本仓库明确 commit；上传后不替换同名素材，新修订采用新版本 / release。
 
 Speed 仓库保存一个材料 lock：定制版本、release 或材料目录、wheel SHA、cache manifest SHA、上游 commit 和定制仓库 commit。下载 / 复制后先核对 hash，再打包；构建产出的 Speed 发布说明记录其材料身份。
+
+当前 Speed 的精确 wheel SHA 锁已生效；后续完整集中材料 lock 仍按上述方案演进。材料仓库新增验收文档不会使已验收的 wheel/DLL 身份变化，Speed 本轮继续引用材料 commit `12bdf743bbf4725fc25468204313cb2f43733758`。新增验收记录反向绑定最终 Speed commit，避免为了同步文档制造两仓库 commit 循环。跨机器同源码重编译字节变化，需要新的材料记录、验收和 Speed SHA 更新；引擎源码变化则同时增加定制版本修订。
 
 由 Speed 在独立分支更新 adapter 与 lock，执行两个历史模型回归，再接入新模型并完成完整包验收。不要一边改变 FreeToken/Torch/Speed 多处，一边继续覆盖同一个“最新 DLL”目录，使问题无法归因。
 

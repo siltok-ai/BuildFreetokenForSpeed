@@ -4,7 +4,7 @@
 
 当前基线：官方 FreeToken `078132480ea4a0424f677a27eb22085624d331e6`，定制版本 `0.1.3+speed.win1`，CPython 3.12 / Windows x64 / Torch 2.11.0+cu130 / CUDA 13.0 / SM120。
 
-**当前完成的是 Speed 源码运行验收。** 原两个 NVFP4 模型已经回归通过；Qwen3.8-Flash-Next 在本机仅通过明确标记的 `INVALID-alias20` 专家复用实验，输出不代表完整模型质量。完整 Speed 安装器、embedded Python 和干净机器尚未验收。
+**当前已完成 Speed 源码与随包运行目录验收。** 原两个 NVFP4 模型已经回归通过；完整 Windows `build.ps1 -SkipInstaller` 打包后，三个模型也通过 embedded Python / 干净 PATH 下的实际运行。Qwen3.8-Flash-Next 仍仅通过明确标记的 `INVALID-alias20` 专家复用实验，输出不代表完整模型质量。安装器与干净机器尚未验收。
 
 ## 从哪里开始读
 
@@ -15,7 +15,7 @@
 | 将补丁应用后，直接浏览、开发定制源码 | [准备源码命令](#只准备源码不编译) |
 | 复制素材给另一台机器，或重新编译 | [构建与复制说明](build/README.md) |
 | Speed 实际使用哪些文件，怎样接入 | [Speed 接入约定](docs/speed-integration.md) |
-| 已经跑了哪些验证，有什么限制 | [验收记录](docs/validation.md)、[历史原始报告](artifacts/win1-cp312-cu130-sm120/validation/) |
+| 已经跑了哪些验证，有什么限制 | [验收记录](docs/validation.md)、[最终随包验收](artifacts/win1-cp312-cu130-sm120/validation/packaged-speed-20261009/)、[历史原始报告](artifacts/win1-cp312-cu130-sm120/validation/) |
 | 如何持续获取上游更新、维护本地差异 | [长期维护方案](docs/maintenance.md) |
 
 ## 内容分层
@@ -126,8 +126,9 @@ python -B tools/prepare_source.py --output .\out\inspect-win1
 
 - Qwen3.6-35B-A3B NVFP4 与 Qwen3.8-27B NVFP4：实际 Speed HTTP / SSE、取消后 worker 复用、算术与 thinking 样例通过。
 - Flash Next：20 物理专家层承载 48 逻辑层，SSD PLE，Speed HTTP / SSE / 取消复用通过；进程树 RSS 峰值约 31.05 GiB。两轮短请求约 35.85 / 35.71 token/s，**只代表 INVALID 实验链路，不能作为完整模型性能或质量**。
-- Speed 定向回归 124 项通过；更广 discovery 的 6 项失败在原打包基线上同样复现，记录保留。
-- 素材对应源码运行通过，不等于完整 Speed 安装包或完整 Flash Next 模型验收通过。
+- 最终 Speed 分支 [feat/freetoken-win1-flash-next](https://github.com/siltok-ai/siltok-speed/tree/808003f0efc70e7f43226e5d1e8c32b3704405cb)，提交 `808003f0efc70e7f43226e5d1e8c32b3704405cb`；199 项定向回归通过。此前更广 discovery 的 6 项失败在原打包基线上同样复现，历史记录保留。
+- 完整运行目录重新编译 208 个 Speed 模块、重建并验证 H3、暂存定制 FreeToken 与 26 DLL，零 `.pyc`。三个模型各完成 HTTP/SSE 和 backend 短长请求、取消后复用、退出，共 6 组实际运行通过；[报告与身份记录](artifacts/win1-cp312-cu130-sm120/validation/packaged-speed-20261009/)已封存。
+- 构建发生在最终提交前，manifest 保留基线 commit + `dirty=true`，由 208 个模块源码 SHA 绑定最终代码。此次未生成安装器，也未验收干净机器或完整正确 Flash Next。
 
 详细边界与证据入口见 [验收说明](docs/validation.md)。后续完整模型运行主要需要足够的专家内存；本轮粗估完整 NVFP4 专家约 63.46 GiB，96 GB 适合受控验证、128 GB 更有余量，尚未在本机进行完整模型实测。
 

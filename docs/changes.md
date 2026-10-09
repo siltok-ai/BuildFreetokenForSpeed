@@ -70,4 +70,4 @@ Speed 对外使用 `engine.extra.allow_invalid_model=true` 和 `invalid_expert_k
 
 Speed backend 的 FreeToken API 适配、worker 事件与取消、manifest / 预算 / INVALID guard、Windows smoke junction、构建参数和 cache 库存校验属于 Speed 自身代码，继续放在 Speed 仓库。本仓库提供 [接入约定](speed-integration.md) 和模板，不把这部分私有应用代码当作 FreeToken patch 发布。
 
-已经验证的 Speed 源码基线及本地适配快照 SHA 保存在 [validation-summary.json](../artifacts/win1-cp312-cu130-sm120/validation-summary.json)。本仓库提供的 FreeToken 素材不能让未经适配的任意旧 Speed commit 自动获得新 API 支持。
+最终 Speed 适配为 [808003f0](https://github.com/siltok-ai/siltok-speed/tree/808003f0efc70e7f43226e5d1e8c32b3704405cb)，材料身份与随包验收保存在 [最终记录](../artifacts/win1-cp312-cu130-sm120/validation/packaged-speed-20261009/record.json)；原始探索基线及适配快照 SHA 仍保存在历史 [validation-summary.json](../artifacts/win1-cp312-cu130-sm120/validation-summary.json)。本仓库提供的 FreeToken 素材不能让未经适配的任意旧 Speed commit 自动获得新 API 支持。

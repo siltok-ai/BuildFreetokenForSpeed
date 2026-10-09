@@ -85,6 +85,8 @@ uv pip install --python D:\envs\ft-win1\Scripts\python.exe `
 
 交给 Speed 打包的素材为 `<OutDir>/wheels/<wheel>` 和 `<OutDir>/kernel-cache/`，使用 `-FreetokenWheel` / `-KernelCacheDir` 参数；SourceVenv 需要先安装同一个 wheel。详见 [接入约定](../docs/speed-integration.md)。
 
+Speed 最终适配还锁定 wheel 的实际 SHA。同一冻结源码跨机器重编译后，二进制字节可能变化；不能仅提供相同版本文件名就替换原材料。新输出先验收、登记 SHA，再在 Speed 候选分支更新 wheel SHA 与消费身份并重做打包。直接复制本仓库已有 wheel / 26 DLL 则保持当前锁定身份。本轮完整 Speed 随包运行使用现有材料通过，没有发现 producer 或 FreeToken 补丁需要进一步修改。
+
 ## 维护依赖 lock
 
 `freeze_build_requirements.py` 用于从准备好的 Windows 环境生成**新候选**依赖闭包，不在正式构建过程中运行：

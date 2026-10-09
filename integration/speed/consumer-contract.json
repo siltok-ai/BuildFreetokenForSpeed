@@ -50,8 +50,21 @@
     "quantization": "NVFP4",
     "ple_backend": "disk"
   },
-  "validation_status": "validated_speed_source_runtime_nvfp4",
-  "packaged_speed_validated": false,
+  "validation_status": "validated_packaged_speed_runtime_nvfp4",
+  "packaged_speed_validated": true,
   "speed_adapter_source_included": false,
-  "speed_source_identity": "artifacts/win1-cp312-cu130-sm120/validation-summary.json"
+  "speed_source_identity": "artifacts/win1-cp312-cu130-sm120/validation/packaged-speed-20261009/record.json",
+  "packaged_speed_validation_scope": "staged runtime, embedded Python and cleaned PATH on original machine; no installer",
+  "installer_validated": false,
+  "clean_machine_validated": false,
+  "normal_full_flash_next_validated": false,
+  "historical_speed_source_identity": "artifacts/win1-cp312-cu130-sm120/validation-summary.json",
+  "speed_adapter": {
+    "repository": "https://github.com/siltok-ai/siltok-speed",
+    "branch": "feat/freetoken-win1-flash-next",
+    "commit": "808003f0efc70e7f43226e5d1e8c32b3704405cb",
+    "base_commit": "5fd331bc5257a6593d6bcb4707c5fa13cf69396b"
+  },
+  "accepted_materials_commit": "12bdf743bbf4725fc25468204313cb2f43733758",
+  "wheel_identity_policy": "Speed checks exact SHA, not only version. Rebuilt bytes require new evidence and Speed SHA update; source changes require a new custom revision."
 }

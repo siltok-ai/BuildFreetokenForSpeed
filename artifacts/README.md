@@ -19,3 +19,5 @@
 历史 AOT 是 25 项整批重建，再用同一冻结源码补构 dense KV store，共 26 项。当前规格已经包含完整 26 项，新入口可一次生成；不把历史记录改写成当时已经使用新目录、新脚本一次编完。
 
 新构建会输出新 `build-record.json`，使用本仓库路径、实际 producer SHA 与 `built_requires_runtime_validation` 状态。重编译的 SHA 可能变化，不能覆盖这份历史已验证结果。长期多版本制品转向 Releases，参见 [维护方案](../docs/maintenance.md)。
+
+后续使用同一材料完成了完整 Speed 运行目录打包及三模型随包运行。新证据追加在 [validation/packaged-speed-20261009/](win1-cp312-cu130-sm120/validation/packaged-speed-20261009/)，绑定最终 Speed commit、材料 commit 与 SHA；原 `build-record.json` 和 `validation-summary.json` 保留当时真实状态，不回写历史。此轮没有重新生成 FreeToken wheel/DLL，也没有生成安装器。
