@@ -1,0 +1,171 @@
+{
+  "format": 1,
+  "platform": "windows-x86_64",
+  "source_commit": "078132480ea4a0424f677a27eb22085624d331e6",
+  "python": "3.12.13 (main, Aug  7 2026, 02:26:41) [MSC v.1944 64 bit (AMD64)]",
+  "torch": "2.11.0+cu130",
+  "torch_cuda": "13.0",
+  "cuda_arches": [
+    "12.0"
+  ],
+  "artifacts": [
+    {
+      "name": "freetoken__store_1024_128_1_false",
+      "path": "freetoken__store_1024_128_1_false/freetoken__store_1024_128_1_false.dll",
+      "size": 318976,
+      "sha256": "f57e44c750e49a48d1028b2a56997276d1960af519e580c1dbae4e5c9b42ebf8"
+    },
+    {
+      "name": "freetoken__index_4096_4_128_1_false",
+      "path": "freetoken__index_4096_4_128_1_false/freetoken__index_4096_4_128_1_false.dll",
+      "size": 337408,
+      "sha256": "40e8f91fa16455f6d4398af17e814903c865eefd934ac3d0e60b19bee7d6b6f8"
+    },
+    {
+      "name": "freetoken__index_10240_4_128_1_false",
+      "path": "freetoken__index_10240_4_128_1_false/freetoken__index_10240_4_128_1_false.dll",
+      "size": 337408,
+      "sha256": "f31202ce5da281c1e9de761e848615433b58814dcaab185dfe65201236410fd1"
+    },
+    {
+      "name": "freetoken__fast_index_copy_update_flag",
+      "path": "freetoken__fast_index_copy_update_flag/freetoken__fast_index_copy_update_flag.dll",
+      "size": 312832,
+      "sha256": "7fd79574b1da9fef3a70748141cbd75689a6e830b72399086effa81c04d7b7b0"
+    },
+    {
+      "name": "freetoken__fast_index_copy_128_8_128_1024_4_1",
+      "path": "freetoken__fast_index_copy_128_8_128_1024_4_1/freetoken__fast_index_copy_128_8_128_1024_4_1.dll",
+      "size": 340992,
+      "sha256": "a4ab38b9f6a2235e9ab8925409cb5e1826576e05e86ccdc4ab445fad99dfd752"
+    },
+    {
+      "name": "freetoken__fast_index_copy_256_8_256_1024_4_1",
+      "path": "freetoken__fast_index_copy_256_8_256_1024_4_1/freetoken__fast_index_copy_256_8_256_1024_4_1.dll",
+      "size": 340480,
+      "sha256": "10d16d73e4ba27720348a0c796a841536fe389ca06348ed5727fc0f4382366b7"
+    },
+    {
+      "name": "freetoken__fast_index_copy_2048_16_2048_1024_4_1",
+      "path": "freetoken__fast_index_copy_2048_16_2048_1024_4_1/freetoken__fast_index_copy_2048_16_2048_1024_4_1.dll",
+      "size": 340992,
+      "sha256": "d2e00c6c8c8c0c06d1e3bfd7f668949618431ac62f50c917e6c10be36a39de5c"
+    },
+    {
+      "name": "freetoken__fast_index_copy_4096_32_2048_1024_4_1",
+      "path": "freetoken__fast_index_copy_4096_32_2048_1024_4_1/freetoken__fast_index_copy_4096_32_2048_1024_4_1.dll",
+      "size": 340992,
+      "sha256": "0e3e6fdc3062342ec5065b1f0f4373d0174d4b757bf2ffc35efbfe37430cb415"
+    },
+    {
+      "name": "freetoken__fast_index_copy_65536_32_2048_1024_4_1",
+      "path": "freetoken__fast_index_copy_65536_32_2048_1024_4_1/freetoken__fast_index_copy_65536_32_2048_1024_4_1.dll",
+      "size": 340992,
+      "sha256": "f2db781b736a52b13e2318fb8cc558cb38a9a4c56fd5d98df844cd78d5e58dc1"
+    },
+    {
+      "name": "freetoken__fast_index_copy_131072_32_2048_1024_4_1",
+      "path": "freetoken__fast_index_copy_131072_32_2048_1024_4_1/freetoken__fast_index_copy_131072_32_2048_1024_4_1.dll",
+      "size": 340992,
+      "sha256": "a22accede4ad0596dec2ff10b9efead2b54bd26270f2614fe531b7d77588e625"
+    },
+    {
+      "name": "freetoken__fast_index_copy_524288_32_2048_1024_4_1",
+      "path": "freetoken__fast_index_copy_524288_32_2048_1024_4_1/freetoken__fast_index_copy_524288_32_2048_1024_4_1.dll",
+      "size": 340992,
+      "sha256": "9b734e4d4632cc6bae9be53387b7fd2dd03e9d44554caca1e4644265e36594b5"
+    },
+    {
+      "name": "freetoken__fast_index_copy_1048576_32_2048_1024_4_1",
+      "path": "freetoken__fast_index_copy_1048576_32_2048_1024_4_1/freetoken__fast_index_copy_1048576_32_2048_1024_4_1.dll",
+      "size": 340992,
+      "sha256": "4413600738b3b408c413e7326cc407ef3c023287d6a0601bea39cebf9bff1d31"
+    },
+    {
+      "name": "freetoken__fast_index_copy_2097152_32_2048_1024_4_1",
+      "path": "freetoken__fast_index_copy_2097152_32_2048_1024_4_1/freetoken__fast_index_copy_2097152_32_2048_1024_4_1.dll",
+      "size": 340992,
+      "sha256": "063e1cb15b1d084049e25e6a35f21496d60d9d144274a4304441572706439a80"
+    },
+    {
+      "name": "freetoken__fast_index_copy_4194304_32_2048_1024_4_1",
+      "path": "freetoken__fast_index_copy_4194304_32_2048_1024_4_1/freetoken__fast_index_copy_4194304_32_2048_1024_4_1.dll",
+      "size": 340992,
+      "sha256": "c5ef6c9ea606684a156f3ce95d80807709be8a129f0f966ec6939e4fc06f43de"
+    },
+    {
+      "name": "freetoken__fast_index_copy_multi_1024_8",
+      "path": "freetoken__fast_index_copy_multi_1024_8/freetoken__fast_index_copy_multi_1024_8.dll",
+      "size": 322560,
+      "sha256": "f6ff5da74b1a53ef70ec12a9b97a433471976d91c702b1c473f0185a9f01a713"
+    },
+    {
+      "name": "freetoken__fast_index_copy_multi_1024_64",
+      "path": "freetoken__fast_index_copy_multi_1024_64/freetoken__fast_index_copy_multi_1024_64.dll",
+      "size": 322560,
+      "sha256": "438a36170d3dfddf3e7c4891a493d6c468e226a13dae9c9e0102e02335b6a656"
+    },
+    {
+      "name": "freetoken__batch_memcpy",
+      "path": "freetoken__batch_memcpy/freetoken__batch_memcpy.dll",
+      "size": 313856,
+      "sha256": "59a4f4a1d1bbb8dfb480486640f7b961ee4c4d0ff15d7df58d1e023e40ba37ff"
+    },
+    {
+      "name": "freetoken__radix",
+      "path": "freetoken__radix/freetoken__radix.dll",
+      "size": 49664,
+      "sha256": "88b43dae65947b9d2585ad1990bd7329281cb9ca79e716d53299d84637dcc99f"
+    },
+    {
+      "name": "freetoken__fast_index_copy_102400_32_2048_1024_4_1",
+      "path": "freetoken__fast_index_copy_102400_32_2048_1024_4_1/freetoken__fast_index_copy_102400_32_2048_1024_4_1.dll",
+      "size": 340992,
+      "sha256": "46cbab09e3898c52dea38045a44860816fe90b4b8228ee76d9ed5799d6adea1e"
+    },
+    {
+      "name": "freetoken__fast_index_copy_1638400_32_2048_1024_4_1",
+      "path": "freetoken__fast_index_copy_1638400_32_2048_1024_4_1/freetoken__fast_index_copy_1638400_32_2048_1024_4_1.dll",
+      "size": 340992,
+      "sha256": "963f30b70fd3239e55ec0dde14289dddde434b55e37ce26dd486eea0d6d71927"
+    },
+    {
+      "name": "freetoken__fast_index_copy_204800_32_2048_1024_4_1",
+      "path": "freetoken__fast_index_copy_204800_32_2048_1024_4_1/freetoken__fast_index_copy_204800_32_2048_1024_4_1.dll",
+      "size": 340992,
+      "sha256": "e7d7c42f07e7d2197b705ce9e8321dd49ced7973fedac1d17b959359844118e4"
+    },
+    {
+      "name": "freetoken__fast_index_copy_2560_32_512_1024_4_1",
+      "path": "freetoken__fast_index_copy_2560_32_512_1024_4_1/freetoken__fast_index_copy_2560_32_512_1024_4_1.dll",
+      "size": 340480,
+      "sha256": "fc5ce88efe331f38ede093279e572fe2377c850edfa515b0ce12fcb48851144a"
+    },
+    {
+      "name": "freetoken__fast_index_copy_5120_32_1024_1024_4_1",
+      "path": "freetoken__fast_index_copy_5120_32_1024_1024_4_1/freetoken__fast_index_copy_5120_32_1024_1024_4_1.dll",
+      "size": 340480,
+      "sha256": "3489534a67ebdcae3ede4bde972a11f597909131a761ad61ad59aea3ba93bfe4"
+    },
+    {
+      "name": "freetoken__fast_index_copy_819200_32_2048_1024_4_1",
+      "path": "freetoken__fast_index_copy_819200_32_2048_1024_4_1/freetoken__fast_index_copy_819200_32_2048_1024_4_1.dll",
+      "size": 340992,
+      "sha256": "dffd935293c0f2670d3bf60cc91adfff205dc6c26934ce66b3911e7d9fd59d51"
+    },
+    {
+      "name": "freetoken__index_5120_2_128_1_false",
+      "path": "freetoken__index_5120_2_128_1_false/freetoken__index_5120_2_128_1_false.dll",
+      "size": 337408,
+      "sha256": "22a78d1b9342659e2b750478cbf379ea092aca3078f548b99584535126194791"
+    },
+    {
+      "name": "freetoken__store_2048_128_1_false",
+      "path": "freetoken__store_2048_128_1_false/freetoken__store_2048_128_1_false.dll",
+      "size": 318976,
+      "sha256": "fc63dc6c6a6f65fdde529eed7298b8d5a295ab39709f87972b03d06ffc8295a0"
+    }
+  ],
+  "source_patch_sha256": "f78e2f925bbe81d580dcad02763d19c1f2261752a8c1f28d7d5fff18f04a3ad0",
+  "inventory_note": "25-spec clean rebuild, plus missing dense KV store compiled from identical frozen build-source; final required inventory 26."
+}

@@ -1,0 +1,23 @@
+name: Frozen source and materials
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  offline-validation:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Validate snapshot, patches, wheel source and DLL checksums
+        run: python -B tools/validate_repository.py
+      - name: Test preparation failure boundaries
+        run: python -B -m unittest discover -s tests -v

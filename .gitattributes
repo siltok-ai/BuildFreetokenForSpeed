@@ -1,0 +1,5 @@
+* -text
+*.zip binary
+*.whl binary
+*.dll binary
+*.pyd binary

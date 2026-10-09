@@ -1,0 +1,1718 @@
+{
+  "owner_pid": 22428,
+  "samples": [
+    {
+      "elapsed_seconds": 0.06199999999080319,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4362240,
+          "private": 819200
+        },
+        {
+          "pid": 5592,
+          "rss": 8024064,
+          "private": 1265664
+        },
+        {
+          "pid": 12812,
+          "rss": 3392126976,
+          "private": 15780093952
+        }
+      ],
+      "commit_used": 60048961536,
+      "commit_available": 10308898816,
+      "ram_available": 51596193792,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 1.1089999999967404,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4362240,
+          "private": 819200
+        },
+        {
+          "pid": 5592,
+          "rss": 8024064,
+          "private": 1265664
+        },
+        {
+          "pid": 12812,
+          "rss": 4225540096,
+          "private": 15780098048
+        }
+      ],
+      "commit_used": 60037746688,
+      "commit_available": 10320113664,
+      "ram_available": 50777567232,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 2.1560000000026776,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4362240,
+          "private": 819200
+        },
+        {
+          "pid": 5592,
+          "rss": 8024064,
+          "private": 1265664
+        },
+        {
+          "pid": 12812,
+          "rss": 4719497216,
+          "private": 15781146624
+        }
+      ],
+      "commit_used": 60042731520,
+      "commit_available": 10315128832,
+      "ram_available": 50283880448,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 3.186999999990803,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4362240,
+          "private": 819200
+        },
+        {
+          "pid": 5592,
+          "rss": 8024064,
+          "private": 1265664
+        },
+        {
+          "pid": 12812,
+          "rss": 5574238208,
+          "private": 15781146624
+        }
+      ],
+      "commit_used": 60044554240,
+      "commit_available": 10313306112,
+      "ram_available": 49423810560,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 4.264999999999418,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4362240,
+          "private": 819200
+        },
+        {
+          "pid": 5592,
+          "rss": 8024064,
+          "private": 1265664
+        },
+        {
+          "pid": 12812,
+          "rss": 6512254976,
+          "private": 15781146624
+        }
+      ],
+      "commit_used": 60046528512,
+      "commit_available": 10311331840,
+      "ram_available": 48480145408,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 5.311999999990803,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4362240,
+          "private": 819200
+        },
+        {
+          "pid": 5592,
+          "rss": 8024064,
+          "private": 1265664
+        },
+        {
+          "pid": 12812,
+          "rss": 7065731072,
+          "private": 15781146624
+        }
+      ],
+      "commit_used": 60059566080,
+      "commit_available": 10298294272,
+      "ram_available": 47915405312,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 6.3439999999973224,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4362240,
+          "private": 819200
+        },
+        {
+          "pid": 5592,
+          "rss": 8024064,
+          "private": 1265664
+        },
+        {
+          "pid": 12812,
+          "rss": 7975030784,
+          "private": 15781142528
+        }
+      ],
+      "commit_used": 60068741120,
+      "commit_available": 10289119232,
+      "ram_available": 46992891904,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 7.389999999999418,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4362240,
+          "private": 819200
+        },
+        {
+          "pid": 5592,
+          "rss": 8024064,
+          "private": 1265664
+        },
+        {
+          "pid": 12812,
+          "rss": 8889790464,
+          "private": 15781146624
+        }
+      ],
+      "commit_used": 60068696064,
+      "commit_available": 10289164288,
+      "ram_available": 46073081856,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 8.436999999990803,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4362240,
+          "private": 819200
+        },
+        {
+          "pid": 5592,
+          "rss": 8024064,
+          "private": 1265664
+        },
+        {
+          "pid": 12812,
+          "rss": 9506848768,
+          "private": 16136994816
+        }
+      ],
+      "commit_used": 60432834560,
+      "commit_available": 9925025792,
+      "ram_available": 45447766016,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 9.48399999999674,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4362240,
+          "private": 819200
+        },
+        {
+          "pid": 5592,
+          "rss": 8024064,
+          "private": 1265664
+        },
+        {
+          "pid": 12812,
+          "rss": 10309980160,
+          "private": 15782195200
+        }
+      ],
+      "commit_used": 60073865216,
+      "commit_available": 10283995136,
+      "ram_available": 44640702464,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 10.531000000002678,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4362240,
+          "private": 819200
+        },
+        {
+          "pid": 5592,
+          "rss": 8024064,
+          "private": 1265664
+        },
+        {
+          "pid": 12812,
+          "rss": 11087015936,
+          "private": 15782195200
+        }
+      ],
+      "commit_used": 60168814592,
+      "commit_available": 10189045760,
+      "ram_available": 43773210624,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 11.561999999990803,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 11995623424,
+          "private": 15782195200
+        }
+      ],
+      "commit_used": 60087545856,
+      "commit_available": 10270314496,
+      "ram_available": 42931949568,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 12.60899999999674,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 12892254208,
+          "private": 15782195200
+        }
+      ],
+      "commit_used": 60094623744,
+      "commit_available": 10263236608,
+      "ram_available": 42025754624,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 13.656000000002678,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 13377343488,
+          "private": 15782195200
+        }
+      ],
+      "commit_used": 60106936320,
+      "commit_available": 10250924032,
+      "ram_available": 41526554624,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 14.702999999994063,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 14308732928,
+          "private": 15783247872
+        }
+      ],
+      "commit_used": 60107931648,
+      "commit_available": 10249928704,
+      "ram_available": 40591020032,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 15.75,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 15107256320,
+          "private": 15783243776
+        }
+      ],
+      "commit_used": 60245426176,
+      "commit_available": 10112434176,
+      "ram_available": 39681282048,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 16.781000000002678,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 15983108096,
+          "private": 15783247872
+        }
+      ],
+      "commit_used": 60127412224,
+      "commit_available": 10230448128,
+      "ram_available": 38889836544,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 17.827999999994063,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 16848257024,
+          "private": 16138043392
+        }
+      ],
+      "commit_used": 60489805824,
+      "commit_available": 9868054528,
+      "ram_available": 38014259200,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 18.875,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 17368866816,
+          "private": 15783251968
+        }
+      ],
+      "commit_used": 60132667392,
+      "commit_available": 10225192960,
+      "ram_available": 37490192384,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 19.921999999991385,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 18221912064,
+          "private": 15783251968
+        }
+      ],
+      "commit_used": 60147142656,
+      "commit_available": 10210717696,
+      "ram_available": 36623253504,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 20.968999999997322,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 19142975488,
+          "private": 15783251968
+        }
+      ],
+      "commit_used": 60143296512,
+      "commit_available": 10214563840,
+      "ram_available": 35701510144,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 22.0,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 20010393600,
+          "private": 15784304640
+        }
+      ],
+      "commit_used": 60155723776,
+      "commit_available": 10202136576,
+      "ram_available": 34820902912,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 23.046999999991385,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 20488355840,
+          "private": 15784296448
+        }
+      ],
+      "commit_used": 60164763648,
+      "commit_available": 10193096704,
+      "ram_available": 34330357760,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 24.093999999997322,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 21405691904,
+          "private": 15784296448
+        }
+      ],
+      "commit_used": 60165177344,
+      "commit_available": 10192683008,
+      "ram_available": 33409368064,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 25.139999999999418,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 22272770048,
+          "private": 15784296448
+        }
+      ],
+      "commit_used": 60178960384,
+      "commit_available": 10178899968,
+      "ram_available": 32529051648,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 26.171999999991385,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 23143227392,
+          "private": 15784296448
+        }
+      ],
+      "commit_used": 60165566464,
+      "commit_available": 10192293888,
+      "ram_available": 31669846016,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 27.218999999997322,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 23936053248,
+          "private": 15784296448
+        }
+      ],
+      "commit_used": 60184801280,
+      "commit_available": 10173059072,
+      "ram_available": 30846676992,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 28.264999999999418,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 24381693952,
+          "private": 15785353216
+        }
+      ],
+      "commit_used": 60132589568,
+      "commit_available": 10225270784,
+      "ram_available": 30423138304,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 29.296999999991385,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 25151520768,
+          "private": 15785504768
+        }
+      ],
+      "commit_used": 60139917312,
+      "commit_available": 10217943040,
+      "ram_available": 29650333696,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 30.35899999999674,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 25982754816,
+          "private": 15785504768
+        }
+      ],
+      "commit_used": 60139532288,
+      "commit_available": 10218328064,
+      "ram_available": 28816498688,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 31.421999999991385,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 26785583104,
+          "private": 15785504768
+        }
+      ],
+      "commit_used": 60148514816,
+      "commit_available": 10209345536,
+      "ram_available": 28002398208,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 32.46899999999732,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 27652509696,
+          "private": 15785504768
+        }
+      ],
+      "commit_used": 60145168384,
+      "commit_available": 10212691968,
+      "ram_available": 27138981888,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 33.51499999999942,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 28473012224,
+          "private": 15785504768
+        }
+      ],
+      "commit_used": 60156559360,
+      "commit_available": 10201300992,
+      "ram_available": 26297712640,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 34.57799999999406,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 28923478016,
+          "private": 15785500672
+        }
+      ],
+      "commit_used": 60165718016,
+      "commit_available": 10192142336,
+      "ram_available": 25836515328,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 35.60899999999674,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957218816,
+          "private": 2570899456
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 29814276096,
+          "private": 15786549248
+        }
+      ],
+      "commit_used": 60174807040,
+      "commit_available": 10183053312,
+      "ram_available": 24934920192,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 36.65600000000268,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957206528,
+          "private": 2570862592
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 30537011200,
+          "private": 15786549248
+        }
+      ],
+      "commit_used": 60180660224,
+      "commit_available": 10177200128,
+      "ram_available": 24214949888,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 37.70299999999406,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957206528,
+          "private": 2570862592
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 31390846976,
+          "private": 15786549248
+        }
+      ],
+      "commit_used": 60177309696,
+      "commit_available": 10180550656,
+      "ram_available": 23350697984,
+      "device_used": 12568231936
+    },
+    {
+      "elapsed_seconds": 38.75,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957210624,
+          "private": 2570862592
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8003584,
+          "private": 1224704
+        },
+        {
+          "pid": 12812,
+          "rss": 31727144960,
+          "private": 18244096000
+        }
+      ],
+      "commit_used": 62639906816,
+      "commit_available": 7717953536,
+      "ram_available": 22996144128,
+      "device_used": 16645095424
+    },
+    {
+      "elapsed_seconds": 39.796999999991385,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957210624,
+          "private": 2570862592
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8011776,
+          "private": 1232896
+        },
+        {
+          "pid": 12812,
+          "rss": 32363745280,
+          "private": 20215947264
+        }
+      ],
+      "commit_used": 64600035328,
+      "commit_available": 5757825024,
+      "ram_available": 22391926784,
+      "device_used": 16655581184
+    },
+    {
+      "elapsed_seconds": 40.82799999999406,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957210624,
+          "private": 2570862592
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8011776,
+          "private": 1232896
+        },
+        {
+          "pid": 12812,
+          "rss": 30224515072,
+          "private": 18123276288
+        }
+      ],
+      "commit_used": 62487461888,
+      "commit_available": 7870398464,
+      "ram_available": 24554094592,
+      "device_used": 16687038464
+    },
+    {
+      "elapsed_seconds": 41.875,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957251584,
+          "private": 2570862592
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8011776,
+          "private": 1232896
+        },
+        {
+          "pid": 12812,
+          "rss": 30509846528,
+          "private": 18427056128
+        }
+      ],
+      "commit_used": 62805553152,
+      "commit_available": 7552307200,
+      "ram_available": 24258551808,
+      "device_used": 16691232768
+    },
+    {
+      "elapsed_seconds": 42.921999999991385,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957251584,
+          "private": 2570862592
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8011776,
+          "private": 1232896
+        },
+        {
+          "pid": 12812,
+          "rss": 30550786048,
+          "private": 18451329024
+        }
+      ],
+      "commit_used": 62832328704,
+      "commit_available": 7525531648,
+      "ram_available": 24214171648,
+      "device_used": 16695427072
+    },
+    {
+      "elapsed_seconds": 43.96899999999732,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957251584,
+          "private": 2570862592
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8011776,
+          "private": 1232896
+        },
+        {
+          "pid": 12812,
+          "rss": 30573170688,
+          "private": 18473684992
+        }
+      ],
+      "commit_used": 62855106560,
+      "commit_available": 7502753792,
+      "ram_available": 24185905152,
+      "device_used": 16695427072
+    },
+    {
+      "elapsed_seconds": 45.01499999999942,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957251584,
+          "private": 2570862592
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8011776,
+          "private": 1232896
+        },
+        {
+          "pid": 12812,
+          "rss": 30573346816,
+          "private": 18473684992
+        }
+      ],
+      "commit_used": 62849110016,
+      "commit_available": 7508750336,
+      "ram_available": 24187904000,
+      "device_used": 16695427072
+    },
+    {
+      "elapsed_seconds": 46.046999999991385,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957321216,
+          "private": 2570862592
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8011776,
+          "private": 1232896
+        },
+        {
+          "pid": 12812,
+          "rss": 30581923840,
+          "private": 18483675136
+        }
+      ],
+      "commit_used": 62859874304,
+      "commit_available": 7497986048,
+      "ram_available": 24178241536,
+      "device_used": 16697524224
+    },
+    {
+      "elapsed_seconds": 47.10899999999674,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957300736,
+          "private": 2570825728
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8011776,
+          "private": 1232896
+        },
+        {
+          "pid": 12812,
+          "rss": 30581923840,
+          "private": 18483675136
+        }
+      ],
+      "commit_used": 62857777152,
+      "commit_available": 7500083200,
+      "ram_available": 24178315264,
+      "device_used": 16697524224
+    },
+    {
+      "elapsed_seconds": 48.13999999999942,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957267968,
+          "private": 2570743808
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8011776,
+          "private": 1232896
+        },
+        {
+          "pid": 12812,
+          "rss": 30578978816,
+          "private": 18480590848
+        }
+      ],
+      "commit_used": 62861541376,
+      "commit_available": 7496318976,
+      "ram_available": 24170876928,
+      "device_used": 16697524224
+    },
+    {
+      "elapsed_seconds": 49.3119999999908,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957272064,
+          "private": 2570743808
+        },
+        {
+          "pid": 18888,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 5592,
+          "rss": 8011776,
+          "private": 1232896
+        },
+        {
+          "pid": 12812,
+          "rss": 30211993600,
+          "private": 13351510016
+        }
+      ],
+      "commit_used": 57577693184,
+      "commit_available": 12780167168,
+      "ram_available": 24656924672,
+      "device_used": 1819279360
+    },
+    {
+      "elapsed_seconds": 50.35899999999674,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957222912,
+          "private": 2570637312
+        }
+      ],
+      "commit_used": 38223921152,
+      "commit_available": 32133939200,
+      "ram_available": 33058844672,
+      "device_used": 1819279360
+    },
+    {
+      "elapsed_seconds": 51.38999999999942,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957222912,
+          "private": 2570637312
+        }
+      ],
+      "commit_used": 28967788544,
+      "commit_available": 41390071808,
+      "ram_available": 42228121600,
+      "device_used": 1819279360
+    },
+    {
+      "elapsed_seconds": 52.421999999991385,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957222912,
+          "private": 2570637312
+        }
+      ],
+      "commit_used": 22651453440,
+      "commit_available": 47706406912,
+      "ram_available": 48635678720,
+      "device_used": 1819279360
+    },
+    {
+      "elapsed_seconds": 53.48399999999674,
+      "processes": [
+        {
+          "pid": 22428,
+          "rss": 4333568,
+          "private": 761856
+        },
+        {
+          "pid": 9332,
+          "rss": 957399040,
+          "private": 2570567680
+        }
+      ],
+      "commit_used": 15722033152,
+      "commit_available": 54635827200,
+      "ram_available": 54858199040,
+      "device_used": 1819279360
+    }
+  ],
+  "scope": "starts during checkpoint SHA validation; complete load/inference covered if owner exits normally",
+  "device_used_peak": 16697524224,
+  "process_tree_rss_peak": 33337634816,
+  "ram_available_min": 22391926784,
+  "commit_available_min": 5757825024
+}

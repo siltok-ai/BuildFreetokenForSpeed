@@ -1,0 +1,19 @@
+{
+  "format": 1,
+  "platform": "windows-x86_64",
+  "source_commit": "unknown",
+  "python": "3.12.13 (main, Aug  7 2026, 02:26:41) [MSC v.1944 64 bit (AMD64)]",
+  "torch": "2.11.0+cu130",
+  "torch_cuda": "13.0",
+  "cuda_arches": [
+    "12.0"
+  ],
+  "artifacts": [
+    {
+      "name": "freetoken__store_2048_128_1_false",
+      "path": "freetoken__store_2048_128_1_false/freetoken__store_2048_128_1_false.dll",
+      "size": 318976,
+      "sha256": "fc63dc6c6a6f65fdde529eed7298b8d5a295ab39709f87972b03d06ffc8295a0"
+    }
+  ]
+}

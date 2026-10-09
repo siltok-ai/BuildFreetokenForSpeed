@@ -1,0 +1,10 @@
+{
+  "official_repository": "https://github.com/FlashML-org/FreeToken",
+  "commit": "078132480ea4a0424f677a27eb22085624d331e6",
+  "upstream_version": "0.1.3",
+  "archive": "upstream/freetoken-0781324.zip",
+  "archive_sha256": "49a51eb5480c61571a69b44684f236cd86992b2b79062544f85bbcd263fd2443",
+  "browse_tree": "upstream/FreeToken",
+  "snapshot_modified": false,
+  "license": "Apache-2.0"
+}

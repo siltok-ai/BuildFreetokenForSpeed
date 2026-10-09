@@ -1,0 +1,20 @@
+{
+  "distribution_count": 101,
+  "checked_owned_files": 31452,
+  "missing": [],
+  "editable": [],
+  "constraint_exceptions": [
+    [
+      "sam3",
+      "numpy",
+      "2.4.6",
+      "<2,>=1.26"
+    ],
+    [
+      "sam3",
+      "ftfy",
+      "6.3.1",
+      "==6.1.1"
+    ]
+  ]
+}

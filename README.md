@@ -1,0 +1,138 @@
+# BuildFreetokenForSpeed
+
+为 Silitok Speed 维护可追溯的 **FreeToken 官方源码 + 本地补丁 + Windows 构建素材**。本仓库既提供已验证的 wheel / DLL，也提供从冻结源码重新生成这些素材的入口。
+
+当前基线：官方 FreeToken `078132480ea4a0424f677a27eb22085624d331e6`，定制版本 `0.1.3+speed.win1`，CPython 3.12 / Windows x64 / Torch 2.11.0+cu130 / CUDA 13.0 / SM120。
+
+**当前完成的是 Speed 源码运行验收。** 原两个 NVFP4 模型已经回归通过；Qwen3.8-Flash-Next 在本机仅通过明确标记的 `INVALID-alias20` 专家复用实验，输出不代表完整模型质量。完整 Speed 安装器、embedded Python 和干净机器尚未验收。
+
+## 从哪里开始读
+
+| 想了解的内容 | 阅读入口 |
+| --- | --- |
+| 官方代码在哪里，模型原本怎样实现 | [官方源码说明](upstream/README.md)、[完整原始源码](upstream/FreeToken/) |
+| 我们究竟修改了什么，为什么修改 | [改动说明](docs/changes.md)、[4 组可读补丁](patches/series/) |
+| 将补丁应用后，直接浏览、开发定制源码 | [准备源码命令](#只准备源码不编译) |
+| 复制素材给另一台机器，或重新编译 | [构建与复制说明](build/README.md) |
+| Speed 实际使用哪些文件，怎样接入 | [Speed 接入约定](docs/speed-integration.md) |
+| 已经跑了哪些验证，有什么限制 | [验收记录](docs/validation.md)、[历史原始报告](artifacts/win1-cp312-cu130-sm120/validation/) |
+| 如何持续获取上游更新、维护本地差异 | [长期维护方案](docs/maintenance.md) |
+
+## 内容分层
+
+```text
+BuildFreetokenForSpeed/
+├── README.md                       人类阅读入口
+├── upstream/                       官方输入：不修改
+│   ├── lock.json                   官方仓库、完整 commit、归档 SHA
+│   ├── freetoken-0781324.zip        冻结源码归档，构建实际使用
+│   └── FreeToken/                  同一归档展开，方便网页浏览原代码
+├── patches/                        我们对 FreeToken 的差异
+│   ├── series.json                 顺序、稳定编号、用途、文件清单、SHA
+│   ├── series/                     Windows 运行 / 构建 / 实验 / 版本补丁
+│   └── legacy/                     历史完整补丁，用来证明旧制品来源
+├── build/                          生成 wheel + AOT DLL
+│   ├── build-materials.ps1          Windows 构建入口
+│   ├── build_materials.py           校验、准备源码、编译、生成记录
+│   ├── profiles/win1.json          本次构建合同与输入 SHA
+│   ├── requirements.lock.txt       71 项构建依赖版本
+│   └── specs/speed-sm120.txt        Speed 需要的 26 个 AOT 规格
+├── tools/                          准备源码 / 导出上游 / 校验仓库与素材
+├── integration/speed/              消费约定与模型 manifest 示例
+├── artifacts/win1-cp312-cu130-sm120/ 已验证制品与历史证据
+│   ├── wheels/                     1 个定制 wheel，内含 3 个原生 .pyd
+│   ├── kernel-cache/               26 个 AOT DLL 与匹配元数据
+│   ├── build-record.json           历史构建身份、逐制品 SHA、验收范围
+│   ├── validation-summary.json     历史验证摘要与 Speed 源码身份
+│   └── validation/                 实际运行报告、关键日志
+├── docs/                           原因、接入、验收、长期维护
+└── tests/                          本仓库工具的失败边界测试
+```
+
+机器以 JSON 合同、补丁顺序和 SHA 为准；人可以从说明文档逐级跳到原代码、差异和实测证据。`upstream/FreeToken/` 保留官方原貌；我们的定制代码通过补丁生成到独立输出目录，避免在一个目录中混淆官方与本地代码。
+
+## 官方提供什么，我们提供什么
+
+官方输入来自 [FlashML-org/FreeToken](https://github.com/FlashML-org/FreeToken/tree/078132480ea4a0424f677a27eb22085624d331e6)，固定的是当时 main 的完整 commit，源码版本为 0.1.3，**并非只按 0.1.3 tag 或 PyPI 版本取代码**。
+
+Qwen3.8-Flash-Next 的 `qwen4_exp` 架构、QSA、NVFP4 专家、MoE offload，以及磁盘 PLE / n-gram 表方案来自官方。我们的工作是把这套能力接到 Windows 和 Speed，并为有限内存设备增加一个显式的无效模型实验。SSD 存 PLE 不是我们新发明的功能，专家复用也不是一种保持模型正确性的更低精度量化。
+
+| 编号 | 我们的差异 | 默认行为 |
+| --- | --- | --- |
+| FTWIN-001 | Windows RowStore 文件读取、驱动符号加载、内存与内核加载兼容 | 支持 Windows 运行，含 SSD PLE 路径 |
+| FTWIN-002 | MSVC 原生扩展、CUDA / TVM AOT 构建、兼容头文件 | 构建 Windows wheel 与匹配 DLL |
+| FTEXP-001 | 只分配保留专家层，其他逻辑层复用已加载权重 | 默认不启用，双开关显式进入 INVALID 实验 |
+| FTPKG-001 | wheel 版本改为 `0.1.3+speed.win1` | 与官方发行包区分，绑定本地素材 |
+
+每组的具体代码位置、实现方式和升级处理见 [改动说明](docs/changes.md)。本仓库包含完整官方代码与完整本地 FreeToken 改动；Speed 自己的 backend / worker / 打包源码继续由 Speed 仓库维护，这里提供其消费合同和素材，不复制 Speed 的业务源码。
+
+## Speed 实际使用的文件
+
+| 文件 | 用途 | 当前身份 |
+| --- | --- | --- |
+| `wheels/freetoken-0.1.3+speed.win1-cp312-cp312-win_amd64.whl` | 安装到 Python runtime，包括 FreeToken Python 包和原生扩展 | SHA-256 `924bee8598cdd058104b8d3dd2cc4936860e092bd269616e0e832a7fbb87e5cf` |
+| `kernel-cache/<spec>/<spec>.dll`，共 26 个 | 禁用 FreeToken C++/CUDA JIT 时加载的预编译算子 | 完整列表与逐文件 SHA 在 [build-record](artifacts/win1-cp312-cu130-sm120/build-record.json) |
+| `kernel-cache/speed-kernel-manifest.json` | Speed 校验 Python / Torch / CUDA / SM / 规格匹配 | 同一制品集的合同 |
+| `kernel-cache/build-metadata.json` | 构建来源与工具链说明 | 与 DLL 同目录保留 |
+
+wheel 内包含 `_pinned_tensor`、`_cpu_moe`、`_row_store` 三个 `.pyd`。它们随 wheel 安装，AOT DLL 单独部署到 kernel-cache。源码 zip、补丁、依赖 lock、构建日志用于生成与追溯，不是 Speed 推理所需的模型文件。本仓库不含权重、虚拟环境或完整 Speed 安装包。
+
+当前初始制品约为十余 MB，随仓库保留，便于首次复制直接验证；长期的大型 / 多版本制品建议放 GitHub Releases，仓库保留合同和校验信息，见 [维护方案](docs/maintenance.md)。
+
+## 快速校验与复用
+
+普通 CPython 3.12 和 Git 即可校验仓库，不需要 GPU、Torch、CUDA 或下载模型：
+
+```powershell
+git clone git@github.com:wenlive/BuildFreetokenForSpeed.git
+cd BuildFreetokenForSpeed
+python -B tools/validate_repository.py
+python -B -m unittest discover -s tests -v
+```
+
+校验覆盖：官方展开源码与归档一致、输入 SHA、4 组补丁与历史完整补丁等价、wheel 中的 Python 源码与补丁结果一致、26 DLL 库存与 SHA、Speed cache 合同。GitHub Actions 配置在 Windows / Linux 执行这些轻量检查；GPU 运行和完整打包验收属于另一阶段。
+
+只需复制已有素材时，复制整个 `artifacts/win1-cp312-cu130-sm120/`，在目标机器运行：
+
+```powershell
+python -B tools/verify_materials.py D:\materials\win1-cp312-cu130-sm120
+```
+
+### 只准备源码，不编译
+
+```powershell
+python -B tools/prepare_source.py --output .\out\inspect-win1
+```
+
+得到 `out/inspect-win1/build-source/`：官方代码已经按顺序应用全部本地补丁，可以直接查看 `python/freetoken/`、`tests/`、`tools/`。同时输出补丁日志和 `preparation-record.json`。输出目录必须不存在；脚本不会覆盖旧制品或修改官方浏览目录。
+
+### 从冻结输入重新生成
+
+准备独立 Windows x64 CPython 3.12 构建环境、VS2022 C++ toolset 14.44、CUDA Toolkit 13.0，以及 [71 项精确版本依赖](build/requirements.lock.txt)，然后：
+
+```powershell
+.\build\build-materials.ps1 `
+  -BuildPython D:\envs\ft-win1\Scripts\python.exe `
+  -CudaHome 'C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0' `
+  -OutDir D:\builds\ft-win1-001 `
+  -PreflightOnly
+
+# 预检通过后，使用同一命令去掉 -PreflightOnly，正式编译。
+```
+
+完整的依赖安装、输出目录、失败日志、跨机器复制以及 Speed 打包参数见 [构建说明](build/README.md)。重新构建具有相同源码与版本合同，但编译工具链 / 时间等可能使二进制字节不同；以该次实际输出 SHA 为准，重新验证后才能交付。
+
+## 已验证状态
+
+- Qwen3.6-35B-A3B NVFP4 与 Qwen3.8-27B NVFP4：实际 Speed HTTP / SSE、取消后 worker 复用、算术与 thinking 样例通过。
+- Flash Next：20 物理专家层承载 48 逻辑层，SSD PLE，Speed HTTP / SSE / 取消复用通过；进程树 RSS 峰值约 31.05 GiB。两轮短请求约 35.85 / 35.71 token/s，**只代表 INVALID 实验链路，不能作为完整模型性能或质量**。
+- Speed 定向回归 124 项通过；更广 discovery 的 6 项失败在原打包基线上同样复现，记录保留。
+- 素材对应源码运行通过，不等于完整 Speed 安装包或完整 Flash Next 模型验收通过。
+
+详细边界与证据入口见 [验收说明](docs/validation.md)。后续完整模型运行主要需要足够的专家内存；本轮粗估完整 NVFP4 专家约 63.46 GiB，96 GB 适合受控验证、128 GB 更有余量，尚未在本机进行完整模型实测。
+
+## 后续维护原则
+
+固定上游 commit → 在独立候选分支重放小补丁 → 原生与模型回归 → 生成新的定制版本和配套 DLL → Speed 升级锁定的素材身份 → 完整包验收。上游已覆盖的改动应删除，本地差异尽量缩小；实验与正式版本逐步拆开。具体步骤与责任边界见 [长期维护方案](docs/maintenance.md)。
+
+官方源码、版权和贡献约定保留于原目录；本地补丁及工具采用根目录 Apache-2.0 [LICENSE](LICENSE)，来源说明见 [NOTICE](NOTICE)。定制 wheel 是 Speed 发行素材，不是官方 FreeToken 发布。

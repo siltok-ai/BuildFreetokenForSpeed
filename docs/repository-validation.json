@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-09",
+  "scope": "repository reorganization and reproducible entry points; not a new native build or model benchmark",
+  "official_snapshot_files": 686,
+  "patch_groups": 4,
+  "changed_files": 29,
+  "split_patch_matches_historical_source": true,
+  "wheel_python_matches_prepared_source": true,
+  "wheel_and_26_dll_sha_verified": true,
+  "speed_cache_and_consumer_contract_verified": true,
+  "tool_failure_boundary_tests_passed": 5,
+  "prepare_source_cli_passed": true,
+  "export_upstream_cli_passed": true,
+  "reexported_archive_sha256": "49a51eb5480c61571a69b44684f236cd86992b2b79062544f85bbcd263fd2443",
+  "new_layout_preflight_passed": true,
+  "nvcc": "13.0.48",
+  "msvc": "19.44.35228",
+  "clean_git_checkout_sha_and_source_validation_passed": true,
+  "clean_git_checkout_tool_tests_passed": 5,
+  "clean_git_checkout_prepare_source_passed": true,
+  "github_ci": "configured; consult Actions for execution status"
+}

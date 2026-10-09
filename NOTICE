@@ -1,0 +1,13 @@
+BuildFreetokenForSpeed
+
+This repository includes an unmodified source snapshot of FreeToken from
+https://github.com/FlashML-org/FreeToken at commit
+078132480ea4a0424f677a27eb22085624d331e6, licensed under Apache-2.0.
+The upstream LICENSE and contributor documents are retained in upstream/FreeToken.
+
+Local modifications are distributed separately in patches/series and are
+identified in patches/series.json and docs/changes.md. The customized wheel
+0.1.3+speed.win1 is a Speed build, not an official FreeToken distribution.
+Repository-owned tooling and patches are provided under the root Apache-2.0
+LICENSE. Model weights are not included. Third-party runtime dependencies
+must be obtained and distributed under their own licenses.
