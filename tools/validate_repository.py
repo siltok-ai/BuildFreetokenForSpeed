@@ -99,6 +99,9 @@ def main():
         raise ValueError("Speed consumer artifact identity mismatch")
     validate_packaged_evidence(contract)
     subprocess.run([sys.executable, "-B", str(ROOT / "tools/verify_materials.py"), str(artifacts)], check=True)
+    # 性能修订独立重放并验证新 wheel 的源码/二进制来源，不覆盖历史 win1 验收。
+    from validate_python_revision import validate as validate_python_revision
+    validate_python_revision(ROOT / "build/profiles/q2opt1.json", ROOT / "artifacts/q2opt1-cp312-cu130-sm120")
     for directory in ("build", "tools", "tests"):
         for path in (ROOT / directory).rglob("*.py"):
             ast.parse(path.read_text(encoding="utf-8"), filename=str(path))

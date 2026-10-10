@@ -1,0 +1,62 @@
+[
+  {
+    "case": "combined-chunk4096",
+    "command": [
+      "C:/workspace/envs/speed-flash-next-q2/Scripts/python.exe",
+      "-B",
+      "-u",
+      "C:\\workspace\\artifacts\\flash-next-q2-optimization-20261010\\supervise.py",
+      "--output",
+      "C:\\workspace\\artifacts\\flash-next-q2-optimization-20261010\\native-combined-chunk4096.capacity.json",
+      "--projected-gib",
+      "50.3",
+      "--",
+      "C:/workspace/envs/speed-flash-next-q2/Scripts/python.exe",
+      "-B",
+      "-u",
+      "C:\\workspace\\artifacts\\flash-next-q2-optimization-20261010\\probe.py",
+      "--suite",
+      "full",
+      "--output",
+      "C:\\workspace\\artifacts\\flash-next-q2-optimization-20261010\\native-combined-chunk4096.json",
+      "--chunk",
+      "4096"
+    ],
+    "env": {
+      "Q2_EXPERIMENT_RUNTIME": "C:\\workspace\\artifacts\\flash-next-q2-optimization-20261010\\runtime-candidate",
+      "TRITON_CACHE_DIR": "C:\\workspace\\artifacts\\flash-next-q2-optimization-20261010\\triton-cache"
+    },
+    "started_unix": 1791632830.4810567,
+    "returncode": 0,
+    "finished_unix": 1791632957.4434748
+  },
+  {
+    "case": "baseline-repeat",
+    "command": [
+      "C:/workspace/envs/speed-flash-next-q2/Scripts/python.exe",
+      "-B",
+      "-u",
+      "C:\\workspace\\artifacts\\flash-next-q2-optimization-20261010\\supervise.py",
+      "--output",
+      "C:\\workspace\\artifacts\\flash-next-q2-optimization-20261010\\native-baseline-repeat.capacity.json",
+      "--projected-gib",
+      "50.3",
+      "--",
+      "C:/workspace/envs/speed-flash-next-q2/Scripts/python.exe",
+      "-B",
+      "-u",
+      "C:\\workspace\\artifacts\\flash-next-q2-optimization-20261010\\probe.py",
+      "--suite",
+      "full",
+      "--output",
+      "C:\\workspace\\artifacts\\flash-next-q2-optimization-20261010\\native-baseline-repeat.json"
+    ],
+    "env": {
+      "Q2_EXPERIMENT_RUNTIME": "C:\\workspace\\artifacts\\flash-next-q2-optimization-20261010\\runtime-base",
+      "TRITON_CACHE_DIR": "C:\\workspace\\artifacts\\flash-next-q2-optimization-20261010\\triton-cache"
+    },
+    "started_unix": 1791632957.4434748,
+    "returncode": 0,
+    "finished_unix": 1791633189.9863765
+  }
+]

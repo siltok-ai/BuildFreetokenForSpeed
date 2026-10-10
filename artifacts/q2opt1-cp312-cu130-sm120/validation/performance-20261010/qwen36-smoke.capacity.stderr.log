@@ -1,0 +1,28 @@
+C:\workspace\envs\speed-flash-next-q2\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+INFO silitok_speed.engine.scheduler: Scheduler started (thread=SilitokScheduler)
+INFO httpx: HTTP Request: GET http://testserver/v1/models "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task a09252ca-4979-483b-9ed0-25ef1eadc235 started (pipeline=chat)
+INFO silitok_speed.engine.resource: admission model=qwen3.6-35b-a3b.nvfp4-freetoken fits=True reject=False vram_need=13.42GB commit_need=39.19GB ram_need=25.77GB vram_free=23.95GB commit_avail=55.13GB ram_avail=55.84GB reasons= warnings=
+INFO silitok_speed.engine.models: Loading backend FreeTokenQwen36Backend for model qwen3.6-35b-a3b.nvfp4-freetoken (estimated VRAM: 13.42 GB, commit: 13.42 GB)
+INFO silitok_speed.engine.models: Backend FreeTokenQwen36Backend loaded for qwen3.6-35b-a3b.nvfp4-freetoken (current VRAM: 12.89 GB)
+INFO silitok_speed.engine.scheduler: Task a09252ca-4979-483b-9ed0-25ef1eadc235 completed
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task 874765e9-cb08-4af4-bb17-500a21f84a24 started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task 874765e9-cb08-4af4-bb17-500a21f84a24 completed
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task d2958ba8-2392-49d9-8186-d0b6c3851a9f started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task d2958ba8-2392-49d9-8186-d0b6c3851a9f completed
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task 730f445d-cf5c-460f-b92a-d5e4355960fd started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task 730f445d-cf5c-460f-b92a-d5e4355960fd completed
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task 2eed8968-d158-4a63-8a1e-5a59490597fe started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task 2eed8968-d158-4a63-8a1e-5a59490597fe completed
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task 086ef8d6-5084-4624-bbae-38603d93f42f started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task 086ef8d6-5084-4624-bbae-38603d93f42f completed
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 200 OK"
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 400 Bad Request"
+INFO httpx: HTTP Request: GET http://testserver/v1/status "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Scheduler stopped cleanly

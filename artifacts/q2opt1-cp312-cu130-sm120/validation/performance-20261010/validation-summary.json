@@ -1,0 +1,44 @@
+{
+  "status": "validated_speed_source_q2_performance_revision",
+  "wheel_sha256": "babbc0b8d0316c2b570a9b1d3294ac51e79ae5ef8bd6f6894a537ab327370c31",
+  "version": "0.1.3+speed.q2opt1",
+  "speed_base_commit": "0183913b",
+  "speed_worktree_dirty_during_validation": true,
+  "speed_source_sha256": {
+    "silitok_speed/backends/freetoken_qwen36.py": "8f5c6a9bc7e1906ffb2b6cfd8058478023727f67182e543fe79972607a32deb3",
+    "silitok_speed/qwen36/freetoken_contract.py": "525687b73de7b67f7e3e2dcfa4973fc5321e9360ec1802122d31a2e51ad7d99b",
+    "silitok_speed/qwen36/freetoken_worker.py": "f5f0f0b474c3af134920f2f5b5eef7d48be6fb9c22659987caae0ce5b393ec4e",
+    "silitok_speed/qwen36/freetoken_kernel_cache.py": "e0f63ad3273d366da55343d4e051ede3074d003678b9e24bab8fbb00a1c1d0aa"
+  },
+  "native_candidate_matches_accepted_performance_source": true,
+  "runtime_release_matches_accepted_wheel": true,
+  "native_modules_and_dlls_reused_byte_for_byte": true,
+  "packaged_speed_rebuilt": false,
+  "installer_validated": false,
+  "clean_machine_validated": false,
+  "quality_models": [
+    "flash-backend",
+    "flash-smoke",
+    "qwen36-smoke",
+    "qwen38-smoke"
+  ],
+  "cancellation_same_worker": true,
+  "gpu_tests": 7,
+  "speed_tests": 129,
+  "native_final_token_matches": 34,
+  "native_final_token_comparisons": 36,
+  "native_token_difference_labels": [
+    "cold-6144-0",
+    "diverse-4096-1"
+  ],
+  "arithmetic_answer": "703",
+  "thinking_answer": "FINAL: 76",
+  "thinking_output_tokens": 374,
+  "limitations": [
+    "single hardware and single request",
+    "3 samples per length",
+    "floating accumulation order differs; not bitwise guarantee",
+    "HTTP end-of-request delay retained",
+    "64-token residuals retain full-layer prefill"
+  ]
+}

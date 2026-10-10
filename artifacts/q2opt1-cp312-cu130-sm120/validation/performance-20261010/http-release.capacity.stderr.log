@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "C:\workspace\artifacts\flash-next-q2-optimization-20261010\http_probe.py", line 129, in <module>
+    if __name__=='__main__':raise SystemExit(main())
+                                             ^^^^^^
+  File "C:\workspace\artifacts\flash-next-q2-optimization-20261010\http_probe.py", line 37, in main
+    os.symlink(probe.MODEL,root/'weights',target_is_directory=True)
+OSError: [WinError 1314] 客户端没有所需的特权。: 'C:\\workspace\\models\\qwen3.8-flash-next.bf16-q2-experts' -> 'C:\\workspace\\artifacts\\flash-next-q2-optimization-20261010\\http-models\\weights'

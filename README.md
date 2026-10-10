@@ -6,6 +6,8 @@
 
 当前基线：官方 FreeToken `078132480ea4a0424f677a27eb22085624d331e6`，定制版本 `0.1.3+speed.win1`，CPython 3.12 / Windows x64 / Torch 2.11.0+cu130 / CUDA 13.0 / SM120。
 
+Flash Next Q2 的新性能修订为 **`0.1.3+speed.q2opt1`**：按专家分组 prefill、小残余按需加载，配合 Speed 的 Q2 chunk4096，4K 原生 TTFT 约8.75→1.09秒，热6-token残余约751→91ms。完整专家和原生二进制保持不变；新wheel、来源与证据位于 `artifacts/q2opt1-cp312-cu130-sm120`，详见[优化、实测及复现](docs/q2-performance-optimizations.md)、[消费合同](integration/speed/consumer-contract-q2opt1.json)。旧版本及以下历史验收记录保留。
+
 `feat/flash-next-q2-experts` 发布了独立的 [Flash Next Q2_0 专家候选](docs/q2-expert-candidate.md)，使用 `build/profiles/q2exp1.json` 和 [q2exp1 消费合同](integration/speed/consumer-contract-q2exp1.json)。它保留全部 48×512 专家，只替换专家来源，DRAM bank 为 31.640625 GiB；源码已通过逻辑题、两旧模型实际回归、4K 输入和 thinking/取消复用。wheel、26 DLL、冻结源码补丁与证据在 `artifacts/q2exp1-cp312-cu130-sm120`。历史 win1 制品和以下验收记录继续代表原基线。
 
 权重获取、组合方式与自行分发见独立目录 [Flash Next 混合权重](model-weights/qwen3.8-flash-next-q2/README.md)。该目录保存来源锁、精确文件清单和分发说明，不存放大权重。
