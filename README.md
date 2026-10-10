@@ -1,10 +1,14 @@
 # BuildFreetokenForSpeed
 
+正式维护仓库为公司 [siltok-ai/BuildFreetokenForSpeed](https://github.com/siltok-ai/BuildFreetokenForSpeed)。后续源码、制品合同、权重说明及证据只更新公司仓库；此前私人仓库保留历史，不再作为更新目标。
+
 为 Silitok Speed 维护可追溯的 **FreeToken 官方源码 + 本地补丁 + Windows 构建素材**。本仓库既提供已验证的 wheel / DLL，也提供从冻结源码重新生成这些素材的入口。
 
 当前基线：官方 FreeToken `078132480ea4a0424f677a27eb22085624d331e6`，定制版本 `0.1.3+speed.win1`，CPython 3.12 / Windows x64 / Torch 2.11.0+cu130 / CUDA 13.0 / SM120。
 
-本分支 `feat/flash-next-q2-experts` 新增独立的 [Flash Next Q2_0 专家候选](docs/q2-expert-candidate.md)，使用 `build/profiles/q2exp1.json` 和 [q2exp1 消费合同](integration/speed/consumer-contract-q2exp1.json)。它保留全部 48×512 专家，只替换专家来源，DRAM bank 为 31.640625 GiB；源码已通过逻辑题、两旧模型实际回归、4K 输入和 thinking/取消复用。wheel、26 DLL、冻结源码补丁与证据在 `artifacts/q2exp1-cp312-cu130-sm120`。历史 win1 制品和以下验收记录继续代表原基线。
+`feat/flash-next-q2-experts` 发布了独立的 [Flash Next Q2_0 专家候选](docs/q2-expert-candidate.md)，使用 `build/profiles/q2exp1.json` 和 [q2exp1 消费合同](integration/speed/consumer-contract-q2exp1.json)。它保留全部 48×512 专家，只替换专家来源，DRAM bank 为 31.640625 GiB；源码已通过逻辑题、两旧模型实际回归、4K 输入和 thinking/取消复用。wheel、26 DLL、冻结源码补丁与证据在 `artifacts/q2exp1-cp312-cu130-sm120`。历史 win1 制品和以下验收记录继续代表原基线。
+
+权重获取、组合方式与自行分发见独立目录 [Flash Next 混合权重](model-weights/qwen3.8-flash-next-q2/README.md)。该目录保存来源锁、精确文件清单和分发说明，不存放大权重。
 
 ## 以下为保留的 win1 基线说明
 
@@ -88,7 +92,7 @@ wheel 内包含 `_pinned_tensor`、`_cpu_moe`、`_row_store` 三个 `.pyd`。它
 普通 CPython 3.12 和 Git 即可校验仓库，不需要 GPU、Torch、CUDA 或下载模型：
 
 ```powershell
-git clone git@github.com:wenlive/BuildFreetokenForSpeed.git
+git clone git@github.com:siltok-ai/BuildFreetokenForSpeed.git
 cd BuildFreetokenForSpeed
 python -B tools/validate_repository.py
 python -B -m unittest discover -s tests -v
@@ -134,7 +138,7 @@ python -B tools/prepare_source.py --output .\out\inspect-win1
 - 完整运行目录重新编译 208 个 Speed 模块、重建并验证 H3、暂存定制 FreeToken 与 26 DLL，零 `.pyc`。三个模型各完成 HTTP/SSE 和 backend 短长请求、取消后复用、退出，共 6 组实际运行通过；[报告与身份记录](artifacts/win1-cp312-cu130-sm120/validation/packaged-speed-20261009/)已封存。
 - 构建发生在最终提交前，manifest 保留基线 commit + `dirty=true`，由 208 个模块源码 SHA 绑定最终代码。此次未生成安装器，也未验收干净机器或完整正确 Flash Next。
 
-详细边界与证据入口见 [验收说明](docs/validation.md)。历史 win1 的完整 NVFP4 专家约 63.46 GiB，未在本机完整实测。独立 [Q2_0 专家候选](docs/q2-expert-candidate.md) 已于 2026-10-10 在本机通过完整 48×512 专家的 Speed 源码 HTTP/SSE 与短问题正确性验收：专家 bank 31.64 GiB、实际 worker RSS 约 33.61 GiB、加载峰值约 35.46 GiB。此候选保留 HF 主干及 SSD FP8 PLE，使用新版本材料，尚未进行新运行包验收。
+详细边界与证据入口见 [验收说明](docs/validation.md)。历史 win1 的完整 NVFP4 专家约 63.46 GiB，未在本机完整实测。独立 [Q2_0 专家候选](docs/q2-expert-candidate.md) 已于 2026-10-10 在本机通过完整 48×512 专家的 Speed 源码 HTTP/SSE 与短问题正确性验收：专家 bank 31.64 GiB、实际 worker RSS 约 33.61 GiB、加载峰值约 35.46 GiB。此候选保留 HF 主干及 SSD FP8 PLE，使用新版本材料；后续三个模型共 6 组随包验收已经通过，当前范围和证据以 [Q2_0 候选说明](docs/q2-expert-candidate.md)为准。
 
 ## 后续维护原则
 

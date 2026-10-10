@@ -1,0 +1,136 @@
+{
+  "format": 1,
+  "trunk_revision": "7b719225242aacd3dbd3f9407468c2ee9a9d2594",
+  "checks": [
+    {
+      "name": "model-bf16-00001.safetensors",
+      "bytes": 1273114461,
+      "sha256": "5990db4bb32ad7183a1ece76387e0c832c2c96b7cf2576a928e3439f606cef14",
+      "matched_historical_receipt": true
+    },
+    {
+      "name": "model-bf16-00010.safetensors",
+      "bytes": 323564201,
+      "sha256": "0c2c3ef0030f5134edca0f3bbffc111cfa5da4b39b839cb8248ec762009be0aa",
+      "matched_historical_receipt": true
+    },
+    {
+      "name": "model-bf16-00011.safetensors",
+      "bytes": 10727387912,
+      "sha256": "d18b0db2e27fa066b3f8f86913686f572ee29406d971c8f5b0ec2902e3419ad9",
+      "matched_historical_receipt": true
+    },
+    {
+      "name": "model-bf16-00012.safetensors",
+      "bytes": 3683689888,
+      "sha256": "6c7c599218f8be53472c7b9ab0a9683b753cc187c5b7a49223e22348470b80e2",
+      "matched_historical_receipt": true
+    },
+    {
+      "name": "model-plefp8-00000.safetensors",
+      "bytes": 5200027199,
+      "sha256": "dc2e845b7edd35bda92834fba3626bf7d199e28d6aceac99fee654aade390cfd",
+      "matched_historical_receipt": true
+    },
+    {
+      "name": "model-plefp8-00001.safetensors",
+      "bytes": 5200027202,
+      "sha256": "899eaa0716e28594468a1389ee58cb065c23907f1270de3831f5ecb0a4f82d56",
+      "matched_historical_receipt": true
+    },
+    {
+      "name": "model-plefp8-00002.safetensors",
+      "bytes": 5200027198,
+      "sha256": "06fd8a11abf0419a669f89397b8d70dd6ff42d401e6b2a037c65e49704faaf71",
+      "matched_historical_receipt": true
+    },
+    {
+      "name": "model-plefp8-00003.safetensors",
+      "bytes": 5200027189,
+      "sha256": "c6aaa1fc08e84eced3c8151ac8679ed943888eba0fcef2556963693430f95bd9",
+      "matched_historical_receipt": true
+    },
+    {
+      "name": "model-plefp8-00004.safetensors",
+      "bytes": 5200027190,
+      "sha256": "d94e97c96d3ea09208614da016960f3f4b429f47a044c898a51b493f42f74ba2",
+      "matched_historical_receipt": true
+    },
+    {
+      "name": "model-plefp8-00005.safetensors",
+      "bytes": 5200027190,
+      "sha256": "03d5d4792e14a4ab55bae50bb459624b01786f818bbcfcaed1a5d0235af484c6",
+      "matched_historical_receipt": true
+    },
+    {
+      "name": "model-plefp8-00006.safetensors",
+      "bytes": 5200027190,
+      "sha256": "586cccbc12383021bc9bc02f206d9b19fbd1672373ed9a5d91e3b0ce34c2418f",
+      "matched_historical_receipt": true
+    },
+    {
+      "name": "model-plefp8-00007.safetensors",
+      "bytes": 5200027190,
+      "sha256": "c4a23bcc10f3cde6b633e82c282a9a518e3a64d433628283e1bc592c94cf3d6c",
+      "matched_historical_receipt": true
+    },
+    {
+      "name": "model-plefp8-00008.safetensors",
+      "bytes": 5200027190,
+      "sha256": "2dc8098c0d020bff277c9cf499a6b908e17836b70a5f949dfa24793371c9a87e",
+      "matched_historical_receipt": true
+    },
+    {
+      "name": "model-plefp8-00009.safetensors",
+      "bytes": 4400023163,
+      "sha256": "61de98b89bb79f386795787d7a76827a26f1e292c26edbb0a1b613da455f5a9c",
+      "matched_historical_receipt": true
+    }
+  ],
+  "extra_checks": [
+    {
+      "name": "model.safetensors.index.json",
+      "bytes": 34258807,
+      "sha256": "da5ca9c3b65e48e151329e64e141c2fa700bf2f99aec53cc014e4b52a6ff7a84",
+      "local_sha256": "da5ca9c3b65e48e151329e64e141c2fa700bf2f99aec53cc014e4b52a6ff7a84",
+      "match": true,
+      "verification": "current pinned HF LFS metadata equals historical local SHA256"
+    },
+    {
+      "name": "config.json",
+      "bytes": 4983,
+      "sha256": "e765305daba0951974308f4d32c075b52a6a45974730d273f2216718a994d624",
+      "local_sha256": "e765305daba0951974308f4d32c075b52a6a45974730d273f2216718a994d624",
+      "match": true
+    },
+    {
+      "name": "generation_config.json",
+      "bytes": 202,
+      "sha256": "e70c136c1b78ddc1fb0905bac8e733a4dc448d4f852a5dd75143fffc70be550e",
+      "local_sha256": "e70c136c1b78ddc1fb0905bac8e733a4dc448d4f852a5dd75143fffc70be550e",
+      "match": true
+    },
+    {
+      "name": "tokenizer_config.json",
+      "bytes": 17928,
+      "sha256": "b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27",
+      "local_sha256": "b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27",
+      "match": true
+    },
+    {
+      "name": "tokenizer.json",
+      "bytes": 12809320,
+      "sha256": "0997f410c57a1f4e53b09e4be8f4a172d90edd9564368fb0847030937229b9f3",
+      "local_sha256": "0997f410c57a1f4e53b09e4be8f4a172d90edd9564368fb0847030937229b9f3",
+      "match": true
+    },
+    {
+      "name": "chat_template.jinja",
+      "bytes": 8952,
+      "sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+      "local_sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+      "match": true
+    }
+  ],
+  "verification": "HF repository metadata and fetched metadata assets; full historical weight SHA receipts were established before this task; no new bulk weight download"
+}

@@ -1,5 +1,7 @@
 # Flash Next Q2_0 专家候选
 
+权重的全部原始来源、精确文件清单、固定 revision 获取方式及自行分发流程，见公司仓库独立目录 [Flash Next 混合权重](../model-weights/qwen3.8-flash-next-q2/README.md)。引擎制品身份仍固定于本页所述 q2exp1；新增权重说明不更换已验收 wheel/cache。
+
 此候选保留完整 48×512 路由专家，使用原生 Q2_0 字节常驻 DRAM；HF BF16 主干、router、共享专家、tokenizer 及 SSD FP8 PLE 保持原有语义。仅消费 GGUF 第一片的 144 个专家张量，不将它声明为完整 GGUF 模型，不读取其主干或第二片 PLE。
 
 当前版本为 `0.1.3+speed.q2exp1`，固定上游 `078132480ea4a0424f677a27eb22085624d331e6`。候选 profile 是 `build/profiles/q2exp1.json`；win1 的 profile、历史补丁和制品保持原字节。候选不包含 INVALID expert alias 补丁。
