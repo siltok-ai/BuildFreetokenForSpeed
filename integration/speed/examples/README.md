@@ -1,5 +1,13 @@
 # Manifest使用范围
 
+当前 Q2_0 候选使用 [flash-next-q2-experts-manifest.json](flash-next-q2-experts-manifest.json)，对应完整 HF 主干 + 全部 Q2_0 专家，并使用 q2exp1 wheel/cache。将 `weights/qwen3.8-flash-next.bf16-q2-experts` 绑定到实际混合模型目录；新 Speed 分支不支持专家复用实验。原始非专家文件的独立校验清单为 [flash-next-hf-source-receipt.json](flash-next-hf-source-receipt.json)，供 checkpoint 准备工具重新 hash 原始 HF 文件使用。
+
+默认候选预算为 36 GiB host / 14 GiB VRAM；本机 HTTP 实测使用 commit safety 1 GiB / VRAM safety 2 GiB。安全余量属于服务全局配置，manifest 不降低全局默认值。复现与实际证据见 [Q2_0 说明](../../../docs/q2-expert-candidate.md)。
+
+## 历史 win1 模板
+
+以下说明及 INVALID 模板只适用于封存的 win1/旧 Speed 分支，不是当前 Q2_0 候选入口。
+
 两份manifest模板使用相对路径，复制到独立models目录后，应在其`weights/qwen36`、`weights/qwen38`、`weights/flash-next`位置放置权重目录或NTFS junction；不要修改正常下载的原始模型索引。模板不包含权重。
 
 这些模板只包含配置，不包含模型权重或本机目录。目标机器需将相对权重路径绑定到自己的模型位置；Windows 可使用 NTFS 目录 junction。

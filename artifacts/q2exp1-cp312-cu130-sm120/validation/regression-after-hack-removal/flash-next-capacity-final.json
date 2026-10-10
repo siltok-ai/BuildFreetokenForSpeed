@@ -1,0 +1,38 @@
+{
+  "command": [
+    "C:/workspace/envs/speed-flash-next-q2/Scripts/python.exe",
+    "-u",
+    "-B",
+    "C:/workspace/worktrees/speed-flash-next-q2/tools/smoke/freetoken_qwen36.py",
+    "--model",
+    "C:/workspace/models/qwen3.8-flash-next.bf16-q2-experts",
+    "--profile",
+    "flash-next",
+    "--quant",
+    "q2_0",
+    "--kernel-cache",
+    "C:/workspace/artifacts/freetoken-flash-next-q2exp1-build/kernel-cache",
+    "--startup-timeout",
+    "600",
+    "--vram-safety-gib",
+    "2",
+    "--commit-safety-gib",
+    "1",
+    "--output",
+    "C:/workspace/artifacts/flash-next-q2-implementation/regression-after-hack-removal/flash-next-http-final.json",
+    "--host-commit-estimate-gib",
+    "36"
+  ],
+  "returncode": 0,
+  "sampling_interval_seconds": 0.1,
+  "samples": 1008,
+  "baseline": {
+    "commit_used": 12436893696,
+    "commit_limit": 70357860352,
+    "physical_available": 56094679040
+  },
+  "peak_commit_used": 68188471296,
+  "min_commit_available": 2169389056,
+  "min_physical_available": 16982515712,
+  "wall_seconds": 101.10489889999735
+}

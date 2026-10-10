@@ -1,0 +1,369 @@
+C:\workspace\build\flash-next-q2-review-001\app\python\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+INFO silitok_speed.engine.scheduler: Scheduler started (thread=SilitokScheduler)
+INFO httpx: HTTP Request: GET http://testserver/v1/models "HTTP/1.1 200 OK"
+{"stage": "admission", "required": {"vram_peak_bytes": 13421772800, "commit_peak_bytes": 13421772800, "cpu_heap_peak_bytes": 25769803776, "effective_commit_bytes": 39191576576, "weight_file_count": 3, "strict_commit_limit": true}, "current": {"vram_total_bytes": 25642467328, "vram_free_bytes": 23951572992, "ram_available_bytes": 55572656128, "commit_available_bytes": 56032657408}, "safety": {"vram_bytes": 2147483648, "ram_bytes": 2147483648, "commit_bytes": 8589934592}, "headroom_after_safety": {"vram_bytes": 8382316544, "ram_bytes": 27655368704, "commit_bytes": 8251146240}, "usable_total_vram_bytes": 23494983680, "allowed": true, "reasons": [], "warnings": []}
+INFO silitok_speed.engine.scheduler: Task ed86a1d1-a991-4acc-958f-ec9ef57bdfe1 started (pipeline=chat)
+INFO silitok_speed.engine.resource: admission model=qwen3.6-35b-a3b.nvfp4-freetoken fits=True reject=False vram_need=13.42GB commit_need=39.19GB ram_need=25.77GB vram_free=23.95GB commit_avail=55.89GB ram_avail=55.43GB reasons= warnings=
+INFO silitok_speed.engine.models: Loading backend FreeTokenQwen36Backend for model qwen3.6-35b-a3b.nvfp4-freetoken (estimated VRAM: 13.42 GB, commit: 13.42 GB)
+INFO silitok_speed.engine.models: Backend FreeTokenQwen36Backend loaded for qwen3.6-35b-a3b.nvfp4-freetoken (current VRAM: 12.62 GB)
+INFO silitok_speed.engine.scheduler: Task ed86a1d1-a991-4acc-958f-ec9ef57bdfe1 completed
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task ac9e1be8-1b2a-451a-83e8-5a05b88d6614 started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task ac9e1be8-1b2a-451a-83e8-5a05b88d6614 completed
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 200 OK"
+{"stage": "quality", "id": "arithmetic", "prompt": "计算 17×23。只输出一个整数，不要解释。", "expected": "391", "actual": "391", "passed": true, "usage": {"prompt_tokens": 28, "completion_tokens": 3, "total_tokens": 31}, "finish_reason": "stop", "truncated": false, "wall_seconds": 0.727535700018052}
+INFO silitok_speed.engine.scheduler: Task f659ac29-be3b-42a0-b556-c63955405023 started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task f659ac29-be3b-42a0-b556-c63955405023 completed
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 200 OK"
+{"stage": "quality", "id": "capital", "prompt": "中国的首都是哪个城市？只输出城市名。", "expected": "北京", "actual": "北京", "passed": true, "usage": {"prompt_tokens": 23, "completion_tokens": 1, "total_tokens": 24}, "finish_reason": "stop", "truncated": false, "wall_seconds": 0.6409723999968264}
+INFO silitok_speed.engine.scheduler: Task c1bb49a5-118d-402c-93e1-e33c1fd38f68 started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task c1bb49a5-118d-402c-93e1-e33c1fd38f68 completed
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 200 OK"
+{"stage": "quality", "id": "translation", "prompt": "将英文单词 cat 翻译成中文。只输出译词。", "expected": "猫", "actual": "猫", "passed": true, "usage": {"prompt_tokens": 25, "completion_tokens": 1, "total_tokens": 26}, "finish_reason": "stop", "truncated": false, "wall_seconds": 0.7018310999847017}
+INFO silitok_speed.engine.scheduler: Task 474587a3-f8e9-40ca-b53f-59d8c5c1bb67 started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task 474587a3-f8e9-40ca-b53f-59d8c5c1bb67 completed
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 200 OK"
+{"stage": "quality", "id": "constraint_logic", "prompt": "甲、乙、丙、丁、戊五人依次进行演示，每人恰好一次，位置编号为1到5。已知：（1）甲既不是第1位，也不是第5位；（2）乙在丁之前；（3）丙紧接在甲后面；（4）丁和戊之间恰好隔着一个人；（5）戊在乙之前。请推导唯一的演示顺序，说明推理并检查全部条件。最后单独写一行 FINAL: 后紧跟按顺序排列的五个人名，不加分隔符。", "expected": "戊乙丁甲丙", "actual": "这是一个经典的逻辑推理问题。我们将通过逐步分析约束条件来确定五人的演示顺序。\n\n**已知条件：**\n1.  甲 $\\neq$ 1，甲 $\\neq$ 5。\n2.  乙 < 丁（乙在丁之前）。\n3.  丙紧接在甲后面，即顺序为 [甲, 丙]。\n4.  丁和戊之间恰好隔着一个人。\n5.  戊 < 乙（戊在乙之前）。\n\n**推理步骤：**\n\n**第一步：确定甲和丙的位置组合**\n根据条件（3），甲和丙必须相邻，且顺序固定为“甲、丙”。\n根据条件（1），甲不能是第1位，也不能是第5位。\n因此，甲的可能位置只能是 2、3 或 4。\n对应的 [甲, 丙] 组合位置如下：\n*   情况 A：甲=2, 丙=3\n*   情况 B：甲=3, 丙=4\n*   情况 C：甲=4, 丙=5\n\n我们需要逐一验证这三种情况。\n\n---\n\n**第二步：验证情况 A（甲=2, 丙=3）**\n此时位置占用：2=甲, 3=丙。\n剩余位置：1, 4, 5。\n剩余人员：乙, 丁, 戊。\n\n根据条件（5）戊 < 乙 和 条件（2）乙 < 丁，我们可以得出顺序链：**戊 < 乙 < 丁**。\n这意味着戊、乙、丁必须占据剩下的三个位置 1, 4, 5，且顺序必须严格递增。\n*   戊必须在最前面，即 戊=1。\n*   乙在中间，即 乙=4。\n*   丁在最后，即 丁=5。\n\n让我们检查这个排列：**1=戊, 2=甲, 3=丙, 4=乙, 5=丁**。\n检查条件（4）：丁和戊之间恰好隔着一个人。\n*   丁在 5，戊在 1。\n*   他们之间隔着位置 2, 3, 4。这中间有两个人（甲、丙、乙中的两个？不，位置2,3,4上有三个人）。\n*   通常“之间恰好隔着一个人”意味着位置索引差为2（例如位置1和3，中间是2）。\n*   这里 |5 - 1| = 4，中间隔了3个人。不符合条件（4）。\n*   **结论：情况 A 不成立。**\n\n---\n\n**第三步：验证情况 B（甲=3, 丙=4）**\n此时位置占用：3=甲, 4=丙。\n剩余位置：1, 2, 5。\n剩余人员：乙, 丁, 戊。\n\n根据顺序链 **戊 < 乙 < 丁**：\n我们需要将 戊, 乙, 丁 放入 1, 2, 5 中，保持相对顺序。\n*   戊必须是最小的索引，所以 戊=1。\n*   乙必须是中间的索引，所以 乙=2。\n*   丁必须是最大的索引，所以 丁=5。\n\n让我们检查这个排列：**1=戊, 2=乙, 3=甲, 4=丙, 5=丁**。\n检查条件（4）：丁和戊之间恰好隔着一个人。\n*   丁在 5，戊在 1。\n*   位置差 |5 - 1| = 4，中间隔了 2, 3, 4 三个位置。不符合“恰好隔着一个人”（通常指中间只有1个位置，即位置差为2）。\n*   **结论：情况 B 不成立。**\n\n*(注：如果“隔着一个人”是指物理位置上中间只有一人，即位置索引差为2。例如位置1和3，中间是2。让我们重新审视条件4的解读。通常这类逻辑题中，“A和B之间恰好隔着一个人”意味着位置是 $i$ 和 $i+2$。)*\n\n让我们重新快速检查是否还有其他可能性。在情况A和B中，戊、乙、丁必须占据剩余的所有空位。\n在情况A中，空位是1, 4, 5。戊=1, 乙=4, 丁=5。丁(5)和戊(1)差4。\n在情况B中，空位是1, 2, 5。戊=1, 乙=2, 丁=5。丁(5)和戊(1)差4。\n\n看来戊和丁的位置比较远。让我们看看情况C。\n\n---\n\n**第四步：验证情况 C（甲=4, 丙=5）**\n此时位置占用：4=甲, 5=丙。\n剩余位置：1, 2, 3。\n剩余人员：乙, 丁, 戊。\n\n根据顺序链 **戊 < 乙 < 丁**：\n我们需要将 戊, 乙, 丁 放入 1, 2, 3 中，保持相对顺序。\n*   戊必须是最小的索引，所以 戊=1。\n*   乙必须是中间的索引，所以 乙=2。\n*   丁必须是最大的索引，所以 丁=3。\n\n让我们检查这个排列：**1=戊, 2=乙, 3=丁, 4=甲, 5=丙**。\n\n现在逐一验证所有条件：\n1.  **甲既不是第1位，也不是第5位**：甲在第4位。 -> **满足**。\n2.  **乙在丁之前**：乙(2) < 丁(3)。 -> **满足**。\n3.  **丙紧接在甲后面**：甲(4), 丙(5)。 -> **满足**。\n4.  **丁和戊之间恰好隔着一个人**：\n    *   丁在第3位。\n    *   戊在第1位。\n    *   它们之间是第2位（乙）。恰好只有1个人。 -> **满足**。\n5.  **戊在乙之前**：戊(1) < 乙(2)。 -> **满足**。\n\n所有条件均满足。\n\n---\n\n**最终顺序确认：**\n1.  戊\n2.  乙\n3.  丁\n4.  甲\n5.  丙\n\n**检查全部条件：**\n*   (1) 甲是第4位，不是1或5。OK。\n*   (2) 乙(2)在丁(3)之前。OK。\n*   (3) 丙(5)紧接在甲(4)后面。OK。\n*   (4) 丁(3)和戊(1)之间隔着乙(2)，恰好1人。OK。\n*   (5) 戊(1)在乙(2)之前。OK。\n\n推理唯一且正确。\n\nFINAL: 戊乙丁甲丙", "passed": true, "usage": {"prompt_tokens": 125, "completion_tokens": 1557, "total_tokens": 1682}, "finish_reason": "stop", "truncated": false, "wall_seconds": 10.046461099991575, "reference": {"method": "exhaustive_permutations", "candidates": 120, "solutions": ["戊乙丁甲丙"]}}
+INFO silitok_speed.engine.scheduler: Task 6cea0488-127c-44f0-b472-48776b79e2ce started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task 6cea0488-127c-44f0-b472-48776b79e2ce completed
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 200 OK"
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 400 Bad Request"
+INFO httpx: HTTP Request: GET http://testserver/v1/status "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Scheduler stopped cleanly
+no balance_serve
+flashinfer not found, use triton for linux
+{
+  "admission_overrides": {
+    "commit_safety_gib": 8.0,
+    "host_commit_estimate_gib": null,
+    "vram_estimate_gib": null,
+    "vram_safety_gib": 2.0
+  },
+  "admission_probe": {
+    "allowed": true,
+    "current": {
+      "commit_available_bytes": 56032657408,
+      "ram_available_bytes": 55572656128,
+      "vram_free_bytes": 23951572992,
+      "vram_total_bytes": 25642467328
+    },
+    "headroom_after_safety": {
+      "commit_bytes": 8251146240,
+      "ram_bytes": 27655368704,
+      "vram_bytes": 8382316544
+    },
+    "reasons": [],
+    "required": {
+      "commit_peak_bytes": 13421772800,
+      "cpu_heap_peak_bytes": 25769803776,
+      "effective_commit_bytes": 39191576576,
+      "strict_commit_limit": true,
+      "vram_peak_bytes": 13421772800,
+      "weight_file_count": 3
+    },
+    "safety": {
+      "commit_bytes": 8589934592,
+      "ram_bytes": 2147483648,
+      "vram_bytes": 2147483648
+    },
+    "usable_total_vram_bytes": 23494983680,
+    "warnings": []
+  },
+  "cache_geometry": {
+    "moe_cache_size": 5070,
+    "num_mamba_slots": 8,
+    "num_pages": 8192,
+    "num_swa_pages": 0,
+    "page_size": 1,
+    "swa_page_size": 0
+  },
+  "expert_storage": {},
+  "model_id": "qwen3.6-35b-a3b.nvfp4-freetoken",
+  "profile": "qwen36",
+  "quality_probes": [
+    {
+      "actual": "391",
+      "expected": "391",
+      "finish_reason": "stop",
+      "id": "arithmetic",
+      "passed": true,
+      "prompt": "\u8ba1\u7b97 17\u00d723\u3002\u53ea\u8f93\u51fa\u4e00\u4e2a\u6574\u6570\uff0c\u4e0d\u8981\u89e3\u91ca\u3002",
+      "truncated": false,
+      "usage": {
+        "completion_tokens": 3,
+        "prompt_tokens": 28,
+        "total_tokens": 31
+      },
+      "wall_seconds": 0.727535700018052
+    },
+    {
+      "actual": "\u5317\u4eac",
+      "expected": "\u5317\u4eac",
+      "finish_reason": "stop",
+      "id": "capital",
+      "passed": true,
+      "prompt": "\u4e2d\u56fd\u7684\u9996\u90fd\u662f\u54ea\u4e2a\u57ce\u5e02\uff1f\u53ea\u8f93\u51fa\u57ce\u5e02\u540d\u3002",
+      "truncated": false,
+      "usage": {
+        "completion_tokens": 1,
+        "prompt_tokens": 23,
+        "total_tokens": 24
+      },
+      "wall_seconds": 0.6409723999968264
+    },
+    {
+      "actual": "\u732b",
+      "expected": "\u732b",
+      "finish_reason": "stop",
+      "id": "translation",
+      "passed": true,
+      "prompt": "\u5c06\u82f1\u6587\u5355\u8bcd cat \u7ffb\u8bd1\u6210\u4e2d\u6587\u3002\u53ea\u8f93\u51fa\u8bd1\u8bcd\u3002",
+      "truncated": false,
+      "usage": {
+        "completion_tokens": 1,
+        "prompt_tokens": 25,
+        "total_tokens": 26
+      },
+      "wall_seconds": 0.7018310999847017
+    },
+    {
+      "actual": "\u8fd9\u662f\u4e00\u4e2a\u7ecf\u5178\u7684\u903b\u8f91\u63a8\u7406\u95ee\u9898\u3002\u6211\u4eec\u5c06\u901a\u8fc7\u9010\u6b65\u5206\u6790\u7ea6\u675f\u6761\u4ef6\u6765\u786e\u5b9a\u4e94\u4eba\u7684\u6f14\u793a\u987a\u5e8f\u3002\n\n**\u5df2\u77e5\u6761\u4ef6\uff1a**\n1.  \u7532 $\\neq$ 1\uff0c\u7532 $\\neq$ 5\u3002\n2.  \u4e59 < \u4e01\uff08\u4e59\u5728\u4e01\u4e4b\u524d\uff09\u3002\n3.  \u4e19\u7d27\u63a5\u5728\u7532\u540e\u9762\uff0c\u5373\u987a\u5e8f\u4e3a [\u7532, \u4e19]\u3002\n4.  \u4e01\u548c\u620a\u4e4b\u95f4\u6070\u597d\u9694\u7740\u4e00\u4e2a\u4eba\u3002\n5.  \u620a < \u4e59\uff08\u620a\u5728\u4e59\u4e4b\u524d\uff09\u3002\n\n**\u63a8\u7406\u6b65\u9aa4\uff1a**\n\n**\u7b2c\u4e00\u6b65\uff1a\u786e\u5b9a\u7532\u548c\u4e19\u7684\u4f4d\u7f6e\u7ec4\u5408**\n\u6839\u636e\u6761\u4ef6\uff083\uff09\uff0c\u7532\u548c\u4e19\u5fc5\u987b\u76f8\u90bb\uff0c\u4e14\u987a\u5e8f\u56fa\u5b9a\u4e3a\u201c\u7532\u3001\u4e19\u201d\u3002\n\u6839\u636e\u6761\u4ef6\uff081\uff09\uff0c\u7532\u4e0d\u80fd\u662f\u7b2c1\u4f4d\uff0c\u4e5f\u4e0d\u80fd\u662f\u7b2c5\u4f4d\u3002\n\u56e0\u6b64\uff0c\u7532\u7684\u53ef\u80fd\u4f4d\u7f6e\u53ea\u80fd\u662f 2\u30013 \u6216 4\u3002\n\u5bf9\u5e94\u7684 [\u7532, \u4e19] \u7ec4\u5408\u4f4d\u7f6e\u5982\u4e0b\uff1a\n*   \u60c5\u51b5 A\uff1a\u7532=2, \u4e19=3\n*   \u60c5\u51b5 B\uff1a\u7532=3, \u4e19=4\n*   \u60c5\u51b5 C\uff1a\u7532=4, \u4e19=5\n\n\u6211\u4eec\u9700\u8981\u9010\u4e00\u9a8c\u8bc1\u8fd9\u4e09\u79cd\u60c5\u51b5\u3002\n\n---\n\n**\u7b2c\u4e8c\u6b65\uff1a\u9a8c\u8bc1\u60c5\u51b5 A\uff08\u7532=2, \u4e19=3\uff09**\n\u6b64\u65f6\u4f4d\u7f6e\u5360\u7528\uff1a2=\u7532, 3=\u4e19\u3002\n\u5269\u4f59\u4f4d\u7f6e\uff1a1, 4, 5\u3002\n\u5269\u4f59\u4eba\u5458\uff1a\u4e59, \u4e01, \u620a\u3002\n\n\u6839\u636e\u6761\u4ef6\uff085\uff09\u620a < \u4e59 \u548c \u6761\u4ef6\uff082\uff09\u4e59 < \u4e01\uff0c\u6211\u4eec\u53ef\u4ee5\u5f97\u51fa\u987a\u5e8f\u94fe\uff1a**\u620a < \u4e59 < \u4e01**\u3002\n\u8fd9\u610f\u5473\u7740\u620a\u3001\u4e59\u3001\u4e01\u5fc5\u987b\u5360\u636e\u5269\u4e0b\u7684\u4e09\u4e2a\u4f4d\u7f6e 1, 4, 5\uff0c\u4e14\u987a\u5e8f\u5fc5\u987b\u4e25\u683c\u9012\u589e\u3002\n*   \u620a\u5fc5\u987b\u5728\u6700\u524d\u9762\uff0c\u5373 \u620a=1\u3002\n*   \u4e59\u5728\u4e2d\u95f4\uff0c\u5373 \u4e59=4\u3002\n*   \u4e01\u5728\u6700\u540e\uff0c\u5373 \u4e01=5\u3002\n\n\u8ba9\u6211\u4eec\u68c0\u67e5\u8fd9\u4e2a\u6392\u5217\uff1a**1=\u620a, 2=\u7532, 3=\u4e19, 4=\u4e59, 5=\u4e01**\u3002\n\u68c0\u67e5\u6761\u4ef6\uff084\uff09\uff1a\u4e01\u548c\u620a\u4e4b\u95f4\u6070\u597d\u9694\u7740\u4e00\u4e2a\u4eba\u3002\n*   \u4e01\u5728 5\uff0c\u620a\u5728 1\u3002\n*   \u4ed6\u4eec\u4e4b\u95f4\u9694\u7740\u4f4d\u7f6e 2, 3, 4\u3002\u8fd9\u4e2d\u95f4\u6709\u4e24\u4e2a\u4eba\uff08\u7532\u3001\u4e19\u3001\u4e59\u4e2d\u7684\u4e24\u4e2a\uff1f\u4e0d\uff0c\u4f4d\u7f6e2,3,4\u4e0a\u6709\u4e09\u4e2a\u4eba\uff09\u3002\n*   \u901a\u5e38\u201c\u4e4b\u95f4\u6070\u597d\u9694\u7740\u4e00\u4e2a\u4eba\u201d\u610f\u5473\u7740\u4f4d\u7f6e\u7d22\u5f15\u5dee\u4e3a2\uff08\u4f8b\u5982\u4f4d\u7f6e1\u548c3\uff0c\u4e2d\u95f4\u662f2\uff09\u3002\n*   \u8fd9\u91cc |5 - 1| = 4\uff0c\u4e2d\u95f4\u9694\u4e863\u4e2a\u4eba\u3002\u4e0d\u7b26\u5408\u6761\u4ef6\uff084\uff09\u3002\n*   **\u7ed3\u8bba\uff1a\u60c5\u51b5 A \u4e0d\u6210\u7acb\u3002**\n\n---\n\n**\u7b2c\u4e09\u6b65\uff1a\u9a8c\u8bc1\u60c5\u51b5 B\uff08\u7532=3, \u4e19=4\uff09**\n\u6b64\u65f6\u4f4d\u7f6e\u5360\u7528\uff1a3=\u7532, 4=\u4e19\u3002\n\u5269\u4f59\u4f4d\u7f6e\uff1a1, 2, 5\u3002\n\u5269\u4f59\u4eba\u5458\uff1a\u4e59, \u4e01, \u620a\u3002\n\n\u6839\u636e\u987a\u5e8f\u94fe **\u620a < \u4e59 < \u4e01**\uff1a\n\u6211\u4eec\u9700\u8981\u5c06 \u620a, \u4e59, \u4e01 \u653e\u5165 1, 2, 5 \u4e2d\uff0c\u4fdd\u6301\u76f8\u5bf9\u987a\u5e8f\u3002\n*   \u620a\u5fc5\u987b\u662f\u6700\u5c0f\u7684\u7d22\u5f15\uff0c\u6240\u4ee5 \u620a=1\u3002\n*   \u4e59\u5fc5\u987b\u662f\u4e2d\u95f4\u7684\u7d22\u5f15\uff0c\u6240\u4ee5 \u4e59=2\u3002\n*   \u4e01\u5fc5\u987b\u662f\u6700\u5927\u7684\u7d22\u5f15\uff0c\u6240\u4ee5 \u4e01=5\u3002\n\n\u8ba9\u6211\u4eec\u68c0\u67e5\u8fd9\u4e2a\u6392\u5217\uff1a**1=\u620a, 2=\u4e59, 3=\u7532, 4=\u4e19, 5=\u4e01**\u3002\n\u68c0\u67e5\u6761\u4ef6\uff084\uff09\uff1a\u4e01\u548c\u620a\u4e4b\u95f4\u6070\u597d\u9694\u7740\u4e00\u4e2a\u4eba\u3002\n*   \u4e01\u5728 5\uff0c\u620a\u5728 1\u3002\n*   \u4f4d\u7f6e\u5dee |5 - 1| = 4\uff0c\u4e2d\u95f4\u9694\u4e86 2, 3, 4 \u4e09\u4e2a\u4f4d\u7f6e\u3002\u4e0d\u7b26\u5408\u201c\u6070\u597d\u9694\u7740\u4e00\u4e2a\u4eba\u201d\uff08\u901a\u5e38\u6307\u4e2d\u95f4\u53ea\u67091\u4e2a\u4f4d\u7f6e\uff0c\u5373\u4f4d\u7f6e\u5dee\u4e3a2\uff09\u3002\n*   **\u7ed3\u8bba\uff1a\u60c5\u51b5 B \u4e0d\u6210\u7acb\u3002**\n\n*(\u6ce8\uff1a\u5982\u679c\u201c\u9694\u7740\u4e00\u4e2a\u4eba\u201d\u662f\u6307\u7269\u7406\u4f4d\u7f6e\u4e0a\u4e2d\u95f4\u53ea\u6709\u4e00\u4eba\uff0c\u5373\u4f4d\u7f6e\u7d22\u5f15\u5dee\u4e3a2\u3002\u4f8b\u5982\u4f4d\u7f6e1\u548c3\uff0c\u4e2d\u95f4\u662f2\u3002\u8ba9\u6211\u4eec\u91cd\u65b0\u5ba1\u89c6\u6761\u4ef64\u7684\u89e3\u8bfb\u3002\u901a\u5e38\u8fd9\u7c7b\u903b\u8f91\u9898\u4e2d\uff0c\u201cA\u548cB\u4e4b\u95f4\u6070\u597d\u9694\u7740\u4e00\u4e2a\u4eba\u201d\u610f\u5473\u7740\u4f4d\u7f6e\u662f $i$ \u548c $i+2$\u3002)*\n\n\u8ba9\u6211\u4eec\u91cd\u65b0\u5feb\u901f\u68c0\u67e5\u662f\u5426\u8fd8\u6709\u5176\u4ed6\u53ef\u80fd\u6027\u3002\u5728\u60c5\u51b5A\u548cB\u4e2d\uff0c\u620a\u3001\u4e59\u3001\u4e01\u5fc5\u987b\u5360\u636e\u5269\u4f59\u7684\u6240\u6709\u7a7a\u4f4d\u3002\n\u5728\u60c5\u51b5A\u4e2d\uff0c\u7a7a\u4f4d\u662f1, 4, 5\u3002\u620a=1, \u4e59=4, \u4e01=5\u3002\u4e01(5)\u548c\u620a(1)\u5dee4\u3002\n\u5728\u60c5\u51b5B\u4e2d\uff0c\u7a7a\u4f4d\u662f1, 2, 5\u3002\u620a=1, \u4e59=2, \u4e01=5\u3002\u4e01(5)\u548c\u620a(1)\u5dee4\u3002\n\n\u770b\u6765\u620a\u548c\u4e01\u7684\u4f4d\u7f6e\u6bd4\u8f83\u8fdc\u3002\u8ba9\u6211\u4eec\u770b\u770b\u60c5\u51b5C\u3002\n\n---\n\n**\u7b2c\u56db\u6b65\uff1a\u9a8c\u8bc1\u60c5\u51b5 C\uff08\u7532=4, \u4e19=5\uff09**\n\u6b64\u65f6\u4f4d\u7f6e\u5360\u7528\uff1a4=\u7532, 5=\u4e19\u3002\n\u5269\u4f59\u4f4d\u7f6e\uff1a1, 2, 3\u3002\n\u5269\u4f59\u4eba\u5458\uff1a\u4e59, \u4e01, \u620a\u3002\n\n\u6839\u636e\u987a\u5e8f\u94fe **\u620a < \u4e59 < \u4e01**\uff1a\n\u6211\u4eec\u9700\u8981\u5c06 \u620a, \u4e59, \u4e01 \u653e\u5165 1, 2, 3 \u4e2d\uff0c\u4fdd\u6301\u76f8\u5bf9\u987a\u5e8f\u3002\n*   \u620a\u5fc5\u987b\u662f\u6700\u5c0f\u7684\u7d22\u5f15\uff0c\u6240\u4ee5 \u620a=1\u3002\n*   \u4e59\u5fc5\u987b\u662f\u4e2d\u95f4\u7684\u7d22\u5f15\uff0c\u6240\u4ee5 \u4e59=2\u3002\n*   \u4e01\u5fc5\u987b\u662f\u6700\u5927\u7684\u7d22\u5f15\uff0c\u6240\u4ee5 \u4e01=3\u3002\n\n\u8ba9\u6211\u4eec\u68c0\u67e5\u8fd9\u4e2a\u6392\u5217\uff1a**1=\u620a, 2=\u4e59, 3=\u4e01, 4=\u7532, 5=\u4e19**\u3002\n\n\u73b0\u5728\u9010\u4e00\u9a8c\u8bc1\u6240\u6709\u6761\u4ef6\uff1a\n1.  **\u7532\u65e2\u4e0d\u662f\u7b2c1\u4f4d\uff0c\u4e5f\u4e0d\u662f\u7b2c5\u4f4d**\uff1a\u7532\u5728\u7b2c4\u4f4d\u3002 -> **\u6ee1\u8db3**\u3002\n2.  **\u4e59\u5728\u4e01\u4e4b\u524d**\uff1a\u4e59(2) < \u4e01(3)\u3002 -> **\u6ee1\u8db3**\u3002\n3.  **\u4e19\u7d27\u63a5\u5728\u7532\u540e\u9762**\uff1a\u7532(4), \u4e19(5)\u3002 -> **\u6ee1\u8db3**\u3002\n4.  **\u4e01\u548c\u620a\u4e4b\u95f4\u6070\u597d\u9694\u7740\u4e00\u4e2a\u4eba**\uff1a\n    *   \u4e01\u5728\u7b2c3\u4f4d\u3002\n    *   \u620a\u5728\u7b2c1\u4f4d\u3002\n    *   \u5b83\u4eec\u4e4b\u95f4\u662f\u7b2c2\u4f4d\uff08\u4e59\uff09\u3002\u6070\u597d\u53ea\u67091\u4e2a\u4eba\u3002 -> **\u6ee1\u8db3**\u3002\n5.  **\u620a\u5728\u4e59\u4e4b\u524d**\uff1a\u620a(1) < \u4e59(2)\u3002 -> **\u6ee1\u8db3**\u3002\n\n\u6240\u6709\u6761\u4ef6\u5747\u6ee1\u8db3\u3002\n\n---\n\n**\u6700\u7ec8\u987a\u5e8f\u786e\u8ba4\uff1a**\n1.  \u620a\n2.  \u4e59\n3.  \u4e01\n4.  \u7532\n5.  \u4e19\n\n**\u68c0\u67e5\u5168\u90e8\u6761\u4ef6\uff1a**\n*   (1) \u7532\u662f\u7b2c4\u4f4d\uff0c\u4e0d\u662f1\u62165\u3002OK\u3002\n*   (2) \u4e59(2)\u5728\u4e01(3)\u4e4b\u524d\u3002OK\u3002\n*   (3) \u4e19(5)\u7d27\u63a5\u5728\u7532(4)\u540e\u9762\u3002OK\u3002\n*   (4) \u4e01(3)\u548c\u620a(1)\u4e4b\u95f4\u9694\u7740\u4e59(2)\uff0c\u6070\u597d1\u4eba\u3002OK\u3002\n*   (5) \u620a(1)\u5728\u4e59(2)\u4e4b\u524d\u3002OK\u3002\n\n\u63a8\u7406\u552f\u4e00\u4e14\u6b63\u786e\u3002\n\nFINAL: \u620a\u4e59\u4e01\u7532\u4e19",
+      "expected": "\u620a\u4e59\u4e01\u7532\u4e19",
+      "finish_reason": "stop",
+      "id": "constraint_logic",
+      "passed": true,
+      "prompt": "\u7532\u3001\u4e59\u3001\u4e19\u3001\u4e01\u3001\u620a\u4e94\u4eba\u4f9d\u6b21\u8fdb\u884c\u6f14\u793a\uff0c\u6bcf\u4eba\u6070\u597d\u4e00\u6b21\uff0c\u4f4d\u7f6e\u7f16\u53f7\u4e3a1\u52305\u3002\u5df2\u77e5\uff1a\uff081\uff09\u7532\u65e2\u4e0d\u662f\u7b2c1\u4f4d\uff0c\u4e5f\u4e0d\u662f\u7b2c5\u4f4d\uff1b\uff082\uff09\u4e59\u5728\u4e01\u4e4b\u524d\uff1b\uff083\uff09\u4e19\u7d27\u63a5\u5728\u7532\u540e\u9762\uff1b\uff084\uff09\u4e01\u548c\u620a\u4e4b\u95f4\u6070\u597d\u9694\u7740\u4e00\u4e2a\u4eba\uff1b\uff085\uff09\u620a\u5728\u4e59\u4e4b\u524d\u3002\u8bf7\u63a8\u5bfc\u552f\u4e00\u7684\u6f14\u793a\u987a\u5e8f\uff0c\u8bf4\u660e\u63a8\u7406\u5e76\u68c0\u67e5\u5168\u90e8\u6761\u4ef6\u3002\u6700\u540e\u5355\u72ec\u5199\u4e00\u884c FINAL: \u540e\u7d27\u8ddf\u6309\u987a\u5e8f\u6392\u5217\u7684\u4e94\u4e2a\u4eba\u540d\uff0c\u4e0d\u52a0\u5206\u9694\u7b26\u3002",
+      "reference": {
+        "candidates": 120,
+        "method": "exhaustive_permutations",
+        "solutions": [
+          "\u620a\u4e59\u4e01\u7532\u4e19"
+        ]
+      },
+      "truncated": false,
+      "usage": {
+        "completion_tokens": 1557,
+        "prompt_tokens": 125,
+        "total_tokens": 1682
+      },
+      "wall_seconds": 10.046461099991575
+    }
+  ],
+  "quant": "nvfp4",
+  "registered": 1,
+  "resource_baselines": {
+    "engine_after_cuda_init": {
+      "captured_unix_ns": 1791615771550020000,
+      "commit_available_bytes": 56580636672,
+      "process_private_bytes": 1850171392,
+      "ram_available_bytes": 55668047872,
+      "torch_allocated_bytes": 0,
+      "torch_reserved_bytes": 0,
+      "vram_free_bytes": 23951572992,
+      "vram_total_bytes": 25642467328
+    },
+    "machine_after_cuda_init": {
+      "captured_unix_ns": 1791615771591980500,
+      "gpus": [
+        {
+          "driver_version": "610.88",
+          "index": 0,
+          "memory_free_bytes": 23949475840,
+          "memory_free_mib": 22840,
+          "memory_total_bytes": 25642926080,
+          "memory_total_mib": 24455,
+          "name": "NVIDIA GeForce RTX 5090 D v2",
+          "uuid": "GPU-269009f4-4be7-e30f-6810-1626a7cbf5b4"
+        }
+      ],
+      "source": "nvidia-smi"
+    },
+    "machine_before_engine": {
+      "captured_unix_ns": 1791615770957890700,
+      "gpus": [
+        {
+          "driver_version": "610.88",
+          "index": 0,
+          "memory_free_bytes": 24401412096,
+          "memory_free_mib": 23271,
+          "memory_total_bytes": 25642926080,
+          "memory_total_mib": 24455,
+          "name": "NVIDIA GeForce RTX 5090 D v2",
+          "uuid": "GPU-269009f4-4be7-e30f-6810-1626a7cbf5b4"
+        }
+      ],
+      "source": "nvidia-smi"
+    }
+  },
+  "status": {
+    "gpu": {
+      "cuda_capability": [
+        12,
+        0
+      ],
+      "name": "NVIDIA GeForce RTX 5090 D v2"
+    },
+    "loaded_backends": [
+      {
+        "backend_class": "FreeTokenQwen36Backend",
+        "commit_delta_bytes": 35071991808,
+        "commit_delta_gb": 35.07,
+        "idle": true,
+        "model_id": "qwen3.6-35b-a3b.nvfp4-freetoken",
+        "private_delta_bytes": 0,
+        "private_delta_gb": 0.0,
+        "refcount": 0,
+        "state": "loaded",
+        "vram_bytes": 12618563584,
+        "vram_gb": 12.62,
+        "weight_files": [
+          "C:\\workspace\\models\\qwen3.6-35b-a3b.nvfp4-modelscope\\model-00001-of-00003.safetensors",
+          "C:\\workspace\\models\\qwen3.6-35b-a3b.nvfp4-modelscope\\model-00002-of-00003.safetensors",
+          "C:\\workspace\\models\\qwen3.6-35b-a3b.nvfp4-modelscope\\model-00003-of-00003.safetensors"
+        ]
+      }
+    ],
+    "queue": {
+      "depth": 0,
+      "running": 0
+    },
+    "ram": {
+      "available_bytes": 35176312832,
+      "available_gb": 35.18,
+      "total_bytes": 66197110784,
+      "total_gb": 66.2,
+      "used_bytes": 31020797952,
+      "used_gb": 31.02
+    },
+    "recent_durations": {},
+    "resources": {
+      "commit": {
+        "available_bytes": 20777652224,
+        "available_gb": 20.78,
+        "limit_bytes": 70357860352,
+        "limit_gb": 70.36,
+        "used_bytes": 49580208128,
+        "used_gb": 49.58
+      },
+      "pagefile": {
+        "allocated_bytes": 4160749568,
+        "allocated_gb": 4.16,
+        "current_bytes": 6168576,
+        "current_gb": 0.01,
+        "peak_bytes": 6291456,
+        "peak_gb": 0.01
+      },
+      "process": {
+        "private_bytes": 2578673664,
+        "private_gb": 2.58,
+        "virtual_bytes": 2578673664,
+        "virtual_gb": 2.58,
+        "working_set_bytes": 974721024,
+        "working_set_gb": 0.97
+      },
+      "ram": {
+        "available_bytes": 35176312832,
+        "available_gb": 35.18,
+        "total_bytes": 66197110784,
+        "total_gb": 66.2
+      },
+      "vram": {
+        "free_bytes": 23951572992,
+        "free_gb": 23.95,
+        "torch_allocated_bytes": 0,
+        "torch_allocated_gb": 0.0,
+        "torch_reserved_bytes": 0,
+        "torch_reserved_gb": 0.0,
+        "total_bytes": 25642467328,
+        "total_gb": 25.64
+      }
+    },
+    "started": true,
+    "task_service": {
+      "error_code": null,
+      "staged_bytes": 0,
+      "status": "ready"
+    },
+    "tasks": {
+      "queued": [],
+      "running": []
+    },
+    "uptime_seconds": 69.51,
+    "vram": {
+      "free_gb": 13.02,
+      "total_bytes": 25642467328,
+      "total_gb": 25.64,
+      "used_bytes": 12618563584,
+      "used_gb": 12.62
+    }
+  },
+  "stream": {
+    "chunks": 31,
+    "done_events": 1,
+    "finish_reason": "stop",
+    "status_code": 200,
+    "text_prefix": "Local inference is a statistical technique that estimates causal effects by comparing treated units to their most similar untreated counterparts within a specif",
+    "tpot_seconds": 3.0666663035474442e-06,
+    "ttft_seconds": 0.8687364000070374,
+    "usage": {
+      "completion_tokens": 28,
+      "prompt_tokens": 20,
+      "total_tokens": 48
+    }
+  },
+  "sync": {
+    "finish_reason": "stop",
+    "status_code": 200,
+    "text_prefix": "Local inference is a statistical technique that estimates causal effects by comparing treated units to their most similar untreated counterparts within a specif",
+    "usage": {
+      "completion_tokens": 28,
+      "prompt_tokens": 20,
+      "total_tokens": 48
+    },
+    "wall_seconds": 56.44004719998338
+  },
+  "unsupported_field": {
+    "code": "unsupported_feature",
+    "message": "Model 'qwen3.6-35b-a3b.nvfp4-freetoken' does not support request field 'presence_penalty' in its current release.",
+    "param": "presence_penalty",
+    "retryable": false,
+    "type": "invalid_request_error"
+  },
+  "wall_seconds": 74.19677699997555,
+  "worker_memory": {
+    "13456": {
+      "nonpaged_pool": 207312,
+      "num_page_faults": 10599673,
+      "paged_pool": 42139424,
+      "pagefile": 16349614080,
+      "peak_nonpaged_pool": 212208,
+      "peak_paged_pool": 100662656,
+      "peak_pagefile": 37342425088,
+      "peak_wset": 28678234112,
+      "private": 16349614080,
+      "rss": 19988860928,
+      "vms": 16349614080,
+      "wset": 19988860928
+    },
+    "9356": {
+      "nonpaged_pool": 8160,
+      "num_page_faults": 2049,
+      "paged_pool": 113496,
+      "pagefile": 1224704,
+      "peak_nonpaged_pool": 8944,
+      "peak_paged_pool": 114776,
+      "peak_pagefile": 1265664,
+      "peak_wset": 8028160,
+      "private": 1224704,
+      "rss": 8007680,
+      "vms": 1224704,
+      "wset": 8007680
+    }
+  },
+  "worker_pids": [
+    9356,
+    13456
+  ],
+  "worker_pids_gone": true
+}

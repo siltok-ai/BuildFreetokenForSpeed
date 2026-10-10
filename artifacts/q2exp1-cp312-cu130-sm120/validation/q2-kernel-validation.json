@@ -1,0 +1,34 @@
+{
+  "status": "passed",
+  "repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+  "revision": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+  "file": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+  "samples": {
+    "gate": "c8944830ed30addd6fba1e75c2f4d12c38c926cc7d75f4613fd8ee4fb3761a02",
+    "up": "6786d778e24019f590c8aa55826a480b07fe91b40fc7d92f7e4a84ac0d3b7cb1",
+    "down": "001827f1bb9ed60d7f12d14c70bfa8bf937d5d70d6252c31b85458c03ebc31d1"
+  },
+  "precision": "Q2_0 weights rounded to BF16, BF16 activations/intermediates, FP32 accumulation/routing sum",
+  "records": [
+    {
+      "tokens": 1,
+      "nrmse": 0.0,
+      "max_abs_error": 0.0,
+      "ms": 0.7414699997752905
+    },
+    {
+      "tokens": 3,
+      "nrmse": 0.0,
+      "max_abs_error": 0.0,
+      "ms": 0.05081999988760799
+    },
+    {
+      "tokens": 16,
+      "nrmse": 1.0614006669129594e-06,
+      "max_abs_error": 1.52587890625e-05,
+      "ms": 0.20996499952161685
+    }
+  ],
+  "cache_remapping": "passed",
+  "cuda_graph": "passed"
+}

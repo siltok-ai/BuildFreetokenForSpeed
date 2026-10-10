@@ -1,0 +1,32 @@
+{
+  "command": [
+    "C:/workspace/tools/python/cpython-3.12.13-windows-x86_64-none/python.exe",
+    "-u",
+    "-B",
+    "tools/verify_packaged_speed.py",
+    "--app",
+    "C:/workspace/build/flash-next-q2-review-001/app",
+    "--speed-source",
+    "C:/workspace/worktrees/speed-flash-next-q2",
+    "--flash-next-model",
+    "C:/workspace/models/qwen3.8-flash-next.bf16-q2-experts",
+    "--qwen36-model",
+    "C:/workspace/models/qwen3.6-35b-a3b.nvfp4-modelscope",
+    "--qwen38-model",
+    "C:/workspace/models/qwen3.8-27b.nvfp4-radixark",
+    "--output",
+    "C:/workspace/artifacts/flash-next-q2-implementation/packaged-speed-20261010"
+  ],
+  "returncode": 0,
+  "sampling_interval_seconds": 0.1,
+  "samples": 4471,
+  "baseline": {
+    "commit_used": 12535521280,
+    "commit_limit": 70357860352,
+    "physical_available": 55707975680
+  },
+  "peak_commit_used": 67806593024,
+  "min_commit_available": 2551267328,
+  "min_physical_available": 17097404416,
+  "wall_seconds": 449.11423870001454
+}

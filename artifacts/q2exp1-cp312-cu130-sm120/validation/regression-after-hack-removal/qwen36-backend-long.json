@@ -1,0 +1,143 @@
+{
+  "cache_geometry": {
+    "moe_cache_size": 5070,
+    "num_mamba_slots": 8,
+    "num_pages": 8192,
+    "num_swa_pages": 0,
+    "page_size": 1,
+    "swa_page_size": 0
+  },
+  "cancel": {
+    "settle_ms": 30.05559998564422,
+    "worker_pid_after": 8780,
+    "worker_pid_before": 8780,
+    "worker_reused": true
+  },
+  "load_seconds": 32.44402709999122,
+  "long_runs": [
+    {
+      "decode_tokens_per_second": 135.92004275352403,
+      "elapsed_ms": 1167.818099987926,
+      "finish_reason": "length",
+      "input_tokens": 4096,
+      "output_tokens": 16,
+      "reasoning_content": null,
+      "text": "Designing a local AI runtime that coordinates **model weights, expert routing, GPU",
+      "text_prefix": "Designing a local AI runtime that coordinates **model weights, expert routing, GPU",
+      "ttft_ms": 1057.4492999876384
+    }
+  ],
+  "median_decode_tokens_per_second": 169.58028580609027,
+  "median_long_ttft_ms": 1057.4492999876384,
+  "median_ttft_ms": 433.20514999504667,
+  "model": "C:\\workspace\\models\\qwen3.6-35b-a3b.nvfp4-modelscope",
+  "post_cancel": {
+    "decode_tokens_per_second": 83.39866226022257,
+    "elapsed_ms": 435.7809999783058,
+    "finish_reason": "stop",
+    "input_tokens": 18,
+    "output_tokens": 2,
+    "reasoning_content": null,
+    "text": "worker reused",
+    "text_prefix": "worker reused",
+    "ttft_ms": 413.7363999907393
+  },
+  "profile": "qwen36",
+  "prompt_profile": {
+    "long_tokens": 4096,
+    "short_tokens": 70
+  },
+  "quality_cases": [
+    {
+      "enable_thinking": false,
+      "id": "arithmetic_no_thinking",
+      "max_tokens": 32,
+      "prompt": "Answer with only one integer. A service handles 37 requests per minute for 19 minutes. How many requests does it handle?",
+      "result": {
+        "decode_tokens_per_second": 86.28127700300757,
+        "elapsed_ms": 459.6744000155013,
+        "finish_reason": "stop",
+        "input_tokens": 40,
+        "output_tokens": 3,
+        "reasoning_content": null,
+        "text": "703",
+        "text_prefix": "703",
+        "ttft_ms": 427.37940000370145
+      }
+    },
+    {
+      "enable_thinking": true,
+      "id": "reasoning_with_thinking",
+      "max_tokens": 4096,
+      "prompt": "A model server has 24 GiB of VRAM. It reserves 2 GiB, uses 3 GiB for runtime state, and each cache block costs 256 MiB. Determine the maximum whole number of cache blocks that fit. Explain the reasoning and end with a line formatted exactly as FINAL: <integer>.",
+      "result": {
+        "decode_tokens_per_second": 166.3260630590901,
+        "elapsed_ms": 12709.133500000462,
+        "finish_reason": "stop",
+        "input_tokens": 78,
+        "output_tokens": 2045,
+        "reasoning_content": "Here's a thinking process that leads to the solution:\n\n1.  **Analyze the Request:**\n    *   **Total VRAM:** 24 GiB.\n    *   **Reserved VRAM:** 2 GiB.\n    *   **Runtime State VRAM:** 3 GiB.\n    *   **Cost per Cache Block:** 256 MiB.\n    *   **Goal:** Determine the maximum *whole number* of cache blocks that fit.\n    *   **Output Format:** Explanation followed by `FINAL: <integer>`.\n\n2.  **Understand Units:**\n    *   The problem uses \"GiB\" (Gibibytes) and \"MiB\" (Mebibytes).\n    *   1 GiB = 1024 MiB.\n    *   It is crucial to convert everything to the same unit (MiB is usually easier for multiplication/division with block sizes) to avoid precision errors, though GiB works too if handled carefully.\n\n3.  **Step-by-Step Calculation:**\n\n    *   **Step 1: Calculate Total Available Memory for Cache.**\n        *   Total VRAM = 24 GiB.\n        *   Reserved = 2 GiB.\n        *   Runtime State = 3 GiB.\n        *   Available VRAM = Total - Reserved - Runtime State.\n        *   Available VRAM = 24 - 2 - 3 = 19 GiB.\n\n    *   **Step 2: Convert Available VRAM to MiB.**\n        *   1 GiB = 1024 MiB.\n        *   Available VRAM (MiB) = 19 * 1024.\n        *   Calculation:\n            *   19 * 1000 = 19000\n            *   19 * 24 = 456\n            *   19000 + 456 = 19456 MiB.\n        *   *Self-Correction/Verification:* $2^{10} = 1024$. $19 \\times 1024 = 19456$. Correct.\n\n    *   **Step 3: Determine the size of one cache block.**\n        *   Block size = 256 MiB.\n        *   Note: 256 is a power of 2 ($2^8$). 1024 is a power of 2 ($2^{10}$). This suggests the division will be clean.\n\n    *   **Step 4: Calculate the number of blocks.**\n        *   Number of blocks = Available VRAM (MiB) / Block size (MiB).\n        *   Number of blocks = 19456 / 256.\n\n    *   **Step 5: Perform the division.**\n        *   Method A: Direct division.\n            *   $19456 / 256$\n            *   $19456 / 2 = 9728$\n            *   $9728 / 2 = 4864$\n            *   $4864 / 2 = 2432$\n            *   $2432 / 2 = 1216$\n            *   $1216 / 2 = 608$\n            *   $608 / 2 = 304$\n            *   $304 / 2 = 152$\n            *   $152 / 2 = 76$\n            *   $76 / 2 = 38$\n            *   $38 / 2 = 19$\n            *   Wait, I divided by 2 eleven times? Let's check powers of 2.\n            *   $256 = 2^8$.\n            *   $19456 = 19 \\times 1024 = 19 \\times 2^{10}$.\n            *   So, $(19 \\times 2^{10}) / 2^8 = 19 \\times 2^{(10-8)} = 19 \\times 2^2 = 19 \\times 4$.\n        *   Method B: Using powers of 2 (Much faster).\n            *   Available = 19 GiB.\n            *   Block = 256 MiB.\n            *   How many 256 MiB blocks in 1 GiB?\n            *   $1024 / 256 = 4$.\n            *   So, 1 GiB holds 4 blocks.\n            *   We have 19 GiB available.\n            *   $19 \\times 4 = 76$.\n\n    *   **Step 6: Verify constraints.**\n        *   \"Maximum whole number\": 76 is an integer.\n        *   Does it fit? $76 \\times 256 \\text{ MiB} = 19456 \\text{ MiB} = 19 \\text{ GiB}$.\n        *   Total used: 2 (reserved) + 3 (runtime) + 19 (cache) = 24 GiB.\n        *   Fits perfectly.\n\n4.  **Drafting the Explanation:**\n    *   Start by defining the total memory.\n    *   Subtract the fixed overheads (reserved and runtime state) to find the memory available for caching.\n    *   Convert units to be consistent (GiB to MiB or vice versa).\n    *   Divide the available memory by the size of a single cache block.\n    *   State the final integer.\n\n5.  **Refining the Explanation:**\n    *   Total VRAM: 24 GiB.\n    *   Overhead: 2 GiB (reserved) + 3 GiB (runtime) = 5 GiB.\n    *   Remaining for cache: 24 - 5 = 19 GiB.\n    *   Block size: 256 MiB.\n    *   Conversion: 1 GiB = 1024 MiB.\n    *   Blocks per GiB: 1024 / 256 = 4 blocks.\n    *   Total blocks: 19 GiB * 4 blocks/GiB = 76 blocks.\n\n6.  **Final Check:**\n    *   Did I miss anything? \"Whole number\" implies floor function, but since it divides evenly, it's exact.\n    *   Is the math right? $19 \\times 4 = 76$. Yes.\n    *   Is the format correct? `FINAL: 76`.\n\n7.  **Final Output Generation.** (Proceed to generate response based on these steps).\n",
+        "text": "\n\nHere is the step-by-step reasoning to determine the maximum number of cache blocks:\n\n1.  **Calculate the available memory for caching:**\n    First, we must subtract the memory reserved for system overhead and runtime state from the total VRAM.\n    *   Total VRAM: 24 GiB\n    *   Reserved: 2 GiB\n    *   Runtime State: 3 GiB\n    *   Available Memory = $24 - 2 - 3 = 19$ GiB.\n\n2.  **Convert units to be consistent:**\n    The available memory is in GiB (Gibibytes), but the cache block size is in MiB (Mebibytes). We need to convert them to the same unit.\n    *   1 GiB = 1024 MiB.\n    *   Available Memory in MiB = $19 \\times 1024 = 19,456$ MiB.\n\n3.  **Calculate the number of cache blocks:**\n    Divide the total available memory (in MiB) by the size of a single cache block.\n    *   Cache Block Size: 256 MiB.\n    *   Number of Blocks = $19,456 / 256$.\n\n    *Alternative calculation using powers of 2:*\n    Since 1 GiB = 1024 MiB and a block is 256 MiB, there are exactly 4 blocks per GiB ($1024 / 256 = 4$).\n    *   $19 \\text{ GiB} \\times 4 \\text{ blocks/GiB} = 76$ blocks.\n\n4.  **Verification:**\n    $76 \\text{ blocks} \\times 256 \\text{ MiB/block} = 19,456 \\text{ MiB}$.\n    $19,456 \\text{ MiB} / 1024 = 19$ GiB.\n    $19 \\text{ GiB} + 3 \\text{ GiB} + 2 \\text{ GiB} = 24$ GiB (Total VRAM).\n\nThe maximum whole number of cache blocks that fit is 76.\n\nFINAL: 76",
+        "text_prefix": "\n\nHere is the step-by-step reasoning to determine the maximum number of cache blocks:\n\n1.  **Calculate the available memory for caching:**\n    First, we must su",
+        "ttft_ms": 413.64750001230277
+      }
+    },
+    {
+      "enable_thinking": false,
+      "id": "long_structured_no_thinking",
+      "max_tokens": 512,
+      "prompt": "Write a self-contained technical note in exactly five numbered sections about designing a local text-generation service. Cover, in order: model identity, resource admission, streaming, cancellation, and shutdown. Each section must state one invariant, one failure mode, and one concrete verification. Do not use a table.",
+      "result": {
+        "decode_tokens_per_second": 189.9054808083325,
+        "elapsed_ms": 2627.5726000021677,
+        "finish_reason": "stop",
+        "input_tokens": 71,
+        "output_tokens": 418,
+        "reasoning_content": null,
+        "text": "1. Model Identity\nThe system must ensure that the loaded model weights and configuration parameters remain immutable during inference to guarantee consistent output behavior. A failure mode occurs if concurrent initialization routines overwrite the model pointer, leading to undefined behavior or segmentation faults. Verification is achieved by asserting that the model pointer is read-only after the initialization phase and that no write operations target the memory region holding the weights.\n\n2. Resource Admission\nThe service must enforce a strict upper bound on the number of concurrent requests to prevent memory exhaustion and ensure predictable latency. A failure mode arises when the admission controller fails to check available capacity before accepting a new request, causing the system to crash under load. Verification is performed by simulating a burst of requests exceeding the configured limit and confirming that the excess requests are rejected with a 429 Too Many Requests status code.\n\n3. Streaming\nThe output stream must deliver tokens in the order they are generated by the model to maintain semantic coherence for the client. A failure mode happens if the internal buffer is flushed out of sequence due to race conditions between the generation thread and the network I/O thread. Verification is conducted by comparing the received token sequence against the expected output of a deterministic model run, ensuring exact positional equality.\n\n4. Cancellation\nThe system must immediately halt generation and release associated resources when a client disconnects or sends a cancellation signal. A failure mode occurs if the cancellation flag is not checked within the generation loop, causing the server to continue consuming CPU cycles and memory for abandoned tasks. Verification is achieved by initiating a long-running generation task and abruptly closing the client connection, then monitoring that the server process does not leak memory or continue CPU-intensive work.\n\n5. Shutdown\nThe service must gracefully drain all active requests and close network listeners before terminating the process to avoid data corruption. A failure mode arises if the shutdown signal interrupts an in-flight write operation, resulting in truncated responses or corrupted state files. Verification is performed by sending a SIGTERM signal during active generation and confirming that the server exits cleanly with a zero exit code and no open file descriptors remain.",
+        "text_prefix": "1. Model Identity\nThe system must ensure that the loaded model weights and configuration parameters remain immutable during inference to guarantee consistent ou",
+        "ttft_ms": 424.51049998635426
+      }
+    }
+  ],
+  "quant": "nvfp4",
+  "runs": [
+    {
+      "decode_tokens_per_second": 155.766057469302,
+      "elapsed_ms": 637.4673999962397,
+      "finish_reason": "length",
+      "input_tokens": 70,
+      "output_tokens": 32,
+      "reasoning_content": null,
+      "text": "A local inference engine balances GPU memory, host memory, and token latency through **paged attention** (e.g., vLLM) and **continuous batching",
+      "text_prefix": "A local inference engine balances GPU memory, host memory, and token latency through **paged attention** (e.g., vLLM) and **continuous batching",
+      "ttft_ms": 438.43889998970553
+    },
+    {
+      "decode_tokens_per_second": 183.39451414287853,
+      "elapsed_ms": 597.0150999783073,
+      "finish_reason": "length",
+      "input_tokens": 70,
+      "output_tokens": 32,
+      "reasoning_content": null,
+      "text": "A local inference engine balances GPU memory, host memory, and token latency through **paged attention** (e.g., vLLM) and **continuous batching",
+      "text_prefix": "A local inference engine balances GPU memory, host memory, and token latency through **paged attention** (e.g., vLLM) and **continuous batching",
+      "ttft_ms": 427.9714000003878
+    }
+  ],
+  "unload_seconds": 3.439453200000571,
+  "vram_bytes": 12618563584,
+  "warmup": {
+    "decode_tokens_per_second": 108.0528940529298,
+    "elapsed_ms": 575.0784999981988,
+    "finish_reason": "length",
+    "input_tokens": 70,
+    "output_tokens": 16,
+    "reasoning_content": null,
+    "text": "A local inference engine balances GPU memory, host memory, and token latency through **",
+    "text_prefix": "A local inference engine balances GPU memory, host memory, and token latency through **",
+    "ttft_ms": 436.235500004841
+  },
+  "worker_pid": 8780,
+  "worker_pid_gone": true
+}

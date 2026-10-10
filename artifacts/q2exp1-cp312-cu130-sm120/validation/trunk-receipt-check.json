@@ -1,0 +1,7 @@
+{
+  "status": "checkpoint_preparation_and_finalization_verified",
+  "scope": "explicit independent HF checksum receipt; all 14 original non-expert shards rehashed, 1561 non-expert tensors, 144 GGUF expert roles; no inference rerun for this duplicate directory",
+  "expert_aliases": false,
+  "model_directory": "C:/workspace/models/qwen3.8-flash-next.bf16-q2-experts-receipt-check",
+  "receipt": "integration/speed/examples/flash-next-hf-source-receipt.json"
+}

@@ -1,0 +1,16 @@
+verified raw non-expert shard: model-bf16-00001.safetensors
+verified raw non-expert shard: model-bf16-00010.safetensors
+verified raw non-expert shard: model-bf16-00011.safetensors
+verified raw non-expert shard: model-bf16-00012.safetensors
+verified raw non-expert shard: model-plefp8-00000.safetensors
+verified raw non-expert shard: model-plefp8-00001.safetensors
+verified raw non-expert shard: model-plefp8-00002.safetensors
+verified raw non-expert shard: model-plefp8-00003.safetensors
+verified raw non-expert shard: model-plefp8-00004.safetensors
+verified raw non-expert shard: model-plefp8-00005.safetensors
+verified raw non-expert shard: model-plefp8-00006.safetensors
+verified raw non-expert shard: model-plefp8-00007.safetensors
+verified raw non-expert shard: model-plefp8-00008.safetensors
+verified raw non-expert shard: model-plefp8-00009.safetensors
+{"status": "trunk_verified_experts_pending", "non_expert_shards": 14, "non_expert_tensors": 1561}
+{"status": "complete_verified_sources_requires_inference_validation", "experts": 144, "expert_GiB": 31.640625}

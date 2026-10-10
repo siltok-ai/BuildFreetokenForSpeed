@@ -1,0 +1,1435 @@
+diff --git a/python/freetoken/kernel/csrc/jit/batch_memcpy.cuh b/python/freetoken/kernel/csrc/jit/batch_memcpy.cuh
+index 690eff3..a9078bf 100644
+--- a/python/freetoken/kernel/csrc/jit/batch_memcpy.cuh
++++ b/python/freetoken/kernel/csrc/jit/batch_memcpy.cuh
+@@ -25,7 +25,7 @@ struct BatchMemcpy {
+         auto N = SymbolicSize{"batch length"};
+         auto ptr_dtype = SymbolicDType{};
+         TensorMatcher({N})
+-            .with_dtype<int64_t>(ptr_dtype)
++            .with_dtype(ptr_dtype)
+             .with_device<kDLCPU>()
+             .verify(dst_ptrs)
+             .verify(src_ptrs)
+diff --git a/python/freetoken/kernel/csrc/jit/fast_index_copy.cuh b/python/freetoken/kernel/csrc/jit/fast_index_copy.cuh
+index 43f3fc1..8f57df7 100644
+--- a/python/freetoken/kernel/csrc/jit/fast_index_copy.cuh
++++ b/python/freetoken/kernel/csrc/jit/fast_index_copy.cuh
+@@ -303,7 +303,7 @@ inline auto get_sync_flag_ptr(
+ ) -> int32_t* {
+     auto flag_dtype = host::SymbolicDType{};
+     host::TensorMatcher({1})
+-        .with_dtype<int32_t>(flag_dtype)
++        .with_dtype(flag_dtype)
+         .with_device<kDLCUDA, kDLROCM>(device)
+         .verify(sync_flag);
+     return static_cast<int32_t*>(sync_flag.data_ptr());
+@@ -388,7 +388,7 @@ struct FastIndexCopyKernel {
+         .verify(dst);
+ 
+         TensorMatcher({L})
+-        .with_dtype<int32_t, int64_t>(indices_dtype)
++        .with_dtype(indices_dtype)
+         .with_device<kDLCUDA, kDLROCM>(device)
+         .verify(src_indices)
+         .verify(dst_indices);
+@@ -397,7 +397,7 @@ struct FastIndexCopyKernel {
+         if (num_indices.has_value()) {
+             const auto num_indices_tensor = num_indices.value();
+             TensorMatcher({1})
+-                .with_dtype<int64_t>(num_indices_dtype)
++                .with_dtype(num_indices_dtype)
+                 .with_device<kDLCUDA, kDLROCM>(device)
+                 .verify(num_indices_tensor);
+ 
+@@ -564,14 +564,14 @@ struct MultiIndexCopyKernel {
+         auto indices_dtype = SymbolicDType{};
+         auto num_indices_dtype = SymbolicDType{};
+ 
+-        TensorMatcher({B}).with_dtype<int64_t>(ptr_dtype).with_device<kDLCUDA, kDLROCM>(device)
++        TensorMatcher({B}).with_dtype(ptr_dtype).with_device<kDLCUDA, kDLROCM>(device)
+             .verify(dst_ptrs).verify(src_ptrs).verify(feat_bytes);
+-        TensorMatcher({L}).with_dtype<int32_t, int64_t>(indices_dtype).with_device<kDLCUDA, kDLROCM>(device)
++        TensorMatcher({L}).with_dtype(indices_dtype).with_device<kDLCUDA, kDLROCM>(device)
+             .verify(dst_indices).verify(src_indices);
+ 
+         const int64_t* valid_length = nullptr;
+         if (num_indices.has_value()) {
+-            TensorMatcher({1}).with_dtype<int64_t>(num_indices_dtype).with_device<kDLCUDA, kDLROCM>(device)
++            TensorMatcher({1}).with_dtype(num_indices_dtype).with_device<kDLCUDA, kDLROCM>(device)
+                 .verify(num_indices.value());
+             valid_length = static_cast<const int64_t*>(num_indices.value().data_ptr());
+         }
+diff --git a/python/freetoken/kernel/csrc/jit/index.cu b/python/freetoken/kernel/csrc/jit/index.cu
+index ca0e1db..8c59ef5 100644
+--- a/python/freetoken/kernel/csrc/jit/index.cu
++++ b/python/freetoken/kernel/csrc/jit/index.cu
+@@ -121,7 +121,7 @@ struct IndexKernel {
+         .with_device<kDLCUDA>(device_)
+         .verify(output);
+     TensorMatcher({L}) //
+-        .with_dtype<int32_t, int64_t>(indices_dtype_)
++        .with_dtype(indices_dtype_)
+         .with_device<kDLCUDA>(device_)
+         .verify(indices);
+ 
+diff --git a/python/freetoken/kernel/csrc/jit/store.cu b/python/freetoken/kernel/csrc/jit/store.cu
+index 8d84d76..24a8855 100644
+--- a/python/freetoken/kernel/csrc/jit/store.cu
++++ b/python/freetoken/kernel/csrc/jit/store.cu
+@@ -84,7 +84,7 @@ struct StoreKernel {
+         .verify(v);
+     TensorMatcher({L}) //
+         .with_device<kDLCUDA>(device_)
+-        .with_dtype<int32_t, int64_t>(indices_dtype_)
++        .with_dtype(indices_dtype_)
+         .verify(indices);
+ 
+     const auto dtype_size = dtype_bytes(dtype_.unwrap());
+diff --git a/python/freetoken/kernel/csrc/row_store/row_store_ext.cpp b/python/freetoken/kernel/csrc/row_store/row_store_ext.cpp
+index e33b18a..92d4473 100644
+--- a/python/freetoken/kernel/csrc/row_store/row_store_ext.cpp
++++ b/python/freetoken/kernel/csrc/row_store/row_store_ext.cpp
+@@ -1,12 +1,7 @@
+-// Disk-backed row store: fixed-width rows read straight from checkpoint shard tensors
+-// through an extent table (row i of extent e at extent_base[e] + i * row_stride).
+-// Engine-thread only, no locks. Duplicate rows in one fill dedup into ONE batched read
+-// round; no RAM cache and no per-sequence state.
+-//
+-//   RowStore  -- hash-agnostic: stage_rows(row_ids) + flush(); callers supply row ids.
+-//   PleStore  -- RowStore plus the Qwen3.8-Flash-Next PLE n-gram hash: stage(tokens).
+-//                Hash reference: tests/models/qwen4_exp/test_ple_disk.py.
+-//
++// Disk-backed PLE row store: rows read straight from the checkpoint's fp8 shard tensors
++// through an extent table (PleRowSource in ple_ssd.py). Engine-thread only, no locks.
++// Duplicate rows in one fill dedup into ONE batched read round; no RAM cache and no
++// per-sequence state. Hash reference: tests/models/qwen4_exp/test_ple_disk.py.
+ // Platform seams: TableFile (O_DIRECT+pread; Win: NO_BUFFERING), BatchReader (io_uring,
+ // pread-pool fallback = the portable shape), cumemop_* (dlopen libcuda; Win: nvcuda).
+ 
+@@ -25,10 +20,15 @@
+ #include <unordered_map>
+ #include <vector>
+ 
++#ifdef _WIN32
++#include <windows.h>
++#include <malloc.h>
++#else
+ #include <dlfcn.h>
+ #include <fcntl.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
++#endif
+ 
+ #if defined(__linux__) && __has_include(<linux/io_uring.h>)
+ #include <linux/io_uring.h>
+@@ -54,13 +54,23 @@ constexpr unsigned kReaderThreads = 16;
+ // ---- portability shims ----
+ 
+ void release_store_i64(int64_t *ptr, int64_t value) {
++#ifdef _WIN32
++  InterlockedExchange64(reinterpret_cast<volatile LONG64 *>(ptr), value);
++#else
+   __atomic_store_n(ptr, value, __ATOMIC_RELEASE);
++#endif
+ }
+ 
+ uint8_t *page_aligned_alloc(size_t bytes) {
++#ifdef _WIN32
++  auto *p = static_cast<uint8_t *>(_aligned_malloc(bytes, kPage));
++  if (!p) throw std::bad_alloc();
++  return p;
++#else
+   void *p = nullptr;
+   if (posix_memalign(&p, kPage, bytes) != 0) throw std::bad_alloc();
+   return static_cast<uint8_t *>(p);
++#endif
+ }
+ 
+ // Stream memops for the flag-sync fast path, resolved from the driver at runtime.
+@@ -73,15 +83,22 @@ constexpr unsigned kCuWriteDefault = 0x0;
+ 
+ bool cumemop_resolve() {
+   static bool resolved = [] {
++#ifdef _WIN32
++    HMODULE h = LoadLibraryW(L"nvcuda.dll");
++    if (h == nullptr) return false;
++    auto symbol = [h](const char *name) { return GetProcAddress(h, name); };
++#else
+     void *h = dlopen("libcuda.so.1", RTLD_LAZY | RTLD_LOCAL);
+     if (h == nullptr) h = dlopen("libcuda.so", RTLD_LAZY | RTLD_LOCAL);
+     if (h == nullptr) return false;
+-    g_cu_write64 = reinterpret_cast<CuMemOp64Fn>(dlsym(h, "cuStreamWriteValue64_v2"));
++    auto symbol = [h](const char *name) { return dlsym(h, name); };
++#endif
++    g_cu_write64 = reinterpret_cast<CuMemOp64Fn>(symbol("cuStreamWriteValue64_v2"));
+     if (g_cu_write64 == nullptr)
+-      g_cu_write64 = reinterpret_cast<CuMemOp64Fn>(dlsym(h, "cuStreamWriteValue64"));
+-    g_cu_wait64 = reinterpret_cast<CuMemOp64Fn>(dlsym(h, "cuStreamWaitValue64_v2"));
++      g_cu_write64 = reinterpret_cast<CuMemOp64Fn>(symbol("cuStreamWriteValue64"));
++    g_cu_wait64 = reinterpret_cast<CuMemOp64Fn>(symbol("cuStreamWaitValue64_v2"));
+     if (g_cu_wait64 == nullptr)
+-      g_cu_wait64 = reinterpret_cast<CuMemOp64Fn>(dlsym(h, "cuStreamWaitValue64"));
++      g_cu_wait64 = reinterpret_cast<CuMemOp64Fn>(symbol("cuStreamWaitValue64"));
+     return g_cu_write64 != nullptr && g_cu_wait64 != nullptr;
+   }();
+   return resolved;
+@@ -111,6 +128,71 @@ void signal_flag(uintptr_t flag_addr) {
+ 
+ // Read at least need bytes; len is the larger aligned span the request must keep.
+ // Resuming past need is not safe: a read that crossed EOF ends at an unaligned offset.
++#ifdef _WIN32
++using FileHandle = HANDLE;
++
++// 每个定位读使用独立事件，允许同一文件上的多个工作线程并发读取。
++void pread_min(FileHandle fd, uint8_t *buf, int64_t len, int64_t need, int64_t off) {
++  OVERLAPPED request{};
++  request.Offset = static_cast<DWORD>(off);
++  request.OffsetHigh = static_cast<DWORD>(static_cast<uint64_t>(off) >> 32);
++  request.hEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
++  if (!request.hEvent) throw std::runtime_error("CreateEvent failed: " + std::to_string(GetLastError()));
++  DWORD got = 0;
++  BOOL ok = ReadFile(fd, buf, static_cast<DWORD>(len), &got, &request);
++  DWORD error = ok ? ERROR_SUCCESS : GetLastError();
++  if (!ok && error == ERROR_IO_PENDING) {
++    ok = GetOverlappedResult(fd, &request, &got, TRUE);
++    error = ok ? ERROR_SUCCESS : GetLastError();
++  }
++  CloseHandle(request.hEvent);
++  if (!ok && error != ERROR_HANDLE_EOF)
++    throw std::runtime_error("ReadFile failed: " + std::to_string(error));
++  if (got < need)
++    throw std::runtime_error("short read at offset " + std::to_string(off) + ": got " +
++                             std::to_string(got) + " of " + std::to_string(need));
++}
++
++class TableFile {
++ public:
++  explicit TableFile(const std::string &path) {
++    int count = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, path.data(),
++                                   static_cast<int>(path.size()), nullptr, 0);
++    if (!count) throw std::runtime_error("invalid UTF-8 table path");
++    std::wstring wide(count, L'\0');
++    MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, path.data(),
++                        static_cast<int>(path.size()), wide.data(), count);
++    auto open = [&](DWORD extra) {
++      return CreateFileW(wide.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
++                         nullptr, OPEN_EXISTING, FILE_FLAG_OVERLAPPED | FILE_FLAG_RANDOM_ACCESS | extra, nullptr);
++    };
++    fd_ = open(FILE_FLAG_NO_BUFFERING);
++    direct_ = fd_ != INVALID_HANDLE_VALUE;
++    if (!direct_) fd_ = open(0);
++    if (fd_ == INVALID_HANDLE_VALUE)
++      throw std::runtime_error(path + ": CreateFile failed: " + std::to_string(GetLastError()));
++    LARGE_INTEGER size{};
++    if (!GetFileSizeEx(fd_, &size)) {
++      DWORD error = GetLastError();
++      CloseHandle(fd_);
++      throw std::runtime_error(path + ": GetFileSizeEx failed: " + std::to_string(error));
++    }
++    size_ = size.QuadPart;
++  }
++  ~TableFile() { if (fd_ != INVALID_HANDLE_VALUE) CloseHandle(fd_); }
++  TableFile(const TableFile &) = delete;
++  TableFile &operator=(const TableFile &) = delete;
++  bool direct_io() const { return direct_; }
++  FileHandle native_fd() const { return fd_; }
++  int64_t size() const { return size_; }
++  void discard_cache(int64_t, int64_t) const {}
++ private:
++  FileHandle fd_ = INVALID_HANDLE_VALUE;
++  bool direct_ = false;
++  int64_t size_ = 0;
++};
++#else
++using FileHandle = int;
+ void pread_min(int fd, uint8_t *buf, int64_t len, int64_t need, int64_t off) {
+   int64_t done = 0;
+   while (done < need) {
+@@ -168,6 +250,8 @@ class TableFile {
+   int64_t size_ = 0;
+ };
+ 
++#endif
++
+ // ---- BatchReader: platform seam for parallel positioned reads ----
+ 
+ // Pipelined: at most capacity() reads in flight; wait_one() returns a finished tag to refill.
+@@ -176,7 +260,7 @@ class BatchReader {
+   virtual ~BatchReader() = default;
+   virtual std::string name() const = 0;
+   virtual unsigned capacity() const = 0;
+-  virtual void submit(unsigned tag, int fd, uint8_t *buf, int64_t len, int64_t need,
++  virtual void submit(unsigned tag, FileHandle fd, uint8_t *buf, int64_t len, int64_t need,
+                       int64_t off) = 0;
+   virtual unsigned wait_one() = 0;
+   // reap every in-flight read so stale completions cannot leak into the next fill
+@@ -207,10 +291,16 @@ class ThreadPoolBatchReader final : public BatchReader {
+     for (auto &w : workers_) w.join();
+   }
+ 
+-  std::string name() const override { return "pread-pool x" + std::to_string(workers_.size()); }
++  std::string name() const override {
++#ifdef _WIN32
++    return "ReadFile pool x" + std::to_string(workers_.size());
++#else
++    return "pread-pool x" + std::to_string(workers_.size());
++#endif
++  }
+   unsigned capacity() const override { return kBatchEntries; }
+ 
+-  void submit(unsigned tag, int fd, uint8_t *buf, int64_t len, int64_t need,
++  void submit(unsigned tag, FileHandle fd, uint8_t *buf, int64_t len, int64_t need,
+               int64_t off) override {
+     {
+       std::lock_guard<std::mutex> lock(mu_);
+@@ -241,7 +331,7 @@ class ThreadPoolBatchReader final : public BatchReader {
+  private:
+   struct Req {
+     unsigned tag;
+-    int fd;
++    FileHandle fd;
+     uint8_t *buf;
+     int64_t len;
+     int64_t need;
+@@ -336,7 +426,7 @@ class IoUringBatchReader final : public BatchReader {
+   std::string name() const override { return "io_uring"; }
+   unsigned capacity() const override { return entries_; }
+ 
+-  void submit(unsigned tag, int fd, uint8_t *buf, int64_t len, int64_t need,
++  void submit(unsigned tag, FileHandle fd, uint8_t *buf, int64_t len, int64_t need,
+               int64_t off) override {
+     io_uring_sqe *sqe = &sqes_[sq_shadow_tail_ & *sq_mask_];
+     std::memset(sqe, 0, sizeof(*sqe));
+@@ -476,7 +566,11 @@ class RowStore {
+   // reader first: a still-running read must not land in freed bounce memory
+   virtual ~RowStore() {
+     reader_.reset();
++#ifdef _WIN32
++    _aligned_free(bounce_);
++#else
+     free(bounce_);
++#endif
+   }
+ 
+   RowStore(const RowStore &) = delete;
+@@ -513,11 +607,28 @@ class RowStore {
+     size_t direct = 0;
+     for (const auto &f : files_) direct += f->direct_io() ? 1 : 0;
+     std::string s = reader_->name();
+-    if (direct == files_.size()) return s + ", O_DIRECT";
++    if (direct == files_.size()) {
++#ifdef _WIN32
++      return s + ", NO_BUFFERING";
++#else
++      return s + ", O_DIRECT";
++#endif
++    }
+     return s + ", buffered " + std::to_string(files_.size() - direct) + "/" +
+            std::to_string(files_.size()) + " files";
+   }
+ 
++  // 仅统计已成功完成的真实文件读取，用于核实推理时确实按行访问 SSD。
++  std::unordered_map<std::string, int64_t> io_stats() const {
++    int64_t direct_files = 0;
++    for (const auto &f : files_) direct_files += f->direct_io() ? 1 : 0;
++    return {{"read_requests_completed", reads_completed_},
++            {"aligned_read_bytes_requested", read_bytes_requested_},
++            {"payload_rows_delivered", rows_delivered_},
++            {"largest_read_offset", largest_read_offset_},
++            {"direct_files", direct_files}, {"files", (int64_t)files_.size()}};
++  }
++
+  protected:
+   // Queue dst on this fill's pending batch; duplicate rows fan out from one read.
+   void request_row(int64_t row_id, uint8_t *dst) {
+@@ -574,6 +685,10 @@ class RowStore {
+       for (size_t completed = 0; completed < total; completed++) {
+         const unsigned tag = reader_->wait_one();
+         const Pending &p = pending_[tag_pending[tag]];
++        reads_completed_++;
++        read_bytes_requested_ += p.read_len;
++        rows_delivered_ += (int64_t)p.dsts.size();
++        largest_read_offset_ = std::max(largest_read_offset_, p.read_off);
+         const uint8_t *row = bounce_ + (size_t)tag * kSpanMax + p.row_off;
+         for (uint8_t *dst : p.dsts) std::memcpy(dst, row, row_bytes_);
+         p.file->discard_cache(p.read_off, p.read_len);
+@@ -593,6 +708,8 @@ class RowStore {
+ 
+   std::vector<Pending> pending_;
+   std::unordered_map<int64_t, size_t> pending_index_;
++  int64_t reads_completed_ = 0, read_bytes_requested_ = 0;
++  int64_t rows_delivered_ = 0, largest_read_offset_ = 0;
+ };
+ 
+ // The Qwen3.8-Flash-Next PLE table: RowStore plus the checkpoint's n-gram hash, so a fill
+@@ -657,6 +774,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+       .def("flush", &RowStore::flush, py::arg("signal_addr") = 0,
+            py::call_guard<py::gil_scoped_release>())
+       .def("io_backend", &RowStore::io_backend)
++      .def("io_stats", &RowStore::io_stats)
+       .def_property_readonly("row_bytes", &RowStore::row_bytes)
+       .def_property_readonly("total_rows", &RowStore::total_rows);
+   py::class_<PleStore, RowStore>(m, "PleStore")
+diff --git a/python/freetoken/kernel/utils.py b/python/freetoken/kernel/utils.py
+index 9af6152..b07af4b 100644
+--- a/python/freetoken/kernel/utils.py
++++ b/python/freetoken/kernel/utils.py
+@@ -259,7 +259,8 @@ def _load_prebuilt(name: str) -> Module | None:
+             )
+         return None
+ 
+-    so_path = cache_dir / name / f"{name}.so"
++    suffix = ".dll" if os.name == "nt" else ".so"
++    so_path = cache_dir / name / f"{name}{suffix}"
+     if so_path.exists():
+         import tvm_ffi
+ 
+diff --git a/python/freetoken/layers/quantization/configs/base.py b/python/freetoken/layers/quantization/configs/base.py
+index a641361..0e58bcb 100644
+--- a/python/freetoken/layers/quantization/configs/base.py
++++ b/python/freetoken/layers/quantization/configs/base.py
+@@ -108,10 +108,10 @@ class QuantConfig(ABC):
+         ``hf_config`` comes from ``cached_load_hf_config``, which folds an old ModelOpt ``hf_quant_config.json`` into ``quantization_config``."""
+         q = quantization_config_of(hf_config)
+         if q is None:
+-            return NoQuantConfig(name_map, unquantized)
++            return _expert_override(hf_config, NoQuantConfig(name_map, unquantized))
+         for cls in dialects():
+             if cls.claims(q):
+-                return cls(q, hf_config, name_map=name_map, unquantized=unquantized)
++                return _expert_override(hf_config, cls(q, hf_config, name_map=name_map, unquantized=unquantized))
+         raise NotImplementedError(f"quantization method {q.get('quant_method')!r} is not supported")
+ 
+ 
+@@ -128,3 +128,53 @@ class NoQuantConfig(QuantConfig):
+ 
+     def scheme_for_name(self, name: str) -> QuantScheme | None:
+         return None
++
++
++class ExpertSourceConfig(QuantConfig):
++    """Independent routed-expert storage; all other schemes come from the HF dialect."""
++
++    dialect = "expert_source"
++    STORAGE = {}
++
++    def __init__(self, base: QuantConfig):
++        super().__init__(base.name_map)
++        self.base = base
++
++    def scheme_for_name(self, name: str) -> QuantScheme | None:
++        from ..names import is_routed_expert
++        from ..scheme import WeightDesc
++
++        # 只覆盖路由专家，shared_expert 和主干继续使用原始 HF 精度契约。
++        if is_routed_expert(name):
++            return QuantScheme(QuantKind.Q2_0, WeightDesc("q2_0", (1, 64), "f16"), {"weight"})
++        return self.base.scheme_for_name(name)
++
++    def scheme_for(self, prefix: str) -> QuantScheme | None:
++        from ..names import is_routed_expert
++
++        if is_routed_expert(prefix):
++            return self.scheme_for_name(prefix)
++        return self.base.scheme_for(prefix)
++
++    def stored_tensors(self, kind: QuantKind) -> dict[str, Stored]:
++        if kind is QuantKind.Q2_0:
++            raise ValueError("Q2_0 experts are read from the explicit GGUF expert source")
++        return self.base.stored_tensors(kind)
++
++    def layer_config(self, layer, layer_kind, scheme):
++        if scheme is not None and scheme.kind is QuantKind.Q2_0:
++            if layer_kind is not LayerKind.MOE:
++                raise ValueError("Q2_0 expert override may only bind a routed MoE layer")
++            return super().layer_config(layer, layer_kind, scheme)
++        return self.base.layer_config(layer, layer_kind, scheme)
++
++
++def _expert_override(hf_config, base: QuantConfig) -> QuantConfig:
++    source = cfg_get(hf_config, "freetoken_expert_source")
++    if source is None:
++        return base
++    if not isinstance(source, dict) or source.get("format") != "q2_0":
++        raise ValueError("unsupported freetoken_expert_source contract")
++    if cfg_get(hf_config, "model_type") != "qwen4_exp":
++        raise ValueError("Q2_0 external experts currently require qwen4_exp")
++    return ExpertSourceConfig(base)
+diff --git a/python/freetoken/layers/quantization/moe/__init__.py b/python/freetoken/layers/quantization/moe/__init__.py
+index a5f2dc6..486279b 100644
+--- a/python/freetoken/layers/quantization/moe/__init__.py
++++ b/python/freetoken/layers/quantization/moe/__init__.py
+@@ -1,5 +1,5 @@
+ from .base import BankSpec, ExpertView, MoEConfig, MoEKernel, MoEMethod
+-from . import fp8_block, mxfp4, mxfp8, nvfp4, unquantized
++from . import fp8_block, mxfp4, mxfp8, nvfp4, unquantized, q2_0
+ from .fp8_block import Fp8BlockMoEMethod
+ from .mxfp4 import Mxfp4MoEMethod
+ from .mxfp8 import Mxfp8MoEMethod
+diff --git a/python/freetoken/layers/quantization/scheme.py b/python/freetoken/layers/quantization/scheme.py
+index 89f968a..7a5e96f 100644
+--- a/python/freetoken/layers/quantization/scheme.py
++++ b/python/freetoken/layers/quantization/scheme.py
+@@ -20,6 +20,7 @@ class QuantKind(Enum):
+     MXFP8 = "mxfp8"
+     NVFP4 = "nvfp4"
+     MXFP4 = "mxfp4"
++    Q2_0 = "q2_0"
+ 
+     def __str__(self) -> str:
+         return self.value
+diff --git a/python/freetoken/models/config.py b/python/freetoken/models/config.py
+index 55b90bb..cf1267f 100644
+--- a/python/freetoken/models/config.py
++++ b/python/freetoken/models/config.py
+@@ -286,6 +286,7 @@ class ModelConfig:
+     # "fp8_block" is DeepSeek-V3-style 128x128 block-fp8 (weight fp8-e4m3 +
+     # weight_scale_inv per block), also applied to the dense projections.
+     expert_quant: str = "none"
++    expert_source: dict | None = None
+     # Block size (out, in) for block-wise weight quantization (fp8_block: (128, 128)).
+     weight_block_size: tuple[int, int] | None = None
+     # the checkpoint's quant kind for the dense attention / GatedDeltaNet projections, detected by the family's parse_config for its reader
+diff --git a/python/freetoken/models/loader.py b/python/freetoken/models/loader.py
+index 0f310cc..97b7587 100644
+--- a/python/freetoken/models/loader.py
++++ b/python/freetoken/models/loader.py
+@@ -73,6 +73,9 @@ def safetensors_weight_map(folder: str) -> dict[str, str]:
+ 
+ def drop_page_cache(path: str) -> None:
+     """drop a file's page cache: banks + full checkpoint cache don't both fit in host RAM (OOM)."""
++    if not hasattr(os, "posix_fadvise"):
++        # Windows 的串行 safetensors 映射可被系统回收；不伪装为已执行 POSIX cache eviction。
++        return
+     try:
+         fd = os.open(path, os.O_RDONLY)
+         try:
+diff --git a/python/freetoken/models/qwen4_exp/config.py b/python/freetoken/models/qwen4_exp/config.py
+index e413786..722305c 100644
+--- a/python/freetoken/models/qwen4_exp/config.py
++++ b/python/freetoken/models/qwen4_exp/config.py
+@@ -256,6 +256,7 @@ def parse_config(hf_config: Any) -> ModelConfig:
+         image_token_id=getattr(hf_config, "image_token_id", None),
+         attention_groups=groups,
+         expert_quant=expert_quant,
++        expert_source=getattr(hf_config, "freetoken_expert_source", None),
+         qwen4_args=qwen4_args,
+         slot_states=ple_slot_states(qwen4_args),
+     )
+diff --git a/python/freetoken/moe/expert_banks.py b/python/freetoken/moe/expert_banks.py
+index 7500174..f6bf7cf 100644
+--- a/python/freetoken/moe/expert_banks.py
++++ b/python/freetoken/moe/expert_banks.py
+@@ -108,7 +108,13 @@ def build_expert_banks(
+     if dummy:
+         for role, per_layer in banks.items():
+             for tensor in per_layer:
+-                _dummy_fill(role, tensor)
++                if method.kind is QuantKind.Q2_0:
++                    tensor.fill_(0x55)
++                    blocks = tensor.reshape(-1, 18)
++                    blocks[:, 0] = 0
++                    blocks[:, 1] = 0x3c  # FP16 scale=1, every code=1 -> exact finite zero
++                else:
++                    _dummy_fill(role, tensor)
+         for alpha in alphas.values():
+             alpha.fill_(1.0)
+         if hb is not None and torch.cuda.is_available():
+diff --git a/python/freetoken/moe/expert_pieces.py b/python/freetoken/moe/expert_pieces.py
+index 79f655a..821f5a2 100644
+--- a/python/freetoken/moe/expert_pieces.py
++++ b/python/freetoken/moe/expert_pieces.py
+@@ -48,6 +48,10 @@ def iter_expert_pieces(
+     ``nvfp4_expert_spec``. The reader is resolved here, before any bank is allocated, so a
+     missing parallel reader raises ``NotImplementedError`` while a serial fallback is still cheap.
+     """
++    if kind is QuantKind.Q2_0:
++        from freetoken.models.qwen4_exp.q2_source import iter_q2_expert_pieces
++
++        return iter_q2_expert_pieces(model_path, config, chunk=chunk)
+     spec = get_model_spec(config.architectures[0])
+     hook = _model_hook(spec, "iter_expert_pieces")
+     if hook is not None:
+diff --git a/python/freetoken/moe/host_banks.py b/python/freetoken/moe/host_banks.py
+index 91e2648..cdc4211 100644
+--- a/python/freetoken/moe/host_banks.py
++++ b/python/freetoken/moe/host_banks.py
+@@ -379,11 +379,36 @@ class LayerCompletionTracker:
+             self._on_layer(layer_id, {name: per[layer_id] for name, per in self._banks.items()})
+ 
+ 
++def _read_buffered_range(mv: memoryview, path: str, file_offset: int,
++                         nbytes: int, dest_offset: int, workers: int, chunk: int) -> int:
++    """Windows 的批量 host-bank 读取直接填入现有 buffer；SSD 按行查表仍走原生 NO_BUFFERING 后端。"""
++    def read_chunk(offset):
++        size = min(chunk, nbytes - offset)
++        destination = mv[dest_offset + offset:dest_offset + offset + size]
++        # 各任务独立文件位置，避免并发 seek/read 互相覆盖。
++        with open(path, "rb", buffering=0) as file:
++            file.seek(file_offset + offset)
++            done = 0
++            while done < size:
++                count = file.readinto(destination[done:])
++                if not count:
++                    raise OSError(f"short buffered read at {file_offset + offset + done}, need {size - done} bytes")
++                done += count
++    with ThreadPoolExecutor(workers) as executor:
++        list(executor.map(read_chunk, range(0, nbytes, chunk)))
++    return nbytes
++
++
+ def read_file_into(buf: memoryview | mmap.mmap, path: str, *, workers: int = 8,
+                    chunk: int = _DEFAULT_CHUNK, drop_cache: bool = True) -> int:
+     """Chunked multi-threaded O_DIRECT read of the whole file ``path`` into ``buf``
+     (page-aligned). Returns the file size. The buffer must be >= the rounded-up file size."""
+     size = os.path.getsize(path)
++    if os.name == "nt":
++        mv = memoryview(buf).cast("B")
++        if size > len(mv):
++            raise ValueError(f"destination holds {len(mv)} bytes, need {size}")
++        return _read_buffered_range(mv, path, 0, size, 0, workers, chunk)
+     if drop_cache:
+         try:
+             fd0 = os.open(path, os.O_RDONLY)
+@@ -434,6 +459,8 @@ def read_range_into(buf: memoryview | mmap.mmap, path: str, *, file_offset: int,
+     mv = (buf if isinstance(buf, memoryview) else memoryview(buf)).cast("B")
+     if dest_offset + nbytes > len(mv):
+         raise ValueError(f"destination holds {len(mv)} bytes, need {dest_offset + nbytes}")
++    if os.name == "nt":
++        return _read_buffered_range(mv, path, file_offset, nbytes, dest_offset, workers, chunk)
+     base = ctypes.addressof(ctypes.c_char.from_buffer(mv))
+     if drop_cache:
+         try:
+diff --git a/python/freetoken/moe/legacy_format.py b/python/freetoken/moe/legacy_format.py
+index 973a3db..889908f 100644
+--- a/python/freetoken/moe/legacy_format.py
++++ b/python/freetoken/moe/legacy_format.py
+@@ -27,6 +27,7 @@ def legacy_bank_names(quant_format: str) -> dict[str, str]:
+ 
+ # (kind, kernel) <-> the quant_format tag
+ LEGACY_FORMAT = {
++    (QuantKind.Q2_0, "triton"): "q2_0",
+     (QuantKind.NONE, "fused"): "bf16",
+     (QuantKind.FP8_BLOCK, "triton"): "fp8_block",
+     (QuantKind.NVFP4, "triton"): "nvfp4",
+diff --git a/python/freetoken/moe/offload_cache.py b/python/freetoken/moe/offload_cache.py
+index 0969f73..6300cbc 100644
+--- a/python/freetoken/moe/offload_cache.py
++++ b/python/freetoken/moe/offload_cache.py
+@@ -46,6 +46,7 @@ _BANK_SCHEMAS: dict[str, tuple[str, ...]] = {
+     # native GGUF Q4_0 experts: packed block bytes per output row, dequantized inside
+     # the borrowed ggml MoE kernels. gate_up [L*E, 2I, H//32*18], down [L*E, H, I//32*18].
+     "q4_0": ("gate_up", "down"),
++    "q2_0": ("gate_up", "down"),
+     # native ModelOpt rows for the Triton inline-dequant kernels: packed e2m1 codes +
+     # fp8-e4m3 per-16 block scales + per-output-row fp16 globals (w1/w3 carry distinct
+     # globals, and folding them into the e4m3 block scales would underflow)
+@@ -91,6 +92,7 @@ _BANK_BYTES_PER_EXPERT = {
+         + (H // 128) * fp8_block_scale_pad(H // 128, I // 128)
+     ) * 2,
+     "q4_0": lambda H, I: 2 * I * (H // 32) * 18 + H * (I // 32) * 18,
++    "q2_0": lambda H, I: 3 * I * H // 64 * 18,
+     "nvfp4": lambda H, I: 2 * I * (H // 2 + H // 16 + 2) + H * (I // 2 + I // 16 + 2),
+     "mxfp4": lambda H, I: 2 * I * (H // 2 + H // 32 + 2) + H * (I // 2 + I // 32 + 2),
+     "ds_fp4": lambda H, I: 2 * I * (H // 2 + H // 32) + H * (I // 2 + I // 32),
+diff --git a/python/freetoken/version.py b/python/freetoken/version.py
+index ae73625..09b4692 100644
+--- a/python/freetoken/version.py
++++ b/python/freetoken/version.py
+@@ -1 +1 @@
+-__version__ = "0.1.3"
++__version__ = "0.1.3+speed.q2exp1"
+diff --git a/setup.py b/setup.py
+index 997745f..67bf638 100644
+--- a/setup.py
++++ b/setup.py
+@@ -69,6 +69,8 @@ def _cuda_runtime_paths() -> tuple[list[str], list[str]]:
+     library_dirs = [str(cuda_home / "lib64")]
+     if (cuda_home / "lib").exists():
+         library_dirs.append(str(cuda_home / "lib"))
++    if os.name == "nt":
++        library_dirs.append(str(cuda_home / "lib" / "x64"))
+     return [str(cuda_home / "include")], library_dirs
+ 
+ 
+@@ -87,6 +89,9 @@ else:
+     runtime_link_args = []
+     extra_compile = ["-O3", "-std=c++17"]
+ 
++if os.name == "nt":
++    extra_compile = ["/O2", "/std:c++17", "/utf-8", "/DNOMINMAX"]
++
+ _check_toolchain()
+ 
+ 
+@@ -116,7 +121,7 @@ setup(
+             include_dirs=[KERNEL_INCLUDE, *runtime_include_dirs],
+             library_dirs=runtime_library_dirs,
+             libraries=[runtime_lib],
+-            extra_compile_args=extra_compile + ["-pthread"],
++            extra_compile_args=extra_compile + ([] if os.name == "nt" else ["-pthread"]),
+             extra_link_args=runtime_link_args,
+         ),
+         # disk-backed row store (PLE / Engram tables); Linux-only until the TableFile/BatchReader seams grow Windows bodies
+@@ -126,9 +131,9 @@ setup(
+                 sources=[
+                     "python/freetoken/kernel/csrc/row_store/row_store_ext.cpp",
+                 ],
+-                extra_compile_args=["-O3", "-std=c++17"],
++                extra_compile_args=extra_compile,
+             )
+-        ] if sys.platform == "linux" else []),
++        ] if sys.platform in {"linux", "win32"} else []),
+     ],
+     cmdclass={"build_ext": BuildExtension.with_options(use_ninja=True)},
+ )
+diff --git a/tests/kernels/test_row_store.py b/tests/kernels/test_row_store.py
+index d4a1950..1c15840 100644
+--- a/tests/kernels/test_row_store.py
++++ b/tests/kernels/test_row_store.py
+@@ -49,6 +49,10 @@ def test_rows_come_back_bitwise_across_extents_and_files(tmp_path, use_io_uring)
+     ids = torch.tensor([0, 999, 1000, 1999, 2000, 2999, 1234, 1234, 42, 0], dtype=torch.int64)
+     got = _stage(store, ids)
+     assert torch.equal(got, table[ids])
++    stats = store.io_stats()
++    assert stats["read_requests_completed"] == ids.unique().numel()
++    assert stats["payload_rows_delivered"] == ids.numel()
++    assert stats["aligned_read_bytes_requested"] >= ids.unique().numel() * ROW_BYTES
+ 
+     # a wider destination stride leaves the gap untouched
+     got = _stage(store, ids, dst_stride=ROW_BYTES + 40)
+diff --git a/tests/models/qwen4_exp/test_ple_disk.py b/tests/models/qwen4_exp/test_ple_disk.py
+index ba9cd98..066ea2c 100644
+--- a/tests/models/qwen4_exp/test_ple_disk.py
++++ b/tests/models/qwen4_exp/test_ple_disk.py
+@@ -347,6 +347,8 @@ def test_graph_sync_protocol(tmp_path, monkeypatch):
+ 
+     # gate mode: the hook fills inline and returns no deferred
+     monkeypatch.setenv("FREETOKEN_PLE_SYNC", "gate")
+-    gated, _, _ = _make_table(tmp_path)
++    gate_path = tmp_path / "gate-中文"
++    gate_path.mkdir()
++    gated, _, _ = _make_table(gate_path)
+     assert not gated._wait_sync
+     assert gated.host_fill_batch(_decode_batch([3, 4], 5), use_graph=True) is None
+diff --git a/python/freetoken/layers/quantization/moe/q2_0.py b/python/freetoken/layers/quantization/moe/q2_0.py
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/layers/quantization/moe/q2_0.py
+@@ -0,0 +1,49 @@
++"""GSQ Q2_0 routed experts, kept in their native 64-element / 18-byte blocks."""
++from __future__ import annotations
++
++import torch
++
++from ..registry import LayerKind, register_method
++from ..scheme import QuantKind
++from .base import BankSpec, MoEConfig, MoEKernel, MoEMethod
++
++
++class TritonQ20MoEKernel(MoEKernel):
++    name = "triton"
++
++    def unusable_reason(self, cfg: MoEConfig):
++        reason = self._common_reject(cfg, tp_ok=False, cpu_ok=False, plain_silu_only=True)
++        if reason:
++            return reason
++        if cfg.interleaved or cfg.apply_router_weight_on_input:
++            return "Q2_0 requires contiguous gate/up halves and output-side routing weights"
++        if cfg.hidden % 64 or cfg.intermediate % 64:
++            return "Q2_0 input dimensions must be divisible by 64"
++        if cfg.strategy != "offload":
++            return "Q2_0 currently requires pure GPU offload"
++        if cfg.dtype != torch.bfloat16:
++            return "Q2_0 mixed-precision path currently requires BF16 activations"
++        return None
++
++    def layout(self, cfg):
++        return {
++            "gate_up": BankSpec((2 * cfg.intermediate, cfg.hidden // 64 * 18), torch.uint8),
++            "down": BankSpec((cfg.hidden, cfg.intermediate // 64 * 18), torch.uint8),
++        }
++
++    def pack(self, pieces, cfg, out):
++        # 原生量化字节直接填入 bank，禁止创建整层 BF16 专家副本。
++        out["gate_up"][:, :cfg.intermediate].copy_(pieces["gate"])
++        out["gate_up"][:, cfg.intermediate:].copy_(pieces["up"])
++        out["down"].copy_(pieces["down"])
++        return {}
++
++    def apply(self, layer, x, topk_weights, topk_ids, view, *, is_prefill):
++        from freetoken.moe.fused_q2_0 import fused_experts_q2_0
++
++        return fused_experts_q2_0(x, view.tensors["gate_up"], view.tensors["down"], topk_weights, topk_ids)
++
++
++@register_method(QuantKind.Q2_0, LayerKind.MOE)
++class Q20MoEMethod(MoEMethod):
++    candidates = (TritonQ20MoEKernel,)
+diff --git a/python/freetoken/models/qwen4_exp/q2_source.py b/python/freetoken/models/qwen4_exp/q2_source.py
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/models/qwen4_exp/q2_source.py
+@@ -0,0 +1,144 @@
++"""Expert-only GGUF v3 source; deliberately independent of GGUF trunk/PLE readers."""
++from __future__ import annotations
++
++import math
++from pathlib import Path
++import re
++import struct
++
++import torch
++
++SOURCE_SHA256 = "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
++SOURCE_SIZE = 37_623_740_192
++_FORMATS = {0: "B", 1: "b", 2: "H", 3: "h", 4: "I", 5: "i", 6: "f", 7: "?", 10: "Q", 11: "q", 12: "d"}
++
++
++def _read(stream, count):
++    data = stream.read(count)
++    if len(data) != count:
++        raise ValueError("truncated GGUF expert source")
++    return data
++
++
++def _unpack(stream, fmt):
++    return struct.unpack("<" + fmt, _read(stream, struct.calcsize("<" + fmt)))
++
++
++def _string(stream):
++    size, = _unpack(stream, "Q")
++    if size > 16 << 20:
++        raise ValueError("oversized GGUF string")
++    return _read(stream, size).decode("utf-8")
++
++
++def _value(stream, kind=None, *, keep=True):
++    if kind is None:
++        kind, = _unpack(stream, "I")
++    if kind == 8:
++        return _string(stream)
++    if kind == 9:
++        elem, count = _unpack(stream, "IQ")
++        if count > 10_000_000:
++            raise ValueError("oversized GGUF metadata array")
++        if not keep and elem in _FORMATS:
++            stream.seek(count * struct.calcsize("<" + _FORMATS[elem]), 1)
++            return None
++        values = [_value(stream, elem, keep=keep) for _ in range(count)]
++        return values if keep else None
++    if kind not in _FORMATS:
++        raise ValueError(f"unsupported GGUF metadata type {kind}")
++    return _unpack(stream, _FORMATS[kind])[0]
++
++
++def read_q2_directory(path: Path, *, layers=48, experts=512, hidden=2560, intermediate=640):
++    """Validate every expert shape/type/bound and return absolute tensor offsets."""
++    metadata, directory = {}, {}
++    with path.open("rb") as stream:
++        magic, version, tensors, values = _unpack(stream, "IIQQ")
++        if magic != 0x46554747 or version != 3 or tensors > 100_000 or values > 100_000:
++            raise ValueError("invalid GGUF v3 header")
++        for _ in range(values):
++            key = _string(stream)
++            value = _value(stream, keep=not key.startswith("tokenizer."))
++            if not key.startswith("tokenizer."):
++                metadata[key] = value
++        for _ in range(tensors):
++            name = _string(stream)
++            dims, = _unpack(stream, "I")
++            if not 1 <= dims <= 4:
++                raise ValueError("invalid GGUF tensor rank")
++            shape = _unpack(stream, "Q" * dims)
++            kind, offset = _unpack(stream, "IQ")
++            if name in directory:
++                raise ValueError(f"duplicate GGUF tensor {name}")
++            directory[name] = (shape, kind, offset)
++        alignment = int(metadata.get("general.alignment", 32))
++        if alignment <= 0 or alignment & (alignment - 1):
++            raise ValueError("invalid GGUF alignment")
++        data_start = (stream.tell() + alignment - 1) // alignment * alignment
++    required = {"general.architecture": "qwen4exp", "qwen4exp.block_count": layers,
++                "qwen4exp.expert_count": experts, "qwen4exp.embedding_length": hidden,
++                "qwen4exp.expert_feed_forward_length": intermediate}
++    for key, expected in required.items():
++        if metadata.get(key) != expected:
++            raise ValueError(f"Q2_0 geometry mismatch: {key}={metadata.get(key)!r}, expected {expected!r}")
++    selected, spans = {}, []
++    source_size = path.stat().st_size
++    for layer in range(layers):
++        for role in ("gate", "up", "down"):
++            name = f"blk.{layer}.ffn_{role}_exps.weight"
++            expected = (intermediate, hidden, experts) if role == "down" else (hidden, intermediate, experts)
++            shape, kind, offset = directory.get(name, (None, None, None))
++            if shape != expected or kind != 42:
++                raise ValueError(f"missing or incompatible Q2_0 expert tensor {name}: {shape}, type {kind}")
++            size = math.prod(shape) // 64 * 18
++            start = data_start + offset
++            if start < data_start or start + size > source_size or offset % alignment:
++                raise ValueError(f"out-of-bounds or misaligned expert tensor {name}")
++            selected[layer, role] = (start, size)
++            spans.append((start, start + size))
++    spans.sort()
++    if any(a[1] > b[0] for a, b in zip(spans, spans[1:])):
++        raise ValueError("overlapping GGUF expert tensors")
++    actual = {name for name in directory if re.fullmatch(r"blk\.\d+\.ffn_(gate|up|down)_exps\.weight", name)}
++    if len(actual) != layers * 3:
++        raise ValueError("unexpected routed-expert tensor count")
++    return selected
++
++
++def iter_q2_expert_pieces(model_path, config, *, chunk=8 << 20):
++    source = config.expert_source
++    if not isinstance(source, dict) or source.get("format") != "q2_0":
++        raise ValueError("Q2_0 requires an explicit expert source")
++    path = Path(source["path"])
++    if not path.is_absolute():
++        path = Path(model_path) / path
++    stat = path.stat()
++    if (source.get("sha256") != SOURCE_SHA256 or stat.st_size != SOURCE_SIZE
++            or source.get("verified_mtime_ns") != stat.st_mtime_ns):
++        raise ValueError("Q2_0 source identity changed; reverify the complete artifact")
++    directory = read_q2_directory(path, layers=config.num_layers, experts=config.num_experts,
++                                  hidden=config.hidden_size, intermediate=config.moe_intermediate_size)
++    E, H, I = config.num_experts, config.hidden_size, config.moe_intermediate_size
++    per_expert = 3 * H * I // 64 * 18
++    count = max(1, min(E, chunk // per_expert))
++    # 有界缓冲区读取原生量化字节，所有 48x512 专家完整加载，禁止缺失专家别名。
++    with path.open("rb", buffering=0) as stream:
++        for layer in range(config.num_layers):
++            for e0 in range(0, E, count):
++                e1 = min(E, e0 + count)
++                pieces = {}
++                for role in ("gate", "up", "down"):
++                    rows, width = (H, I // 64 * 18) if role == "down" else (I, H // 64 * 18)
++                    piece = torch.empty((e1 - e0, rows, width), dtype=torch.uint8)
++                    dst = memoryview(piece.numpy()).cast("B")
++                    start, total = directory[layer, role]
++                    stream.seek(start + e0 * (total // E))
++                    done = 0
++                    while done < len(dst):
++                        got = stream.readinto(dst[done:])
++                        if not got:
++                            raise ValueError("short Q2_0 expert read")
++                        done += got
++                    pieces[role] = piece
++                yield layer, e0, e1, pieces
+diff --git a/python/freetoken/moe/fused_q2_0.py b/python/freetoken/moe/fused_q2_0.py
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/moe/fused_q2_0.py
+@@ -0,0 +1,85 @@
++"""Q2_0 weight-only MoE: native blocks, BF16 activations, FP32 accumulation."""
++from __future__ import annotations
++
++import torch
++import triton
++import triton.language as tl
++
++
++@triton.jit
++def _q2_values(W, base, row, k, N: tl.constexpr, K: tl.constexpr):
++    # 每个 64 元素块保存 FP16 scale + 16 字节相邻 2-bit 编码，区别于 Q2_K/TQ2_0。
++    block = base + row[:, None] * (K // 64 * 18) + (k[None, :] // 64) * 18
++    mask = (row[:, None] < N) & (k[None, :] < K)
++    low = tl.load(W + block, mask, 0).to(tl.uint16)
++    high = tl.load(W + block + 1, mask, 0).to(tl.uint16)
++    scale = (low | (high << 8)).to(tl.float16, bitcast=True).to(tl.float32)
++    packed = tl.load(W + block + 2 + k[None, :] % 64 // 4, mask, 0).to(tl.int32)
++    code = (packed >> ((k[None, :] % 4) * 2)) & 3
++    # 权重先舍入到 BF16，主干激活不再额外量化；乘加使用 FP32。
++    return ((code - 1).to(tl.float32) * scale).to(tl.bfloat16).to(tl.float32)
++
++
++@triton.jit
++def _gate_up(X, W, IDS, A, H: tl.constexpr, I: tl.constexpr, TOPK: tl.constexpr,
++             BK: tl.constexpr, BN: tl.constexpr):
++    route = tl.program_id(0)
++    token = route // TOPK
++    expert = tl.load(IDS + route).to(tl.int64)
++    row = tl.program_id(1) * BN + tl.arange(0, BN)
++    k = tl.arange(0, BK)
++    base = expert * (2 * I * (H // 64 * 18))
++    xv = tl.load(X + token * H + k, k < H, 0).to(tl.float32)
++    gate = tl.sum(_q2_values(W, base, row, k, 2 * I, H) * xv[None, :], 1).to(tl.bfloat16).to(tl.float32)
++    up = tl.sum(_q2_values(W, base, row + I, k, 2 * I, H) * xv[None, :], 1).to(tl.bfloat16).to(tl.float32)
++    value = gate / (1.0 + tl.exp(-gate)) * up
++    tl.store(A + route * I + row, value, row < I)
++
++
++@triton.jit
++def _down(A, W, IDS, R, H: tl.constexpr, I: tl.constexpr, BK: tl.constexpr, BN: tl.constexpr):
++    route = tl.program_id(0)
++    expert = tl.load(IDS + route).to(tl.int64)
++    row = tl.program_id(1) * BN + tl.arange(0, BN)
++    k = tl.arange(0, BK)
++    base = expert * (H * (I // 64 * 18))
++    av = tl.load(A + route * I + k, k < I, 0).to(tl.float32)
++    value = tl.sum(_q2_values(W, base, row, k, H, I) * av[None, :], 1)
++    tl.store(R + route * H + row, value, row < H)
++
++
++@triton.jit
++def _reduce(R, WEIGHTS, Y, H: tl.constexpr, TOPK: tl.constexpr, BT: tl.constexpr, BH: tl.constexpr):
++    token = tl.program_id(0)
++    row = tl.program_id(1) * BH + tl.arange(0, BH)
++    route = tl.arange(0, BT)
++    w = tl.load(WEIGHTS + token * TOPK + route, route < TOPK, 0).to(tl.float32)
++    values = tl.load(R + (token * TOPK + route[:, None]) * H + row[None, :],
++                     (route[:, None] < TOPK) & (row[None, :] < H), 0).to(tl.float32)
++    tl.store(Y + token * H + row, tl.sum(values * w[:, None], 0), row < H)
++
++
++def fused_experts_q2_0(x, gate_up, down, topk_weights, topk_ids):
++    if x.dtype != torch.bfloat16 or gate_up.dtype != torch.uint8 or down.dtype != torch.uint8:
++        raise ValueError("Q2_0 requires BF16 activations and native uint8 blocks")
++    if not all(t.is_contiguous() and t.is_cuda for t in (x, gate_up, down, topk_weights, topk_ids)):
++        raise ValueError("Q2_0 tensors must be contiguous CUDA tensors")
++    tokens, hidden = x.shape
++    intermediate = gate_up.shape[1] // 2
++    topk = topk_ids.shape[1]
++    if (hidden % 64 or intermediate % 64 or gate_up.shape[2] != hidden // 64 * 18
++            or down.shape != (gate_up.shape[0], hidden, intermediate // 64 * 18)
++            or topk_ids.shape[0] != tokens or topk_weights.shape != topk_ids.shape):
++        raise ValueError("incompatible Q2_0 expert geometry or routing tensors")
++    active = torch.empty((tokens * topk, intermediate), dtype=x.dtype, device=x.device)
++    routed = torch.empty((tokens * topk, hidden), dtype=x.dtype, device=x.device)
++    out = torch.empty_like(x)
++    _gate_up[(tokens * topk, triton.cdiv(intermediate, 4))](
++        x, gate_up, topk_ids, active, hidden, intermediate, topk,
++        triton.next_power_of_2(hidden), 4, num_warps=8)
++    _down[(tokens * topk, triton.cdiv(hidden, 4))](
++        active, down, topk_ids, routed, hidden, intermediate,
++        triton.next_power_of_2(intermediate), 4, num_warps=4)
++    _reduce[(tokens, triton.cdiv(hidden, 128))](
++        routed, topk_weights, out, hidden, topk, triton.next_power_of_2(topk), 128, num_warps=4)
++    return out
+diff --git a/tests/moe/test_q2_0.py b/tests/moe/test_q2_0.py
+new file mode 100644
+--- /dev/null
++++ b/tests/moe/test_q2_0.py
+@@ -0,0 +1,48 @@
++"""External expert overrides must preserve the trunk's independent schemes."""
++from dataclasses import replace
++from types import SimpleNamespace
++
++import pytest
++import torch
++
++from freetoken.layers.quantization import QuantConfig, QuantKind
++from freetoken.layers.quantization.configs.base import ExpertSourceConfig, NoQuantConfig
++from freetoken.layers.quantization.moe.base import MoEConfig
++from freetoken.layers.quantization.moe.q2_0 import Q20MoEMethod
++from freetoken.layers.quantization.names import NameMap
++
++
++def test_q2_override_preserves_trunk_and_shared_experts():
++    quant = ExpertSourceConfig(NoQuantConfig(NameMap(roots=(("model.layers", "model.language_model.layers"),))))
++    for name in ("model.layers.0.self_attn.q_proj", "model.layers.0.mlp.shared_expert.gate_up_proj",
++                 "model.layers.0.mlp.shared_expert_gate", "model.layers.0.mlp.gate", "lm_head"):
++        assert quant.scheme_for(name) is None
++    scheme = quant.scheme_for("model.layers.0.mlp.experts")
++    assert scheme.kind is QuantKind.Q2_0
++    assert quant.scheme_for_name("model.language_model.layers.0.mlp.experts.511.down_proj") == scheme
++
++
++def test_q2_layout_packing_preserves_expert_rows_without_expansion():
++    cfg = MoEConfig(num_experts=3, hidden=64, intermediate=64, top_k=2, strategy="offload")
++    method = Q20MoEMethod(cfg)
++    layout = method.layout()
++    assert sum(torch.empty(spec.shape, dtype=spec.dtype).numel() for spec in layout.values()) == 3 * 64 * 64 // 64 * 18
++    pieces = {role: torch.randint(0, 256, (3, 64, 18), dtype=torch.uint8) for role in ("gate", "up", "down")}
++    out = {role: torch.empty((3, *spec.shape), dtype=spec.dtype) for role, spec in layout.items()}
++    method.pack(pieces, out)
++    torch.testing.assert_close(out["gate_up"][:, :64], pieces["gate"], rtol=0, atol=0)
++    torch.testing.assert_close(out["gate_up"][:, 64:], pieces["up"], rtol=0, atol=0)
++    torch.testing.assert_close(out["down"], pieces["down"], rtol=0, atol=0)
++    assert method.cpu_format is None
++    for changes in ({"decode_target": "cpu"}, {"strategy": "resident"}, {"hidden": 65},
++                    {"dtype": torch.float16}, {"apply_router_weight_on_input": True}):
++        with pytest.raises(RuntimeError):
++            Q20MoEMethod(replace(cfg, **changes))
++
++
++def test_q2_source_is_explicit_and_architecture_scoped():
++    config = SimpleNamespace(model_type="qwen4_exp", freetoken_expert_source={"format": "q2_0"})
++    assert QuantConfig.from_hf(config).scheme_for("model.layers.0.mlp.experts").kind is QuantKind.Q2_0
++    config.model_type = "qwen3_5_moe"
++    with pytest.raises(ValueError):
++        QuantConfig.from_hf(config)
+diff --git a/tools/build_windows_extensions.py b/tools/build_windows_extensions.py
+new file mode 100644
+--- /dev/null
++++ b/tools/build_windows_extensions.py
+@@ -0,0 +1,19 @@
++"""在当前 worktree 构建 Windows 扩展，避免共享入口写死旧源码路径。"""
++
++import os
++from pathlib import Path
++import runpy
++
++import torch.utils.cpp_extension as cpp_extension
++
++
++def main():
++    """保留 Torch 编译器检查，仅修正无控制台进程的 MSVC 输出解码。"""
++    root = Path(__file__).resolve().parents[1]
++    os.chdir(root)
++    cpp_extension.SUBPROCESS_DECODE_ARGS = ("utf-8", "replace")
++    runpy.run_path(str(root / "setup.py"), run_name="__main__")
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/tools/build_windows_kernel_cache.py b/tools/build_windows_kernel_cache.py
+new file mode 100644
+--- /dev/null
++++ b/tools/build_windows_kernel_cache.py
+@@ -0,0 +1,318 @@
++#!/usr/bin/env python3
++"""Build FreeToken's TVM FFI kernel cache as Windows DLLs.
++
++The upstream cache wheel builder is written for Linux and collects ``.so``
++files.  The kernel implementation itself is platform-neutral: ``tvm_ffi``
++uses MSVC/nvcc and emits ``.dll`` on Windows.  This helper keeps the upstream
++spec table and compiler calls intact, then collects the Windows outputs into a
++portable cache tree.
++"""
++
++from __future__ import annotations
++
++import argparse
++import hashlib
++import json
++import os
++import shutil
++import subprocess
++import sys
++from pathlib import Path
++
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++def _parse_args() -> argparse.Namespace:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument(
++        "--output",
++        type=Path,
++        default=ROOT / "windows-kernel-cache",
++        help="destination cache tree (default: %(default)s)",
++    )
++    parser.add_argument(
++        "--build-dir",
++        type=Path,
++        default=ROOT / "build" / "windows-kernel-cache",
++        help="per-spec compiler scratch directory (default: %(default)s)",
++    )
++    parser.add_argument(
++        "--spec",
++        action="append",
++        dest="specs",
++        help="build one spec; may be repeated. The default builds all specs.",
++    )
++    parser.add_argument(
++        "--spec-file",
++        type=Path,
++        help="newline-delimited spec names; relative paths use the repository root",
++    )
++    parser.add_argument(
++        "--arch",
++        default="12.0",
++        help="space-separated CUDA compute capabilities for the fatbin (default: 12.0)",
++    )
++    parser.add_argument(
++        "--jobs",
++        type=int,
++        default=1,
++        help="number of concurrent spec builds (default: 1)",
++    )
++    parser.add_argument(
++        "--keep-build",
++        action="store_true",
++        help="keep compiler scratch files after a successful build",
++    )
++    parser.add_argument(
++        "--list",
++        action="store_true",
++        help="list the upstream default spec names and exit",
++    )
++    return parser.parse_args()
++
++
++def _sha256(path: Path) -> str:
++    digest = hashlib.sha256()
++    with path.open("rb") as stream:
++        for block in iter(lambda: stream.read(1024 * 1024), b""):
++            digest.update(block)
++    return digest.hexdigest()
++
++
++def _dll_candidates(build_dir: Path, name: str) -> list[Path]:
++    candidates = [
++        path
++        for path in build_dir.rglob("*.dll")
++        if path.is_file() and path.name.lower() == f"{name.lower()}.dll"
++    ]
++    if candidates:
++        return candidates
++    # Keep the fallback broad enough for a future tvm_ffi naming change while
++    # excluding runtime dependencies copied beside the output.
++    return [
++        path
++        for path in build_dir.rglob("*.dll")
++        if path.is_file() and path.stem.lower().startswith(name.lower())
++    ]
++
++
++def _load_specs():
++    sys.path.insert(0, str(ROOT / "python"))
++    from freetoken.kernel.aot import default_kernel_specs
++
++    return default_kernel_specs()
++
++
++def _read_spec_file(path: Path) -> list[str]:
++    path = path if path.is_absolute() else ROOT / path
++    try:
++        lines = path.read_text(encoding="utf-8").splitlines()
++    except OSError as exc:
++        raise SystemExit(f"cannot read --spec-file {path}: {exc}") from exc
++    names = [line.strip() for line in lines if line.strip() and not line.lstrip().startswith("#")]
++    if not names:
++        raise SystemExit(f"--spec-file is empty: {path}")
++    return names
++
++
++def _patch_tvm_ffi_windows_flags() -> None:
++    """Apply the small Windows/CUDA compatibility fixes needed by this build.
++
++    That release emits ``-Xcompiler /std:c++17 /O2`` in Ninja.  CUDA 12.8's
++    Windows parser treats the second MSVC flag as another input file, and the
++    C++17 flag overrides FreeToken's required C++20 mode.  The comma form is
++    accepted by CUDA and forwards the corrected flags to cl.exe.  FreeToken's
++    portable headers use the GCC-style ``__always_inline`` spelling, which is
++    not predefined by nvcc on this Windows toolchain, so map it to CUDA's
++    ``__forceinline__`` spelling as well.  Finally, the Windows link rule in
++    this tvm_ffi release does not add CUDA's import library, so add
++    ``cudart.lib`` from ``CUDA_HOME``.  Keep all workarounds local to this
++    builder. The companion ``jit`` sources carry one small source-level
++    compatibility edit: redundant template arguments on the symbolic
++    ``with_dtype`` overload are removed because nvcc 12.8 rejects that spelling
++    on Windows. The edit is behavior-preserving; the overload ignores those
++    template arguments when a symbolic dtype is supplied.
++    """
++    if sys.platform != "win32":
++        return
++    import tvm_ffi.cpp.extension as extension
++
++    original = extension._generate_ninja_build
++    if getattr(original, "_freetoken_windows_patch", False):
++        return
++
++    def generate(*args, **kwargs):
++        text = original(*args, **kwargs)
++        # tvm_ffi emits POSIX-style flags in the MSVC rule as well.  cl.exe
++        # ignores ``-std``/``-O3`` and keeps its leading C++17 setting, which
++        # breaks the C++20-only radix source.  Rewrite only the cxxflags line;
++        # the CUDA rule needs its own ``-std=c++20`` flag below.
++        cxx_lines = []
++        for line in text.splitlines(keepends=True):
++            if line.startswith("cxxflags = "):
++                line = line.replace("/std:c++17", "/std:c++20")
++                line = line.replace(" -std=c++20", "")
++                line = line.replace(" -O3", " /O2")
++            cxx_lines.append(line)
++        text = "".join(cxx_lines)
++        text = text.replace(
++            "-Xcompiler /std:c++17 /O2",
++            "-Xcompiler=/std:c++20,/O2",
++        )
++        if "-D__always_inline=" not in text:
++            text = text.replace(
++                "cuda_cflags = ",
++                "cuda_cflags = -D__always_inline=__forceinline__ ",
++                1,
++            )
++        compat_include = ROOT / "tools" / "windows-compat"
++        compat_flag = f"-I{compat_include}"
++        if compat_flag not in text:
++            text = text.replace(
++                "cuda_cflags = ",
++                f"cuda_cflags = {compat_flag} ",
++                1,
++            )
++        cuda_home = os.environ.get("CUDA_HOME") or os.environ.get("CUDA_PATH")
++        if cuda_home and "cuda_cflags = " in text and "cudart.lib" not in text:
++            cuda_lib = Path(cuda_home) / "lib" / "x64"
++            text = text.replace(
++                "ldflags = ",
++                f"ldflags = /LIBPATH:{cuda_lib} cudart.lib ",
++                1,
++            )
++        return text
++
++    generate._freetoken_windows_patch = True
++    extension._generate_ninja_build = generate
++
++
++def _build_one(spec, build_root: Path, output_root: Path) -> dict[str, object]:
++    scratch = build_root / spec.name
++    if scratch.exists():
++        shutil.rmtree(scratch)
++    scratch.mkdir(parents=True, exist_ok=True)
++    print(f"[build] {spec.name}", flush=True)
++    spec.build(scratch)
++
++    candidates = _dll_candidates(scratch, spec.name)
++    if len(candidates) != 1:
++        found = ", ".join(str(path) for path in candidates) or "<none>"
++        raise RuntimeError(
++            f"expected one DLL for {spec.name}, found {len(candidates)}: {found}"
++        )
++    source = candidates[0]
++    destination_dir = output_root / spec.name
++    if destination_dir.exists():
++        shutil.rmtree(destination_dir)
++    destination_dir.mkdir(parents=True, exist_ok=True)
++    destination = destination_dir / f"{spec.name}.dll"
++    shutil.copy2(source, destination)
++    size = destination.stat().st_size
++    digest = _sha256(destination)
++    print(f"[done ] {spec.name} size={size} sha256={digest}", flush=True)
++    return {
++        "name": spec.name,
++        "path": str(destination.relative_to(output_root)).replace("\\", "/"),
++        "size": size,
++        "sha256": digest,
++    }
++
++
++def main() -> int:
++    args = _parse_args()
++    if args.jobs < 1:
++        raise SystemExit("--jobs must be at least 1")
++
++    # Force source compilation even if a cache wheel happens to be installed.
++    os.environ["FREETOKEN_DISABLE_KERNEL_CACHE"] = "1"
++    os.environ.pop("FREETOKEN_DISABLE_JIT", None)
++    os.environ["TVM_FFI_CUDA_ARCH_LIST"] = args.arch
++    os.environ.setdefault("FREETOKEN_KERNEL_CACHE_JOBS", str(args.jobs))
++    _patch_tvm_ffi_windows_flags()
++
++    specs = _load_specs()
++    by_name = {spec.name: spec for spec in specs}
++    if args.list:
++        if args.specs and args.spec_file:
++            raise SystemExit("use either --spec or --spec-file, not both")
++        names = (
++            args.specs
++            if args.specs
++            else _read_spec_file(args.spec_file)
++            if args.spec_file
++            else [spec.name for spec in specs]
++        )
++        unknown = [name for name in names if name not in by_name]
++        if unknown:
++            raise SystemExit("unknown spec(s): " + ", ".join(unknown))
++        for name in names:
++            print(name)
++        return 0
++    if args.specs and args.spec_file:
++        raise SystemExit("use either --spec or --spec-file, not both")
++    selected_names = (
++        args.specs
++        if args.specs
++        else _read_spec_file(args.spec_file)
++        if args.spec_file
++        else [spec.name for spec in specs]
++    )
++    unknown = [name for name in selected_names if name not in by_name]
++    if unknown:
++        raise SystemExit(
++            "unknown spec(s): " + ", ".join(unknown) + "\nvalid names:\n" + "\n".join(by_name)
++        )
++
++    output_root = args.output.resolve()
++    build_root = args.build_dir.resolve()
++    if output_root == ROOT or build_root == ROOT:
++        raise SystemExit("refusing to use the repository root as an output directory")
++    output_root.mkdir(parents=True, exist_ok=True)
++    build_root.mkdir(parents=True, exist_ok=True)
++
++    # A sequential build is deliberate by default: each nvcc/MSVC invocation is
++    # large, and it keeps logs and GPU/toolchain failures attributable to one spec.
++    records = []
++    for name in selected_names:
++        records.append(_build_one(by_name[name], build_root, output_root))
++
++    try:
++        import torch
++
++        torch_version = torch.__version__
++        torch_cuda = torch.version.cuda
++    except Exception as exc:  # pragma: no cover - metadata must not hide DLLs
++        torch_version = f"unavailable: {exc}"
++        torch_cuda = None
++    try:
++        commit = subprocess.run(
++            ["git", "-C", str(ROOT), "rev-parse", "HEAD"],
++            check=True,
++            capture_output=True,
++            text=True,
++        ).stdout.strip()
++    except (OSError, subprocess.CalledProcessError):
++        commit = "unknown"
++    metadata = {
++        "format": 1,
++        "platform": "windows-x86_64",
++        "source_commit": commit,
++        "python": sys.version,
++        "torch": torch_version,
++        "torch_cuda": torch_cuda,
++        "cuda_arches": args.arch.split(),
++        "artifacts": records,
++    }
++    (output_root / "build-metadata.json").write_text(
++        json.dumps(metadata, indent=2) + "\n", encoding="utf-8"
++    )
++    print(f"built {len(records)} DLL(s) under {output_root}", flush=True)
++    if not args.keep_build:
++        shutil.rmtree(build_root, ignore_errors=True)
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tools/windows-compat/README.md b/tools/windows-compat/README.md
+new file mode 100644
+--- /dev/null
++++ b/tools/windows-compat/README.md
+@@ -0,0 +1,10 @@
++# Windows compatibility shim
++
++The upstream AOT sources use the POSIX header `<sys/cdefs.h>` for the
++`__always_inline` annotation.  MSVC does not ship that header, so the Windows
++builder adds this directory to the CUDA include path.  The shim only defines
++the annotation in terms of MSVC/CUDA's `__forceinline__`; it does not replace
++any platform headers or change the kernel ABI.
++
++Keep this directory in the repository.  Removing it causes the Windows build
++to fail before nvcc starts compiling the kernels.
+diff --git a/tools/windows-compat/sys/cdefs.h b/tools/windows-compat/sys/cdefs.h
+new file mode 100644
+--- /dev/null
++++ b/tools/windows-compat/sys/cdefs.h
+@@ -0,0 +1,7 @@
++#pragma once
++
++// FreeToken's CUDA headers use the Linux spelling for this inline hint.
++// nvcc on Windows provides the equivalent MSVC/CUDA spelling instead.
++#ifndef __always_inline
++#define __always_inline __forceinline__
++#endif
