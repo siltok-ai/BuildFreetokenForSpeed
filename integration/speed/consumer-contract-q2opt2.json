@@ -34,7 +34,7 @@
     "KernelCacheDir": "<materials>/kernel-cache"
   },
   "speed_adapter": {
-    "repository": "https://github.com/siltok-ai/silitok-speed",
+    "repository": "https://github.com/siltok-ai/siltok-speed",
     "branch": "fix/freetoken-q2-material-review",
     "base_commit": "cc294a76ba511d8770875f9160bf29a5a3f9f370",
     "source_identity_policy": "Match the compiled module SHA256 values in the new review evidence."
@@ -78,11 +78,11 @@
   "installer_validated": false,
   "clean_machine_validated": false,
   "wheel_identity_policy": "Speed checks exact SHA. Changed source requires a new custom revision; rebuilt bytes require new validation and Speed SHA update.",
-  "validation_status": "source_identity_and_kernels_validated_pending_full_runtime",
-  "packaged_speed_validated": false,
-  "normal_full_flash_next_validated": false,
-  "speed_source_identity": "artifacts/q2opt2-cp312-cu130-sm120/validation/review-20261011/validation-summary.json",
-  "packaged_speed_validation_scope": "New exact wheel and compiled application; current full Flash Next run pending available host commit. Historical q2opt1 results are not inherited.",
+  "validation_status": "validated_compiled_runtime_on_original_windows_host",
+  "packaged_speed_validated": true,
+  "normal_full_flash_next_validated": true,
+  "speed_source_identity": "artifacts/q2opt2-cp312-cu130-sm120/validation/runtime-review-20261011/validation-summary.json",
+  "packaged_speed_validation_scope": "New compiled package, all three models on this Windows host. Full Flash Next default-budget HTTP and complete backend passed. Installer and clean-machine acceptance excluded.",
   "performance_policy": {
     "grouped_prefill_min_tokens": 128,
     "sparse_prefill_max_tokens": 16,

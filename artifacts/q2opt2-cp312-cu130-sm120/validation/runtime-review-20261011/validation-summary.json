@@ -1,0 +1,88 @@
+{
+  "version": "0.1.3+speed.q2opt2",
+  "wheel_sha256": "f17519571a760c7fb025b9958885d5edcb931785d63b6f64cd2b345de163c79c",
+  "patch_series": "patches/q2opt2-series.json",
+  "patch_count": 6,
+  "speed_base_commit": "cc294a76ba511d8770875f9160bf29a5a3f9f370",
+  "speed_source_sha256": {
+    "silitok_speed/qwen36/freetoken_contract.py": "b4b306a04d5b1aab080ea3fb2bb05e9ddaaf5170a4240f16101d50581da5a0c9",
+    "silitok_speed/backends/freetoken_qwen36.py": "33362c496c9f33cd917ab56328a4b3bdfbf25085253673eedc3edb58d9bcd937"
+  },
+  "compiled_module_count": 208,
+  "compiled_source_mismatches": [],
+  "repository_validation_passed": true,
+  "material_tool_tests_passed": 16,
+  "speed_related_tests_passed": 163,
+  "engine_source_kernel_tests_passed": 17,
+  "full_unit_suite": {
+    "passed": 2032,
+    "failed": 13,
+    "skipped": 5,
+    "xfailed": 1,
+    "all_13_failures_reproduced_on_unmodified_q2_base": true
+  },
+  "actual_source_sha256_reverified": true,
+  "complete_expert_stream": {
+    "scope": "complete_real_expert_source_read_only; no inference or bank allocation",
+    "layers": 48,
+    "experts_per_layer": 512,
+    "bytes": 33973862400,
+    "seconds": 22.627393100003246,
+    "passed": true
+  },
+  "native_modules_and_26_aot_dlls_identical_to_q2opt1": true,
+  "packaged_old_model_runs_passed": 4,
+  "packaged_speed_validated": true,
+  "normal_full_flash_next_validated": true,
+  "installer_validated": false,
+  "clean_machine_validated": false,
+  "flash_next_pending_reason": null,
+  "scope": "New compiled package, all three models on this Windows host. Full Flash Next default-budget HTTP and complete backend passed. Installer and clean-machine acceptance excluded.",
+  "speed_commit": "f66e44361e58672b56c28cbd3c2cfc6b60dd5bfb",
+  "materials_code_commit": "19615a6cd2e287aa67c08e5962964c479a3a62f0",
+  "packaged_flash_next_runs_passed": 3,
+  "packaged_default_http_validated": true,
+  "previous_partial_evidence": "../review-20261011/validation-summary.json",
+  "commit_measurements": [
+    {
+      "case": "packaged-flash-backend-capacity-002",
+      "returncode": 0,
+      "peak_system_commit_gib": 63.032203674316406,
+      "reference_system_commit_gib": 13.543132781982422,
+      "increment_gib": 49.489070892333984,
+      "reference": "first sample containing the new worker; may include initial allocation",
+      "min_commit_available_gib": 2.4936599731445312,
+      "min_physical_available_gib": 16.275436401367188,
+      "safety_abort": false,
+      "wall_seconds": 110.13026139995782
+    },
+    {
+      "case": "packaged-flash-http-49p5-002",
+      "returncode": 0,
+      "peak_system_commit_gib": 63.3005256652832,
+      "reference_system_commit_gib": 13.520267486572266,
+      "increment_gib": 49.78025817871094,
+      "reference": "HTTP admission snapshot before worker load",
+      "min_commit_available_gib": 2.2253379821777344,
+      "min_physical_available_gib": 16.334552764892578,
+      "safety_abort": false,
+      "wall_seconds": 102.92739809997147
+    },
+    {
+      "case": "packaged-flash-http-default",
+      "returncode": 0,
+      "peak_system_commit_gib": 63.27149963378906,
+      "reference_system_commit_gib": 13.48007583618164,
+      "increment_gib": 49.79142379760742,
+      "reference": "HTTP admission snapshot before worker load",
+      "min_commit_available_gib": 2.254364013671875,
+      "min_physical_available_gib": 16.262451171875,
+      "safety_abort": false,
+      "wall_seconds": 102.62159610004164
+    }
+  ],
+  "recommended_model_commit_budget_gib": 50,
+  "test_commit_safety_gib": 1,
+  "default_budget_lowered": false,
+  "budget_decision": "49.5 GiB HTTP passed but observed 49.78 GiB increment exceeds its estimate. Default 50 GiB covers the observed 49.79 GiB HTTP increment; no material reduction supported."
+}

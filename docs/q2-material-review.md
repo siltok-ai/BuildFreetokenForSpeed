@@ -59,4 +59,14 @@ python -B build/derive_python_materials.py --profile build/profiles/q2opt2.json 
 
 本轮[验收摘要](../artifacts/q2opt2-cp312-cu130-sm120/validation/review-20261011/validation-summary.json)记录：16 项材料工具、17 项引擎来源 / GPU / RowStore、163 项相关 Speed 回归通过；真实专家全部读取完成；三种模型中的两种旧模型共四组随包回归通过，208 个编译模块来源无差异。全量 Speed unit 的 13 个失败在未修改 q2 基线上全部重现。
 
-新版本 Flash Next 默认准入需要约 51 GiB 可用 commit，目前整机余量不足，初次实际 HTTP 请求按预期被拒绝。未降低预算 / 余量、调整系统 pagefile 或停止他人的程序。完整模型、安装器和干净机器状态均保持未验收；q2opt1 历史成功记录继续独立保留。
+初次新版本 Flash Next HTTP 因整机 commit 余量不足被正常拒绝，原始证据保留。用户授权释放闲置程序后，停止无窗口 Edge 和搜狗辅助程序；暂停已安装 Speed 服务因 Windows 权限不足未执行。系统 pagefile 保持不变。
+
+随后完整 Flash Next 的新包 backend、49.5 GiB 实验预算 HTTP、原默认 50 GiB 模型预算 HTTP 均通过，完整专家、长输入、thinking、取消复用与卸载有实际证据；默认 HTTP 与 backend 合并两旧模型四组构成三个模型的随包验收。208 个编译模块来源一致。新增结果封存于 [runtime-review-20261011](../artifacts/q2opt2-cp312-cu130-sm120/validation/runtime-review-20261011/validation-summary.json)，不替换先前失败或 q2opt1 历史记录。安装器和干净机器仍未验收。
+
+## Windows commit 预算复核
+
+专家 bank 为 31.640625 GiB 压缩且锁页的主存，并非仅保留当前 token 选中的专家。36 GiB host 预算来自约 35.5 GiB 的加载 RSS 峰值；14 GiB 是整个 GPU 运行预算，含主干、专家 cache、KV、计算缓冲和 graph。Speed 在 Windows 把 GPU 预算作为额外 commit 的保守估计，与 host 相加；该值并非单独测得的驱动精确开销，也不等同于额外常驻 DRAM。
+
+本次以 100 ms 连续采样整机 commit，backend 的 worker 初次出现到峰值增量约 49.49 GiB；49.5 GiB HTTP 的准入快照到峰值约 49.78 GiB；默认 HTTP 约 49.79 GiB。各次整机峰值约 63.03 / 63.30 / 63.27 GiB，最小 commit 余量约 2.49 / 2.23 / 2.25 GiB；物理可用内存仍约 16.3 GiB。进程 private/RSS 与整机 commit 不是同一口径，增量也包含观测期间其他进程波动。
+
+49.5 GiB 配置虽然运行通过，其实测增量已超过估计，不能推荐为更准确的默认上界。保留 50 GiB 模型预算（36 host + 14 GPU 估计），本机测试加 1 GiB safety 共约 51 GiB；全局默认 safety 仍为 8 GiB。此结果只覆盖当前硬件、驱动和 cache1024 / KV8192 / chunk4096 的已测路径，不能泛化到更大几何或其他驱动。系统驱逐驻留页面不能视为可自动消除 commit 承诺，锁页 bank 也不参与普通换页。
