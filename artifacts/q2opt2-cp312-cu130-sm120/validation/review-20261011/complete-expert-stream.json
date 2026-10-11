@@ -1,0 +1,8 @@
+{
+  "scope": "complete_real_expert_source_read_only; no inference or bank allocation",
+  "layers": 48,
+  "experts_per_layer": 512,
+  "bytes": 33973862400,
+  "seconds": 22.627393100003246,
+  "passed": true
+}

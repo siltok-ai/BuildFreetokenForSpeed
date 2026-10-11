@@ -9,7 +9,7 @@ import subprocess
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_PROFILE = ROOT / "build/profiles/win1.json"
+DEFAULT_PROFILE = ROOT / "build/profiles/q2opt2.json"
 
 
 def sha256(path):
@@ -61,7 +61,8 @@ def apply_patch(source, patch, log):
     environment["GIT_CEILING_DIRECTORIES"] = str(Path(source).resolve().parent)
     with Path(log).open("w", encoding="utf-8") as output:
         for flags in (["--check"], []):
-            subprocess.run(["git", "apply", *flags, str(Path(patch).resolve())],
+            # 冻结归档与已验收 wheel 使用 CRLF；重放不能依赖调用者的 Git 行尾配置。
+            subprocess.run(["git", "-c", "core.autocrlf=true", "apply", *flags, str(Path(patch).resolve())],
                            cwd=source, env=environment, stdout=output,
                            stderr=subprocess.STDOUT, check=True)
 

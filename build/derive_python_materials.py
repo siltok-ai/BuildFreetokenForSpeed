@@ -22,6 +22,8 @@ PYTHON_ONLY_CHANGES = {
     'python/freetoken/layers/quantization/moe/q2_0.py',
     'python/freetoken/version.py',
     'tests/moe/test_q2_grouped.py',
+    'python/freetoken/models/qwen4_exp/q2_source.py',
+    'tests/moe/test_q2_source.py',
 }
 
 
@@ -31,7 +33,7 @@ def tree_hashes(root):
 
 
 def validate_python_only_changes(base_source, source):
-    """只有已界定的 Python 性能文件可改动，任何原生或 AOT 输入差异立即拒绝。"""
+    """仅允许明确列出的 Python 算子/来源读取修订，原生或 AOT 输入差异立即拒绝。"""
     old, new = tree_hashes(base_source), tree_hashes(source)
     changed = {name for name in old.keys() | new.keys() if old.get(name) != new.get(name)}
     if not changed <= PYTHON_ONLY_CHANGES:
@@ -106,7 +108,7 @@ def derive(profile_path, base_profile_path, base_materials, output):
     metadata['source_patch_series_sha256'] = profile['input_sha256'][profile['patch_series']]
     metadata['binary_reuse'] = {'base_materials': base_materials.name,
                               'base_build_record_sha256': sha256(base_materials / 'build-record.json'),
-                              'reason': 'Python-only Q2 scheduling and grouped prefill; native/AOT inputs identical'}
+                              'reason': 'Allowlisted Python-only revision; native/AOT source and inputs identical'}
     metadata_path.write_text(json.dumps(metadata, indent=2) + '\n', encoding='utf-8')
     native_hashes = {name: hashlib.sha256(members[name]).hexdigest() for name in base_record['native_modules']}
     with zipfile.ZipFile(base_wheel) as archive:
@@ -114,7 +116,10 @@ def derive(profile_path, base_profile_path, base_materials, output):
             raise ValueError('native module bytes changed during repack')
     files = [wheel, *(cache / name.removeprefix('kernel-cache/') for name in base_record['artifacts'] if name.endswith('.dll')),
              manifest_path, metadata_path]
-    record = {**base_record, **profile, 'status': 'derived_requires_runtime_validation',
+    # 复用构建环境身份，不能继承旧 wheel 的运行验收或证据路径。
+    inherited = {key: base_record[key] for key in ('format', 'python', 'build_python', 'native_modules',
+                                                  'dependencies', 'cuda_compiler', 'msvc_compiler', 'aot_count')}
+    record = {**inherited, **profile, 'status': 'derived_requires_runtime_validation',
               'producer': 'build/derive_python_materials.py',
               'producer_sha256': {'build/derive_python_materials.py': sha256(Path(__file__))},
               'patches': json.loads((output / 'candidate-source/preparation-record.json').read_text())['patches'],

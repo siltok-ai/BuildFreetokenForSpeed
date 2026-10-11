@@ -9,7 +9,7 @@ from pathlib import Path
 import shutil
 import struct
 
-from download_q2_experts import FILENAME, REPO, REVISION, SHA256, SIZE
+from q2_source_identity import DEFAULT_LOCK, load_expert_source, model_geometry, verify_expert_file
 
 
 def read(path):
@@ -23,6 +23,7 @@ def write(path, value):
 
 
 def main():
+    """按锁定来源建立独立混合 checkpoint；最终校验通过后才发布完成状态。"""
     parser = argparse.ArgumentParser()
     parser.add_argument("--trunk", type=Path, required=True)
     parser.add_argument("--trunk-receipt", type=Path,
@@ -30,22 +31,45 @@ def main():
     parser.add_argument("--experts", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--finalize", action="store_true")
+    parser.add_argument("--source-lock", type=Path, default=DEFAULT_LOCK)
     args = parser.parse_args()
+    identity = load_expert_source(args.source_lock)
+    expert_file = args.experts / identity["filename"]
     if args.finalize:
         verified = read(args.experts / "expert-source.json")
-        expert_file = args.experts / FILENAME
-        if verified.get("sha256") != SHA256 or expert_file.stat().st_size != SIZE:
+        if any(verified.get(key) != value for key, value in identity.items()):
             raise ValueError("complete Q2_0 artifact has not been verified")
-        from freetoken.models.qwen4_exp.q2_source import read_q2_directory
-        directory = read_q2_directory(expert_file)
         config = read(args.output / "config.json")
-        config["freetoken_expert_source"].update(verified_mtime_ns=expert_file.stat().st_mtime_ns)
-        write(args.output / "config.json", config)
+        geometry = model_geometry(config)
+        source = config["freetoken_expert_source"]
+        source_path = Path(source["path"])
+        if not source_path.is_absolute():
+            source_path = args.output / source_path
+        if (source_path.resolve() != expert_file.resolve()
+                or any(source.get(key) != value for key, value in geometry.items())
+                or any(source.get(key) != value for key, value in identity.items() if key != "filename")):
+            raise ValueError("checkpoint expert source differs from requested source")
+        print("Verifying actual Q2_0 bytes before finalizing checkpoint", flush=True)
+        stat = verify_expert_file(expert_file, identity)
+        from freetoken.models.qwen4_exp.q2_source import read_q2_directory
+        directory = read_q2_directory(expert_file, layers=geometry["layers"],
+                                      experts=geometry["experts_per_layer"], hidden=geometry["hidden"],
+                                      intermediate=geometry["intermediate"])
         record = read(args.output / "mixed-source.json")
+        indexed = set(read(args.output / "model.safetensors.index.json")["weight_map"].values())
+        if indexed != set(record["non_expert_files"]):
+            raise ValueError("HF provenance does not cover all indexed non-expert shards")
+        for name, receipt in record["non_expert_files"].items():
+            info = (args.output / name).stat()
+            if info.st_size != receipt["bytes"] or info.st_mtime_ns != receipt["mtime_ns"]:
+                raise ValueError(f"HF source changed before finalization: {name}")
+        source.update(verified_mtime_ns=stat.st_mtime_ns)
+        write(args.output / "config.json", config)
         record.update(status="complete_verified_sources_requires_inference_validation", expert_receipt=verified,
-                      expert_tensor_count=len(directory), expert_bytes=33_973_862_400)
+                      expert_tensor_count=len(directory), expert_bytes=geometry["expert_bytes"])
         write(args.output / "mixed-source.json", record)
-        print(json.dumps({"status": record["status"], "experts": len(directory), "expert_GiB": 31.640625}), flush=True)
+        print(json.dumps({"status": record["status"], "experts": len(directory),
+                          "expert_GiB": geometry["expert_bytes"] / 2**30}), flush=True)
         return
 
     if args.output.exists():
@@ -94,11 +118,10 @@ def main():
         if (args.trunk / name).exists():
             shutil.copyfile(args.trunk / name, args.output / name)
     config = read(args.output / "config.json")
+    geometry = model_geometry(config)
     config["freetoken_expert_source"] = {"format": "q2_0", "scope": "routed_experts_only",
-        "path": str((args.experts / FILENAME).resolve()), "sha256": SHA256, "size": SIZE,
-        "repo": REPO, "revision": REVISION, "verified_mtime_ns": None,
-        "layers": 48, "experts_per_layer": 512, "hidden": 2560, "intermediate": 640,
-        "expert_bytes": 33_973_862_400}
+        "path": str(expert_file.resolve()), **{key: value for key, value in identity.items() if key != "filename"},
+        "verified_mtime_ns": None, **geometry}
     write(args.output / "config.json", config)
     write(args.output / "model.safetensors.index.json", {"metadata": {"total_size": total}, "weight_map": weight_map})
     write(args.output / "mixed-source.json", {"format": 1, "status": "trunk_verified_experts_pending",
@@ -106,7 +129,7 @@ def main():
         "trunk_source_directory": str(args.trunk.resolve()), "original_index_sha256": provenance["index_sha256"],
         "non_expert_files": verified, "trunk_precision": "BF16", "ple_precision": "FP8 E4M3 with original BF16 scale",
         "expert_precision": "GSQ Q2_0 (64 elements / 18 bytes)", "expert_aliases": False,
-        "scope": "all 48x512 routed experts; HF non-experts and tokenizer; SSD HF PLE"})
+        "scope": "all routed experts; HF non-experts and tokenizer; SSD HF PLE"})
     print(json.dumps({"status": "trunk_verified_experts_pending", "non_expert_shards": len(files),
                       "non_expert_tensors": len(weight_map)}), flush=True)
 

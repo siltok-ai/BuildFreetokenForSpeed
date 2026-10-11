@@ -1,6 +1,6 @@
 # 生成与复制 Windows 素材
 
-构建输入由 [profiles/win1.json](profiles/win1.json) 固定。正常构建使用冻结归档与补丁，不从可变 worktree 复制源码，也不会在线拉取最新 main。
+当前构建输入由 [profiles/q2opt2.json](profiles/q2opt2.json) 固定，使用[六组当前补丁](../patches/q2opt2-series.json)。默认构建 / 准备入口均选择 q2opt2。以下 ft-win1 环境命名及历史制品说明保留作为工具链参考；复现历史 win1 必须显式指定 `-Profile build/profiles/win1.json`。正常构建使用冻结归档与补丁，不从可变 worktree 复制源码，也不会在线拉取最新 main。
 
 ## 本次环境合同
 

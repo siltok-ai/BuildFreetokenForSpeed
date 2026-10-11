@@ -1,0 +1,32 @@
+C:\workspace\build\q2-review-20261011\app\python\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+INFO silitok_speed.engine.scheduler: Scheduler started (thread=SilitokScheduler)
+INFO httpx: HTTP Request: GET http://testserver/v1/models "HTTP/1.1 200 OK"
+{"stage": "admission", "required": {"vram_peak_bytes": 15032385536, "commit_peak_bytes": 15032385536, "cpu_heap_peak_bytes": 38654705664, "effective_commit_bytes": 53687091200, "weight_file_count": 14, "strict_commit_limit": true}, "current": {"vram_total_bytes": 25642467328, "vram_free_bytes": 23951572992, "ram_available_bytes": 54053294080, "commit_available_bytes": 53664899072}, "safety": {"vram_bytes": 2147483648, "ram_bytes": 2147483648, "commit_bytes": 1073741824}, "headroom_after_safety": {"vram_bytes": 6771703808, "ram_bytes": 13251104768, "commit_bytes": -1095933952}, "usable_total_vram_bytes": 23494983680, "allowed": false, "reasons": ["commit_pressure: need 53.69GB, available 53.66GB, safety 1.07GB"], "warnings": []}
+INFO silitok_speed.engine.scheduler: Task ff5fc742-880a-4636-9293-d93715dfea43 started (pipeline=chat)
+WARNING silitok_speed.engine.resource: admission model=qwen3.8-flash-next.q2_0-freetoken fits=False reject=True vram_need=15.03GB commit_need=53.69GB ram_need=38.65GB vram_free=23.95GB commit_avail=53.52GB ram_avail=53.90GB reasons=commit_pressure: need 53.69GB, available 53.52GB, safety 1.07GB warnings=
+ERROR silitok_speed.engine.scheduler: Task ff5fc742-880a-4636-9293-d93715dfea43 failed: ResourceInsufficientError: Insufficient resources to load qwen3.8-flash-next.q2_0-freetoken: commit_pressure: need 53.69GB, available 53.52GB, safety 1.07GB
+Traceback (most recent call last):
+  File ".artifacts/compiled-build/generated/engine/scheduler.py", line 398, in silitok_speed.engine.scheduler.Scheduler._run_task
+  File ".artifacts/compiled-build/generated/engine/models.py", line 156, in silitok_speed.engine.models.ModelManager.ensure_loaded
+  File ".artifacts/compiled-build/generated/engine/models.py", line 166, in silitok_speed.engine.models.ModelManager.ensure_loaded
+  File ".artifacts/compiled-build/generated/engine/models.py", line 169, in silitok_speed.engine.models.ModelManager.ensure_loaded
+  File ".artifacts/compiled-build/generated/engine/models.py", line 332, in silitok_speed.engine.models.ModelManager._evict_until_fits
+silitok_speed.engine.types.ResourceInsufficientError: Insufficient resources to load qwen3.8-flash-next.q2_0-freetoken: commit_pressure: need 53.69GB, available 53.52GB, safety 1.07GB
+INFO httpx: HTTP Request: POST http://testserver/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+INFO silitok_speed.engine.scheduler: Scheduler stopped cleanly
+Traceback (most recent call last):
+  File "C:\workspace\worktrees\build-freetoken-q2-material-review\tools\packaged_speed_child.py", line 38, in <module>
+    runpy.run_path(str(script), run_name="__main__")
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\workspace\worktrees\speed-q2-material-review\tools\smoke\freetoken_qwen36.py", line 620, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "C:\workspace\worktrees\speed-q2-material-review\tools\smoke\freetoken_qwen36.py", line 608, in main
+    result = run(args)
+             ^^^^^^^^^
+  File "C:\workspace\worktrees\speed-q2-material-review\tools\smoke\freetoken_qwen36.py", line 494, in run
+    raise RuntimeError(
+RuntimeError: FreeToken synchronous HTTP request failed: {"error":{"code":"resource_insufficient","message":"The engine does not currently have enough resources.","type":"server_error","retryable":true,"details":{"attempted_eviction_count":0,"current":{"commit_available":53516062720,"commit_limit":70357860352,"commit_used":16841797632,"pagefile_allocated":4160749568,"pagefile_current":34697216,"pagefile_peak":106954752,"process_private":2579714048,"process_virtual":2579714048,"process_working_set":973512704,"ram_available":53903626240,"ram_total":6619

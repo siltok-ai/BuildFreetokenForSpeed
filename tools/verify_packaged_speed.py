@@ -44,6 +44,9 @@ def main():
     parser.add_argument("--qwen36-model", type=Path, required=True)
     parser.add_argument("--qwen38-model", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--profiles", nargs='+', choices=('flash-next', 'qwen36', 'qwen38'),
+                        default=['flash-next', 'qwen36', 'qwen38'],
+                        help='Select independent model regressions; only all three give full acceptance')
     args = parser.parse_args()
     app, source = args.app.resolve(strict=True), args.speed_source.resolve(strict=True)
     args.output.mkdir(parents=True, exist_ok=True)
@@ -63,6 +66,8 @@ def main():
     records = []
     for profile, model in (("flash-next", args.flash_next_model),
                            ("qwen36", args.qwen36_model), ("qwen38", args.qwen38_model)):
+        if profile not in args.profiles:
+            continue
         for mode in ("http", "backend"):
             report_path = output_root / f"packaged-{profile}-{mode}.json"
             identity_path = output_root / f"packaged-{profile}-{mode}-identity.json"
@@ -79,7 +84,7 @@ def main():
                 arguments += ["--repeats", "2", "--long-repeats", "1", "--tokens", "32",
                               "--long-prompt-tokens", "1024" if profile == "qwen38" else "4096",
                               "--quality"]
-            command = [str(app / "python/python.exe"), "-I", "-B",
+            command = [str(app / "python/python.exe"), "-X", "utf8", "-I", "-B",
                        str(Path(__file__).with_name("packaged_speed_child.py")), str(script), *arguments]
             environment["SPEED_REVIEW_IDENTITY_PATH"] = str(identity_path)
             print(f"START {profile} {mode}", flush=True)
@@ -112,7 +117,7 @@ def main():
                      "scope": "staged application on original machine; no installer or clean-machine acceptance"}
             (output_root / "compiled-source-proof.json").write_text(
                 json.dumps(proof, indent=2) + "\n", encoding="utf-8")
-    print("PASS: three packaged models, HTTP logic and backend reasoning/lifecycle", flush=True)
+    print(f"PASS: packaged profiles {','.join(args.profiles)}, HTTP logic and backend reasoning/lifecycle", flush=True)
 
 
 if __name__ == "__main__":

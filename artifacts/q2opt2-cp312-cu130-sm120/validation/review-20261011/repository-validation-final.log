@@ -1,0 +1,6 @@
+{"custom_version": "0.1.3+speed.win1", "aot_count": 26, "wheel_sha256": "924bee8598cdd058104b8d3dd2cc4936860e092bd269616e0e832a7fbb87e5cf", "status": "validated_speed_source_runtime_nvfp4", "verified": true}
+{"custom_version": "0.1.3+speed.q2opt1", "aot_count": 26, "wheel_sha256": "babbc0b8d0316c2b570a9b1d3294ac51e79ae5ef8bd6f6894a537ab327370c31", "status": "validated_speed_source_q2_performance_revision", "verified": true}
+{"custom_version": "0.1.3+speed.q2opt2", "aot_count": 26, "wheel_sha256": "f17519571a760c7fb025b9958885d5edcb931785d63b6f64cd2b345de163c79c", "status": "derived_requires_runtime_validation", "verified": true}
+{"verified": true, "scope": "offline_source_and_binary_identity_only", "version": "0.1.3+speed.q2opt1", "patches": 2, "python_files": 442, "aot_count": 26}
+{"verified": true, "scope": "offline_source_and_binary_identity_only", "version": "0.1.3+speed.q2opt2", "patches": 6, "python_files": 442, "aot_count": 26}
+{"official_files": 686, "changed_files": 29, "patches": 4, "split_equals_historical": true, "wheel_python_matches_prepared_source": true, "aot_count": 26, "packaged_acceptance_evidence_verified": true, "verified": true}

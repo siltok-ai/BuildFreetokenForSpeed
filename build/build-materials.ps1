@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory)][string]$BuildPython,
     [Parameter(Mandatory)][string]$CudaHome,
     [Parameter(Mandatory)][string]$OutDir,
-    [string]$Profile = (Join-Path $PSScriptRoot 'profiles/win1.json'),
+    [string]$Profile = (Join-Path $PSScriptRoot 'profiles/q2opt2.json'),
     [int]$Jobs = 2,
     [switch]$PreflightOnly
 )

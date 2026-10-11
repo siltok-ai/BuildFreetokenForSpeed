@@ -45,7 +45,7 @@ def validate_packaged_evidence(contract):
 
 
 def main():
-    profile, series = load_profile()
+    profile, series = load_profile(ROOT / "build/profiles/win1.json")
     lock = json.loads(repository_path(profile["upstream_lock"]).read_text(encoding="utf-8"))
     if lock["snapshot_modified"]:
         raise ValueError("official browsing snapshot must be unmodified")
@@ -102,6 +102,27 @@ def main():
     # 性能修订独立重放并验证新 wheel 的源码/二进制来源，不覆盖历史 win1 验收。
     from validate_python_revision import validate as validate_python_revision
     validate_python_revision(ROOT / "build/profiles/q2opt1.json", ROOT / "artifacts/q2opt1-cp312-cu130-sm120")
+    validate_python_revision(ROOT / "build/profiles/q2opt2.json", ROOT / "artifacts/q2opt2-cp312-cu130-sm120")
+    current = json.loads((ROOT / "integration/speed/consumer-contract-q2opt2.json").read_text(encoding="utf-8"))
+    current_profile, _ = load_profile(ROOT / current["profile"])
+    current_materials = repository_path(current["materials"])
+    current_record = json.loads((current_materials / "build-record.json").read_text(encoding="utf-8"))
+    if (current["version"] != current_profile["custom_version"]
+            or current["wheel"]["sha256"] != current_record["wheel_sha256"]
+            or current["kernel_cache"]["manifest_sha256"] != sha256(current_materials / current["kernel_cache"]["manifest"])):
+        raise ValueError("current Q2 consumer contract differs from actual materials")
+    review = repository_path(current["speed_source_identity"])
+    evidence = json.loads((review.parent / "evidence.json").read_text(encoding="utf-8"))
+    for name, entry in evidence["files"].items():
+        path = (review.parent / name).resolve()
+        if not path.is_relative_to(review.parent) or path.stat().st_size != entry["bytes"] or sha256(path) != entry["sha256"]:
+            raise ValueError(f"Q2 review evidence identity mismatch: {name}")
+    summary = json.loads(review.read_text(encoding="utf-8"))
+    if summary["wheel_sha256"] != current_record["wheel_sha256"] or summary["version"] != current["version"]:
+        raise ValueError("Q2 review evidence belongs to a different wheel")
+    for key in ("packaged_speed_validated", "normal_full_flash_next_validated", "installer_validated", "clean_machine_validated"):
+        if summary[key] != current[key]:
+            raise ValueError(f"Q2 review acceptance scope differs: {key}")
     for directory in ("build", "tools", "tests"):
         for path in (ROOT / directory).rglob("*.py"):
             ast.parse(path.read_text(encoding="utf-8"), filename=str(path))

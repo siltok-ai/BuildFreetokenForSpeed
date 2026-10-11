@@ -16,6 +16,19 @@ from derive_python_materials import derive, validate_python_only_changes
 
 
 class PythonMaterials(unittest.TestCase):
+    def test_review_revision_reuses_native_bytes_without_inheriting_acceptance(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / 'derived'
+            derive(ROOT / 'build/profiles/q2opt2.json', ROOT / 'build/profiles/q2opt1.json',
+                   ROOT / 'artifacts/q2opt1-cp312-cu130-sm120', output)
+            record = json.loads((output / 'build-record.json').read_text(encoding='utf-8'))
+            self.assertNotIn('validation_summary', record)
+            self.assertEqual(record['status'], 'derived_requires_runtime_validation')
+            base = json.loads((ROOT / 'artifacts/q2opt1-cp312-cu130-sm120/build-record.json').read_text(encoding='utf-8'))
+            self.assertEqual(record['binary_reuse']['native_sha256'], base['binary_reuse']['native_sha256'])
+            self.assertEqual({key: value for key, value in record['artifacts'].items() if key.endswith('.dll')},
+                             {key: value for key, value in base['artifacts'].items() if key.endswith('.dll')})
+
     def test_native_input_changes_are_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

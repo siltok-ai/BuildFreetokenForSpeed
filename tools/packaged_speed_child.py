@@ -11,6 +11,7 @@ import freetoken
 import freetoken.kernel._row_store as row_store
 import freetoken.models.qwen4_exp.q2_source as q2_source
 import freetoken.moe.fused_q2_0 as q2_kernel
+from silitok_speed.qwen36.freetoken_contract import FREETOKEN_VERSION
 
 application = Path(os.environ["SPEED_REVIEW_APP"]).resolve()
 origin = Path(silitok_speed.__spec__.origin).resolve()
@@ -21,7 +22,7 @@ for module in (freetoken, row_store, q2_source, q2_kernel):
     if not Path(module.__file__).resolve().is_relative_to(application):
         raise RuntimeError(f"module escaped application: {module.__file__}")
 version = importlib.metadata.version("freetoken")
-if version != "0.1.3+speed.q2exp1":
+if version != FREETOKEN_VERSION:
     raise RuntimeError(f"unexpected FreeToken version: {version}")
 identity = {
     "speed_origin": str(origin), "freetoken_origin": freetoken.__file__,

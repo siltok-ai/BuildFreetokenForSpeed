@@ -13,6 +13,20 @@ from prepare_source import DEFAULT_PROFILE, apply_patch, extract_archive, load_p
 
 
 class PreparationBoundaries(unittest.TestCase):
+    def test_patch_replay_does_not_depend_on_callers_git_line_endings(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            patch = root / 'new-file.patch'
+            patch.write_bytes(b'diff --git a/new.py b/new.py\nnew file mode 100644\n'
+                              b'--- /dev/null\n+++ b/new.py\n@@ -0,0 +1 @@\n+answer = 42\n')
+            for setting in ('true', 'false'):
+                source = root / setting
+                source.mkdir()
+                subprocess.run(['git', 'init', '--quiet'], cwd=source, check=True)
+                subprocess.run(['git', 'config', 'core.autocrlf', setting], cwd=source, check=True)
+                apply_patch(source, patch, root / f'{setting}.log')
+                self.assertEqual((source / 'new.py').read_bytes(), b'answer = 42\r\n')
+
     def test_changed_input_is_rejected_before_creating_output(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

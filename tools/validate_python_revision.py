@@ -14,6 +14,11 @@ from prepare_source import ROOT, load_profile, prepare, sha256
 def validate(profile_path, materials):
     """核对新版本冻结输入和实际材料，以防旧 binary 或 Python 文件被混入。"""
     profile, series = load_profile(profile_path)
+    for patch in series['patches']:
+        changes = subprocess.run(['git', 'apply', '--numstat', str(ROOT / patch['path'])],
+                                 check=True, capture_output=True, encoding='utf-8').stdout
+        if {line.split('\t', 2)[2] for line in changes.splitlines()} != set(patch['files']):
+            raise ValueError(f"patch file catalog differs from actual diff: {patch['path']}")
     materials = Path(materials).resolve(strict=True)
     record = json.loads((materials / 'build-record.json').read_text(encoding='utf-8'))
     for key in ('source_commit', 'custom_version', 'wheel_filename', 'torch', 'cuda', 'sm', 'input_sha256'):
@@ -33,7 +38,10 @@ def validate(profile_path, materials):
             native = {name: hashlib.sha256(archive.read(name)).hexdigest() for name in record['native_modules']}
             if native != record['binary_reuse']['native_sha256']:
                 raise ValueError('optimized wheel native reuse identity mismatch')
-    base_record = ROOT / 'artifacts/q2exp1-cp312-cu130-sm120/build-record.json'
+    base_name = record['binary_reuse']['base_materials']
+    if Path(base_name).name != base_name:
+        raise ValueError('base materials must name a repository artifact directory')
+    base_record = ROOT / 'artifacts' / base_name / 'build-record.json'
     if sha256(base_record) != record['binary_reuse']['base_build_record_sha256']:
         raise ValueError('base binary provenance changed')
     baseline = json.loads(base_record.read_text(encoding='utf-8'))

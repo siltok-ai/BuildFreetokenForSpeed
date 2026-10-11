@@ -4,7 +4,11 @@
 
 为 Silitok Speed 维护可追溯的 **FreeToken 官方源码 + 本地补丁 + Windows 构建素材**。本仓库既提供已验证的 wheel / DLL，也提供从冻结源码重新生成这些素材的入口。
 
-当前基线：官方 FreeToken `078132480ea4a0424f677a27eb22085624d331e6`，定制版本 `0.1.3+speed.win1`，CPython 3.12 / Windows x64 / Torch 2.11.0+cu130 / CUDA 13.0 / SM120。
+当前构建候选为 **`0.1.3+speed.q2opt2`**，官方来源 `078132480ea4a0424f677a27eb22085624d331e6`，CPython 3.12 / Windows x64 / Torch 2.11.0+cu130 / CUDA 13.0 / SM120。新构建默认使用 `build/profiles/q2opt2.json`；历史 win1 含 INVALID 专家别名实验，仅保留复现。
+
+本轮修正专家文件身份重复写死、finalize 实际字节验证、Speed 分片回执覆盖、patch 行尾与派生材料验收继承。引擎改动整理为[六组有序补丁](patches/q2opt2-series.json)，详见[审查结论与重放入口](docs/q2-material-review.md)及[q2opt2 消费合同](integration/speed/consumer-contract-q2opt2.json)。既有 wheel / patch / 验收记录不覆盖。
+
+候选已通过来源 / 二进制验证、16 项材料工具测试、17 项引擎读取 / GPU / RowStore 测试、163 项 Speed 相关测试、完整专家流式读取及两种旧模型四组随包回归。当前新版本 Flash Next 随包验收被默认 commit 准入拒绝，等待释放整机余量；不继承 q2opt1 的完整模型成功状态。确切范围见[新验收摘要](artifacts/q2opt2-cp312-cu130-sm120/validation/review-20261011/validation-summary.json)。
 
 Flash Next Q2 的新性能修订为 **`0.1.3+speed.q2opt1`**：按专家分组 prefill、小残余按需加载，配合 Speed 的 Q2 chunk4096，4K 原生 TTFT 约8.75→1.09秒，热6-token残余约751→91ms。完整专家和原生二进制保持不变；新wheel、来源与证据位于 `artifacts/q2opt1-cp312-cu130-sm120`，详见[优化、实测及复现](docs/q2-performance-optimizations.md)、[消费合同](integration/speed/consumer-contract-q2opt1.json)。旧版本及以下历史验收记录保留。
 
