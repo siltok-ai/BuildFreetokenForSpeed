@@ -1,0 +1,68 @@
+[1m[2026-10-13|19:55:02|core|rank=0][0m [32mINFO    [0m Enabled expandable_segments (override via PYTORCH_ALLOC_CONF)
+[1m[2026-10-13|19:55:03|core|rank=0][0m [33mWARNING [0m Page size is overridden to 64 for the qsa_sparse backend
+[1m[2026-10-13|19:55:03|core|rank=0][0m [32mINFO    [0m Resolved config: moe_strategy='offload', attention_backend='qsa_sparse', cache_type='hybrid_radix', page_size=64
+[1m[2026-10-13|19:55:03|core|rank=0][0m [32mINFO    [0m Free memory before loading model: 22.29 GiB
+[1m[2026-10-13|19:55:07|core|rank=0][0m [32mINFO    [0m PLE disk backend: ReadFile pool x16, NO_BUFFERING, wait-sync
+[1m[2026-10-13|19:55:07|core|rank=0][0m [32mINFO    [0m MoE experts: q2_0 via triton
+protected-Q2 loaded layer 0 compact host rows 371
+protected-Q2 loaded layer 1 compact host rows 363
+protected-Q2 loaded layer 2 compact host rows 372
+protected-Q2 loaded layer 3 compact host rows 405
+protected-Q2 loaded layer 4 compact host rows 386
+protected-Q2 loaded layer 5 compact host rows 377
+protected-Q2 loaded layer 6 compact host rows 347
+protected-Q2 loaded layer 7 compact host rows 365
+protected-Q2 loaded layer 8 compact host rows 374
+protected-Q2 loaded layer 9 compact host rows 376
+protected-Q2 loaded layer 10 compact host rows 379
+protected-Q2 loaded layer 11 compact host rows 386
+protected-Q2 loaded layer 12 compact host rows 365
+protected-Q2 loaded layer 13 compact host rows 358
+protected-Q2 loaded layer 14 compact host rows 395
+protected-Q2 loaded layer 15 compact host rows 415
+protected-Q2 loaded layer 16 compact host rows 395
+protected-Q2 loaded layer 17 compact host rows 379
+protected-Q2 loaded layer 18 compact host rows 375
+protected-Q2 loaded layer 19 compact host rows 374
+protected-Q2 loaded layer 20 compact host rows 392
+protected-Q2 loaded layer 21 compact host rows 372
+protected-Q2 loaded layer 22 compact host rows 356
+protected-Q2 loaded layer 23 compact host rows 400
+protected-Q2 loaded layer 24 compact host rows 379
+protected-Q2 loaded layer 25 compact host rows 382
+protected-Q2 loaded layer 26 compact host rows 381
+protected-Q2 loaded layer 27 compact host rows 394
+protected-Q2 loaded layer 28 compact host rows 400
+protected-Q2 loaded layer 29 compact host rows 373
+protected-Q2 loaded layer 30 compact host rows 399
+protected-Q2 loaded layer 31 compact host rows 414
+protected-Q2 loaded layer 32 compact host rows 405
+protected-Q2 loaded layer 33 compact host rows 388
+protected-Q2 loaded layer 34 compact host rows 373
+protected-Q2 loaded layer 35 compact host rows 384
+protected-Q2 loaded layer 36 compact host rows 389
+protected-Q2 loaded layer 37 compact host rows 368
+protected-Q2 loaded layer 38 compact host rows 357
+protected-Q2 loaded layer 39 compact host rows 402
+protected-Q2 loaded layer 40 compact host rows 410
+protected-Q2 loaded layer 41 compact host rows 397
+protected-Q2 loaded layer 42 compact host rows 383
+protected-Q2 loaded layer 43 compact host rows 395
+protected-Q2 loaded layer 44 compact host rows 399
+protected-Q2 loaded layer 45 compact host rows 400
+protected-Q2 loaded layer 46 compact host rows 395
+protected-Q2 loaded layer 47 compact host rows 388
+[1m[2026-10-13|19:55:40|core|rank=0][0m [32mINFO    [0m Multimodal disabled: --text-model-only
+[1m[2026-10-13|19:55:40|core|rank=0][0m [32mINFO    [0m Allocating 8192 tokens for KV cache, K + V = 0.20 GiB
+[1m[2026-10-13|19:55:40|core|rank=0][0m [32mINFO    [0m qsa_sparse block top-k: triton qsa_block_topk
+[1m[2026-10-13|19:55:40|core|rank=0][0m [32mINFO    [0m Free memory after initialization: 6.85 GiB
+[1m[2026-10-13|19:55:40|core|rank=0][0m [32mINFO    [0m Start capturing CUDA graphs with sizes: [1]
+[1m[2026-10-13|19:55:40|core|rank=0][0m [32mINFO    [0m Free GPU memory before capturing CUDA graphs: 6.85 GiB
+[1m[2026-10-13|19:55:41|core|rank=0][0m [32mINFO    [0m Free GPU memory after capturing CUDA graphs: 6.84 GiB
+[1m[2026-10-13|19:55:43|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 70, #cached-token: 0, token usage: 0.02, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 91.84
+[1m[2026-10-13|19:55:43|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 70, #cached-token: 0, token usage: 0.02, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 101.99
+{"label": "short-0-cold", "input_tokens": 70, "output_tokens": 32, "eos": false, "truncated": true, "ttft_ms": 568.0679999641143, "decode_tps": 91.08720512677611, "prefix_cached_tokens": 0}
+[1m[2026-10-13|19:55:45|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 6, #cached-token: 64, token usage: 0.02, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 3.87
+{"label": "short-0-hot", "input_tokens": 70, "output_tokens": 32, "eos": false, "truncated": true, "ttft_ms": 433.3446000237018, "decode_tps": 93.35038132673141, "prefix_cached_tokens": 64}
+[1m[2026-10-13|19:55:53|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 4096, #cached-token: 0, token usage: 0.51, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 491.53
+[1m[2026-10-13|19:56:00|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 4096, #cached-token: 0, token usage: 0.51, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 560.45

@@ -1,0 +1,410 @@
+{
+  "status": "bounded_prototype_ready_to_port_to_free_token_candidate",
+  "installed_base_version": "0.1.3+speed.strataq2dev5",
+  "protected_8192": {
+    "contexts": {
+      "short": {
+        "median_tps": 97.92632039634296,
+        "minimum_tps": 94.26371534236665,
+        "maximum_tps": 98.83061336049674,
+        "median_miss_rate": 0.14627568493150683,
+        "median_payload_bytes_per_token": 96871950.0,
+        "actual_outputs": [
+          512,
+          512,
+          512,
+          512,
+          512,
+          512
+        ],
+        "eos": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "cold_hot_first_differences": [
+          104,
+          105,
+          105
+        ],
+        "cold_ttft_ms": [
+          561.8547999765724,
+          561.0025000059977,
+          553.1413999851793
+        ],
+        "hot_ttft_ms": [
+          11813.033999991603,
+          105.58400000445545,
+          105.3657999727875
+        ]
+      },
+      "diverse4096": {
+        "median_tps": 92.31677520076634,
+        "minimum_tps": 91.01457292875097,
+        "maximum_tps": 94.39668483315472,
+        "median_miss_rate": 0.19281229615133724,
+        "median_payload_bytes_per_token": 127691100.0,
+        "actual_outputs": [
+          512,
+          512,
+          512,
+          512,
+          512,
+          512
+        ],
+        "eos": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "cold_hot_first_differences": [
+          null,
+          null,
+          null
+        ],
+        "cold_ttft_ms": [
+          7231.689499982167,
+          7209.917600033805,
+          7180.707799969241
+        ],
+        "hot_ttft_ms": [
+          1405.3703999961726,
+          535.0932999863289,
+          529.7810999909416
+        ]
+      }
+    },
+    "peak_commit_used": 63716651008,
+    "min_commit_available": 6641209344,
+    "min_physical_available": 27311525888,
+    "no_mtp": true,
+    "version": "0.1.3+speed.strataq2dev5",
+    "prototype": {
+      "source_sha256": "d973a89e2927f249e0632611fd17352ad28d85c847e7125dbe1459afd0afb275",
+      "profile_sha256": "8f59b4aa8873209dff11c11e37bcda9529a1335b724a1afeea37bf6388975baf",
+      "protected_count": 6144,
+      "dynamic_count": 1024,
+      "expert_cache_slots": 8192,
+      "compact_host_bytes": 25480396800,
+      "gpu_bank_bytes": 11324620800,
+      "process_engine_override": true,
+      "full_engine_acceptance": false,
+      "restrictions": [
+        "one real Q2 GPU model",
+        "fixed protected set",
+        "rebuild requires restart",
+        "decode routes <=128"
+      ]
+    },
+    "cold_cache_semantics": "Prefix and dynamic LRU reset; fixed protected owners survive all requests. Unlike the dev5 full LRU cold reset, permanent owners remain resident."
+  },
+  "protected_11264": {
+    "contexts": {
+      "short": {
+        "median_tps": 111.90113976934869,
+        "minimum_tps": 107.98137006473033,
+        "maximum_tps": 112.40745330408265,
+        "median_miss_rate": 0.060276011089367254,
+        "median_payload_bytes_per_token": 39918150.0,
+        "actual_outputs": [
+          512,
+          512,
+          512,
+          512,
+          512,
+          512
+        ],
+        "eos": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "cold_hot_first_differences": [
+          104,
+          105,
+          105
+        ],
+        "cold_ttft_ms": [
+          484.31010002968833,
+          487.0494999922812,
+          486.84199998388067
+        ],
+        "hot_ttft_ms": [
+          223.94529997836798,
+          80.93080000253394,
+          62.66890000551939
+        ]
+      },
+      "diverse4096": {
+        "median_tps": 103.15148899215484,
+        "minimum_tps": 99.95586293371133,
+        "maximum_tps": 105.83540159435744,
+        "median_miss_rate": 0.10785632746249185,
+        "median_payload_bytes_per_token": 71428500.0,
+        "actual_outputs": [
+          512,
+          512,
+          512,
+          512,
+          512,
+          512
+        ],
+        "eos": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "cold_hot_first_differences": [
+          null,
+          null,
+          null
+        ],
+        "cold_ttft_ms": [
+          7166.09310003696,
+          7169.5031999843195,
+          7139.8395000142045
+        ],
+        "hot_ttft_ms": [
+          512.0801000157371,
+          474.3067999952473,
+          465.7620000070892
+        ]
+      }
+    },
+    "peak_commit_used": 63482896384,
+    "min_commit_available": 6874963968,
+    "min_physical_available": 32212230144,
+    "no_mtp": true,
+    "version": "0.1.3+speed.strataq2dev5",
+    "prototype": {
+      "source_sha256": "d973a89e2927f249e0632611fd17352ad28d85c847e7125dbe1459afd0afb275",
+      "profile_sha256": "8f59b4aa8873209dff11c11e37bcda9529a1335b724a1afeea37bf6388975baf",
+      "protected_count": 9216,
+      "dynamic_count": 1024,
+      "expert_cache_slots": 11264,
+      "compact_host_bytes": 21233664000,
+      "gpu_bank_bytes": 15571353600,
+      "process_engine_override": true,
+      "full_engine_acceptance": false,
+      "restrictions": [
+        "one real Q2 GPU model",
+        "fixed protected set",
+        "rebuild requires restart",
+        "decode routes <=128"
+      ]
+    },
+    "cold_cache_semantics": "Prefix and dynamic LRU reset; fixed protected owners survive all requests. Unlike the dev5 full LRU cold reset, permanent owners remain resident."
+  },
+  "token_checks": [
+    {
+      "measurement": "prototype-protected-cache-performance-8192-v1.json",
+      "label": "short-0-cold",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-8192-v1.json",
+      "label": "short-0-hot",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-8192-v1.json",
+      "label": "short-1-cold",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-8192-v1.json",
+      "label": "short-1-hot",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-8192-v1.json",
+      "label": "short-2-cold",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-8192-v1.json",
+      "label": "short-2-hot",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-8192-v1.json",
+      "label": "diverse4096-0-cold",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-8192-v1.json",
+      "label": "diverse4096-0-hot",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-8192-v1.json",
+      "label": "diverse4096-1-cold",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-8192-v1.json",
+      "label": "diverse4096-1-hot",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-8192-v1.json",
+      "label": "diverse4096-2-cold",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-8192-v1.json",
+      "label": "diverse4096-2-hot",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-11264-v1.json",
+      "label": "short-0-cold",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-11264-v1.json",
+      "label": "short-0-hot",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-11264-v1.json",
+      "label": "short-1-cold",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-11264-v1.json",
+      "label": "short-1-hot",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-11264-v1.json",
+      "label": "short-2-cold",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-11264-v1.json",
+      "label": "short-2-hot",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-11264-v1.json",
+      "label": "diverse4096-0-cold",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-11264-v1.json",
+      "label": "diverse4096-0-hot",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-11264-v1.json",
+      "label": "diverse4096-1-cold",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-11264-v1.json",
+      "label": "diverse4096-1-hot",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-11264-v1.json",
+      "label": "diverse4096-2-cold",
+      "all_tokens_equal": true
+    },
+    {
+      "measurement": "prototype-protected-cache-performance-11264-v1.json",
+      "label": "diverse4096-2-hot",
+      "all_tokens_equal": true
+    }
+  ],
+  "state_components": [
+    662,
+    662
+  ],
+  "max_state_component_relative_l2": 0.0,
+  "traces": [
+    {
+      "path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\prototype-protected-cache-decode-only-11264-v1.diverse4096-0-cold.trace.json",
+      "families": {
+        "gguf_main": 3.9573968064516616,
+        "expert_routed": 0.8289328709677418,
+        "expert_grouped": 0.0,
+        "expert_alignment": 0.0,
+        "expert_copy": 1.2011624516129065,
+        "admission": 0.11650832258064583,
+        "other": 2.2024461935484
+      },
+      "decode_forwards": 31
+    },
+    {
+      "path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\prototype-protected-cache-decode-only-11264-v1.diverse4096-0-hot.trace.json",
+      "families": {
+        "gguf_main": 3.9903474838710062,
+        "expert_routed": 0.8271686451612911,
+        "expert_grouped": 0.0,
+        "expert_alignment": 0.0,
+        "expert_copy": 0.7854351290322703,
+        "admission": 0.1098879677419363,
+        "other": 2.2050448387096897
+      },
+      "decode_forwards": 31
+    },
+    {
+      "path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\prototype-protected-cache-decode-only-11264-v1.short-0-cold.trace.json",
+      "families": {
+        "gguf_main": 3.9704936774193955,
+        "expert_routed": 0.8271379032258076,
+        "expert_grouped": 0.0,
+        "expert_alignment": 0.0,
+        "expert_copy": 1.2334901290322633,
+        "admission": 0.11647670967741984,
+        "other": 2.1428102580645274
+      },
+      "decode_forwards": 31
+    },
+    {
+      "path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\prototype-protected-cache-decode-only-11264-v1.short-0-hot.trace.json",
+      "families": {
+        "gguf_main": 4.002792096774239,
+        "expert_routed": 0.816681,
+        "expert_grouped": 0.0,
+        "expert_alignment": 0.0,
+        "expert_copy": 0.9767906451613056,
+        "admission": 0.11383929032258144,
+        "other": 2.147886000000012
+      },
+      "decode_forwards": 31
+    }
+  ],
+  "decision": "Stop additional cache-policy exploration for this version; port the 11264-slot configuration into a new optional FreeToken revision and validate actual installed materials before Speed integration.",
+  "full_runtime_acceptance": false,
+  "speed_acceptance": false,
+  "remaining": [
+    "Remove process overrides/global payload and add explicit configuration/resource contract",
+    "Reject unsafe fixed-owner cache resizing before destructive runtime rebuild; retain KV-only recapture",
+    "New frozen source/profile/patch/version/material identity",
+    "Actual installed GPU/state/quality/long-output and old-model regressions",
+    "Speed backend/HTTP/cancel/resource and packaged validation"
+  ],
+  "limitations": [
+    "No MTP; maximum one active request, KV reserve 8192, tested prefill <=4096",
+    "One 4K output measured just below 100 tps; this is not an all-request throughput guarantee",
+    "Protected owners survive cold resets; cold means prefix/dynamic-cache cold",
+    "Short cold/hot divergence at 104/105 is identical to frozen dev5, not newly introduced",
+    "4K prefill regression versus dev3 remains; first shape compilation TTFT retained",
+    "Full-prefill diagnostic stopped at 306 seconds; decode-only replacement completed",
+    "Combined component v1 input fixture superseded by corrected v2"
+  ]
+}

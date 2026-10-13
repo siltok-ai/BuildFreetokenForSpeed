@@ -1,0 +1,1033 @@
+{
+  "passed": true,
+  "gates": {
+    "model_state": true,
+    "matrix": true,
+    "sparse_context": true,
+    "cancel_reuse": true,
+    "previous_and_prefix_logits": true,
+    "finite_components": true,
+    "sparse_selection": true,
+    "owned_process_exit": true,
+    "memory_headroom": true
+  },
+  "checks": [
+    {
+      "label": "previous_dev5_quality",
+      "passed": true,
+      "positions": 5,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_39",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_40",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_41",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_42",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_43",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    },
+    {
+      "label": "previous_dev5_technical-cold",
+      "passed": true,
+      "positions": 32,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_35",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_36",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_37",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_38",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_39",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_40",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_41",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_42",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_43",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_44",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_45",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_46",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_47",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_48",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_49",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_50",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_51",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_52",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_53",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_54",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_55",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_56",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_57",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_58",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_59",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_60",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_61",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_62",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_63",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_64",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_65",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_66",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    },
+    {
+      "label": "previous_dev5_technical-hot",
+      "passed": true,
+      "positions": 32,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_35",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_36",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_37",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_38",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_39",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_40",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_41",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_42",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_43",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_44",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_45",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_46",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_47",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_48",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_49",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_50",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_51",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_52",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_53",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_54",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_55",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_56",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_57",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_58",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_59",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_60",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_61",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_62",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_63",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_64",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_65",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_66",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    },
+    {
+      "label": "previous_dev5_prefix-cold",
+      "passed": true,
+      "positions": 5,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_107",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_108",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_109",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_110",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_111",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    },
+    {
+      "label": "previous_dev5_prefix-hot",
+      "passed": true,
+      "positions": 5,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_107",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_108",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_109",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_110",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_111",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    },
+    {
+      "label": "previous_dev5_prefix-diverged",
+      "passed": true,
+      "positions": 5,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_107",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_108",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_109",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_110",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_111",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    },
+    {
+      "label": "previous_dev5_prefix-restored",
+      "passed": true,
+      "positions": 5,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_107",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_108",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_109",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_110",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_111",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    },
+    {
+      "label": "previous_dev5_long-cold",
+      "passed": true,
+      "positions": 5,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_2720",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2721",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2722",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2723",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2724",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    },
+    {
+      "label": "previous_dev5_long-hot",
+      "passed": true,
+      "positions": 5,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_2720",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2721",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2722",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2723",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2724",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    },
+    {
+      "label": "technical-hot",
+      "passed": true,
+      "positions": 32,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_35",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_36",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_37",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_38",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_39",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_40",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_41",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_42",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_43",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_44",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_45",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_46",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_47",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_48",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_49",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_50",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_51",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_52",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_53",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_54",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_55",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_56",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_57",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_58",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_59",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_60",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_61",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_62",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_63",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_64",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_65",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_66",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    },
+    {
+      "label": "prefix-hot",
+      "passed": true,
+      "positions": 5,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_107",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_108",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_109",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_110",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_111",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    },
+    {
+      "label": "prefix-restored",
+      "passed": true,
+      "positions": 5,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_107",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_108",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_109",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_110",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_111",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    },
+    {
+      "label": "long-hot",
+      "passed": true,
+      "positions": 5,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_2720",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2721",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2722",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2723",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2724",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    }
+  ],
+  "components": 662,
+  "max_component_relative_l2": 0.0,
+  "prototype": {
+    "source_sha256": "d973a89e2927f249e0632611fd17352ad28d85c847e7125dbe1459afd0afb275",
+    "profile_sha256": "8f59b4aa8873209dff11c11e37bcda9529a1335b724a1afeea37bf6388975baf",
+    "protected_count": 9216,
+    "dynamic_count": 1024,
+    "expert_cache_slots": 11264,
+    "compact_host_bytes": 21233664000,
+    "gpu_bank_bytes": 15571353600,
+    "process_engine_override": true,
+    "full_engine_acceptance": false,
+    "restrictions": [
+      "one real Q2 GPU model",
+      "fixed protected set",
+      "rebuild requires restart",
+      "decode routes <=128"
+    ]
+  },
+  "min_commit_available": 7219142656,
+  "full_runtime_acceptance": false,
+  "speed_acceptance": false,
+  "scope": "Permits bounded prototype performance measurement only; graph/prefix/cancel/sparse-state and fixed logits against frozen dev5. No complete quality suite, rebuild, other-model or multi-request release gate.",
+  "superseded_component_fixture": "Combined component v1 captured after an in-place rewrite without refreshing raw IDs; corrected v2 is authoritative. Preserve v1 rather than count it as an accepted test."
+}

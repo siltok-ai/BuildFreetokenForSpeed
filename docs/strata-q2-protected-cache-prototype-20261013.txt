@@ -1,0 +1,36 @@
+FreeToken Q2 protected residency: completed experiment, selected for source integration
+2026-10-13
+
+Current results are process-local prototypes on the frozen installed dev5 wheel. They are not a new accepted wheel or a Speed release.
+Archive: research/q2-protected-cache-20261013-v1/index.json, 100 copied files and 10 hashed external references.
+Archive index SHA256: 552b24b0b1a268db93ffb35d7897d6a76db24bd97296e4c7db34cb470f9f7fd3.
+
+All original Q2 bank bytes and dev5 routed DP4A arithmetic remain unchanged. Permanent GPU experts have no duplicate pinned-RAM rows; other experts have compact pinned owners and disposable dynamic GPU copies. Prefill double buffers, dynamic LRU slots and protected slots are disjoint.
+Frozen Strata ranking SHA256: 8f59b4aa8873209dff11c11e37bcda9529a1335b724a1afeea37bf6388975baf. Evaluation prompts were not used to train this ranking.
+
+Validation completed
+- Mixed owner gather: 13 exact-byte/graph checks on real GGUF experts, including sparse logical index 4095, repeated routes, zero host owners and changed source pointer contents.
+- Protected admission: 330 calls against an independent Python LRU reference, 165 graph replays, multiple layers and resets; permanent owners were never evicted.
+- Combined cache: corrected component v2 passed 70 real-weight loader/prefill/decode/reset/graph checks, including an entirely GPU-owned layer.
+- Both full-model capacities passed arithmetic, prefix divergence/restoration, sparse long-context and cancellation reuse. Each had 662 finite long-context component checks with zero differences and 12 matching QSA selections. Fixed logits and outputs matched frozen dev5.
+- Both 12 x 512-output performance runs delivered exactly the same full token sequences as dev5's corresponding runs. The pre-existing short cold/hot divergence at positions 104/105 remains recorded.
+- Fresh-process allocation experiment saved about 1.99 GiB of Windows commit by removing about 1.98 GiB of duplicate host payload, with the same GPU bank capacity.
+
+Capacity and performance
+8192 slots = 1024 prefill + 1024 dynamic + 6144 protected. It reduced commit pressure but its static-ranking miss rate was worse than the old LRU configuration; short/4K throughput was about 98/92 tps. This is not the selected performance configuration.
+11264 slots = 1024 prefill + 1024 dynamic + 9216 protected. Compact host banks occupy 21,233,664,000 bytes instead of 33,973,862,400; GPU banks occupy 15,571,353,600 bytes.
+The selected configuration completed six short and six 4K measurements, every request delivering 512 tokens with the length limit reached, no MTP and greedy temperature zero. Median short decode was about 111.9 tps; median 4K was about 103.2 tps, with one 4K run about 99.96 tps. Exact values are in the archived summary JSON. Minimum commit headroom was 6,874,963,968 bytes, about 6.4 GiB.
+Cold clears prefix and dynamic LRU contents; fixed protected owners survive. This differs from clearing every expert in the old full-host/LRU architecture and is explicit in all completed prototype reports.
+
+Decode-only trace
+Four completed diagnostic traces observed 31 decode forwards each. Main matrices were about 3.96-4.00 ms/forward, routed experts 0.82-0.83, owner gather 0.79-1.23 and admission 0.11-0.12. GPU kernel sums/unions were about 7.9-8.3 ms; CPU waits are not added to those durations. The 32-token windows do not replace the long-output throughput results.
+An earlier full-prefill trace was terminated after 306 seconds because 4K event post-processing stalled while the GPU was idle. Its two completed short traces, partial report and process logs are preserved. The replacement disables prefill activity collection, synchronizes before decode and bounds profiler post-processing; four traces completed in about 67 seconds. Raw activity-toggle warnings are retained and matching CPU/GPU decode annotation counts were checked.
+
+Decision and required work
+Stop additional residency-policy exploration for this version. Port the validated implementation into a new optional FreeToken revision, replacing prototype globals and process overrides with explicit ownership/configuration/resource contracts. Preserve the old default cache path for other models.
+Protected expert capacity must remain fixed during an engine lifetime. Unsafe expert-cache resizing must fail before graph teardown or freeing any owner; supported KV-only rebuilds must preserve owners and recapture graphs. This boundary requires explicit tests and Speed resource handling.
+Freeze a new profile, patch, custom version and matching materials, update the obsolete bitwise expert-test contract in that new revision, and rerun installed-wheel component/state/quality/performance checks. Then adapt the existing Speed candidate branch and verify backend/HTTP/cancel/resource behavior and historical models before package acceptance.
+Do not replace dev4/dev5 source, wheels, native caches, existing environments or model weights. No remote push or main merge is implied by this checkpoint.
+
+Limits
+This prototype rejects expert-cache rebuild and CPU/hybrid execution. It tested one active request, an 8192-token KV reserve and prefill up to 4096; it is not multi-request or arbitrary-context resource acceptance. Prefill remains slower than dev3 on the 4K case; compilation TTFT outliers are retained. The first combined component fixture is superseded because it failed to restore raw IDs before graph capture; corrected v2 is the authoritative result. No MTP or Speed performance has been claimed.

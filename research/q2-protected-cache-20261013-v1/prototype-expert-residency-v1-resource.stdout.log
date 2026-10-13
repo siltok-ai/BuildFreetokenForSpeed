@@ -1,0 +1,342 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "mixed_ten",
+      "routes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "exact_bytes": true,
+      "untouched_destination_tail": true,
+      "protected_owners_unchanged": true,
+      "passed": true
+    },
+    {
+      "name": "mixed_repeated",
+      "routes": [
+        9,
+        9,
+        3,
+        0,
+        7
+      ],
+      "exact_bytes": true,
+      "untouched_destination_tail": true,
+      "protected_owners_unchanged": true,
+      "passed": true
+    },
+    {
+      "name": "mixed_zero",
+      "routes": [],
+      "exact_bytes": true,
+      "untouched_destination_tail": true,
+      "protected_owners_unchanged": true,
+      "passed": true
+    },
+    {
+      "name": "host_only_ten",
+      "routes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "exact_bytes": true,
+      "untouched_destination_tail": true,
+      "protected_owners_unchanged": true,
+      "passed": true
+    },
+    {
+      "name": "host_only_repeated",
+      "routes": [
+        9,
+        9,
+        3,
+        0,
+        7
+      ],
+      "exact_bytes": true,
+      "untouched_destination_tail": true,
+      "protected_owners_unchanged": true,
+      "passed": true
+    },
+    {
+      "name": "host_only_zero",
+      "routes": [],
+      "exact_bytes": true,
+      "untouched_destination_tail": true,
+      "protected_owners_unchanged": true,
+      "passed": true
+    },
+    {
+      "name": "gpu_only_zero_host_ten",
+      "routes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "exact_bytes": true,
+      "untouched_destination_tail": true,
+      "protected_owners_unchanged": true,
+      "passed": true
+    },
+    {
+      "name": "gpu_only_zero_host_repeated",
+      "routes": [
+        9,
+        9,
+        3,
+        0,
+        7
+      ],
+      "exact_bytes": true,
+      "untouched_destination_tail": true,
+      "protected_owners_unchanged": true,
+      "passed": true
+    },
+    {
+      "name": "gpu_only_zero_host_zero",
+      "routes": [],
+      "exact_bytes": true,
+      "untouched_destination_tail": true,
+      "protected_owners_unchanged": true,
+      "passed": true
+    },
+    {
+      "name": "graph_changed_route_count",
+      "routes": [
+        9,
+        0,
+        9,
+        7
+      ],
+      "exact_bytes": true,
+      "untouched_destination_tail": true,
+      "protected_owners_unchanged": true,
+      "passed": true
+    },
+    {
+      "name": "graph_changed_route_count",
+      "routes": [],
+      "exact_bytes": true,
+      "untouched_destination_tail": true,
+      "protected_owners_unchanged": true,
+      "passed": true
+    },
+    {
+      "name": "graph_changed_route_count",
+      "routes": [
+        1,
+        2,
+        4,
+        5,
+        7,
+        8
+      ],
+      "exact_bytes": true,
+      "untouched_destination_tail": true,
+      "protected_owners_unchanged": true,
+      "passed": true
+    },
+    {
+      "name": "same_graph_changed_pointer_contents",
+      "routes": [
+        0,
+        1,
+        2,
+        3,
+        9,
+        8,
+        8
+      ],
+      "exact_bytes": true,
+      "untouched_destination_tail": true,
+      "protected_owners_unchanged": true,
+      "passed": true
+    }
+  ],
+  "timings": {
+    "mixed_blocks8": {
+      "median_us": 245.62649428844452,
+      "samples_us": [
+        2508.558988571167,
+        352.3859977722168,
+        242.808997631073,
+        247.0725029706955,
+        243.34250390529633,
+        243.0724948644638,
+        245.62649428844452
+      ],
+      "operations_per_sample": 64,
+      "scope": "GPU events, captured copy only; no model or CPU launch timing"
+    },
+    "mixed_blocks16": {
+      "median_us": 186.50299310684204,
+      "samples_us": [
+        186.50299310684204,
+        189.37049806118011,
+        186.1249953508377,
+        189.58650529384613,
+        188.91100585460663,
+        186.03050708770752,
+        185.98300218582153
+      ],
+      "operations_per_sample": 64,
+      "scope": "GPU events, captured copy only; no model or CPU launch timing"
+    },
+    "mixed_blocks32": {
+      "median_us": 174.39450323581696,
+      "samples_us": [
+        176.03549361228943,
+        174.39450323581696,
+        172.66049981117249,
+        175.64499378204346,
+        173.4669953584671,
+        172.7515012025833,
+        175.72249472141266
+      ],
+      "operations_per_sample": 64,
+      "scope": "GPU events, captured copy only; no model or CPU launch timing"
+    },
+    "host_only_blocks8": {
+      "median_us": 312.034010887146,
+      "samples_us": [
+        314.1529858112335,
+        309.60550904273987,
+        312.547504901886,
+        312.54100799560547,
+        309.4255030155182,
+        312.034010887146,
+        308.7109923362732
+      ],
+      "operations_per_sample": 64,
+      "scope": "GPU events, captured copy only; no model or CPU launch timing"
+    },
+    "host_only_blocks16": {
+      "median_us": 291.59098863601685,
+      "samples_us": [
+        290.44249653816223,
+        294.1735088825226,
+        288.9924943447113,
+        292.14850068092346,
+        288.8230085372925,
+        291.68900847435,
+        291.59098863601685
+      ],
+      "operations_per_sample": 64,
+      "scope": "GPU events, captured copy only; no model or CPU launch timing"
+    },
+    "host_only_blocks32": {
+      "median_us": 281.77300095558167,
+      "samples_us": [
+        281.3139855861664,
+        284.3075096607208,
+        281.77300095558167,
+        284.9299907684326,
+        281.54098987579346,
+        284.38499569892883,
+        281.3585102558136
+      ],
+      "operations_per_sample": 64,
+      "scope": "GPU events, captured copy only; no model or CPU launch timing"
+    },
+    "gpu_only_zero_host_blocks8": {
+      "median_us": 183.2209974527359,
+      "samples_us": [
+        183.25349688529968,
+        185.78100204467773,
+        183.20250511169434,
+        182.96749889850616,
+        188.291996717453,
+        183.2209974527359,
+        183.06000530719757
+      ],
+      "operations_per_sample": 64,
+      "scope": "GPU events, captured copy only; no model or CPU launch timing"
+    },
+    "gpu_only_zero_host_blocks16": {
+      "median_us": 93.8659980893135,
+      "samples_us": [
+        94.15599703788757,
+        93.42049807310104,
+        93.99549663066864,
+        93.8659980893135,
+        93.41999888420105,
+        96.28549963235855,
+        93.61600130796432
+      ],
+      "operations_per_sample": 64,
+      "scope": "GPU events, captured copy only; no model or CPU launch timing"
+    },
+    "gpu_only_zero_host_blocks32": {
+      "median_us": 47.605499625205994,
+      "samples_us": [
+        47.77500033378601,
+        47.59800061583519,
+        47.62149974703789,
+        47.57450148463249,
+        47.605499625205994,
+        47.535501420497894,
+        47.65550047159195
+      ],
+      "operations_per_sample": 64,
+      "scope": "GPU events, captured copy only; no model or CPU launch timing"
+    },
+    "native_full_host_baseline": {
+      "median_us": 274.55300092697144,
+      "samples_us": [
+        275.081992149353,
+        271.53900265693665,
+        274.55300092697144,
+        274.6725082397461,
+        272.41700887680054,
+        275.2614915370941,
+        271.6139853000641
+      ],
+      "operations_per_sample": 64,
+      "scope": "GPU events, captured copy only; no model or CPU launch timing"
+    }
+  },
+  "expert_row_bytes": 1382400,
+  "logical_source_ids": [
+    7,
+    4095,
+    1027,
+    1901,
+    29,
+    3028,
+    811,
+    2458,
+    90,
+    3800
+  ],
+  "source_sha256": "04e4d205ce502f6418213337e993f08d4bf0b679d8ce7a91386a19aa23cfb71c",
+  "gguf_revision": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+  "prototype_only": true,
+  "engine_modified": false,
+  "full_engine_acceptance": false,
+  "scope": "Ten real layer-0 GGUF experts, two original Q2 banks; sparse 4095 logical IDs, compact mapped host / GPU owners, graph pointer updates. No cache/LRU/prefill lifecycle integration.",
+  "gpu_max_allocated": 50758144
+}

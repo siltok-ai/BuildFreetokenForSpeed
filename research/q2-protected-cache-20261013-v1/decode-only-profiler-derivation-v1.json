@@ -1,0 +1,15 @@
+{
+  "source": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\first_freetoken_performance_dev5_v1.py",
+  "source_sha256": "73630da6021d11321bbe9c22cd75f650a571d5fc73c24b0c516a58eafe2018fc",
+  "target": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\first_freetoken_decode_only_diagnostic_v1.py",
+  "target_sha256": "c240e3454005222a67946b242a78a57601fbff50c3e923bb15dd9624e517f432",
+  "changes": [
+    "Disable CPU/CUDA activity during prefill; synchronize and enable before first decode forward",
+    "Bound Python post-processing to 60 seconds; preserve CUDA graph/markers/counters"
+  ],
+  "aborted_previous_diagnostic": {
+    "path": "prototype-protected-cache-diagnostic-8192-v1-resource.json",
+    "reason": "Full 4K prefill activity post-processing exceeded three minutes while GPU idle; stopped verified owned PID 22768 after 306-second total diagnostic. Two short traces preserved; no completed four-trace gate."
+  },
+  "throughput_acceptance": false
+}
