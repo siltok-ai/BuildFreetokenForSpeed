@@ -1,0 +1,14 @@
+{
+  "source": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\first_freetoken_performance_dev3_v5.py",
+  "source_sha256": "23e24b3389376292e844b2827527811db2b0c7c74316a6c8ab413e0ca21d6b31",
+  "derived": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\first_freetoken_performance_dev4_v1.py",
+  "derived_sha256": "68e0d0a6912012134e0ca54f91845bb0003545dd32fe0f46b08bceaf23e4e0a8",
+  "changes": [
+    "Expected actual installed dev4 version",
+    "Independent bounded dev4 runtime gate",
+    "Gate SHA in output",
+    "Native repair result naming"
+  ],
+  "measurement_protocol_changed": false,
+  "process_engine_override": false
+}

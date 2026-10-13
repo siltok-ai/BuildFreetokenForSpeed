@@ -1,0 +1,12 @@
+C:/workspace/worktrees/build-freetoken-flash-next-strata-q2/patches/series/q2opt2-0003-q2-routed-experts.patch:89: trailing whitespace.
+"""GSQ Q2_0 routed experts, kept in their native 64-element / 18-byte blocks."""
+C:/workspace/worktrees/build-freetoken-flash-next-strata-q2/patches/series/q2opt2-0003-q2-routed-experts.patch:90: trailing whitespace.
+from __future__ import annotations
+C:/workspace/worktrees/build-freetoken-flash-next-strata-q2/patches/series/q2opt2-0003-q2-routed-experts.patch:91: trailing whitespace.
+
+C:/workspace/worktrees/build-freetoken-flash-next-strata-q2/patches/series/q2opt2-0003-q2-routed-experts.patch:92: trailing whitespace.
+import torch
+C:/workspace/worktrees/build-freetoken-flash-next-strata-q2/patches/series/q2opt2-0003-q2-routed-experts.patch:93: trailing whitespace.
+
+warning: squelched 335 whitespace errors
+warning: 340 lines add whitespace errors.

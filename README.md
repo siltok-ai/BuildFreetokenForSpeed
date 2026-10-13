@@ -148,6 +148,18 @@ python -B tools/prepare_source.py --output .\out\inspect-win1
 
 ## 后续维护原则
 
+完整 Strata Q2 路径的当前研究修订由 `build/profiles/strataq2dev3.json` 与 `patches/strataq2dev3-series.json` 重放，版本为 `0.1.3+speed.strataq2dev3`；dev1/dev2 源码、补丁和制品保留。dev2 修复长前缀复用的计算与归约差异，dev3 固定 GGUF PLE gate 的 FP32 归约，处理多请求 decode 经 Q8 放大的数值差异。当前已通过进入第一版 FreeToken 性能评估的正确性门槛：849 项实际长输入组件与 504 项状态检查通过，预先固定的 20 项质量对照为 FreeToken 15/20、同权重 Strata 15/20、历史混合权重 16/20，没有 FreeToken 独有失败。保留整模型长上下文数值差异及局部质量检查的范围限制，不承诺跨引擎逐位一致。当前不更新 Speed 消费合同，也不继承 q2opt2 整包验收。证据见 [研究记录](docs/strata-q2-research.txt)、[dev3 正确性进展](docs/strata-q2-dev3-correctness.txt)、[扩展任务、真实状态与长上下文对照](docs/strata-q2-dev3-expanded-correctness.txt)及[正确性门槛与质量验收](docs/strata-q2-dev3-quality-acceptance.txt)。第一版正式性能已完成，主要性能修复、MTP 与 Speed 验收仍待完成。
+
+补充[权重使用复核与 thinking 对照](docs/strata-q2-dev3-thinking-and-model-use.txt)：有效词表、BPE 与实际聊天模板渲染通过 GGUF 对照。此前直接作答失败的三道基础题，在 FreeToken Q2、Strata Q2 与历史混合权重模型上开启 thinking 后均答对；两套 Q2 的完整输出 token 序列一致。
+
+已完成[第一版性能与主要退化诊断](docs/strata-q2-dev3-first-performance.txt)：FreeToken 完整 GGUF Q2 约9.6 tps，同机 Strata 自动 resident 模式无 MTP 约122–126 tps中位数。trace 将首要问题定位到通用 GGUF 投影；HC 融合及小投影 GEMV 原型将32-token诊断提高到约31–34 tps，但长prefill发生退化，因此尚不形成优化版wheel或Speed消费合同。当前优先修复主要执行效率问题，并继续验证共同数值约定，性能恢复合理后再评估MTP及Speed接入。正式测量与原型门槛、历史诊断失败和资源边界均保留在追加证据中。
+
+后续[decode 优先的结构修复实验](docs/strata-q2-decode-repair-20261013.txt)以专用压缩 MMVQ 设计验证为主：FreeToken 独立进程原型在1024槽、无MTP下，四个实际512-token请求约51.1–53.5 tps；专家搬运成为最大单项耗时。短输入冷热序列差异、prefill退化和淘汰的低效整数原型均保留，参考CUDA DLL仅用于诊断。下一步是新的 FreeToken AOT/profile/制品与必要状态/质量验收，然后优先改善专家驻留、搬运和重叠；微小矩阵差异留档，不逐项深究逐位一致。当前没有新优化wheel验收或Speed接入。
+
+已形成[dev4 原生 decode 修复](docs/strata-q2-dev4-native-decode.txt)：独立版本重新编译 3 个原生扩展和 27 个 AOT，将压缩 MMVQ 集成到 FreeToken，脱离诊断 DLL。实际 12 个 512-token 请求无 MTP，短输入中位数 53.81、4K 51.10 tps，冷热完整输出一致；必要组件、logits、graph、前缀与取消复用检查通过。4K cold TTFT 从 dev3 4.62 秒退化至 6.90 秒，仍记录并待优化。decode 优先，当前最大单项为专家搬运约 7.3–7.5 ms/token，随后是专家计算约 3.8 ms；下一轮优先改善驻留与主要专家执行设计。此轮是独立引擎有限验收，旧模型、多请求、MTP 和 Speed 随包仍待完成。
+
+已形成 [dev5 routed Q2 专家 decode 修复](docs/strata-q2-dev5-routed-decode.txt)：取消全缓存路由整理与 16-token decode tile，专家投影 trace 约 3.8→0.75 ms/token。实际安装新 wheel，4096 槽的 12 个 512-token 请求无 MTP，短/4K 中位数 90.71/86.78 tps；6144 槽另一组 12 次为 104.05/99.35 tps，但 commit 余量仅约 2.1 GiB，尚非资源准入配置。实际质量 15/20 与 Strata 相同、无新增失败，状态/logits/取消复用通过；短输入冷热长输出差异及 18 passed / 1 过时逐位断言失败保留，单独有界数值契约通过。下一重点为 [完整专家驻留与 host complement 设计](docs/strata-q2-expert-residency-design-20261013.txt)，持续 trace 并对照 Strata；prefill 回归、旧模型、MTP、Speed 与随包验收仍待完成。
+
 固定上游 commit → 在独立候选分支重放小补丁 → 原生与模型回归 → 生成新的定制版本和配套 DLL → Speed 升级锁定的素材身份 → 完整包验收。上游已覆盖的改动应删除，本地差异尽量缩小；实验与正式版本逐步拆开。具体步骤与责任边界见 [长期维护方案](docs/maintenance.md)。
 
 官方源码、版权和贡献约定保留于原目录；本地补丁及工具采用根目录 Apache-2.0 [LICENSE](LICENSE)，来源说明见 [NOTICE](NOTICE)。定制 wheel 是 Speed 发行素材，不是官方 FreeToken 发布。

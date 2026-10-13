@@ -1,0 +1,90 @@
+{
+  "command": [
+    "powershell.exe",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "C:\\workspace\\worktrees\\build-freetoken-flash-next-strata-q2\\build\\build-materials.ps1",
+    "-BuildPython",
+    "C:\\workspace\\envs\\speed-strata-q2-dev4\\Scripts\\python.exe",
+    "-CudaHome",
+    "C:\\workspace\\tools\\cuda-13.0",
+    "-OutDir",
+    "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-built-native-materials-v1",
+    "-Profile",
+    "C:\\workspace\\worktrees\\build-freetoken-flash-next-strata-q2\\build\\profiles\\strataq2dev4.json",
+    "-Jobs",
+    "2"
+  ],
+  "baseline": {
+    "commit_used": 13108137984,
+    "commit_limit": 70357860352,
+    "physical_available": 56187465728
+  },
+  "samples": [
+    {
+      "commit_used": 13129011200,
+      "commit_limit": 70357860352,
+      "physical_available": 56165404672,
+      "seconds": 0.036251200013794005,
+      "processes": [
+        {
+          "pid": 18904,
+          "rss": 7221248,
+          "private": 1437696,
+          "cpu_user": 0.0,
+          "cpu_system": 0.0,
+          "read_bytes": 0,
+          "write_bytes": 0
+        }
+      ],
+      "gpu": {
+        "temperature": 48,
+        "power_mw": 17098,
+        "sm_clock_mhz": 180,
+        "memory_clock_mhz": 405
+      }
+    },
+    {
+      "commit_used": 13187481600,
+      "commit_limit": 70357860352,
+      "physical_available": 56125603840,
+      "seconds": 0.14201289997436106,
+      "processes": [
+        {
+          "pid": 18904,
+          "rss": 65073152,
+          "private": 53841920,
+          "cpu_user": 0.09375,
+          "cpu_system": 0.078125,
+          "read_bytes": 178085,
+          "write_bytes": 120
+        }
+      ]
+    },
+    {
+      "commit_used": 13192974336,
+      "commit_limit": 70357860352,
+      "physical_available": 56117374976,
+      "seconds": 0.24726939998799935,
+      "processes": [
+        {
+          "pid": 18904,
+          "rss": 72450048,
+          "private": 58253312,
+          "cpu_user": 0.09375,
+          "cpu_system": 0.09375,
+          "read_bytes": 182693,
+          "write_bytes": 120
+        }
+      ]
+    }
+  ],
+  "sampling_interval_seconds": 0.1,
+  "returncode": 1,
+  "wall_seconds": 0.3526150999823585,
+  "peak_commit_used": 13192974336,
+  "min_commit_available": 57164886016,
+  "min_physical_available": 56117374976
+}

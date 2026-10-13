@@ -1,0 +1,3694 @@
+diff --git a/pyproject.toml b/pyproject.toml
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -14,7 +14,7 @@
+ readme = "README.md"
+ requires-python = ">=3.10"
+ license = "Apache-2.0"
+-license-files = ["LICENSE"]
++license-files = ["LICENSE", "python/freetoken/kernel/csrc/third_party/strata_mmvq/LICENSE-*.txt"]
+ authors = [{ name = "FlashML Team" }]
+ # No License:: classifier: setuptools>=77 rejects mixing one with the SPDX string above.
+ classifiers = [
+diff --git a/python/freetoken/kernel/aot.py b/python/freetoken/kernel/aot.py
+--- a/python/freetoken/kernel/aot.py
++++ b/python/freetoken/kernel/aot.py
+@@ -141,6 +141,13 @@
+         return load_aot("radix", cpp_files=["radix.cpp"], build_directory=str(build_directory))
+ 
+     return KernelSpec(name=_make_name("radix"), build=build)
++
++
++def _gguf_mmvq_spec() -> KernelSpec:
++    def build(build_directory: pathlib.Path) -> object:
++        from .gguf_native import _module
++        return _module(build_directory=str(build_directory))
++    return KernelSpec(name=_make_name("gguf_mmvq_r1"), build=build)
+ 
+ 
+ def default_kernel_specs() -> tuple[KernelSpec, ...]:
+@@ -158,6 +165,7 @@
+     specs.append(_fast_index_copy_multi_spec(num_threads=1024, blocks_per_bank=64))
+     specs.append(_batch_memcpy_spec())
+     specs.append(_radix_spec())
++    specs.append(_gguf_mmvq_spec())
+ 
+     names = [spec.name for spec in specs]
+     duplicates = {name for name in names if names.count(name) > 1}
+diff --git a/python/freetoken/kernel/csrc/jit/gguf_mmvq.cuh b/python/freetoken/kernel/csrc/jit/gguf_mmvq.cuh
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/kernel/csrc/jit/gguf_mmvq.cuh
+@@ -0,0 +1,83 @@
++#pragma once
++#include <freetoken/tensor.h>
++#include <freetoken/utils.cuh>
++#include <freetoken/utils.h>
++#include <tvm/ffi/container/tensor.h>
++#include <limits>
++#include <stdexcept>
++#include "../third_party/strata_mmvq/src/kernels/cuda/native_mmvq.cu"
++
++namespace freetoken::gguf_native {
++// Graph dependency edges belong to FreeToken; this module uses ordinary launches.
++bool& pdl_scope() { static thread_local bool enabled = false; return enabled; }
++bool pdl_supported() { return false; }
++bool pdl_launch_ok(const void*, cudaStream_t) { return false; }
++size_t iq_row_bytes(int, int64_t) noexcept { return 0; }
++void iq_mmvq(int, const void*, const void*, float*, int, int, int, void*) {
++    throw std::invalid_argument("FreeToken native MMVQ excludes external IQ dispatch");
++}
++}
++
++struct GGUFNativeMMVQ {
++    static void independent(const void* a, size_t na, const void* b, size_t nb) {
++        using namespace host;
++        const auto pa = reinterpret_cast<uintptr_t>(a);
++        const auto pb = reinterpret_cast<uintptr_t>(b);
++        RuntimeCheck(pa + na <= pb || pb + nb <= pa, "GGUF buffers must not overlap");
++    }
++
++    static void quantize(tvm::ffi::TensorView x, tvm::ffi::TensorView q, int64_t stream) {
++        using namespace host;
++        auto tokens = SymbolicSize{"tokens"};
++        auto width = SymbolicSize{"width"};
++        auto device = SymbolicDevice{};
++        TensorMatcher({tokens, width}).with_dtype<float>().with_device<kDLCUDA>(device).verify(x);
++        const auto t = tokens.unwrap(), k = width.unwrap();
++        RuntimeCheck(t > 0 && k > 0 && k % 32 == 0, "Q8_1 requires positive rows and width divisible by 32");
++        RuntimeCheck(t <= std::numeric_limits<int>::max() / k, "Q8_1 flat input exceeds native index width");
++        TensorMatcher({t, k / 32, 36}).with_dtype<uint8_t>().with_device<kDLCUDA>(device).verify(q);
++        independent(x.data_ptr(), t * k * sizeof(float), q.data_ptr(), t * (k / 32) * 36);
++        // Flattening keeps every 32-element block inside its original token.
++        freetoken::gguf_native::native_quantize_q8_1(static_cast<const float*>(x.data_ptr()), q.data_ptr(),
++            static_cast<int>(t * k), 1, reinterpret_cast<void*>(stream));
++    }
++
++    static void project(tvm::ffi::TensorView weights, tvm::ffi::TensorView q,
++                        tvm::ffi::TensorView y, int64_t type, int64_t width, int64_t stream) {
++        using namespace host;
++        int64_t block = 0, bytes = 0;
++        switch (type) {
++            case 2: case 20: block = 32; bytes = 18; break;
++            case 6: block = 32; bytes = 22; break;
++            case 8: block = 32; bytes = 34; break;
++            case 11: block = 256; bytes = 110; break;
++            case 12: block = 256; bytes = 144; break;
++            case 13: block = 256; bytes = 176; break;
++            case 14: block = 256; bytes = 210; break;
++            case 23: block = 256; bytes = 136; break;
++            case 42: block = 64; bytes = 18; break;
++            default: throw std::invalid_argument("Unsupported FreeToken native GGUF matrix type");
++        }
++        RuntimeCheck(width > 0 && width % block == 0 && width <= std::numeric_limits<int>::max() / 8,
++            "Native GGUF input width differs from its format");
++        auto tokens = SymbolicSize{"tokens"};
++        auto rows = SymbolicSize{"rows"};
++        auto device = SymbolicDevice{};
++        TensorMatcher({tokens, rows}).with_dtype<float>().with_device<kDLCUDA>(device).verify(y);
++        const auto t = tokens.unwrap(), n = rows.unwrap();
++        RuntimeCheck(t > 0 && n > 0 && n <= std::numeric_limits<int>::max(), "Native GGUF output shape invalid");
++        TensorMatcher({t, width / 32, 36}).with_dtype<uint8_t>().with_device<kDLCUDA>(device).verify(q);
++        const auto weight_bytes = n * (width / block) * bytes;
++        TensorMatcher({weight_bytes}).with_dtype<uint8_t>().with_device<kDLCUDA>(device).verify(weights);
++        independent(weights.data_ptr(), weight_bytes, y.data_ptr(), t * n * sizeof(float));
++        independent(q.data_ptr(), t * (width / 32) * 36, y.data_ptr(), t * n * sizeof(float));
++        const auto* input = static_cast<const uint8_t*>(q.data_ptr());
++        auto* output = static_cast<float*>(y.data_ptr());
++        for (int64_t first = 0; first < t; first += 8) {
++            freetoken::gguf_native::native_mmvq(static_cast<int>(type), weights.data_ptr(),
++                input + first * (width / 32) * 36, output + first * n,
++                static_cast<int>(width), static_cast<int>(n), static_cast<int>(std::min<int64_t>(8, t - first)),
++                reinterpret_cast<void*>(stream));
++        }
++    }
++};
+diff --git a/python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/dp4a.hpp b/python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/dp4a.hpp
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/dp4a.hpp
+@@ -0,0 +1,53 @@
++// include/strata/kernels/dp4a.hpp - the two instructions the kernels use that Pascal (sm_60) does not have.
++//
++// The engine is written for compute capability 7.5 and newer and refuses older cards at CMake configure time
++// (a Pascal build passes -DFREETOKEN_GGUF_EXPERIMENTAL_SM60=ON).  A GP100-class card is compute capability 6.0, which is
++// missing exactly two things the i-quant kernels rely on:
++//
++//   * `__dp4a`, a byte-wise dot product, available from 6.1 (Pascal GP10x/GV11x).  The reference for its
++//     fallback is llama.cpp's own (`ggml/src/ggml-cuda/common.cuh`), since the kernels in this directory are
++//     transcribed from llama.cpp's vecdotq.cuh and that wrapper's operands are the same sites: it reinterprets
++//     the operands as SIGNED bytes and accumulates in int32, which is what `__dp4a` does for these calls.  The
++//     fallback below computes exactly that with four PTX `vmad` byte-select instructions, so it is bit-exact
++//     rather than merely close (tools/sm60_dp4a_check.cu checks it against the byte-wise form).
++//   * `__nanosleep`, available from 7.0 (Volta).  It only paces single-thread doorbell waits, so a loop that
++//     spins without it is correct, merely busier.
++//
++// Both are compile-time selections on `__CUDA_ARCH__`, so one source tree builds for Pascal and for RTX
++// 20/30/40/50 without a #define at the call sites.  A HIP build never takes either fallback: `__CUDA_ARCH__` is
++// undefined there, so `FREETOKEN_GGUF_DP4A` is `__dp4a` (which `hip_compat/intrinsics.hpp` provides) and the pause is
++// HIP's own `__nanosleep`.
++#pragma once
++
++#include <cstdint>
++#if defined(FREETOKEN_GGUF_HIP_GFX906)
++#include <cuda_runtime.h>   // gfx906: the compat layer (__forceinline__, __nanosleep, __dp4a)
++#endif
++
++#if defined(__CUDA_ARCH__) && __CUDA_ARCH__ < 610
++__device__ __forceinline__ int strata_dp4a(const int a, const int b, const int c) {
++    // PTX vmad with byte selectors: compiles to four VMAD.S8.S8 (cuobjdump -sass), no byte extraction.
++    // Bit-exact with the byte-wise form it replaces: 1.07e9 cases (edge bytes, every per-lane byte pair, random),
++    // 0 mismatches, ~2.2x faster in isolation on a Tesla P100 (tools/sm60_dp4a_check.cu).
++    int r = c;
++    asm("vmad.s32.s32.s32 %0, %1.b0, %2.b0, %0;\n\t"
++        "vmad.s32.s32.s32 %0, %1.b1, %2.b1, %0;\n\t"
++        "vmad.s32.s32.s32 %0, %1.b2, %2.b2, %0;\n\t"
++        "vmad.s32.s32.s32 %0, %1.b3, %2.b3, %0;"
++        : "+r"(r) : "r"(a), "r"(b));
++    return r;
++}
++#define FREETOKEN_GGUF_DP4A(a, b, c) strata_dp4a((a), (b), (c))
++#else
++#define FREETOKEN_GGUF_DP4A(a, b, c) __dp4a((a), (b), (c))
++#endif
++
++/// Yield the thread while a doorbell flag is being polled.  The length of the pause is a backoff hint, not a
++/// contract, and only pre-Volta CUDA has no `__nanosleep` at all.
++__device__ __forceinline__ void strata_spin_pause() {
++#if defined(__CUDA_ARCH__) && __CUDA_ARCH__ < 700
++    // sm_6x: the loop spins.  Every call site is a single-thread doorbell wait, so nothing else is delayed.
++#else
++    __nanosleep(100);
++#endif
++}
+diff --git a/python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/iq_kernels.hpp b/python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/iq_kernels.hpp
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/iq_kernels.hpp
+@@ -0,0 +1,80 @@
++// include/strata/kernels/iq_kernels.hpp - the i-quant formats (IQ1_M, IQ2_XXS, IQ2_XS, IQ2_S, IQ3_XXS, IQ3_S,
++// IQ4_NL) and Q2_0 on the GPU for the IQ2_XS / IQ3_XXS model files, and Q4_K / Q5_K / Q5_1 / Q8_0 for Unsloth's
++// UD-Q4_K_XL (gate/up Q4_K or Q5_K, down Q5_1 or Q8_0, a Q8_0 embedding).
++//
++// The block layouts, codebook grids and dot products are llama.cpp's (ggml-common.h, ggml-cuda/vecdotq.cuh,
++// ggml-cuda/dequantize.cuh; MIT, see third_party/ggml/LICENSE and VERSION.txt), so a weight means exactly what it
++// means in llama.cpp.  Activations are q8_1 (32 values, fp16 scale and fp16 sum), the llama.cpp CUDA contract.
++#pragma once
++
++#include <cstddef>
++#include <cstdint>
++
++namespace freetoken::gguf_native {
++
++/// ggml type ids handled here.
++bool iq_supported(int ggml_type) noexcept;
++/// The token-embedding types iq_embed_rows and iq_dequant_f32 read: the i-quants above and BF16 (30).
++bool embed_type_supported(int ggml_type) noexcept;
++/// Bytes of one row of `n` values of `ggml_type` (n a multiple of the type's block).
++size_t iq_row_bytes(int ggml_type, int64_t n) noexcept;
++
++/// q8_1 blocks for `n_rows` rows of `n_cols` floats (n_cols a multiple of 32): y is n_rows * n_cols/32 blocks.
++void quantize_q8_1_rows(const float* x, int64_t n_rows, int64_t n_cols, void* y, void* stream);
++
++/// y[c][r] = W[r] . x[c] for `ncols` columns of q8_1 activations (x stride n_in/32 blocks per column).
++void iq_mmvq(int ggml_type, const void* w, const void* x_q8_1, float* y, int n_in, int n_out, int ncols, void* stream);
++
++/// Dequantize `n` contiguous values (n a multiple of 256) to fp16 / fp32.
++void iq_dequant_f16(int ggml_type, const void* src, int64_t n, uint16_t* dst, void* stream);
++void iq_dequant_f32(int ggml_type, const void* src, int64_t n, float* dst, void* stream);
++/// Rows `tokens[0..n_tok)` (device ids) of a GGUF embedding table (`row_bytes` per row; the table may be mapped
++/// host memory) dequantized to fp32, `n_embd` per row (a multiple of 256).
++void iq_embed_rows(int ggml_type, const void* table, size_t row_bytes, const int32_t* tokens, int64_t n_tok,
++                   int64_t n_embd, float* out, void* stream);
++/// One expert's gate and up matrices (n_ff rows of n_embd each) into the interleaved fp16 layout the prompt path
++/// uses: row 2r = gate row r, row 2r+1 = up row r.
++void iq_dequant_gu_f16(int ggml_type, const void* gate, const void* up, int64_t n_ff, int64_t n_embd, uint16_t* dst,
++                       void* stream);
++
++/// The layout of one native expert blob: [gate rows | up rows | down rows], raw GGUF blocks.
++struct NativeExpertLayout {
++    int gu_type = -1, d_type = -1;
++    int64_t n_embd = 0, n_ff = 0;
++    size_t gu_row = 0, d_row = 0;       // bytes per row
++    size_t up_off = 0, down_off = 0;    // byte offsets inside the blob
++    size_t bytes = 0;                   // the whole blob
++};
++NativeExpertLayout native_expert_layout(int gu_type, int d_type, int64_t n_embd, int64_t n_ff);
++/// Whether `native_expert_grouped` has kernels for this gate/up and down type pair at these dimensions, and the
++/// prompt path's dequantizer takes both (checked for every layer at startup, before anything is allocated).
++bool native_expert_supported(int gu_type, int d_type, int64_t n_embd, int64_t n_ff) noexcept;
++
++/// Bytes of scratch `native_expert_grouped` needs for `cap_entries` entries.
++size_t native_expert_scratch_bytes(int64_t cap_entries, int64_t n_ff);
++
++/// Grouped experts in the native format: group g's blob at device address grp_ptr[g]; its entries
++/// [grp_start[g], grp_start[g+1]) read token ent_tok[e]'s q8_1 activation (n_embd/32 blocks per token in x_q8_1)
++/// and write row ent_dst[e] of `out` (n_embd floats).  Counts are read on the device.
++/// `grid_groups` (1 .. cap_groups; 0 = cap_groups) groups run side by side, a block row each striding over the rest:
++/// a call that usually has few groups or none (the verify window's PCIe share) launches less for the ones it does
++/// not have.  The results do not depend on it.
++void native_expert_grouped(const NativeExpertLayout& L, const unsigned long long* grp_ptr, const int32_t* grp_start,
++                           const int32_t* n_groups, const int32_t* ent_dst, const int32_t* ent_tok, int64_t cap_groups,
++                           int64_t cap_entries, const void* x_q8_1, void* scratch, float* out, void* stream,
++                           int64_t grid_groups = 0);
++/// true: `native_expert_grouped`'s launches before the group stride (FREETOKEN_GGUF_GROUPED_V1=1 at startup) - a block row
++/// per possible group, SwiGLU and the q8_1 quantization as two kernels over all cap_entries.  Bitwise the same results
++/// (native_grouped_parity checks it); kept for A/B timing.  Set before graph capture; captured graphs keep theirs.
++void native_grouped_set_v1(bool v1);
++
++/// The bench only: the AMD kernel layout (FREETOKEN_GGUF_EXP_MODE values; -1 = the environment's) and the phase
++/// (0 all, 1 gate/up + SwiGLU + quantize, 2 down).
++void native_expert_set_mode(int mode, int phase);
++/// `iq_mmvq` and `native_expert_grouped` decode each weight part once and apply it to every column / entry;
++/// true selects the older kernels that decode it again per column (FREETOKEN_GGUF_OLD_IQ_MMVQ=1 at startup).  Both give
++/// bitwise the same results.  Set before graph capture; captured graphs keep the kernels they captured.
++void iq_set_old_kernels(bool old);
++bool iq_old_kernels();
++
++}  // namespace freetoken::gguf_native
+diff --git a/python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/native_mmvq.hpp b/python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/native_mmvq.hpp
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/native_mmvq.hpp
+@@ -0,0 +1,154 @@
++#pragma once
++
++#include <cstddef>
++
++namespace freetoken::gguf_native {
++
++// Native GGUF Q2_0, Q4_0, Q5_0, Q8_0, Q3_K, Q4_K, Q5_K, Q6_K, IQ4_NL
++// and IQ4_XS / CUDA Q8_1 adapters, pinned to llama.cpp
++// 3cf03257f219afbe7334045ff7c6a06ac68c627d, sm_120 generic MMVQ.
++// All pointers are device pointers, at least 4-byte aligned, with no overlap.
++// All calls enqueue on the explicit current CUDA stream; no allocation or wait.
++// The translation unit must use --use_fast_math, as the pinned CUDA oracle does.
++//
++// Shapes use GGUF order: n_in is the contiguous reduction dimension, n_out is
++// the weight row count, and ncols is the activation column/token count, 1..8
++// (plan v0.3 P3). Columns are contiguous: activation column j is x + j * n_in
++// (its Q8_1 blocks at j * n_in / 32) and output column j is y + j * n_out. See
++// native_mmvq_set_multi_exact for how ncols > 1 relates to ncols == 1.
++// n_in must be a positive multiple of 32 for quantization/Q4_0/Q5_0/Q8_0/IQ4_NL,
++// 64 for Q2_0, or 256 for the other formats. n_out must be positive. Weights remain
++// unmodified row-major GGUF blocks: Q3_K=110, Q4_K=144, Q5_K=176, Q6_K=210 and
++// IQ4_XS=136 bytes per 256 elements; Q2_0 is 18 bytes per 64 elements.
++// Q4_0/IQ4_NL=18, Q5_0=22, Q8_0=34 bytes per 32 elements.
++// Q8_1 scratch has 36 bytes per 32 elements, with no extra row padding here.
++// Input floats must be finite, and their block scales/sums representable in FP16.
++std::size_t native_q8_1_bytes(int n_in, int ncols = 1);
++
++// Layout for ncols > 1. false: llama.cpp's generic multi-column table (upstream), equal to ncols == 1 to
++// float rounding, speed not yet measured. true (default): the ncols == 1 layout, every column bitwise equal to a
++// single-column call. Set before
++// graph capture; captured graphs keep the kernels they captured.
++void native_mmvq_set_multi_exact(bool exact);
++bool native_mmvq_multi_exact();
++
++// One quantization may serve multiple weight matrices sharing the same input.
++// Q8_1 stores FP16 scale and FP16 warp sum of the ORIGINAL float inputs; it does
++// not reconstruct that sum from the quantized integers.
++void native_quantize_q8_1(const float* x, void* x_q8_1, int n_in, int ncols,
++                          void* stream);
++
++void native_swiglu_quantize_q8_1(const float* gate, const float* up, void* x_q8_1,
++                                 int n_in, int ncols, void* stream);
++
++void native_q5_k_mmvq(const void* weights, const void* x_q8_1, float* y,
++                      int n_in, int n_out, int ncols, void* stream);
++
++// Convenience composition: caller owns scratch sized by native_q8_1_bytes.
++void native_q5_k_f32(const void* weights, const float* x, void* scratch_q8_1,
++                     float* y, int n_in, int n_out, int ncols, void* stream);
++
++void native_q2_0_mmvq(const void* weights, const void* x_q8_1, float* y,
++                      int n_in, int n_out, int ncols, void* stream);
++
++void native_q2_0_f32(const void* weights, const float* x, void* scratch_q8_1,
++                     float* y, int n_in, int n_out, int ncols, void* stream);
++
++void native_q3_k_mmvq(const void* weights, const void* x_q8_1, float* y,
++                      int n_in, int n_out, int ncols, void* stream);
++
++void native_q3_k_f32(const void* weights, const float* x, void* scratch_q8_1,
++                     float* y, int n_in, int n_out, int ncols, void* stream);
++
++void native_iq4_xs_mmvq(const void* weights, const void* x_q8_1, float* y,
++                       int n_in, int n_out, int ncols, void* stream);
++
++void native_iq4_xs_f32(const void* weights, const float* x, void* scratch_q8_1,
++                      float* y, int n_in, int n_out, int ncols, void* stream);
++
++void native_q4_k_mmvq(const void* weights, const void* x_q8_1, float* y,
++                      int n_in, int n_out, int ncols, void* stream);
++
++void native_q4_k_f32(const void* weights, const float* x, void* scratch_q8_1,
++                     float* y, int n_in, int n_out, int ncols, void* stream);
++
++void native_q6_k_mmvq(const void* weights, const void* x_q8_1, float* y,
++                      int n_in, int n_out, int ncols, void* stream);
++
++void native_q6_k_f32(const void* weights, const float* x, void* scratch_q8_1,
++                     float* y, int n_in, int n_out, int ncols, void* stream);
++
++void native_q4_0_mmvq(const void* weights, const void* x_q8_1, float* y,
++                       int n_in, int n_out, int ncols, void* stream);
++
++void native_q4_0_f32(const void* weights, const float* x, void* scratch_q8_1,
++                      float* y, int n_in, int n_out, int ncols, void* stream);
++
++void native_q5_0_mmvq(const void* weights, const void* x_q8_1, float* y,
++                       int n_in, int n_out, int ncols, void* stream);
++
++void native_q5_0_f32(const void* weights, const float* x, void* scratch_q8_1,
++                      float* y, int n_in, int n_out, int ncols, void* stream);
++
++void native_q8_0_mmvq(const void* weights, const void* x_q8_1, float* y,
++                       int n_in, int n_out, int ncols, void* stream);
++
++/// FREETOKEN_GGUF_Q8_PACKED=1 (opt-in): a lossless load-time repack of a Q8_0 matrix into a qs plane (n_out x n_in int8)
++/// followed by a d plane (n_out x n_in / 32 fp16), the same bytes (34 per 32 values). A registered matrix's
++/// native_q8_0_mmvq calls (keyed by its GGUF-layout device pointer, which stays valid for the prompt path) read the
++/// packed copy instead; every output is bitwise equal to the GGUF-layout kernels.
++bool native_q8_0_packed_enabled();
++bool native_q8_0_packed_eligible(int n_in, int n_out);
++void native_q8_0_pack_host(const void* gguf_blocks, void* out, int n_in, int n_out);
++void native_q8_0_packed_register(const void* gguf_weights, const void* packed, int n_in, int n_out);
++void native_q8_0_packed_unregister(const void* gguf_weights);
++
++/// FREETOKEN_GGUF_Q6_PACKED=1 (opt-in): a packed copy of a Q6_K matrix (the output heads) - the same bytes as ql / qh /
++/// scales / d planes - that native_q6_k_mmvq calls on `weights` read instead (bitwise equal outputs). The copy is
++/// owned here: native_q6_k_pack builds it from the device matrix (false: not eligible or failed; nothing changes),
++/// native_q6_k_unpack frees it. FREETOKEN_GGUF_Q6P_SELFTEST=1 checks it bitwise and times it at load.
++bool native_q6_k_packed_enabled();
++bool native_q6_k_pack(const void* weights, int n_in, int n_out, const char* what);
++void native_q6_k_unpack(const void* weights);
++
++void native_q8_0_f32(const void* weights, const float* x, void* scratch_q8_1,
++                      float* y, int n_in, int n_out, int ncols, void* stream);
++
++void native_iq4_nl_mmvq(const void* weights, const void* x_q8_1, float* y,
++                       int n_in, int n_out, int ncols, void* stream);
++
++void native_iq4_nl_f32(const void* weights, const float* x, void* scratch_q8_1,
++                      float* y, int n_in, int n_out, int ncols, void* stream);
++
++// Storage/dispatch helpers take stable GGML type IDs, avoiding a ggml runtime
++// dependency in the engine: Q4_0=2, Q5_0=6, Q8_0=8, Q3_K=11, Q4_K=12, Q5_K=13,
++// Q6_K=14, IQ4_NL=20, IQ4_XS=23, Q2_0=42. Unsupported IDs throw in the byte-count
++// and launch helpers; only the
++// capability query returns false.
++bool native_mmvq_supported(int ggml_type) noexcept;
++std::size_t native_mmvq_weight_bytes(int ggml_type, int n_in, int n_out);
++void native_mmvq(int ggml_type, const void* weights, const void* x_q8_1, float* y,
++                 int n_in, int n_out, int ncols, void* stream);
++/// S26 FREETOKEN_GGUF_LFUSE: native_mmvq(w1 -> y1) and native_mmvq(w2 -> y2), same type / shape / input, in ONE launch,
++/// bitwise the two calls. Returns false (nothing launched) where that is not the case (Q8_0, 2-8 columns only).
++bool native_mmvq_pair(int ggml_type, const void* w1, const void* w2, const void* x_q8_1, float* y1, float* y2,
++                      int n_in, int n_out, int ncols, void* stream);
++
++// Fork F4 (Eddoursul): 2..4 columns also INTERLEAVED, so one 16-byte load reads a position of every column: CP = 2 (2
++// columns) or 4 (3-4), zero-padded; nb = n_in / 32 blocks; int32 bm[nb][8][CP] (block-major), int32 pm[8][nb][CP]
++// (position-major), float d[nb][CP] (each block's scale as the dots read it, __low2float of ds).
++constexpr int native_q8_1_il_cp(int ncols) { return ncols <= 2 ? 2 : ncols <= 4 ? 4 : 8; }
++std::size_t native_q8_1_il_bytes(int n_in, int ncols);
++// Writes the interleaved copy of 2..4 columns of plain q8_1 blocks (native_quantize_q8_1's, or a fused producer's)
++// to x_il (native_q8_1_il_bytes): the same values in the same bytes.
++void native_q8_1_interleave(const void* x_q8_1, void* x_il, int n_in, int ncols, void* stream);
++// True when native_mmvq_il runs its own kernel for this call (IQ4_XS, Q4_K, Q5_K, Q6_K, 2-4 columns, the exact layout).
++bool native_mmvq_il_supported(int ggml_type, int ncols, int n_out);
++// native_mmvq for 2..4 columns whose copy native_q8_1_interleave wrote, bitwise native_mmvq's output: kernels in which a
++// warp takes 1, 2 or 4 rows and reads the columns from the interleaved copy; native_mmvq (x_q8_1) when not supported.
++void native_mmvq_il(int ggml_type, const void* weights, const void* x_q8_1, const void* x_il, float* y, int n_in,
++                    int n_out, int ncols, void* stream);
++// Tests and benchmarks: every native_mmvq_il call takes `rows` a warp (0: the table).
++void native_mmvq_il_tune(int rows);
++
++} // namespace freetoken::gguf_native
+diff --git a/python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/pdl.hpp b/python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/pdl.hpp
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/pdl.hpp
+@@ -0,0 +1,100 @@
++// include/strata/kernels/pdl.hpp - programmatic dependent launch (PDL) for the verify window's kernel chain.
++//
++// On sm_90+ a kernel launched with cudaLaunchAttributeProgrammaticStreamSerialization may start while the kernel
++// before it is still running: everything before `pdl_wait()` overlaps that kernel (and its launch latency), everything
++// after it sees the kernel's writes, exactly as after an ordinary launch.  The kernels that opt in only LOAD constant
++// weights before `pdl_wait()` and write nothing, so every value they compute is unchanged.  `pdl_trigger()` lets the
++// next kernel launch early (it still waits for this grid to finish before it reads anything).  Their activations and
++// outputs are not `__restrict__` on CUDA (FREETOKEN_GGUF_PDL_RESTRICT): with it the compiler may load them before the wait
++// (the reason llama.cpp's PDL drops __restrict__ too); the weights keep it.
++//
++// Stream capture turns the attribute into a programmatic graph edge, which CUDA allows only between two kernel nodes.
++// `launch_pdl` therefore uses it only while `pdl_scope()` is set (the verify window's recorder, on a device where
++// `pdl_supported()`), only for a kernel whose code was built for sm_90+ (PTX of an older architecture, JIT-compiled,
++// has no griddepcontrol.wait: such a kernel would race), and only when every node the capturing stream's next node
++// depends on is a kernel - never after a memcpy, a memset, a host node or an event node.  After a join of branches
++// (several kernels) each edge is programmatic and the wait covers them all; FREETOKEN_GGUF_DF_PDL=2 allows one predecessor
++// only.  Everything else is an ordinary launch.  On HIP all of this is an ordinary launch, the device functions are
++// no-ops and the kernels keep their plain loops (kPdlPrefetch).
++#pragma once
++
++#include <cuda_runtime.h>
++
++#include <utility>
++
++namespace freetoken::gguf_native {
++
++/// Whether launches on this thread may carry the PDL attribute (set by the verify window's recorder).
++bool& pdl_scope();
++
++/// The current device runs PDL: a CUDA 12.3+ build, sm_90+ (FREETOKEN_GGUF_EMULATE_CC counts), code built for it, and
++/// FREETOKEN_GGUF_DF_PDL is set (1, or 2 for single-predecessor edges only).  Always false on HIP.
++bool pdl_supported();
++
++#if (defined(__CUDACC__) || defined(__HIPCC__))
++
++// FREETOKEN_GGUF_PDL_RESTRICT never goes on a __global__ signature: the host pass and the stub must see the same signature on
++// every architecture (MSVC rejects the template stubs otherwise, and so does g++ when the stub is generated from a
++// device pass).  A kernel takes plain pointers and declares `const T* FREETOKEN_GGUF_PDL_RESTRICT p = p_;` locals in its body.
++// On CUDA the activation pointers lose __restrict__ so the compiler cannot load them before pdl_wait() - but only
++// where PDL can run (sm_70 and newer here).  On Pascal and older (__CUDA_ARCH__ < 700, no PDL) `__restrict__` is what
++// lets the compiler use the read-only data path (LDG.CI): without it decode on sm_61 halves (#1469).
++#if defined(__HIPCC__)
++#define FREETOKEN_GGUF_PDL_RESTRICT __restrict__
++#elif defined(__CUDA_ARCH__) && (__CUDA_ARCH__ < 700)
++#define FREETOKEN_GGUF_PDL_RESTRICT __restrict__
++#else
++#define FREETOKEN_GGUF_PDL_RESTRICT
++#endif
++
++#if defined(__HIPCC__)
++inline constexpr bool kPdlPrefetch = false;   // HIP: no PDL, the kernels keep their plain loops
++#else
++#if defined(__CUDA_ARCH__) && (__CUDA_ARCH__ < 700)
++inline constexpr bool kPdlPrefetch = false;   // Pascal and older: no PDL, the prefetch only costs registers (#1469)
++#else
++inline constexpr bool kPdlPrefetch = true;    // CUDA: the weights a kernel can load before pdl_wait() are loaded there
++#endif
++/// `kernel` may be launched with the PDL attribute into `stream` now (see the header comment).
++bool pdl_launch_ok(const void* kernel, cudaStream_t stream);
++#endif
++
++__device__ __forceinline__ void pdl_wait() {
++#if !defined(__HIPCC__) && defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 900)
++    asm volatile("griddepcontrol.wait;" ::: "memory");
++#endif
++}
++
++__device__ __forceinline__ void pdl_trigger() {
++#if !defined(__HIPCC__) && defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 900)
++    asm volatile("griddepcontrol.launch_dependents;" :::);
++#endif
++}
++
++/// `kernel<<<grid, block, smem, stream>>>(args...)`, with the PDL attribute when `pdl_launch_ok` says so.  A launch
++/// error stays the thread's last error for the caller's own check (cudaGetLastError) to report.
++template <typename... KArgs, typename... Args>
++inline void launch_pdl(void (*kernel)(KArgs...), dim3 grid, dim3 block, size_t smem, cudaStream_t stream,
++                       Args&&... args) {
++#if !defined(__HIPCC__)
++    if (pdl_scope() && pdl_launch_ok((const void*) kernel, stream)) {
++        cudaLaunchConfig_t cfg = {};
++        cfg.gridDim = grid;
++        cfg.blockDim = block;
++        cfg.dynamicSmemBytes = smem;
++        cfg.stream = stream;
++        cudaLaunchAttribute attr[1];
++        attr[0].id = cudaLaunchAttributeProgrammaticStreamSerialization;
++        attr[0].val.programmaticStreamSerializationAllowed = 1;
++        cfg.attrs = attr;
++        cfg.numAttrs = 1;
++        (void) cudaLaunchKernelEx(&cfg, kernel, std::forward<Args>(args)...);
++        return;
++    }
++#endif
++    kernel<<<grid, block, smem, stream>>>(std::forward<Args>(args)...);
++}
++
++#endif  // __CUDACC__ || __HIPCC__
++
++}  // namespace freetoken::gguf_native
+diff --git a/python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/q8_1_finite.hpp b/python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/q8_1_finite.hpp
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/q8_1_finite.hpp
+@@ -0,0 +1,33 @@
++// include/strata/kernels/q8_1_finite.hpp - #606: the q8_1 activation block's scale and sum, kept finite.
++//
++// A q8_1 block stores its scale d = amax / 127 and the sum of its 32 raw activations as fp16. A sum past 65504 (one
++// massive-activation dimension among 32 values is enough) rounds to inf, and d does past amax = 8.3M; the dot
++// products then read inf * 0 = NaN, and a NaN in the residual ends as one token repeated (ggml-org/llama.cpp#23606
++// is the same defect). Clamped to the largest finite half, such a block gives an approximate product instead of NaN,
++// and the values are held to the int8 range they then exceed. Every block that was finite before is stored bit for
++// bit as before: values in (65504, 65520) round to 65504 anyway, and a finite block's |x / d| is at most 127. A NaN
++// stays NaN (the comparisons are false for it), so FREETOKEN_GGUF_DBG_NAN still sees one.
++#pragma once
++
++#include <cuda_fp16.h>
++
++namespace freetoken::gguf_native {
++
++constexpr float kHalfMax = 65504.0f;
++
++__device__ __forceinline__ float q8_1_finite(const float v) {
++    return fabsf(v) > kHalfMax ? copysignf(kHalfMax, v) : v;
++}
++
++/// The block's quantized value of `xi` for the (finite) scale `d`; `amax` = 0 is an all-zero block.
++__device__ __forceinline__ int8_t q8_1_quant(const float xi, const float d, const float amax) {
++    if (amax == 0.0f) return 0;
++    const float q = roundf(xi / d);
++    return (int8_t) (q > 127.0f ? 127.0f : q < -127.0f ? -127.0f : q);
++}
++
++__device__ __forceinline__ half2 q8_1_ds(const float d, const float sum) {
++    return make_half2(__float2half(q8_1_finite(d)), __float2half(q8_1_finite(sum)));
++}
++
++}  // namespace freetoken::gguf_native
+diff --git a/python/freetoken/kernel/csrc/third_party/strata_mmvq/LICENSE-ggml.txt b/python/freetoken/kernel/csrc/third_party/strata_mmvq/LICENSE-ggml.txt
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/kernel/csrc/third_party/strata_mmvq/LICENSE-ggml.txt
+@@ -0,0 +1,21 @@
++MIT License
++
++Copyright (c) 2023-2026 The ggml authors
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff --git a/python/freetoken/kernel/csrc/third_party/strata_mmvq/LICENSE-strata.txt b/python/freetoken/kernel/csrc/third_party/strata_mmvq/LICENSE-strata.txt
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/kernel/csrc/third_party/strata_mmvq/LICENSE-strata.txt
+@@ -0,0 +1,21 @@
++MIT License
++
++Copyright (c) 2026 Niko1221 and the Strata contributors
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff --git a/python/freetoken/kernel/csrc/third_party/strata_mmvq/src/kernels/cuda/native_mmvq.cu b/python/freetoken/kernel/csrc/third_party/strata_mmvq/src/kernels/cuda/native_mmvq.cu
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/kernel/csrc/third_party/strata_mmvq/src/kernels/cuda/native_mmvq.cu
+@@ -0,0 +1,2575 @@
++// Adapted from llama.cpp 3cf03257f219afbe7334045ff7c6a06ac68c627d:
++// ggml/src/ggml-cuda/{quantize.cu,vecdotq.cuh,mmvq.cu,common.cuh}
++// and ggml/src/ggml-common.h. See docs/native-mmvq.md for exact scope.
++//
++// MIT License
++// Copyright (c) 2023-2026 The ggml authors
++//
++// Permission is hereby granted, free of charge, to any person obtaining a copy
++// of this software and associated documentation files (the "Software"), to deal
++// in the Software without restriction, including without limitation the rights
++// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++// copies of the Software, and to permit persons to whom the Software is
++// furnished to do so, subject to the following conditions:
++//
++// The above copyright notice and this permission notice shall be included in all
++// copies or substantial portions of the Software.
++//
++// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++// SOFTWARE.
++
++#include "strata/kernels/native_mmvq.hpp"
++#include "strata/kernels/dp4a.hpp"
++#include "strata/kernels/q8_1_finite.hpp"
++#include "strata/kernels/iq_kernels.hpp"
++#include "s26_tsum.cuh"
++#if !defined(__HIPCC__)
++#include "q8_1_il.cuh"
++#endif
++#include "strata/kernels/pdl.hpp"
++
++#include <cuda_fp16.h>
++#include <cuda_runtime.h>
++
++#include <algorithm>
++#include <cstdint>
++#include <cstdlib>
++#include <cstring>
++#include <limits>
++#include <stdexcept>
++#include <string>
++#include <unordered_map>
++#include <cstdio>
++#include <vector>
++
++namespace freetoken::gguf_native {
++namespace {
++
++constexpr int QK = 256;
++constexpr int Q8K = 32;
++constexpr int QI = 32;
++constexpr int VDR = 2;
++constexpr int WARPS = 4;
++constexpr int WARP = 32;
++constexpr int QUANT_THREADS = 256;
++
++struct Q5KBlock {
++    half2 dm;
++    uint8_t scales[12];
++    uint8_t qh[32];
++    uint8_t qs[128];
++};
++struct Q81Block {
++    half2 ds;
++    int8_t qs[32];
++};
++struct Q20Block {
++    half d;
++    uint8_t qs[16];
++};
++struct Q3KBlock {
++    uint8_t hmask[32];
++    uint8_t qs[64];
++    uint8_t scales[12];
++    half d;
++};
++struct IQ4XSBlock {
++    half d;
++    uint16_t scales_h;
++    uint8_t scales_l[4];
++    uint8_t qs[128];
++};
++struct Q4KBlock {
++    half2 dm;
++    uint8_t scales[12];
++    uint8_t qs[128];
++};
++struct Q6KBlock {
++    uint8_t ql[128];
++    uint8_t qh[64];
++    int8_t scales[16];
++    half d;
++};
++struct Q40Block {
++    half d;
++    uint8_t qs[16];
++};
++struct Q50Block {
++    half d;
++    uint8_t qh[4];
++    uint8_t qs[16];
++};
++struct Q80Block {
++    half d;
++    int8_t qs[32];
++};
++struct IQ4NLBlock {
++    half d;
++    uint8_t qs[16];
++};
++static_assert(sizeof(Q5KBlock) == 176 && alignof(Q5KBlock) == 4);
++static_assert(sizeof(Q81Block) == 36 && alignof(Q81Block) == 4);
++static_assert(sizeof(Q20Block) == 18 && alignof(Q20Block) == 2 && offsetof(Q20Block, qs) == 2);
++static_assert(sizeof(Q3KBlock) == 110 && alignof(Q3KBlock) == 2 && offsetof(Q3KBlock, qs) == 32 &&
++              offsetof(Q3KBlock, scales) == 96 && offsetof(Q3KBlock, d) == 108);
++static_assert(sizeof(IQ4XSBlock) == 136 && alignof(IQ4XSBlock) == 2 &&
++              offsetof(IQ4XSBlock, scales_h) == 2 && offsetof(IQ4XSBlock, scales_l) == 4 &&
++              offsetof(IQ4XSBlock, qs) == 8);
++static_assert(offsetof(Q5KBlock, scales) == 4 && offsetof(Q5KBlock, qh) == 16 &&
++              offsetof(Q5KBlock, qs) == 48 && offsetof(Q81Block, qs) == 4);
++static_assert(sizeof(Q4KBlock) == 144 && alignof(Q4KBlock) == 4 &&
++              offsetof(Q4KBlock, scales) == 4 && offsetof(Q4KBlock, qs) == 16);
++static_assert(sizeof(Q6KBlock) == 210 && alignof(Q6KBlock) == 2 &&
++              offsetof(Q6KBlock, qh) == 128 && offsetof(Q6KBlock, scales) == 192 &&
++              offsetof(Q6KBlock, d) == 208);
++static_assert(sizeof(Q40Block) == 18 && alignof(Q40Block) == 2 && offsetof(Q40Block, qs) == 2);
++static_assert(sizeof(Q50Block) == 22 && alignof(Q50Block) == 2 &&
++              offsetof(Q50Block, qh) == 2 && offsetof(Q50Block, qs) == 6);
++static_assert(sizeof(Q80Block) == 34 && alignof(Q80Block) == 2 && offsetof(Q80Block, qs) == 2);
++static_assert(sizeof(IQ4NLBlock) == 18 && alignof(IQ4NLBlock) == 2 && offsetof(IQ4NLBlock, qs) == 2);
++
++__device__ __forceinline__ float warp_sum(float x) {
++#pragma unroll
++    for (int offset = WARP / 2; offset > 0; offset >>= 1) {
++        x += __shfl_xor_sync(0xffffffff, x, offset, WARP);
++    }
++    return x;
++}
++
++__device__ __forceinline__ float warp_max(float x) {
++#pragma unroll
++    for (int offset = WARP / 2; offset > 0; offset >>= 1) {
++        x = fmaxf(x, __shfl_xor_sync(0xffffffff, x, offset, WARP));
++    }
++    return x;
++}
++
++__launch_bounds__(QUANT_THREADS, 1)
++__global__ void native_quantize_q8_1_kernel(const float* x_, Q81Block* y_, int n_in) {
++    const float* FREETOKEN_GGUF_PDL_RESTRICT x = x_;   // __restrict__ below sm_70 only (pdl.hpp, #1469)
++    Q81Block* FREETOKEN_GGUF_PDL_RESTRICT y = y_;
++    pdl_trigger();   // PDL (pdl.hpp): the projection after this one may start loading its weights
++    pdl_wait();
++    const int i = int(blockIdx.x) * QUANT_THREADS + int(threadIdx.x);
++    if (i >= n_in) return; // n_in is a multiple of 32: only whole warps return.
++    const float xi = x[i];
++    const float amax = warp_max(fabsf(xi));
++    const float sum = warp_sum(xi);
++    const float d = q8_1_finite(amax / 127.0f);   // #606: q8_1_finite.hpp - the same bits for every finite block
++    const int8_t q = q8_1_quant(xi, d, amax);
++    y[i / Q8K].qs[i % Q8K] = q;
++    if (i % Q8K == 0) y[i / Q8K].ds = q8_1_ds(d, sum);
++}
++
++__launch_bounds__(QUANT_THREADS, 1)
++__global__ void native_swiglu_quantize_q8_1_kernel(const float* __restrict__ gate,
++                                                   const float* __restrict__ up,
++                                                   Q81Block* __restrict__ y, int n_in) {
++    const int i = int(blockIdx.x) * QUANT_THREADS + int(threadIdx.x);
++    if (i >= n_in) return; // n_in is a multiple of 32: only whole warps return.
++    const float gi = gate[i];
++    const float xi = __fmul_rn(__fdividef(gi, __fadd_rn(1.0f, __expf(-gi))), up[i]);
++    const float amax = warp_max(fabsf(xi));
++    const float sum = warp_sum(xi);
++    const float d = q8_1_finite(amax / 127.0f);   // #606, as native_quantize_q8_1_kernel: finite blocks bit for bit
++    const int8_t q = q8_1_quant(xi, d, amax);
++    y[i / Q8K].qs[i % Q8K] = q;
++    if (i % Q8K == 0) y[i / Q8K].ds = q8_1_ds(d, sum);
++}
++
++// Exact pinned vec_dot_q5_K_q8_1_impl_vmmq expression and integer dot order.
++__device__ __forceinline__ float q5_q8_dot_impl(
++    const int* __restrict__ vl, const int* __restrict__ vh, const int* __restrict__ u,
++    const uint8_t* __restrict__ sc, const uint8_t* __restrict__ m, const half2& dm5,
++    const float* __restrict__ d8) {
++    float sumf_d = 0.0f;
++    float sumf_m = 0.0f;
++#pragma unroll
++    for (int i = 0; i < 2; ++i) {
++        const int vl0i = (vl[0] >> (4 * i)) & 0x0f0f0f0f;
++        const int vl1i = (vl[1] >> (4 * i)) & 0x0f0f0f0f;
++        const int vh0i = ((vh[0] >> i) << 4) & 0x10101010;
++        const int vh1i = ((vh[1] >> i) << 4) & 0x10101010;
++        const int v0i = vl0i | vh0i;
++        const int v1i = vl1i | vh1i;
++        const int dot1 = FREETOKEN_GGUF_DP4A(v0i, u[2 * i], FREETOKEN_GGUF_DP4A(v1i, u[2 * i + 1], 0));
++        const int dot2 = FREETOKEN_GGUF_DP4A(0x01010101, u[2 * i], FREETOKEN_GGUF_DP4A(0x01010101, u[2 * i + 1], 0));
++        sumf_d += d8[i] * (dot1 * sc[i]);
++        sumf_m += d8[i] * (dot2 * m[i]);
++    }
++    const float2 dm5f = __half22float2(dm5);
++    return dm5f.x * sumf_d - dm5f.y * sumf_m;
++}
++
++__device__ __forceinline__ float q5_q8_dot(const Q5KBlock* __restrict__ bq5,
++                                          const Q81Block* __restrict__ bq8, int iqs) {
++    int vl[2];
++    int vh[2];
++    int u[4];
++    float d8[2];
++    const int bq8_offset = 2 * ((iqs / 2) / 4);
++    const int* ql = reinterpret_cast<const int*>(bq5->qs + 16 * bq8_offset + 4 * ((iqs / 2) % 4));
++    const int* qh = reinterpret_cast<const int*>(bq5->qh + 4 * ((iqs / 2) % 4));
++    vl[0] = ql[0];
++    vl[1] = ql[4];
++    vh[0] = qh[0] >> bq8_offset;
++    vh[1] = qh[4] >> bq8_offset;
++
++    const uint16_t* scales = reinterpret_cast<const uint16_t*>(bq5->scales);
++    const int j = bq8_offset / 2;
++    const int jm = j & 1;
++    const uint32_t s0 = scales[jm];
++    const uint32_t s2 = scales[jm + 2];
++    const uint32_t s4 = scales[jm + 4];
++    const uint32_t hi = uint32_t(-int32_t(j >= 2));
++    uint16_t aux[2];
++    aux[0] = uint16_t(((s0 & 0x3f3f) & ~hi) |
++                     ((((s4 >> 0) & 0x0f0f) | ((s0 & 0xc0c0) >> 2)) & hi));
++    aux[1] = uint16_t(((s2 & 0x3f3f) & ~hi) |
++                     ((((s4 >> 4) & 0x0f0f) | ((s2 & 0xc0c0) >> 2)) & hi));
++    const uint8_t* sc = reinterpret_cast<const uint8_t*>(aux);
++    const uint8_t* m = sc + 2;
++#pragma unroll
++    for (int i = 0; i < 2; ++i) {
++        const Q81Block* bq8i = bq8 + bq8_offset + i;
++        d8[i] = __low2float(bq8i->ds);
++        const int* q8 = reinterpret_cast<const int*>(bq8i->qs) + ((iqs / 2) % 4);
++        u[2 * i] = q8[0];
++        u[2 * i + 1] = q8[4];
++    }
++    return q5_q8_dot_impl(vl, vh, u, sc, m, bq5->dm, d8);
++}
++
++// The generic ncols=1 oracle uses 4 warps and 1 row (or 4 rows for small K),
++// eight weight blocks per K iteration, warp-ascending shared sum, then XOR tree.
++template<bool SmallK>
++__launch_bounds__(WARPS * WARP, 1)
++__global__ void native_q5_k_mmvq_kernel(const Q5KBlock* __restrict__ w,
++                                        const Q81Block* __restrict__ x,
++                                        float* __restrict__ y, int n_in, int n_out) {
++    constexpr int ROWS = SmallK ? WARPS : 1;
++    constexpr int BLOCKS_PER_ITER = VDR * WARPS * WARP / QI;
++    const int tid = WARP * int(threadIdx.y) + int(threadIdx.x);
++    const int row0 = ROWS * int(blockIdx.x);
++    const int blocks_per_row = n_in / QK;
++    float tmp[ROWS] = {};
++    for (int kbx = tid / (QI / VDR); kbx < blocks_per_row; kbx += BLOCKS_PER_ITER) {
++        const int kby = kbx * (QK / Q8K);
++        const int kqs = VDR * (tid % (QI / VDR));
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) {
++            // The source assumes allocator padding for partial row groups. This
++            // guard preserves every valid row's math without an out-of-bounds read.
++            if (row0 + i < n_out) {
++                const std::size_t block = std::size_t(row0 + i) * blocks_per_row + kbx;
++                tmp[i] += q5_q8_dot(w + block, x + kby, kqs);
++            }
++        }
++    }
++    __shared__ float partial[WARPS - 1][ROWS][WARP];
++    if (threadIdx.y > 0) {
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) partial[threadIdx.y - 1][i][threadIdx.x] = tmp[i];
++    }
++    __syncthreads();
++    if (threadIdx.y > 0) return;
++#pragma unroll
++    for (int i = 0; i < ROWS; ++i) {
++#pragma unroll
++        for (int l = 0; l < WARPS - 1; ++l) tmp[i] += partial[l][i][threadIdx.x];
++        tmp[i] = warp_sum(tmp[i]);
++        if (threadIdx.x == i && row0 + i < n_out) y[row0 + i] = tmp[i];
++    }
++}
++
++// Exact pinned vec_dot_q2_0_q8_1: each thread handles one 32-element chunk.
++// The weight block is only 2-byte aligned, so qs is intentionally loaded as
++// int16_t, unlike the naturally 4-byte aligned activation codes.
++__device__ __forceinline__ float q2_q8_dot(const Q20Block* __restrict__ w,
++                                          const Q81Block* __restrict__ x, int iqs) {
++    const float d2 = w->d;
++    const int16_t* qs = reinterpret_cast<const int16_t*>(w->qs) + iqs * 4;
++    const Q81Block* chunk = x + iqs;
++    const int* q8 = reinterpret_cast<const int*>(chunk->qs);
++    int sumi = 0;
++#pragma unroll
++    for (int j = 0; j < 4; ++j) {
++        const int q = qs[j];
++        const int u = q8[j * 2];
++        const int v = q8[j * 2 + 1];
++        const int qe = __byte_perm(0x020100ff, 0x020100ff, q >> 0);
++        const int qo = __byte_perm(0x020100ff, 0x020100ff, q >> 2);
++        const int qx = __byte_perm(qe, qo, 0x5140);
++        const int qy = __byte_perm(qe, qo, 0x7362);
++        sumi = FREETOKEN_GGUF_DP4A(u, qx, sumi);
++        sumi = FREETOKEN_GGUF_DP4A(v, qy, sumi);
++    }
++    const float d8 = __low2float(chunk->ds);
++    return d2 * d8 * sumi;
++}
++
++// Q2_0 generic MMVQ: QK=64, QI=2, VDR=1, 64 blocks per iteration.
++// Preserve the same outer accumulation and cross-warp reduction as the oracle.
++template<bool SmallK>
++__launch_bounds__(WARPS * WARP, 1)
++__global__ void native_q2_0_mmvq_kernel(const Q20Block* __restrict__ w,
++                                        const Q81Block* __restrict__ x,
++                                        float* __restrict__ y, int n_in, int n_out) {
++    constexpr int ROWS = SmallK ? WARPS : 1;
++    constexpr int BLOCKS_PER_ITER = WARPS * WARP / 2;
++    const int tid = WARP * int(threadIdx.y) + int(threadIdx.x);
++    const int row0 = ROWS * int(blockIdx.x);
++    const int blocks_per_row = n_in / 64;
++    float tmp[ROWS] = {};
++    for (int kbx = tid / 2; kbx < blocks_per_row; kbx += BLOCKS_PER_ITER) {
++        const int kby = kbx * 2;
++        const int kqs = tid % 2;
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) {
++            if (row0 + i < n_out) {
++                const std::size_t block = std::size_t(row0 + i) * blocks_per_row + kbx;
++                tmp[i] += q2_q8_dot(w + block, x + kby, kqs);
++            }
++        }
++    }
++    __shared__ float partial[WARPS - 1][ROWS][WARP];
++    if (threadIdx.y > 0) {
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) partial[threadIdx.y - 1][i][threadIdx.x] = tmp[i];
++    }
++    __syncthreads();
++    if (threadIdx.y > 0) return;
++#pragma unroll
++    for (int i = 0; i < ROWS; ++i) {
++#pragma unroll
++        for (int l = 0; l < WARPS - 1; ++l) tmp[i] += partial[l][i][threadIdx.x];
++        tmp[i] = warp_sum(tmp[i]);
++        if (threadIdx.x == i && row0 + i < n_out) y[row0 + i] = tmp[i];
++    }
++}
++
++// Q3_K's 110-byte stride gives alternate blocks only two-byte alignment.
++// Preserve the pinned helper's pair of 16-bit loads and little-endian combine.
++__device__ __forceinline__ int load_int_b2(const void* ptr, int i32) {
++    const auto* x = static_cast<const uint16_t*>(ptr);
++    int value = x[2 * i32] << 0;
++    value |= x[2 * i32 + 1] << 16;
++    return value;
++}
++
++__device__ __forceinline__ float q3_q8_dot_impl(int vl, int vh, const int* __restrict__ u,
++                                              const uint8_t* __restrict__ scales,
++                                              int scale_offset, float d3,
++                                              const float* __restrict__ d8) {
++    float sumf = 0.0f;
++#pragma unroll
++    for (int i = 0; i < 4; ++i) {
++        const int isc = scale_offset + 2 * i;
++        const int isc_low = isc % 8;
++        const int sc_shift_low = 4 * (isc / 8);
++        const int sc_low = (scales[isc_low] >> sc_shift_low) & 0xf;
++        const int isc_high = isc % 4;
++        const int sc_shift_high = 2 * (isc / 4);
++        const int sc_high = ((scales[8 + isc_high] >> sc_shift_high) & 3) << 4;
++        const int sc = (sc_low | sc_high) - 32;
++        const int vil = (vl >> (2 * i)) & 0x03030303;
++        const int vih = ((vh >> i) << 2) & 0x04040404;
++        const int vi = __vsubss4(vil, vih);
++        sumf += d8[i] * (FREETOKEN_GGUF_DP4A(vi, u[i], 0) * sc);
++    }
++    return d3 * sumf;
++}
++
++__device__ __forceinline__ float q3_q8_dot(const Q3KBlock* __restrict__ w,
++                                          const Q81Block* __restrict__ x, int iqs) {
++    const int bq8_offset = 4 * (iqs / 8);
++    const int scale_offset = iqs - iqs % 8 + (iqs % 8) / 4;
++    const float d = w->d;
++    const int vl = load_int_b2(w->qs, iqs);
++    const int vh = ~load_int_b2(w->hmask, iqs % 8) >> bq8_offset;
++    int u[4];
++    float d8[4];
++#pragma unroll
++    for (int i = 0; i < 4; ++i) {
++        u[i] = reinterpret_cast<const int*>(x[bq8_offset + i].qs)[iqs % 8];
++        d8[i] = __low2float(x[bq8_offset + i].ds);
++    }
++    return q3_q8_dot_impl(vl, vh, u, w->scales, scale_offset, d, d8);
++}
++
++// Q3_K generic MMVQ: QK=256, QI=16, VDR=1, eight blocks per iteration.
++template<bool SmallK>
++__launch_bounds__(WARPS * WARP, 1)
++__global__ void native_q3_k_mmvq_kernel(const Q3KBlock* __restrict__ w,
++                                        const Q81Block* __restrict__ x,
++                                        float* __restrict__ y, int n_in, int n_out) {
++    constexpr int ROWS = SmallK ? WARPS : 1;
++    constexpr int BLOCKS_PER_ITER = WARPS * WARP / 16;
++    const int tid = WARP * int(threadIdx.y) + int(threadIdx.x);
++    const int row0 = ROWS * int(blockIdx.x);
++    const int blocks_per_row = n_in / 256;
++    float tmp[ROWS] = {};
++    for (int kbx = tid / 16; kbx < blocks_per_row; kbx += BLOCKS_PER_ITER) {
++        const int kby = kbx * 8;
++        const int kqs = tid % 16;
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) {
++            if (row0 + i < n_out) {
++                const std::size_t block = std::size_t(row0 + i) * blocks_per_row + kbx;
++                tmp[i] += q3_q8_dot(w + block, x + kby, kqs);
++            }
++        }
++    }
++    __shared__ float partial[WARPS - 1][ROWS][WARP];
++    if (threadIdx.y > 0) {
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) partial[threadIdx.y - 1][i][threadIdx.x] = tmp[i];
++    }
++    __syncthreads();
++    if (threadIdx.y > 0) return;
++#pragma unroll
++    for (int i = 0; i < ROWS; ++i) {
++#pragma unroll
++        for (int l = 0; l < WARPS - 1; ++l) tmp[i] += partial[l][i][threadIdx.x];
++        tmp[i] = warp_sum(tmp[i]);
++        if (threadIdx.x == i && row0 + i < n_out) y[row0 + i] = tmp[i];
++    }
++}
++
++// The pinned nonlinear IQ4 codebook and its CUDA two-stage byte lookup. The
++// explicit alignment satisfies the four 32-bit table loads; values are unchanged.
++__device__ __align__(4) int8_t iq4nl_values[16] = {
++    -127, -104, -83, -65, -49, -35, -22, -10, 1, 13, 25, 38, 53, 69, 89, 113
++};
++
++__device__ __forceinline__ int2 iq4_table_lookup(int q4) {
++#if defined(FREETOKEN_GGUF_HIP_GFX906)
++    // AMD: llama.cpp's HIP lookup (see iq_kernels.cu get_int_from_table_16): 4 v_perm_b32 per 8 values
++    const uint32_t* v32 = reinterpret_cast<const uint32_t*>(iq4nl_values);
++    const uint32_t q_even = (uint32_t) q4, q_odd = (uint32_t) q4 >> 4;
++    const uint32_t el = __builtin_amdgcn_perm(v32[1], v32[0], q_even & 0x07070707u);
++    const uint32_t ol = __builtin_amdgcn_perm(v32[1], v32[0], q_odd & 0x07070707u);
++    const uint32_t eh = __builtin_amdgcn_perm(v32[3], v32[2], q_even & 0x07070707u);
++    const uint32_t oh = __builtin_amdgcn_perm(v32[3], v32[2], q_odd & 0x07070707u);
++    return make_int2((int) __builtin_amdgcn_perm(eh, el, 0x03020100u | ((q_even & 0x08080808u) >> 1)),
++                     (int) __builtin_amdgcn_perm(oh, ol, 0x03020100u | ((q_odd & 0x08080808u) >> 1)));
++#else
++    const uint32_t* table32 = reinterpret_cast<const uint32_t*>(iq4nl_values);
++    uint32_t tmp[2];
++    const uint32_t low_high_selection_indices = 0x32103210 | ((q4 & 0x88888888) >> 1);
++#pragma unroll
++    for (uint32_t i = 0; i < 2; ++i) {
++        const uint32_t shift = 16 * i;
++        const uint32_t low = __byte_perm(table32[0], table32[1], q4 >> shift);
++        const uint32_t high = __byte_perm(table32[2], table32[3], q4 >> shift);
++        tmp[i] = __byte_perm(low, high, low_high_selection_indices >> shift);
++    }
++    return make_int2(__byte_perm(tmp[0], tmp[1], 0x6420), __byte_perm(tmp[0], tmp[1], 0x7531));
++#endif
++}
++
++// Exact pinned vec_dot_iq4_xs_q8_1: a lane consumes one 32-element subblock,
++// computes integer dot products, applies signed scale in the integer domain,
++// then multiplies the two half scales and integer sum in the original order.
++__device__ __forceinline__ float iq4_xs_q8_dot(const IQ4XSBlock* __restrict__ w,
++                                              const Q81Block* __restrict__ x, int iqs) {
++    int sumi = 0;
++#pragma unroll
++    for (int j = 0; j < 4; ++j) {
++        const int aux_q4 = reinterpret_cast<const int*>(w->qs)[iqs + j];
++        const int2 v = iq4_table_lookup(aux_q4);
++        const int u0 = reinterpret_cast<const int*>(x[iqs / 4].qs)[j];
++        const int u1 = reinterpret_cast<const int*>(x[iqs / 4].qs)[j + 4];
++        sumi = FREETOKEN_GGUF_DP4A(v.x, u0, sumi);
++        sumi = FREETOKEN_GGUF_DP4A(v.y, u1, sumi);
++    }
++    const int ls = ((w->scales_l[iqs / 8] >> (iqs & 0x04)) & 0x0f) |
++                   (((w->scales_h >> (iqs / 2)) & 0x03) << 4);
++    sumi *= ls - 32;
++    const float d = __half2float(w->d) * __low2float(x[iqs / 4].ds);
++    return d * sumi;
++}
++
++// IQ4_XS generic MMVQ: QK=256, QI=32, VDR=4,16 blocks per iteration.
++template<bool SmallK>
++__launch_bounds__(WARPS * WARP, 1)
++__global__ void native_iq4_xs_mmvq_kernel(const IQ4XSBlock* __restrict__ w,
++                                         const Q81Block* __restrict__ x,
++                                         float* __restrict__ y, int n_in, int n_out) {
++    constexpr int ROWS = SmallK ? WARPS : 1;
++    constexpr int BLOCKS_PER_ITER = 4 * WARPS * WARP / 32;
++    const int tid = WARP * int(threadIdx.y) + int(threadIdx.x);
++    const int row0 = ROWS * int(blockIdx.x);
++    const int blocks_per_row = n_in / 256;
++    float tmp[ROWS] = {};
++    for (int kbx = tid / 8; kbx < blocks_per_row; kbx += BLOCKS_PER_ITER) {
++        const int kby = kbx * 8;
++        const int kqs = 4 * (tid % 8);
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) {
++            if (row0 + i < n_out) {
++                const std::size_t block = std::size_t(row0 + i) * blocks_per_row + kbx;
++                tmp[i] += iq4_xs_q8_dot(w + block, x + kby, kqs);
++            }
++        }
++    }
++    __shared__ float partial[WARPS - 1][ROWS][WARP];
++    if (threadIdx.y > 0) {
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) partial[threadIdx.y - 1][i][threadIdx.x] = tmp[i];
++    }
++    __syncthreads();
++    if (threadIdx.y > 0) return;
++#pragma unroll
++    for (int i = 0; i < ROWS; ++i) {
++#pragma unroll
++        for (int l = 0; l < WARPS - 1; ++l) tmp[i] += partial[l][i][threadIdx.x];
++        tmp[i] = warp_sum(tmp[i]);
++        if (threadIdx.x == i && row0 + i < n_out) y[row0 + i] = tmp[i];
++    }
++}
++
++// Exact pinned vec_dot_q4_K_q8_1_impl_vmmq expression and integer dot order.
++__device__ __forceinline__ float q4_q8_dot_impl(
++    const int* __restrict__ v, const int* __restrict__ u,
++    const uint8_t* __restrict__ sc, const uint8_t* __restrict__ m, const half2& dm4,
++    const float* __restrict__ d8) {
++    float sumf_d = 0.0f;
++    float sumf_m = 0.0f;
++#pragma unroll
++    for (int i = 0; i < 2; ++i) {
++        const int v0i = (v[0] >> (4 * i)) & 0x0f0f0f0f;
++        const int v1i = (v[1] >> (4 * i)) & 0x0f0f0f0f;
++        const int dot1 = FREETOKEN_GGUF_DP4A(v1i, u[2 * i + 1], FREETOKEN_GGUF_DP4A(v0i, u[2 * i], 0));
++        const int dot2 = FREETOKEN_GGUF_DP4A(0x01010101, u[2 * i + 1], FREETOKEN_GGUF_DP4A(0x01010101, u[2 * i], 0));
++        sumf_d += d8[i] * (dot1 * sc[i]);
++        sumf_m += d8[i] * (dot2 * m[i]);
++    }
++    const float2 dm4f = __half22float2(dm4);
++    return dm4f.x * sumf_d - dm4f.y * sumf_m;
++}
++
++__device__ __forceinline__ float q4_q8_dot(const Q4KBlock* __restrict__ bq4,
++                                          const Q81Block* __restrict__ bq8, int iqs) {
++    int v[2];
++    int u[4];
++    float d8[2];
++    const int bq8_offset = 2 * ((iqs / 2) / 4);
++    const int* ql = reinterpret_cast<const int*>(bq4->qs + 16 * bq8_offset + 4 * ((iqs / 2) % 4));
++    v[0] = ql[0];
++    v[1] = ql[4];
++
++    const uint16_t* scales = reinterpret_cast<const uint16_t*>(bq4->scales);
++    const int j = bq8_offset / 2;
++    const int jm = j & 1;
++    const uint32_t s0 = scales[jm];
++    const uint32_t s2 = scales[jm + 2];
++    const uint32_t s4 = scales[jm + 4];
++    const uint32_t hi = uint32_t(-int32_t(j >= 2));
++    uint16_t aux[2];
++    aux[0] = uint16_t(((s0 & 0x3f3f) & ~hi) |
++                     ((((s4 >> 0) & 0x0f0f) | ((s0 & 0xc0c0) >> 2)) & hi));
++    aux[1] = uint16_t(((s2 & 0x3f3f) & ~hi) |
++                     ((((s4 >> 4) & 0x0f0f) | ((s2 & 0xc0c0) >> 2)) & hi));
++    const uint8_t* sc = reinterpret_cast<const uint8_t*>(aux);
++    const uint8_t* m = sc + 2;
++#pragma unroll
++    for (int i = 0; i < 2; ++i) {
++        const Q81Block* bq8i = bq8 + bq8_offset + i;
++        d8[i] = __low2float(bq8i->ds);
++        const int* q8 = reinterpret_cast<const int*>(bq8i->qs) + ((iqs / 2) % 4);
++        u[2 * i] = q8[0];
++        u[2 * i + 1] = q8[4];
++    }
++    return q4_q8_dot_impl(v, u, sc, m, bq4->dm, d8);
++}
++
++// The generic ncols=1 oracle uses 4 warps and 1 row (or 4 rows for small K),
++// eight weight blocks per K iteration, warp-ascending shared sum, then XOR tree.
++template<bool SmallK>
++__launch_bounds__(WARPS * WARP, 1)
++__global__ void native_q4_k_mmvq_kernel(const Q4KBlock* __restrict__ w,
++                                        const Q81Block* __restrict__ x,
++                                        float* __restrict__ y, int n_in, int n_out) {
++    constexpr int ROWS = SmallK ? WARPS : 1;
++    constexpr int BLOCKS_PER_ITER = VDR * WARPS * WARP / QI;
++    const int tid = WARP * int(threadIdx.y) + int(threadIdx.x);
++    const int row0 = ROWS * int(blockIdx.x);
++    const int blocks_per_row = n_in / QK;
++    float tmp[ROWS] = {};
++    for (int kbx = tid / (QI / VDR); kbx < blocks_per_row; kbx += BLOCKS_PER_ITER) {
++        const int kby = kbx * (QK / Q8K);
++        const int kqs = VDR * (tid % (QI / VDR));
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) {
++            // The source assumes allocator padding for partial row groups. This
++            // guard preserves every valid row's math without an out-of-bounds read.
++            if (row0 + i < n_out) {
++                const std::size_t block = std::size_t(row0 + i) * blocks_per_row + kbx;
++                tmp[i] += q4_q8_dot(w + block, x + kby, kqs);
++            }
++        }
++    }
++    __shared__ float partial[WARPS - 1][ROWS][WARP];
++    if (threadIdx.y > 0) {
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) partial[threadIdx.y - 1][i][threadIdx.x] = tmp[i];
++    }
++    __syncthreads();
++    if (threadIdx.y > 0) return;
++#pragma unroll
++    for (int i = 0; i < ROWS; ++i) {
++#pragma unroll
++        for (int l = 0; l < WARPS - 1; ++l) tmp[i] += partial[l][i][threadIdx.x];
++        tmp[i] = warp_sum(tmp[i]);
++        if (threadIdx.x == i && row0 + i < n_out) y[row0 + i] = tmp[i];
++    }
++}
++
++// Exact pinned vec_dot_q6_K_q8_1: keep signed per-16-element scales,
++// signed-byte subtraction, DP4A order, and the float accumulation sequence.
++__device__ __forceinline__ float q6_q8_dot_impl(int vl, int vh, const int* __restrict__ u,
++                                              const int8_t* __restrict__ scales,
++                                              float d, const float* __restrict__ d8) {
++    float sumf = 0.0f;
++#pragma unroll
++    for (int i = 0; i < 2; ++i) {
++        const int sc = scales[4 * i];
++        const int vil = (vl >> (4 * i)) & 0x0f0f0f0f;
++        const int vih = ((vh >> (4 * i)) << 4) & 0x30303030;
++        const int vi = __vsubss4(vil | vih, 0x20202020);
++        sumf += d8[i] * (FREETOKEN_GGUF_DP4A(vi, u[i], 0) * sc);
++    }
++    return d * sumf;
++}
++
++__device__ __forceinline__ float q6_q8_dot(const Q6KBlock* __restrict__ w,
++                                          const Q81Block* __restrict__ x, int iqs) {
++    const int bq8_offset = 4 * (iqs / 16) + (iqs % 16) / 8;
++    const int scale_offset = 8 * (iqs / 16) + (iqs % 16) / 4;
++    const int vh_shift = 2 * ((iqs % 16) / 8);
++    const int vl = load_int_b2(w->ql, iqs);
++    const int vh = load_int_b2(w->qh, 8 * (iqs / 16) + iqs % 8) >> vh_shift;
++    int u[2];
++    float d8[2];
++#pragma unroll
++    for (int i = 0; i < 2; ++i) {
++        u[i] = reinterpret_cast<const int*>(x[bq8_offset + 2 * i].qs)[iqs % 8];
++        d8[i] = __low2float(x[bq8_offset + 2 * i].ds);
++    }
++    return q6_q8_dot_impl(vl, vh, u, w->scales + scale_offset, w->d, d8);
++}
++
++// Q6_K generic MMVQ: QK=256, QI=32, VDR=1, four blocks per iteration.
++template<bool SmallK>
++__launch_bounds__(WARPS * WARP, 1)
++__global__ void native_q6_k_mmvq_kernel(const Q6KBlock* __restrict__ w,
++                                        const Q81Block* __restrict__ x,
++                                        float* __restrict__ y, int n_in, int n_out) {
++    constexpr int ROWS = SmallK ? WARPS : 1;
++    constexpr int BLOCKS_PER_ITER = WARPS * WARP / 32;
++    const int tid = WARP * int(threadIdx.y) + int(threadIdx.x);
++    const int row0 = ROWS * int(blockIdx.x);
++    const int blocks_per_row = n_in / 256;
++    float tmp[ROWS] = {};
++    for (int kbx = tid / 32; kbx < blocks_per_row; kbx += BLOCKS_PER_ITER) {
++        const int kby = kbx * 8;
++        const int kqs = tid % 32;
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) {
++            if (row0 + i < n_out) {
++                const std::size_t block = std::size_t(row0 + i) * blocks_per_row + kbx;
++                tmp[i] += q6_q8_dot(w + block, x + kby, kqs);
++            }
++        }
++    }
++    __shared__ float partial[WARPS - 1][ROWS][WARP];
++    if (threadIdx.y > 0) {
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) partial[threadIdx.y - 1][i][threadIdx.x] = tmp[i];
++    }
++    __syncthreads();
++    if (threadIdx.y > 0) return;
++#pragma unroll
++    for (int i = 0; i < ROWS; ++i) {
++#pragma unroll
++        for (int l = 0; l < WARPS - 1; ++l) tmp[i] += partial[l][i][threadIdx.x];
++        tmp[i] = warp_sum(tmp[i]);
++        if (threadIdx.x == i && row0 + i < n_out) y[row0 + i] = tmp[i];
++    }
++}
++
++// The four 32-element formats use native two-byte loads and VDR=2. The affine
++// Q4_0/Q5_0 correction consumes the original-input sum stored in Q8_1, exactly
++// as the pinned CUDA dot does; a signed-integer code substitution would differ.
++__device__ __forceinline__ float small_q8_dot(const Q40Block* __restrict__ w,
++                                             const Q81Block* __restrict__ x, int iqs) {
++    int sumi = 0;
++#pragma unroll
++    for (int i = 0; i < 2; ++i) {
++        const int v = load_int_b2(w->qs, iqs + i);
++        const int vi0 = (v >> 0) & 0x0f0f0f0f;
++        const int vi1 = (v >> 4) & 0x0f0f0f0f;
++        sumi = FREETOKEN_GGUF_DP4A(vi0, reinterpret_cast<const int*>(x->qs)[iqs + i], sumi);
++        sumi = FREETOKEN_GGUF_DP4A(vi1, reinterpret_cast<const int*>(x->qs)[iqs + i + 4], sumi);
++    }
++    const float2 ds = __half22float2(x->ds);
++    const float d = w->d;
++    return d * (sumi * ds.x - 4 * ds.y);
++}
++
++__device__ __forceinline__ float small_q8_dot(const Q50Block* __restrict__ w,
++                                             const Q81Block* __restrict__ x, int iqs) {
++    int sumi = 0;
++#pragma unroll
++    for (int i = 0; i < 2; ++i) {
++        const int vl = load_int_b2(w->qs, iqs + i);
++        const int vh = load_int_b2(w->qh, 0) >> (4 * (iqs + i));
++        int vi0 = (vl >> 0) & 0x0f0f0f0f;
++        vi0 |= (vh << 4) & 0x00000010;
++        vi0 |= (vh << 11) & 0x00001000;
++        vi0 |= (vh << 18) & 0x00100000;
++        vi0 |= (vh << 25) & 0x10000000;
++        sumi = FREETOKEN_GGUF_DP4A(vi0, reinterpret_cast<const int*>(x->qs)[iqs + i], sumi);
++        int vi1 = (vl >> 4) & 0x0f0f0f0f;
++        vi1 |= (vh >> 12) & 0x00000010;
++        vi1 |= (vh >> 5) & 0x00001000;
++        vi1 |= (vh << 2) & 0x00100000;
++        vi1 |= (vh << 9) & 0x10000000;
++        sumi = FREETOKEN_GGUF_DP4A(vi1, reinterpret_cast<const int*>(x->qs)[iqs + i + 4], sumi);
++    }
++    const float2 ds = __half22float2(x->ds);
++    const float d = w->d;
++    return d * (sumi * ds.x - 8 * ds.y);
++}
++
++__device__ __forceinline__ float small_q8_dot(const Q80Block* __restrict__ w,
++                                             const Q81Block* __restrict__ x, int iqs) {
++    int sumi = 0;
++#pragma unroll
++    for (int i = 0; i < 2; ++i) {
++        const int v = load_int_b2(w->qs, iqs + i);
++        const int u = reinterpret_cast<const int*>(x->qs)[iqs + i];
++        sumi = FREETOKEN_GGUF_DP4A(v, u, sumi);
++    }
++    const float d0 = w->d;
++    const float d1 = __low2float(x->ds);
++    return d0 * d1 * float(sumi);
++}
++
++__device__ __forceinline__ float small_q8_dot(const IQ4NLBlock* __restrict__ w,
++                                             const Q81Block* __restrict__ x, int iqs) {
++    const int* q8 = reinterpret_cast<const int*>(x->qs) + iqs;
++    int sumi = 0;
++#pragma unroll
++    for (int i = 0; i < 2; ++i) {
++        const int2 v = iq4_table_lookup(load_int_b2(w->qs, iqs + i));
++        sumi = FREETOKEN_GGUF_DP4A(v.x, q8[i], sumi);
++        sumi = FREETOKEN_GGUF_DP4A(v.y, q8[i + 4], sumi);
++    }
++    const float d = __half2float(w->d) * __low2float(x->ds);
++    return d * sumi;
++}
++
++// QI=4 for Q4_0/Q5_0/IQ4_NL and QI=8 for Q8_0. With VDR=2 this preserves
++// the pinned 64/32-block iteration and 2048/1024-element small-K thresholds.
++template<typename Weight, int Qi, bool SmallK>
++__launch_bounds__(WARPS * WARP, 1)
++__global__ void native_small_mmvq_kernel(const Weight* __restrict__ w,
++                                         const Q81Block* __restrict__ x,
++                                         float* __restrict__ y, int n_in, int n_out) {
++    constexpr int ROWS = SmallK ? WARPS : 1;
++    constexpr int BLOCKS_PER_ITER = 2 * WARPS * WARP / Qi;
++    const int tid = WARP * int(threadIdx.y) + int(threadIdx.x);
++    const int row0 = ROWS * int(blockIdx.x);
++    const int blocks_per_row = n_in / 32;
++    float tmp[ROWS] = {};
++    for (int kbx = tid / (Qi / 2); kbx < blocks_per_row; kbx += BLOCKS_PER_ITER) {
++        const int kqs = 2 * (tid % (Qi / 2));
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) {
++            if (row0 + i < n_out) {
++                const std::size_t block = std::size_t(row0 + i) * blocks_per_row + kbx;
++                tmp[i] += small_q8_dot(w + block, x + kbx, kqs);
++            }
++        }
++    }
++    __shared__ float partial[WARPS - 1][ROWS][WARP];
++    if (threadIdx.y > 0) {
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) partial[threadIdx.y - 1][i][threadIdx.x] = tmp[i];
++    }
++    __syncthreads();
++    if (threadIdx.y > 0) return;
++#pragma unroll
++    for (int i = 0; i < ROWS; ++i) {
++#pragma unroll
++        for (int l = 0; l < WARPS - 1; ++l) tmp[i] += partial[l][i][threadIdx.x];
++        tmp[i] = warp_sum(tmp[i]);
++        if (threadIdx.x == i && row0 + i < n_out) y[row0 + i] = tmp[i];
++    }
++}
++
++// ============================ plan v0.3 P3: ncols = 2..8 (speculative verify, small batches) ============================
++//
++// One generic kernel for every format, parameterized by the format's iteration traits below, which are
++// transcribed from the ncols = 1 kernels above (same thread-to-block mapping, same blocks per iteration, same
++// small-K rule). Column j reads activation blocks x + j * (n_in / 32) and writes y + j * n_out. Each (column,
++// row) value is accumulated over kbx in the same order, summed across warps in the same order and reduced with
++// the same warp tree as the ncols = 1 kernel, so every column is BITWISE equal to a single-column call on that
++// column (checked by bench/micro/native_mmvq_multi.cpp). The ncols = 1 kernels are untouched.
++constexpr int MAX_NCOLS = 8;
++
++// Each format splits its dot product into `load` (everything that depends only on the weight block: codes,
++// unpacked scales, block scale) and `apply` (the activation loads and the original *_impl expression). `load` runs
++// once per (row, block) and `apply` once per column, so adding columns adds only activation work. `apply` calls
++// the same impl functions, in the same order, with the same values as the ncols = 1 dot, which is what keeps
++// every column bitwise equal to it.
++struct Q5KTraits {
++    using Block = Q5KBlock;
++    static constexpr int DIV = QK, T = QI / VDR, KBY = QK / Q8K, BPI = VDR * WARPS * WARP / QI;
++    __device__ static int kqs(int tid) { return VDR * (tid % (QI / VDR)); }
++    struct W { int vl[2], vh[2]; uint16_t aux[2]; half2 dm; int bq8_offset; };
++    __device__ static W load(const Block* __restrict__ bq5, int iqs) {
++        W r;
++        r.bq8_offset = 2 * ((iqs / 2) / 4);
++        const int* ql = reinterpret_cast<const int*>(bq5->qs + 16 * r.bq8_offset + 4 * ((iqs / 2) % 4));
++        const int* qh = reinterpret_cast<const int*>(bq5->qh + 4 * ((iqs / 2) % 4));
++        r.vl[0] = ql[0];
++        r.vl[1] = ql[4];
++        r.vh[0] = qh[0] >> r.bq8_offset;
++        r.vh[1] = qh[4] >> r.bq8_offset;
++        const uint16_t* scales = reinterpret_cast<const uint16_t*>(bq5->scales);
++        const int j = r.bq8_offset / 2;
++        const int jm = j & 1;
++        const uint32_t s0 = scales[jm];
++        const uint32_t s2 = scales[jm + 2];
++        const uint32_t s4 = scales[jm + 4];
++        const uint32_t hi = uint32_t(-int32_t(j >= 2));
++        r.aux[0] = uint16_t(((s0 & 0x3f3f) & ~hi) | ((((s4 >> 0) & 0x0f0f) | ((s0 & 0xc0c0) >> 2)) & hi));
++        r.aux[1] = uint16_t(((s2 & 0x3f3f) & ~hi) | ((((s4 >> 4) & 0x0f0f) | ((s2 & 0xc0c0) >> 2)) & hi));
++        r.dm = bq5->dm;
++        return r;
++    }
++    __device__ static float apply(const W& r, const Q81Block* __restrict__ bq8, int iqs) {
++        int u[4];
++        float d8[2];
++#pragma unroll
++        for (int i = 0; i < 2; ++i) {
++            const Q81Block* bq8i = bq8 + r.bq8_offset + i;
++            d8[i] = __low2float(bq8i->ds);
++            const int* q8 = reinterpret_cast<const int*>(bq8i->qs) + ((iqs / 2) % 4);
++            u[2 * i] = q8[0];
++            u[2 * i + 1] = q8[4];
++        }
++        const uint8_t* sc = reinterpret_cast<const uint8_t*>(r.aux);
++        return q5_q8_dot_impl(r.vl, r.vh, u, sc, sc + 2, r.dm, d8);
++    }
++};
++struct Q4KTraits {
++    using Block = Q4KBlock;
++    static constexpr int DIV = QK, T = QI / VDR, KBY = QK / Q8K, BPI = VDR * WARPS * WARP / QI;
++    __device__ static int kqs(int tid) { return VDR * (tid % (QI / VDR)); }
++    struct W { int v[2]; uint16_t aux[2]; half2 dm; int bq8_offset; };
++    __device__ static W load(const Block* __restrict__ bq4, int iqs) {
++        W r;
++        r.bq8_offset = 2 * ((iqs / 2) / 4);
++        const int* ql = reinterpret_cast<const int*>(bq4->qs + 16 * r.bq8_offset + 4 * ((iqs / 2) % 4));
++        r.v[0] = ql[0];
++        r.v[1] = ql[4];
++        const uint16_t* scales = reinterpret_cast<const uint16_t*>(bq4->scales);
++        const int j = r.bq8_offset / 2;
++        const int jm = j & 1;
++        const uint32_t s0 = scales[jm];
++        const uint32_t s2 = scales[jm + 2];
++        const uint32_t s4 = scales[jm + 4];
++        const uint32_t hi = uint32_t(-int32_t(j >= 2));
++        r.aux[0] = uint16_t(((s0 & 0x3f3f) & ~hi) | ((((s4 >> 0) & 0x0f0f) | ((s0 & 0xc0c0) >> 2)) & hi));
++        r.aux[1] = uint16_t(((s2 & 0x3f3f) & ~hi) | ((((s4 >> 4) & 0x0f0f) | ((s2 & 0xc0c0) >> 2)) & hi));
++        r.dm = bq4->dm;
++        return r;
++    }
++    __device__ static float apply(const W& r, const Q81Block* __restrict__ bq8, int iqs) {
++        int u[4];
++        float d8[2];
++#pragma unroll
++        for (int i = 0; i < 2; ++i) {
++            const Q81Block* bq8i = bq8 + r.bq8_offset + i;
++            d8[i] = __low2float(bq8i->ds);
++            const int* q8 = reinterpret_cast<const int*>(bq8i->qs) + ((iqs / 2) % 4);
++            u[2 * i] = q8[0];
++            u[2 * i + 1] = q8[4];
++        }
++        const uint8_t* sc = reinterpret_cast<const uint8_t*>(r.aux);
++        return q4_q8_dot_impl(r.v, u, sc, sc + 2, r.dm, d8);
++    }
++};
++struct Q20Traits {
++    using Block = Q20Block;
++    static constexpr int DIV = 64, T = 2, KBY = 2, BPI = WARPS * WARP / 2;
++    __device__ static int kqs(int tid) { return tid % 2; }
++    struct W { int qx[4], qy[4]; float d2; };
++    __device__ static W load(const Block* __restrict__ w, int iqs) {
++        W r;
++        r.d2 = w->d;
++        const int16_t* qs = reinterpret_cast<const int16_t*>(w->qs) + iqs * 4;
++#pragma unroll
++        for (int j = 0; j < 4; ++j) {
++            const int q = qs[j];
++            const int qe = __byte_perm(0x020100ff, 0x020100ff, q >> 0);
++            const int qo = __byte_perm(0x020100ff, 0x020100ff, q >> 2);
++            r.qx[j] = __byte_perm(qe, qo, 0x5140);
++            r.qy[j] = __byte_perm(qe, qo, 0x7362);
++        }
++        return r;
++    }
++    __device__ static float apply(const W& r, const Q81Block* __restrict__ x, int iqs) {
++        const Q81Block* chunk = x + iqs;
++        const int* q8 = reinterpret_cast<const int*>(chunk->qs);
++        int sumi = 0;
++#pragma unroll
++        for (int j = 0; j < 4; ++j) {
++            sumi = FREETOKEN_GGUF_DP4A(q8[j * 2], r.qx[j], sumi);
++            sumi = FREETOKEN_GGUF_DP4A(q8[j * 2 + 1], r.qy[j], sumi);
++        }
++        const float d8 = __low2float(chunk->ds);
++        return r.d2 * d8 * sumi;
++    }
++};
++struct Q3KTraits {
++    using Block = Q3KBlock;
++    static constexpr int DIV = 256, T = 16, KBY = 8, BPI = WARPS * WARP / 16;
++    __device__ static int kqs(int tid) { return tid % 16; }
++    struct W { int vl, vh; float d; const uint8_t* scales; int scale_offset, bq8_offset; };
++    __device__ static W load(const Block* __restrict__ w, int iqs) {
++        W r;
++        r.bq8_offset = 4 * (iqs / 8);
++        r.scale_offset = iqs - iqs % 8 + (iqs % 8) / 4;
++        r.d = w->d;
++        r.vl = load_int_b2(w->qs, iqs);
++        r.vh = ~load_int_b2(w->hmask, iqs % 8) >> r.bq8_offset;
++        r.scales = w->scales;
++        return r;
++    }
++    __device__ static float apply(const W& r, const Q81Block* __restrict__ x, int iqs) {
++        int u[4];
++        float d8[4];
++#pragma unroll
++        for (int i = 0; i < 4; ++i) {
++            u[i] = reinterpret_cast<const int*>(x[r.bq8_offset + i].qs)[iqs % 8];
++            d8[i] = __low2float(x[r.bq8_offset + i].ds);
++        }
++        return q3_q8_dot_impl(r.vl, r.vh, u, r.scales, r.scale_offset, r.d, d8);
++    }
++};
++struct Q6KTraits {
++    using Block = Q6KBlock;
++    static constexpr int DIV = 256, T = 32, KBY = 8, BPI = WARPS * WARP / 32;
++    __device__ static int kqs(int tid) { return tid % 32; }
++    struct W { int vl, vh; float d; const int8_t* scales; int bq8_offset; };
++    __device__ static W load(const Block* __restrict__ w, int iqs) {
++        W r;
++        r.bq8_offset = 4 * (iqs / 16) + (iqs % 16) / 8;
++        const int scale_offset = 8 * (iqs / 16) + (iqs % 16) / 4;
++        const int vh_shift = 2 * ((iqs % 16) / 8);
++        r.vl = load_int_b2(w->ql, iqs);
++        r.vh = load_int_b2(w->qh, 8 * (iqs / 16) + iqs % 8) >> vh_shift;
++        r.scales = w->scales + scale_offset;
++        r.d = w->d;
++        return r;
++    }
++    __device__ static float apply(const W& r, const Q81Block* __restrict__ x, int iqs) {
++        int u[2];
++        float d8[2];
++#pragma unroll
++        for (int i = 0; i < 2; ++i) {
++            u[i] = reinterpret_cast<const int*>(x[r.bq8_offset + 2 * i].qs)[iqs % 8];
++            d8[i] = __low2float(x[r.bq8_offset + 2 * i].ds);
++        }
++        return q6_q8_dot_impl(r.vl, r.vh, u, r.scales, r.d, d8);
++    }
++};
++struct IQ4XSTraits {
++    using Block = IQ4XSBlock;
++    static constexpr int DIV = 256, T = 8, KBY = 8, BPI = 4 * WARPS * WARP / 32;
++    __device__ static int kqs(int tid) { return 4 * (tid % 8); }
++    struct W { int2 v[4]; int ls; float dw; };
++    __device__ static W load(const Block* __restrict__ w, int iqs) {
++        W r;
++#pragma unroll
++        for (int j = 0; j < 4; ++j) r.v[j] = iq4_table_lookup(reinterpret_cast<const int*>(w->qs)[iqs + j]);
++        r.ls = ((w->scales_l[iqs / 8] >> (iqs & 0x04)) & 0x0f) | (((w->scales_h >> (iqs / 2)) & 0x03) << 4);
++        r.dw = __half2float(w->d);
++        return r;
++    }
++    __device__ static float apply(const W& r, const Q81Block* __restrict__ x, int iqs) {
++        int sumi = 0;
++#pragma unroll
++        for (int j = 0; j < 4; ++j) {
++            const int u0 = reinterpret_cast<const int*>(x[iqs / 4].qs)[j];
++            const int u1 = reinterpret_cast<const int*>(x[iqs / 4].qs)[j + 4];
++            sumi = FREETOKEN_GGUF_DP4A(r.v[j].x, u0, sumi);
++            sumi = FREETOKEN_GGUF_DP4A(r.v[j].y, u1, sumi);
++        }
++        sumi *= r.ls - 32;
++        const float d = r.dw * __low2float(x[iqs / 4].ds);
++        return d * sumi;
++    }
++};
++// The four 32-element formats: `load` decodes the two 32-bit weight chunks and block scale once per (row, block),
++// and `apply` runs the exact same FREETOKEN_GGUF_DP4A and scale arithmetic per activation column as `small_q8_dot`.
++template<typename Weight, int Qi>
++struct SmallTraits;
++
++template<>
++struct SmallTraits<Q40Block, 4> {
++    using Block = Q40Block;
++    static constexpr int DIV = 32, T = 2, KBY = 1, BPI = 2 * WARPS * WARP / 4;
++    __device__ static int kqs(int tid) { return 2 * (tid % 2); }
++    struct W { int vi0[2], vi1[2]; float d; };
++    __device__ static W load(const Block* __restrict__ w, int iqs) {
++        W r;
++#pragma unroll
++        for (int i = 0; i < 2; ++i) {
++            const int v = load_int_b2(w->qs, iqs + i);
++            r.vi0[i] = (v >> 0) & 0x0f0f0f0f;
++            r.vi1[i] = (v >> 4) & 0x0f0f0f0f;
++        }
++        r.d = w->d;
++        return r;
++    }
++    __device__ static float apply(const W& r, const Q81Block* __restrict__ x, int iqs) {
++        int sumi = 0;
++#pragma unroll
++        for (int i = 0; i < 2; ++i) {
++            sumi = FREETOKEN_GGUF_DP4A(r.vi0[i], reinterpret_cast<const int*>(x->qs)[iqs + i], sumi);
++            sumi = FREETOKEN_GGUF_DP4A(r.vi1[i], reinterpret_cast<const int*>(x->qs)[iqs + i + 4], sumi);
++        }
++        const float2 ds = __half22float2(x->ds);
++        return r.d * (sumi * ds.x - 4 * ds.y);
++    }
++};
++
++template<>
++struct SmallTraits<Q50Block, 4> {
++    using Block = Q50Block;
++    static constexpr int DIV = 32, T = 2, KBY = 1, BPI = 2 * WARPS * WARP / 4;
++    __device__ static int kqs(int tid) { return 2 * (tid % 2); }
++    struct W { int vi0[2], vi1[2]; float d; };
++    __device__ static W load(const Block* __restrict__ w, int iqs) {
++        W r;
++        const int qh = load_int_b2(w->qh, 0);
++#pragma unroll
++        for (int i = 0; i < 2; ++i) {
++            const int vl = load_int_b2(w->qs, iqs + i);
++            const int vh = qh >> (4 * (iqs + i));
++            int vi0 = (vl >> 0) & 0x0f0f0f0f;
++            vi0 |= (vh << 4) & 0x00000010;
++            vi0 |= (vh << 11) & 0x00001000;
++            vi0 |= (vh << 18) & 0x00100000;
++            vi0 |= (vh << 25) & 0x10000000;
++            r.vi0[i] = vi0;
++            int vi1 = (vl >> 4) & 0x0f0f0f0f;
++            vi1 |= (vh >> 12) & 0x00000010;
++            vi1 |= (vh >> 5) & 0x00001000;
++            vi1 |= (vh << 2) & 0x00100000;
++            vi1 |= (vh << 9) & 0x10000000;
++            r.vi1[i] = vi1;
++        }
++        r.d = w->d;
++        return r;
++    }
++    __device__ static float apply(const W& r, const Q81Block* __restrict__ x, int iqs) {
++        int sumi = 0;
++#pragma unroll
++        for (int i = 0; i < 2; ++i) {
++            sumi = FREETOKEN_GGUF_DP4A(r.vi0[i], reinterpret_cast<const int*>(x->qs)[iqs + i], sumi);
++            sumi = FREETOKEN_GGUF_DP4A(r.vi1[i], reinterpret_cast<const int*>(x->qs)[iqs + i + 4], sumi);
++        }
++        const float2 ds = __half22float2(x->ds);
++        return r.d * (sumi * ds.x - 8 * ds.y);
++    }
++};
++
++template<>
++struct SmallTraits<Q80Block, 8> {
++    using Block = Q80Block;
++    static constexpr int DIV = 32, T = 4, KBY = 1, BPI = 2 * WARPS * WARP / 8;
++    __device__ static int kqs(int tid) { return 2 * (tid % 4); }
++    struct W { int v[2]; float d0; };
++    __device__ static W load(const Block* __restrict__ w, int iqs) {
++        W r;
++#pragma unroll
++        for (int i = 0; i < 2; ++i) r.v[i] = load_int_b2(w->qs, iqs + i);
++        r.d0 = w->d;
++        return r;
++    }
++    __device__ static float apply(const W& r, const Q81Block* __restrict__ x, int iqs) {
++        int sumi = 0;
++#pragma unroll
++        for (int i = 0; i < 2; ++i) {
++            const int u = reinterpret_cast<const int*>(x->qs)[iqs + i];
++            sumi = FREETOKEN_GGUF_DP4A(r.v[i], u, sumi);
++        }
++        const float d1 = __low2float(x->ds);
++        return r.d0 * d1 * float(sumi);
++    }
++};
++
++template<>
++struct SmallTraits<IQ4NLBlock, 4> {
++    using Block = IQ4NLBlock;
++    static constexpr int DIV = 32, T = 2, KBY = 1, BPI = 2 * WARPS * WARP / 4;
++    __device__ static int kqs(int tid) { return 2 * (tid % 2); }
++    struct W { int2 v[2]; float dw; };
++    __device__ static W load(const Block* __restrict__ w, int iqs) {
++        W r;
++#pragma unroll
++        for (int i = 0; i < 2; ++i) r.v[i] = iq4_table_lookup(load_int_b2(w->qs, iqs + i));
++        r.dw = __half2float(w->d);
++        return r;
++    }
++    __device__ static float apply(const W& r, const Q81Block* __restrict__ x, int iqs) {
++        const int* q8 = reinterpret_cast<const int*>(x->qs) + iqs;
++        int sumi = 0;
++#pragma unroll
++        for (int i = 0; i < 2; ++i) {
++            sumi = FREETOKEN_GGUF_DP4A(r.v[i].x, q8[i], sumi);
++            sumi = FREETOKEN_GGUF_DP4A(r.v[i].y, q8[i + 4], sumi);
++        }
++        const float d = r.dw * __low2float(x->ds);
++        return d * sumi;
++    }
++};
++
++// NW warps per block and ROWS rows per block. The EXACT layout (NW = 4, ROWS = 1, or 4 for small K) is the
++// ncols = 1 layout and keeps every column bitwise equal to a single-column call. The UPSTREAM layout is
++// llama.cpp's generic multi-column table (ncols 2-4: 4 warps; 5-8: 2 warps; always 2 rows per block): faster,
++// equal to ncols = 1 only to float rounding (the cross-warp reduction groups partial sums differently).
++bool g_multi_exact = true;   // until the upstream layout is timed on an idle GPU (plan rule: default only what is measured)
++
++// S26 FREETOKEN_GGUF_TSUM=1 (TS): warp 0's NCOLS x ROWS sums as one transposed butterfly (s26_tsum.cuh), bitwise the same
++static bool s26_tsum_on() {
++    static const bool on = [] { const char* v = std::getenv("FREETOKEN_GGUF_TSUM"); return v && v[0] == '1'; }();
++    return on;
++}
++
++// S26 FREETOKEN_GGUF_LFUSE (PAIR): blocks n_out.. compute the same rows of w2 into y2 (two matrices of one shape on one
++// input in one launch; each output's code is the single matrix's)
++template<typename F, int NCOLS, int NW, int ROWS, bool TS = false, bool PAIR = false>
++__launch_bounds__(NW * WARP, (ROWS <= 2 ? 4 : 1))
++__global__ void native_mmvq_multi_kernel(const typename F::Block* __restrict__ w, const Q81Block* x_, float* y_,
++                                         int n_in, int n_out,
++                                         const typename F::Block* __restrict__ w2 = nullptr, float* __restrict__ y2 = nullptr) {
++    const Q81Block* FREETOKEN_GGUF_PDL_RESTRICT x = x_;   // __restrict__ below sm_70 only (pdl.hpp, #1469)
++    float* FREETOKEN_GGUF_PDL_RESTRICT y = y_;
++    constexpr int BPI = F::BPI * NW / WARPS;           // blocks per iteration scale with the warp count
++    const int tid = WARP * int(threadIdx.y) + int(threadIdx.x);
++    int bxi = int(blockIdx.x);
++    if constexpr (PAIR) {
++        if (bxi >= n_out / ROWS) { bxi -= n_out / ROWS; w = w2; y = y2; }
++    }
++    const int row0 = ROWS * bxi;
++    const int blocks_per_row = n_in / F::DIV;
++    const int x_stride = n_in / Q8K;                   // Q8_1 blocks per activation column
++    float tmp[NCOLS][ROWS] = {};
++    int kbx = tid / F::T;
++    if constexpr (kPdlPrefetch) {
++        // PDL (pdl.hpp): the first block's weights are loaded before waiting for the activations, then that block
++        // is applied exactly as the loop below would apply it (the same rows, columns and order)
++        typename F::W w0[ROWS];
++        const int kqs = F::kqs(tid);
++        if (kbx < blocks_per_row) {
++#pragma unroll
++            for (int i = 0; i < ROWS; ++i)
++                if (row0 + i < n_out) w0[i] = F::load(w + std::size_t(row0 + i) * blocks_per_row + kbx, kqs);
++        }
++        pdl_trigger();
++        pdl_wait();
++        if (kbx < blocks_per_row) {
++            const int kby = kbx * F::KBY;
++#pragma unroll
++            for (int i = 0; i < ROWS; ++i) {
++                if (row0 + i < n_out) {
++#pragma unroll
++                    for (int j = 0; j < NCOLS; ++j)
++                        tmp[j][i] += F::apply(w0[i], x + std::size_t(j) * x_stride + kby, kqs);
++                }
++            }
++        }
++        kbx += BPI;
++    }
++    for (; kbx < blocks_per_row; kbx += BPI) {
++        const int kby = kbx * F::KBY;
++        const int kqs = F::kqs(tid);
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) {
++            if (row0 + i < n_out) {
++                const std::size_t block = std::size_t(row0 + i) * blocks_per_row + kbx;
++                const typename F::W wv = F::load(w + block, kqs);      // once per (row, block)
++#pragma unroll
++                for (int j = 0; j < NCOLS; ++j)                         // then per column
++                    tmp[j][i] += F::apply(wv, x + std::size_t(j) * x_stride + kby, kqs);
++            }
++        }
++    }
++    __shared__ float partial[NW - 1 > 0 ? NW - 1 : 1][NCOLS][ROWS][WARP];
++    if (threadIdx.y > 0) {
++#pragma unroll
++        for (int j = 0; j < NCOLS; ++j)
++#pragma unroll
++            for (int i = 0; i < ROWS; ++i) partial[threadIdx.y - 1][j][i][threadIdx.x] = tmp[j][i];
++    }
++    __syncthreads();
++    if (threadIdx.y > 0) return;
++    if constexpr (TS) {
++        constexpr int V = NCOLS * ROWS, P = s26ts::pow2_ceil(V);
++        float v[P];
++#pragma unroll
++        for (int j = 0; j < NCOLS; ++j)
++#pragma unroll
++            for (int i = 0; i < ROWS; ++i) {
++#pragma unroll
++                for (int l = 0; l < NW - 1; ++l) tmp[j][i] += partial[l][j][i][threadIdx.x];
++                v[j * ROWS + i] = tmp[j][i];
++            }
++#pragma unroll
++        for (int k = V; k < P; ++k) v[k] = 0.0f;
++        const float sum = s26ts::tsum<P>(v, int(threadIdx.x));
++        const int k = s26ts::tsum_token<P>(int(threadIdx.x));
++        const int j = k / ROWS, i = k % ROWS;
++        if (int(threadIdx.x) == s26ts::tsum_lane<P>(k) && k < V && row0 + i < n_out) y[std::size_t(j) * n_out + row0 + i] = sum;
++        return;
++    }
++#pragma unroll
++    for (int j = 0; j < NCOLS; ++j) {
++#pragma unroll
++        for (int i = 0; i < ROWS; ++i) {
++#pragma unroll
++            for (int l = 0; l < NW - 1; ++l) tmp[j][i] += partial[l][j][i][threadIdx.x];
++            tmp[j][i] = warp_sum(tmp[j][i]);
++            if (threadIdx.x == i && row0 + i < n_out) y[std::size_t(j) * n_out + row0 + i] = tmp[j][i];
++        }
++    }
++}
++
++template<typename F, int NCOLS>
++void launch_multi_n(const void* weights, const void* x_q8_1, float* y, int n_in, int n_out, cudaStream_t s) {
++    const auto* w = static_cast<const typename F::Block*>(weights);
++    const auto* x = static_cast<const Q81Block*>(x_q8_1);
++    if (!g_multi_exact) {
++        constexpr int NW = NCOLS <= 4 ? 4 : 2;
++        const unsigned blocks = unsigned((std::size_t(n_out) + 1) / 2);
++        launch_pdl(native_mmvq_multi_kernel<F, NCOLS, NW, 2, false, false>, dim3(blocks), dim3(WARP, NW), 0, s, w, x, y, n_in, n_out,
++                   (const typename F::Block*) nullptr, (float*) nullptr);
++        return;
++    }
++    const dim3 threads(WARP, WARPS);
++    // the PAIR arguments, unused here (launch_pdl passes every parameter)
++    const typename F::Block* const no_w2 = nullptr;
++    float* const no_y2 = nullptr;
++    // #783 PR-h (stuchapin909): two rows per block for every K, not only small K - each row keeps its own partial sums and
++    // reduction, so a row's result does not depend on its neighbour; FREETOKEN_GGUF_NO_MMVQ_ROWS2=1 keeps one row for large K
++    static const bool rows1 = [] {
++        const char* v = std::getenv("FREETOKEN_GGUF_NO_MMVQ_ROWS2");
++        return v != nullptr && v[0] != '\0' && v[0] != '0';
++    }();
++    if (rows1 && n_in / F::DIV >= F::BPI) {
++        if (s26_tsum_on()) launch_pdl(native_mmvq_multi_kernel<F, NCOLS, WARPS, 1, true, false>, dim3(unsigned(n_out)), threads, 0, s, w, x, y, n_in, n_out, no_w2, no_y2);
++        else launch_pdl(native_mmvq_multi_kernel<F, NCOLS, WARPS, 1, false, false>, dim3(unsigned(n_out)), threads, 0, s, w, x, y, n_in, n_out, no_w2, no_y2);
++        return;
++    }
++    constexpr int ROWS = 2;
++    const unsigned blocks = unsigned((std::size_t(n_out) + ROWS - 1) / ROWS);
++    if (s26_tsum_on()) launch_pdl(native_mmvq_multi_kernel<F, NCOLS, WARPS, ROWS, true, false>, dim3(blocks), threads, 0, s, w, x, y, n_in, n_out, no_w2, no_y2);
++    else launch_pdl(native_mmvq_multi_kernel<F, NCOLS, WARPS, ROWS, false, false>, dim3(blocks), threads, 0, s, w, x, y, n_in, n_out, no_w2, no_y2);
++}
++
++template<typename F>
++void launch_multi(const void* weights, const void* x_q8_1, float* y, int n_in, int n_out, int ncols,
++                  void* stream) {
++    const auto s = static_cast<cudaStream_t>(stream);
++    switch (ncols) {
++        case 2: launch_multi_n<F, 2>(weights, x_q8_1, y, n_in, n_out, s); break;
++        case 3: launch_multi_n<F, 3>(weights, x_q8_1, y, n_in, n_out, s); break;
++        case 4: launch_multi_n<F, 4>(weights, x_q8_1, y, n_in, n_out, s); break;
++        case 5: launch_multi_n<F, 5>(weights, x_q8_1, y, n_in, n_out, s); break;
++        case 6: launch_multi_n<F, 6>(weights, x_q8_1, y, n_in, n_out, s); break;
++        case 7: launch_multi_n<F, 7>(weights, x_q8_1, y, n_in, n_out, s); break;
++        case 8: launch_multi_n<F, 8>(weights, x_q8_1, y, n_in, n_out, s); break;
++        default: throw std::invalid_argument("native MMVQ multi-column launch requires 2 <= ncols <= 8");
++    }
++}
++
++#if !defined(__HIPCC__)   // CUDA only: the HIP paths keep native_mmvq's kernels
++// ============================ ncols = 2..4 from interleaved activations (fork F4, Eddoursul) ============================
++//
++// `native_quantize_q8_1_il` also writes the columns interleaved (native_mmvq.hpp), so one load reads the same int of
++// every column. A warp takes R rows and walks their blocks in the chunks of the exact layout above - its lane l's chunk
++// m is what thread 32 (m % 4) + l does in iteration m / 4 - with a sum per virtual warp, added in warp order before the
++// xor tree; each weight block is decoded once (the traits' `load`) and every column takes the single-column dot's own
++// expression (the same *_q8_dot_impl calls), so each value is bitwise the multi-column kernel's. K-quants read the
++// block-major copy; IQ4_XS, whose lanes read the same int of consecutive blocks, the position-major one.
++struct IlIQ4XS {
++    using F = IQ4XSTraits;
++    static constexpr bool PM = true;
++    template <int NC, class X>
++    __device__ static void apply(const F::W& r, const X& x, int kby, int iqs, float (&out)[NC]) {
++        const int b = kby + iqs / 4;
++        int u0[4][NC], u1[4][NC];
++#pragma unroll
++        for (int j = 0; j < 4; ++j) {
++            x.u(b, j, u0[j]);
++            x.u(b, j + 4, u1[j]);
++        }
++        float d8[NC];
++        x.scales(b, d8);
++#pragma unroll
++        for (int c = 0; c < NC; ++c) {
++            int sumi = 0;
++#pragma unroll
++            for (int j = 0; j < 4; ++j) {
++                sumi = FREETOKEN_GGUF_DP4A(r.v[j].x, u0[j][c], sumi);
++                sumi = FREETOKEN_GGUF_DP4A(r.v[j].y, u1[j][c], sumi);
++            }
++            sumi *= r.ls - 32;
++            const float d = r.dw * d8[c];
++            out[c] = d * sumi;
++        }
++    }
++};
++struct IlQ4K {
++    using F = Q4KTraits;
++    static constexpr bool PM = false;
++    template <int NC, class X>
++    __device__ static void apply(const F::W& r, const X& x, int kby, int iqs, float (&out)[NC]) {
++        int u[4][NC];
++        float d8[2][NC];
++#pragma unroll
++        for (int i = 0; i < 2; ++i) {
++            const int b = kby + r.bq8_offset + i;
++            x.u(b, (iqs / 2) % 4, u[2 * i]);
++            x.u(b, (iqs / 2) % 4 + 4, u[2 * i + 1]);
++            x.scales(b, d8[i]);
++        }
++        const uint8_t* sc = reinterpret_cast<const uint8_t*>(r.aux);
++#pragma unroll
++        for (int c = 0; c < NC; ++c) {
++            const int uc[4] = {u[0][c], u[1][c], u[2][c], u[3][c]};
++            const float dc[2] = {d8[0][c], d8[1][c]};
++            out[c] = q4_q8_dot_impl(r.v, uc, sc, sc + 2, r.dm, dc);
++        }
++    }
++};
++struct IlQ5K {
++    using F = Q5KTraits;
++    static constexpr bool PM = false;
++    template <int NC, class X>
++    __device__ static void apply(const F::W& r, const X& x, int kby, int iqs, float (&out)[NC]) {
++        int u[4][NC];
++        float d8[2][NC];
++#pragma unroll
++        for (int i = 0; i < 2; ++i) {
++            const int b = kby + r.bq8_offset + i;
++            x.u(b, (iqs / 2) % 4, u[2 * i]);
++            x.u(b, (iqs / 2) % 4 + 4, u[2 * i + 1]);
++            x.scales(b, d8[i]);
++        }
++        const uint8_t* sc = reinterpret_cast<const uint8_t*>(r.aux);
++#pragma unroll
++        for (int c = 0; c < NC; ++c) {
++            const int uc[4] = {u[0][c], u[1][c], u[2][c], u[3][c]};
++            const float dc[2] = {d8[0][c], d8[1][c]};
++            out[c] = q5_q8_dot_impl(r.vl, r.vh, uc, sc, sc + 2, r.dm, dc);
++        }
++    }
++};
++struct IlQ6K {
++    using F = Q6KTraits;
++    static constexpr bool PM = false;
++    template <int NC, class X>
++    __device__ static void apply(const F::W& r, const X& x, int kby, int iqs, float (&out)[NC]) {
++        int u[2][NC];
++        float d8[2][NC];
++#pragma unroll
++        for (int i = 0; i < 2; ++i) {
++            x.u(kby + r.bq8_offset + 2 * i, iqs % 8, u[i]);
++            x.scales(kby + r.bq8_offset + 2 * i, d8[i]);
++        }
++#pragma unroll
++        for (int c = 0; c < NC; ++c) {
++            const int uc[2] = {u[0][c], u[1][c]};
++            const float dc[2] = {d8[0][c], d8[1][c]};
++            out[c] = q6_q8_dot_impl(r.vl, r.vh, uc, r.scales, r.d, dc);
++        }
++    }
++};
++
++template <typename I, int NC, int R>
++__launch_bounds__(4 * WARP)
++__global__ void native_mmvq_il_kernel(const typename I::F::Block* __restrict__ w, const int* __restrict__ xq,
++                                      const float* __restrict__ xd, float* __restrict__ y, int n_in, int n_out) {
++    using F = typename I::F;
++    constexpr int SUB = WARP / F::T;   // weight blocks a chunk covers
++    const int lane = int(threadIdx.x) & (WARP - 1);
++    const auto x = q8_1_cols<NC, I::PM>(xq, xd, n_in / Q8K);
++    const int bpr = n_in / F::DIV;
++    const int kqs = F::kqs(lane);
++    const int nm = (bpr + SUB - 1) / SUB;
++    // A grid-stride loop over the row groups, though the grid gives each warp one: without it ptxas gives several
++    // instances fewer registers (the fork measured Q6_K's at 3 columns 10-50% slower).
++    for (int grp = int(blockIdx.x) * 4 + (int(threadIdx.x) >> 5); grp * R < n_out; grp += int(gridDim.x) * 4) {
++        const int row0 = grp * R;
++        float acc[4][R][NC];
++#pragma unroll
++        for (int v = 0; v < 4; ++v)
++#pragma unroll
++            for (int i = 0; i < R; ++i)
++#pragma unroll
++                for (int c = 0; c < NC; ++c) acc[v][i][c] = 0.0f;
++        for (int m0 = 0; m0 < nm; m0 += 4) {
++#pragma unroll
++            for (int v = 0; v < 4; ++v) {
++                const int kbx = SUB * (m0 + v) + lane / F::T;
++                if (kbx < bpr) {
++#pragma unroll
++                    for (int i = 0; i < R; ++i) {
++                        const int row = min(row0 + i, n_out - 1);   // a partial last group recomputes its last row
++                        const typename F::W wv = F::load(w + std::size_t(row) * bpr + kbx, kqs);
++                        float o[NC];
++                        I::template apply<NC>(wv, x, kbx * F::KBY, kqs, o);
++#pragma unroll
++                        for (int c = 0; c < NC; ++c) acc[v][i][c] += o[c];
++                    }
++                }
++            }
++        }
++#pragma unroll
++        for (int i = 0; i < R; ++i)
++#pragma unroll
++            for (int c = 0; c < NC; ++c) {
++                float s = acc[0][i][c];
++                s += acc[1][i][c];
++                s += acc[2][i][c];
++                s += acc[3][i][c];
++                s = warp_sum(s);
++                if (lane == 0 && row0 + i < n_out) y[std::size_t(c) * n_out + row0 + i] = s;
++            }
++    }
++}
++
++template <typename I, int R>
++void launch_il(const void* weights, const void* x_il, float* y, int n_in, int n_out, int ncols, cudaStream_t s) {
++    const auto* w = static_cast<const typename I::F::Block*>(weights);
++    const unsigned blocks = unsigned(((n_out + R - 1) / R + 3) / 4);
++    const Q81IlParts parts = q8_1_il_parts(x_il, n_in, ncols);
++    const int* xq = I::PM ? parts.pm : parts.bm;
++    const float* xd = parts.d;
++    switch (ncols) {
++#define FREETOKEN_GGUF_IL_CASE(N) case N: native_mmvq_il_kernel<I, N, R><<<blocks, 4 * WARP, 0, s>>>(w, xq, xd, y, n_in, n_out); break;
++        FREETOKEN_GGUF_IL_CASE(2) FREETOKEN_GGUF_IL_CASE(3) FREETOKEN_GGUF_IL_CASE(4)
++#undef FREETOKEN_GGUF_IL_CASE
++        default: throw std::invalid_argument("native_mmvq_il requires 2 <= ncols <= 4");
++    }
++}
++
++template <typename I>
++void launch_il_rows(int r, const void* weights, const void* x_il, float* y, int n_in, int n_out, int ncols, cudaStream_t s) {
++    switch (r) {
++    case 1: launch_il<I, 1>(weights, x_il, y, n_in, n_out, ncols, s); break;
++    case 4: launch_il<I, 4>(weights, x_il, y, n_in, n_out, ncols, s); break;
++    default: launch_il<I, 2>(weights, x_il, y, n_in, n_out, ncols, s); break;
++    }
++}
++
++// The interleaved copy (native_mmvq.hpp) of columns already quantized into plain q8_1 blocks, whoever wrote them (the
++// quantizer, a fused norm): the same bytes, one int of a block a thread.
++__global__ void native_q8_1_interleave_kernel(const Q81Block* __restrict__ y, int* __restrict__ bm, int* __restrict__ pm,
++                                              float* __restrict__ dl, int nb, int n_total, int cp) {
++    const int i = int(blockIdx.x) * 256 + int(threadIdx.x);
++    if (i >= n_total) return;
++    const int c = i / (nb * 8), r = i - c * nb * 8, b = r / 8, p = r % 8;
++    const Q81Block& blk = y[std::size_t(c) * nb + b];
++    const int q = reinterpret_cast<const int*>(blk.qs)[p];
++    bm[(std::size_t(b) * 8 + p) * cp + c] = q;
++    pm[(std::size_t(p) * nb + b) * cp + c] = q;
++    if (p == 0) dl[std::size_t(b) * cp + c] = __low2float(blk.ds);
++}
++
++#endif  // !__HIPCC__
++
++void validate_shape(int n_in, int ncols, int block_elems = Q8K) {
++    if (n_in <= 0 || n_in % block_elems != 0) {
++        throw std::invalid_argument("native MMVQ requires n_in > 0 and divisible by its block element count");
++    }
++    if (ncols < 1 || ncols > MAX_NCOLS) throw std::invalid_argument("native MMVQ requires 1 <= ncols <= 8");
++}
++void validate_pointer(const void* p) {
++    if (!p || reinterpret_cast<std::uintptr_t>(p) % 4 != 0) {
++        throw std::invalid_argument("native MMVQ requires non-null 4-byte aligned device pointers");
++    }
++}
++void validate_stream(void* stream) {
++    // FreeToken passes its current CUDA stream explicitly; CUDA also permits handle 0.
++    (void) stream;
++}
++void launch_check() {
++    const auto error = cudaGetLastError();
++    if (error != cudaSuccess) {
++        throw std::runtime_error(std::string("native MMVQ launch: ") + cudaGetErrorString(error));
++    }
++}
++
++
++#if defined(FREETOKEN_GGUF_HIP_GFX906)
++// ---- AMD (wave64) layout: one wavefront per R rows, four wavefronts per block, the row's blocks strided over the
++// 64 lanes exactly as the CUDA kernels stride them over a block (kbx = lane / T, stride 64 / T), and a 64-lane
++// butterfly instead of the LDS partials and __syncthreads of the one-block-per-row layout: on gfx906 a block per
++// 2 KB row spent most of its time being launched and joined.  The SAME kernel serves every column count 1..8, so a
++// column's sums do not depend on how many columns (verify tokens) ride along.  FREETOKEN_GGUF_MMVQ_WAVE=0: the CUDA layout.
++bool g_wave_off = std::getenv("FREETOKEN_GGUF_MMVQ_WAVE") && std::string(std::getenv("FREETOKEN_GGUF_MMVQ_WAVE")) == "0";
++template<typename F, int NCOLS, int R>
++__launch_bounds__(256)
++__global__ void native_mmvq_wave_kernel(const typename F::Block* __restrict__ w, const Q81Block* __restrict__ x,
++                                        float* __restrict__ y, int n_in, int n_out) {
++    constexpr int BPIW = 64 / F::T;
++    static_assert(64 % F::T == 0, "a block's threads must tile the wavefront");
++    const int lane = int(threadIdx.x) & 63;
++    const int row0 = (int(blockIdx.x) * 4 + (int(threadIdx.x) >> 6)) * R;
++    if (row0 >= n_out) return;
++    const int blocks_per_row = n_in / F::DIV;
++    const int x_stride = n_in / Q8K;
++    const int kqs = F::kqs(lane);
++    float tmp[NCOLS][R] = {};
++    for (int kbx = lane / F::T; kbx < blocks_per_row; kbx += BPIW) {
++        const int kby = kbx * F::KBY;
++#pragma unroll
++        for (int i = 0; i < R; ++i) {
++            if (row0 + i < n_out) {
++                const typename F::W wv = F::load(w + std::size_t(row0 + i) * blocks_per_row + kbx, kqs);
++#pragma unroll
++                for (int j = 0; j < NCOLS; ++j) tmp[j][i] += F::apply(wv, x + std::size_t(j) * x_stride + kby, kqs);
++            }
++        }
++    }
++#pragma unroll
++    for (int j = 0; j < NCOLS; ++j)
++#pragma unroll
++        for (int i = 0; i < R; ++i) {
++            float v = tmp[j][i];
++#pragma unroll
++            for (int off = 32; off > 0; off >>= 1) v += __shfl_xor(v, off, 64);
++            if (lane == 0 && row0 + i < n_out) y[std::size_t(j) * n_out + row0 + i] = v;
++        }
++}
++template<typename F, int NCOLS>
++void wave_launch_n(const void* weights, const void* x_q8_1, float* y, int n_in, int n_out, cudaStream_t s) {
++    const auto* w = static_cast<const typename F::Block*>(weights);
++    const auto* x = static_cast<const Q81Block*>(x_q8_1);
++    constexpr int R = 1;
++    const unsigned blocks = unsigned((std::size_t(n_out) + 4 * R - 1) / (4 * R));
++    native_mmvq_wave_kernel<F, NCOLS, R><<<blocks, 256, 0, s>>>(w, x, y, n_in, n_out);
++}
++template<typename F>
++void wave_launch(const void* weights, const void* x_q8_1, float* y, int n_in, int n_out, int ncols, void* stream) {
++    const auto s = static_cast<cudaStream_t>(stream);
++    switch (ncols) {
++        case 1: wave_launch_n<F, 1>(weights, x_q8_1, y, n_in, n_out, s); break;
++        case 2: wave_launch_n<F, 2>(weights, x_q8_1, y, n_in, n_out, s); break;
++        case 3: wave_launch_n<F, 3>(weights, x_q8_1, y, n_in, n_out, s); break;
++        case 4: wave_launch_n<F, 4>(weights, x_q8_1, y, n_in, n_out, s); break;
++        case 5: wave_launch_n<F, 5>(weights, x_q8_1, y, n_in, n_out, s); break;
++        case 6: wave_launch_n<F, 6>(weights, x_q8_1, y, n_in, n_out, s); break;
++        case 7: wave_launch_n<F, 7>(weights, x_q8_1, y, n_in, n_out, s); break;
++        case 8: wave_launch_n<F, 8>(weights, x_q8_1, y, n_in, n_out, s); break;
++        default: throw std::invalid_argument("native MMVQ (wave) requires 1 <= ncols <= 8");
++    }
++}
++#define FREETOKEN_GGUF_WAVE_MMVQ(...) \
++    if (!g_wave_off) { wave_launch<__VA_ARGS__>(weights, x_q8_1, y, n_in, n_out, ncols, stream); launch_check(); return; }
++#else
++#define FREETOKEN_GGUF_WAVE_MMVQ(...)
++#endif
++
++template<typename Weight, int Qi>
++void small_mmvq(const void* weights, const void* x_q8_1, float* y,
++                int n_in, int n_out, int ncols, void* stream) {
++    validate_shape(n_in, ncols, 32);
++    if (n_out <= 0) throw std::invalid_argument("native MMVQ requires n_out > 0");
++    validate_pointer(weights);
++    validate_pointer(x_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    FREETOKEN_GGUF_WAVE_MMVQ(SmallTraits<Weight, Qi>)
++    if (ncols > 1) {
++        launch_multi<SmallTraits<Weight, Qi>>(weights, x_q8_1, y, n_in, n_out, ncols, stream);
++        launch_check();
++        return;
++    }
++    const auto* w = static_cast<const Weight*>(weights);
++    const auto* x = static_cast<const Q81Block*>(x_q8_1);
++    const auto s = static_cast<cudaStream_t>(stream);
++    const dim3 threads(WARP, WARPS);
++    if (n_in / 32 < 2 * WARPS * WARP / Qi) {
++        const unsigned blocks = unsigned((std::size_t(n_out) + WARPS - 1) / WARPS);
++        native_small_mmvq_kernel<Weight, Qi, true><<<blocks, threads, 0, s>>>(w, x, y, n_in, n_out);
++    } else {
++        native_small_mmvq_kernel<Weight, Qi, false><<<unsigned(n_out), threads, 0, s>>>(w, x, y, n_in, n_out);
++    }
++    launch_check();
++}
++
++template<typename Weight, int Qi>
++void small_f32(const void* weights, const float* x, void* scratch_q8_1,
++               float* y, int n_in, int n_out, int ncols, void* stream) {
++    validate_shape(n_in, ncols, 32);
++    if (n_out <= 0) throw std::invalid_argument("native MMVQ requires n_out > 0");
++    validate_pointer(weights);
++    validate_pointer(x);
++    validate_pointer(scratch_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    native_quantize_q8_1(x, scratch_q8_1, n_in, ncols, stream);
++    small_mmvq<Weight, Qi>(weights, scratch_q8_1, y, n_in, n_out, ncols, stream);
++}
++
++// ============================ FREETOKEN_GGUF_Q8_PACKED=1: the packed Q8_0 decode layout (opt-in) ============================
++//
++// A lossless load-time repack of a Q8_0 matrix: the SAME int8 values in a qs plane (row-major, n_in bytes per row)
++// followed by the SAME fp16 scales in a d plane (row-major, n_in / 32 per row) - no requantization, same bytes.
++// The GGUF's 34-byte blocks leave every int 2-byte aligned (load_int_b2 = two 16-bit loads); the planes give each
++// thread one aligned 8-byte run, read with streaming (non-temporal) loads. Every thread owns exactly the bytes of
++// the ncols = 1 / multi-column EXACT layout (block kbx = tid / 4 + 32 i, ints 2 (tid % 4) and +1), accumulates them
++// in the same order with the same expression, and the cross-warp sum and XOR tree are the same: every output is
++// BITWISE equal to native_small_mmvq_kernel / native_mmvq_multi_kernel<SmallTraits<Q80Block, 8>, NC, 4, 1>.
++// Eligible: 1024 <= n_in <= 4096 and n_out >= 2048, run as 640 persistent workgroups (a grid-stride over rows, two
++// partial buffers). Measured on gfx1151 (S26, 8 real UD-IQ4_XS layers per shape, paired, 1-5 columns): 2560 ->
++// 6144/10240/12288 +10-12% per call (engine trace: -10.7% on those calls). 6144 -> 2560 (one workgroup per row)
++// was +2-4% standalone but -3% in the engine, and rows < 2048 lose: neither is packed.
++#if defined(__HIPCC__)
++#define FREETOKEN_GGUF_Q8P_LOAD(p) __builtin_nontemporal_load(p)
++#else
++#define FREETOKEN_GGUF_Q8P_LOAD(p) __ldcs(p)
++#endif
++constexpr int Q8P_PERSIST_GRID = 640;
++constexpr int Q8P_PERSIST_MAX_IN = 4096;
++
++template<int NCOLS, bool TS = false>
++__launch_bounds__(WARPS * WARP, 1)
++__global__ void native_q8_0_packed_kernel(const int8_t* __restrict__ qs, const half* __restrict__ dpl,
++                                          const Q81Block* __restrict__ x, float* __restrict__ y,
++                                          int n_in, int n_out, int row_step) {
++    const int tid = WARP * int(threadIdx.y) + int(threadIdx.x);
++    const int nb = n_in / 32;
++    const int kqs = 2 * (tid % 4);
++    __shared__ float partial[2][WARPS - 1][NCOLS][WARP];
++    int buf = 0;
++    for (int row = int(blockIdx.x); row < n_out; row += row_step, buf ^= 1) {
++        float tmp[NCOLS] = {};
++        for (int kbx = tid / 4; kbx < nb; kbx += 2 * WARPS * WARP / 8) {
++            const std::size_t block = std::size_t(row) * nb + kbx;
++            const int* p = reinterpret_cast<const int*>(qs + block * 32) + kqs;
++            const int v0 = FREETOKEN_GGUF_Q8P_LOAD(p);
++            const int v1 = FREETOKEN_GGUF_Q8P_LOAD(p + 1);
++            const float d0 = dpl[block];
++#pragma unroll
++            for (int j = 0; j < NCOLS; ++j) {
++                const Q81Block* xb = x + std::size_t(j) * nb + kbx;
++                const int* u = reinterpret_cast<const int*>(xb->qs);
++                int sumi = 0;
++                sumi = FREETOKEN_GGUF_DP4A(v0, u[kqs], sumi);
++                sumi = FREETOKEN_GGUF_DP4A(v1, u[kqs + 1], sumi);
++                const float d1 = __low2float(xb->ds);
++                tmp[j] += d0 * d1 * float(sumi);
++            }
++        }
++        if (threadIdx.y > 0) {
++#pragma unroll
++            for (int j = 0; j < NCOLS; ++j) partial[buf][threadIdx.y - 1][j][threadIdx.x] = tmp[j];
++        }
++        __syncthreads();
++        if (TS && threadIdx.y == 0) {   // S26 FREETOKEN_GGUF_TSUM=1: one transposed butterfly, bitwise the same sums
++            constexpr int P = s26ts::pow2_ceil(NCOLS);
++            float v[P];
++#pragma unroll
++            for (int j = 0; j < NCOLS; ++j) {
++#pragma unroll
++                for (int l = 0; l < WARPS - 1; ++l) tmp[j] += partial[buf][l][j][threadIdx.x];
++                v[j] = tmp[j];
++            }
++#pragma unroll
++            for (int j = NCOLS; j < P; ++j) v[j] = 0.0f;
++            const float sum = s26ts::tsum<P>(v, int(threadIdx.x));
++            const int j = s26ts::tsum_token<P>(int(threadIdx.x));
++            if (int(threadIdx.x) == s26ts::tsum_lane<P>(j) && j < NCOLS) y[std::size_t(j) * n_out + row] = sum;
++        } else if (threadIdx.y == 0) {
++#pragma unroll
++            for (int j = 0; j < NCOLS; ++j) {
++#pragma unroll
++                for (int l = 0; l < WARPS - 1; ++l) tmp[j] += partial[buf][l][j][threadIdx.x];
++                tmp[j] = warp_sum(tmp[j]);
++                if (threadIdx.x == 0) y[std::size_t(j) * n_out + row] = tmp[j];
++            }
++        }
++    }
++}
++
++struct Q8Packed { const int8_t* qs; const half* d; int n_in, n_out; };
++std::unordered_map<const void*, Q8Packed>& q8_packed_registry() {
++    static std::unordered_map<const void*, Q8Packed> registry;
++    return registry;
++}
++
++template<int NCOLS>
++void q8_packed_launch(const Q8Packed& w, const Q81Block* x, float* y, cudaStream_t s) {
++    const bool persist = w.n_in <= Q8P_PERSIST_MAX_IN;
++    const int grid = persist ? (std::min)(w.n_out, Q8P_PERSIST_GRID) : w.n_out;
++    if (s26_tsum_on())
++        native_q8_0_packed_kernel<NCOLS, true><<<unsigned(grid), dim3(WARP, WARPS), 0, s>>>(w.qs, w.d, x, y, w.n_in, w.n_out,
++                                                                                          persist ? grid : w.n_out);
++    else
++        native_q8_0_packed_kernel<NCOLS><<<unsigned(grid), dim3(WARP, WARPS), 0, s>>>(w.qs, w.d, x, y, w.n_in, w.n_out,
++                                                                                    persist ? grid : w.n_out);
++}
++
++bool q8_packed_mmvq(const void* weights, const void* x_q8_1, float* y, int n_in, int n_out, int ncols, void* stream) {
++    auto& registry = q8_packed_registry();
++    if (registry.empty() || (ncols > 1 && !g_multi_exact)) return false;   // packed = the EXACT layout only
++    const auto found = registry.find(weights);
++    if (found == registry.end() || found->second.n_in != n_in || found->second.n_out != n_out) return false;
++    validate_shape(n_in, ncols, 32);
++    validate_pointer(x_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    const auto* x = static_cast<const Q81Block*>(x_q8_1);
++    const auto s = static_cast<cudaStream_t>(stream);
++    switch (ncols) {
++        case 1: q8_packed_launch<1>(found->second, x, y, s); break;
++        case 2: q8_packed_launch<2>(found->second, x, y, s); break;
++        case 3: q8_packed_launch<3>(found->second, x, y, s); break;
++        case 4: q8_packed_launch<4>(found->second, x, y, s); break;
++        case 5: q8_packed_launch<5>(found->second, x, y, s); break;
++        case 6: q8_packed_launch<6>(found->second, x, y, s); break;
++        case 7: q8_packed_launch<7>(found->second, x, y, s); break;
++        case 8: q8_packed_launch<8>(found->second, x, y, s); break;
++        default: throw std::invalid_argument("native MMVQ requires 1 <= ncols <= 8");
++    }
++    launch_check();
++    return true;
++}
++
++
++// ============================ FREETOKEN_GGUF_Q6_PACKED=1: the packed Q6_K head layout (opt-in) ============================
++//
++// The output heads (the main head, 248320 rows, and the MTP draft head's row subset) are Q6_K matrices of 2560-wide
++// rows: 10 blocks of 210 bytes each, so every int load is 2-byte aligned and a row is 2100 bytes. The packed copy
++// holds the SAME bytes as four planes - ql (128 B per block), qh (64 B), scales (16 B), d (2 B) - so a thread's
++// two words are aligned dword loads (non-temporal). Thread ownership (block tid / 32 + 4 i, word tid % 32), the
++// q6_q8_dot_impl expression, the per-thread order and the reduction are those of native_q6_k_mmvq_kernel<false> /
++// native_mmvq_multi_kernel<Q6KTraits, NC, 4, 1>: every output is bitwise equal. Persistent workgroups.
++int g_q6p_grid_override = 0;   // the self-test's grid sweep (FREETOKEN_GGUF_Q6P_SELFTEST=2)
++int q6p_grid() {
++    if (g_q6p_grid_override > 0) return g_q6p_grid_override;
++    static const int grid = [] {
++        const char* v = std::getenv("FREETOKEN_GGUF_Q6P_GRID");
++        const int g = v ? std::atoi(v) : 0;
++        return g > 0 ? g : 640;
++    }();
++    return grid;
++}
++
++template<int NCOLS, bool TS = false>
++__launch_bounds__(WARPS * WARP, 1)
++__global__ void native_q6_k_packed_kernel(const int* __restrict__ ql, const int* __restrict__ qh,
++                                          const int8_t* __restrict__ sc, const half* __restrict__ dpl,
++                                          const Q81Block* __restrict__ x, float* __restrict__ y,
++                                          int n_in, int n_out, int row_step) {
++    const int tid = WARP * int(threadIdx.y) + int(threadIdx.x);
++    const int nb = n_in / 256;
++    const int x_stride = n_in / Q8K;
++    const int iqs = tid % 32;
++    const int bq8_offset = 4 * (iqs / 16) + (iqs % 16) / 8;
++    const int scale_offset = 8 * (iqs / 16) + (iqs % 16) / 4;
++    const int vh_shift = 2 * ((iqs % 16) / 8);
++    const int qh_word = 8 * (iqs / 16) + iqs % 8;
++    __shared__ float partial[2][WARPS - 1][NCOLS][WARP];
++    int buf = 0;
++    for (int row = int(blockIdx.x); row < n_out; row += row_step, buf ^= 1) {
++        float tmp[NCOLS] = {};
++        for (int kbx = tid / 32; kbx < nb; kbx += WARPS * WARP / 32) {
++            const std::size_t block = std::size_t(row) * nb + kbx;
++            const int vl = FREETOKEN_GGUF_Q8P_LOAD(ql + block * 32 + iqs);
++            const int vh = FREETOKEN_GGUF_Q8P_LOAD(qh + block * 16 + qh_word) >> vh_shift;
++            const int8_t* scales = sc + block * 16 + scale_offset;
++            const float d = dpl[block];
++            const int kby = kbx * 8;
++#pragma unroll
++            for (int j = 0; j < NCOLS; ++j) {
++                const Q81Block* xb = x + std::size_t(j) * x_stride + kby;
++                int u[2];
++                float d8[2];
++#pragma unroll
++                for (int i = 0; i < 2; ++i) {
++                    u[i] = reinterpret_cast<const int*>(xb[bq8_offset + 2 * i].qs)[iqs % 8];
++                    d8[i] = __low2float(xb[bq8_offset + 2 * i].ds);
++                }
++                tmp[j] += q6_q8_dot_impl(vl, vh, u, scales, d, d8);
++            }
++        }
++        if (threadIdx.y > 0) {
++#pragma unroll
++            for (int j = 0; j < NCOLS; ++j) partial[buf][threadIdx.y - 1][j][threadIdx.x] = tmp[j];
++        }
++        __syncthreads();
++        if (TS && threadIdx.y == 0) {   // S26 FREETOKEN_GGUF_TSUM=1: one transposed butterfly, bitwise the same sums
++            constexpr int P = s26ts::pow2_ceil(NCOLS);
++            float v[P];
++#pragma unroll
++            for (int j = 0; j < NCOLS; ++j) {
++#pragma unroll
++                for (int l = 0; l < WARPS - 1; ++l) tmp[j] += partial[buf][l][j][threadIdx.x];
++                v[j] = tmp[j];
++            }
++#pragma unroll
++            for (int j = NCOLS; j < P; ++j) v[j] = 0.0f;
++            const float sum = s26ts::tsum<P>(v, int(threadIdx.x));
++            const int j = s26ts::tsum_token<P>(int(threadIdx.x));
++            if (int(threadIdx.x) == s26ts::tsum_lane<P>(j) && j < NCOLS) y[std::size_t(j) * n_out + row] = sum;
++        } else if (threadIdx.y == 0) {
++#pragma unroll
++            for (int j = 0; j < NCOLS; ++j) {
++#pragma unroll
++                for (int l = 0; l < WARPS - 1; ++l) tmp[j] += partial[buf][l][j][threadIdx.x];
++                tmp[j] = warp_sum(tmp[j]);
++                if (threadIdx.x == 0) y[std::size_t(j) * n_out + row] = tmp[j];
++            }
++        }
++    }
++}
++
++bool g_q6_bypass = false;   // the load-time self-test times the GGUF-layout kernels with the copy registered
++
++// the packed planes of one Q6_K matrix (owned: allocated by native_q6_k_pack, freed by native_q6_k_unpack)
++struct Q6Packed { void* base; const int* ql; const int* qh; const int8_t* sc; const half* d; int n_in, n_out; };
++std::unordered_map<const void*, Q6Packed>& q6_packed_registry() {
++    static std::unordered_map<const void*, Q6Packed> registry;
++    return registry;
++}
++
++template<int NCOLS>
++void q6_packed_launch(const Q6Packed& w, const Q81Block* x, float* y, cudaStream_t s) {
++    const int grid = (std::min)(w.n_out, q6p_grid());
++    if (s26_tsum_on())
++        native_q6_k_packed_kernel<NCOLS, true><<<unsigned(grid), dim3(WARP, WARPS), 0, s>>>(w.ql, w.qh, w.sc, w.d, x, y, w.n_in,
++                                                                                          w.n_out, grid);
++    else
++        native_q6_k_packed_kernel<NCOLS><<<unsigned(grid), dim3(WARP, WARPS), 0, s>>>(w.ql, w.qh, w.sc, w.d, x, y, w.n_in,
++                                                                                    w.n_out, grid);
++}
++
++bool q6_packed_mmvq(const void* weights, const void* x_q8_1, float* y, int n_in, int n_out, int ncols, void* stream) {
++    auto& registry = q6_packed_registry();
++    if (registry.empty() || g_q6_bypass || (ncols > 1 && !g_multi_exact)) return false;
++    const auto found = registry.find(weights);
++    if (found == registry.end() || found->second.n_in != n_in || found->second.n_out != n_out) return false;
++    validate_shape(n_in, ncols, 256);
++    validate_pointer(x_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    const auto* x = static_cast<const Q81Block*>(x_q8_1);
++    const auto s = static_cast<cudaStream_t>(stream);
++    switch (ncols) {
++        case 1: q6_packed_launch<1>(found->second, x, y, s); break;
++        case 2: q6_packed_launch<2>(found->second, x, y, s); break;
++        case 3: q6_packed_launch<3>(found->second, x, y, s); break;
++        case 4: q6_packed_launch<4>(found->second, x, y, s); break;
++        case 5: q6_packed_launch<5>(found->second, x, y, s); break;
++        case 6: q6_packed_launch<6>(found->second, x, y, s); break;
++        case 7: q6_packed_launch<7>(found->second, x, y, s); break;
++        case 8: q6_packed_launch<8>(found->second, x, y, s); break;
++        default: throw std::invalid_argument("native MMVQ requires 1 <= ncols <= 8");
++    }
++    launch_check();
++    return true;
++}
++} // namespace
++
++bool native_q8_0_packed_enabled() {
++    static const bool enabled = [] {
++        const char* v = std::getenv("FREETOKEN_GGUF_Q8_PACKED");
++        return v && v[0] == '1' && v[1] == '\0';
++    }();
++    return enabled;
++}
++
++bool native_q8_0_packed_eligible(int n_in, int n_out) {
++    return n_in > 0 && n_in % 32 == 0 && n_in / 32 >= 2 * WARPS * WARP / 8 && n_in <= Q8P_PERSIST_MAX_IN &&
++           n_out >= 2048;
++}
++
++void native_q8_0_pack_host(const void* gguf_blocks, void* out, int n_in, int n_out) {
++    const auto* blocks = static_cast<const Q80Block*>(gguf_blocks);
++    auto* qs = static_cast<int8_t*>(out);
++    auto* d = reinterpret_cast<half*>(qs + std::size_t(n_in) * n_out);
++    const std::size_t count = std::size_t(n_in / 32) * n_out;
++    for (std::size_t b = 0; b < count; ++b) {
++        std::memcpy(qs + b * 32, blocks[b].qs, 32);
++        std::memcpy(d + b, &blocks[b].d, sizeof(half));
++    }
++}
++
++void native_q8_0_packed_register(const void* gguf_weights, const void* packed, int n_in, int n_out) {
++    validate_pointer(gguf_weights);
++    validate_pointer(packed);
++    if (!native_q8_0_packed_eligible(n_in, n_out)) throw std::invalid_argument("Q8_0 packed: ineligible shape");
++    const auto* qs = static_cast<const int8_t*>(packed);
++    q8_packed_registry()[gguf_weights] =
++        Q8Packed{qs, reinterpret_cast<const half*>(qs + std::size_t(n_in) * n_out), n_in, n_out};
++}
++
++void native_q8_0_packed_unregister(const void* gguf_weights) { q8_packed_registry().erase(gguf_weights); }
++
++bool native_q6_k_packed_enabled() {
++    static const bool enabled = [] {
++        const char* v = std::getenv("FREETOKEN_GGUF_Q6_PACKED");
++        return v && v[0] == '1' && v[1] == '\0';
++    }();
++    return enabled;
++}
++
++bool native_q6_k_pack(const void* weights, int n_in, int n_out, const char* what) {
++    if (!weights || n_in <= 0 || n_in % 256 || n_in / 256 < WARPS * WARP / 32 || n_out < 2048) return false;
++    if (q6_packed_registry().count(weights)) return true;
++    const std::size_t nb = std::size_t(n_in / 256) * std::size_t(n_out);
++    const std::size_t bytes = nb * sizeof(Q6KBlock);
++    std::vector<Q6KBlock> host(nb);
++    if (cudaMemcpy(host.data(), weights, bytes, cudaMemcpyDeviceToHost) != cudaSuccess) { cudaGetLastError(); return false; }
++    // planes: ql | qh | scales | d, each 256-byte aligned
++    const std::size_t o_qh = (nb * 128 + 255) & ~std::size_t(255);
++    const std::size_t o_sc = (o_qh + nb * 64 + 255) & ~std::size_t(255);
++    const std::size_t o_d = (o_sc + nb * 16 + 255) & ~std::size_t(255);
++    const std::size_t total = o_d + nb * 2;
++    std::vector<uint8_t> packed(total, 0);
++    for (std::size_t b = 0; b < nb; ++b) {
++        std::memcpy(packed.data() + b * 128, host[b].ql, 128);
++        std::memcpy(packed.data() + o_qh + b * 64, host[b].qh, 64);
++        std::memcpy(packed.data() + o_sc + b * 16, host[b].scales, 16);
++        std::memcpy(packed.data() + o_d + b * 2, &host[b].d, 2);
++    }
++    void* dev = nullptr;
++    if (cudaMalloc(&dev, total) != cudaSuccess) { cudaGetLastError(); return false; }
++    if (cudaMemcpy(dev, packed.data(), total, cudaMemcpyHostToDevice) != cudaSuccess) {
++        cudaFree(dev); cudaGetLastError(); return false;
++    }
++    auto* base = static_cast<uint8_t*>(dev);
++    q6_packed_registry()[weights] = Q6Packed{dev, reinterpret_cast<const int*>(base),
++                                             reinterpret_cast<const int*>(base + o_qh),
++                                             reinterpret_cast<const int8_t*>(base + o_sc),
++                                             reinterpret_cast<const half*>(base + o_d), n_in, n_out};
++    std::fprintf(stderr, "strata: FREETOKEN_GGUF_Q6_PACKED=1 packed the %s (%d x %d, +%.1f MiB)\n", what, n_out, n_in,
++                 total / 1048576.0);
++    // FREETOKEN_GGUF_Q6P_SELFTEST=1: bitwise check against the GGUF-layout kernels (1..4 columns) and paired timings
++    if (const char* v = std::getenv("FREETOKEN_GGUF_Q6P_SELFTEST"); v && (v[0] == '1' || v[0] == '2')) {
++        cudaStream_t s = nullptr;
++        cudaStreamCreateWithFlags(&s, cudaStreamNonBlocking);
++        const int nq = n_in / Q8K;
++        std::vector<Q81Block> hx(std::size_t(4) * nq);
++        uint32_t r = 12345u;
++        for (auto& blk : hx) {
++            for (auto& q : blk.qs) { r = r * 1664525u + 1013904223u; q = int8_t(int((r >> 24) & 255u) - 128); }
++            r = r * 1664525u + 1013904223u;
++            blk.ds = __floats2half2_rn(0.001f + float(r >> 8) * 1e-9f, 0.0f);
++        }
++        void *dx = nullptr, *ya = nullptr, *yb = nullptr;
++        cudaMalloc(&dx, hx.size() * sizeof(Q81Block));
++        cudaMalloc(&ya, std::size_t(4) * n_out * 4);
++        cudaMalloc(&yb, std::size_t(4) * n_out * 4);
++        cudaMemcpy(dx, hx.data(), hx.size() * sizeof(Q81Block), cudaMemcpyHostToDevice);
++        std::vector<float> a(std::size_t(4) * n_out), c(std::size_t(4) * n_out);
++        bool same = true;
++        for (int nc = 1; nc <= 4; ++nc) {
++            g_q6_bypass = true;
++            native_q6_k_mmvq(weights, dx, (float*) ya, n_in, n_out, nc, s);
++            g_q6_bypass = false;
++            native_q6_k_mmvq(weights, dx, (float*) yb, n_in, n_out, nc, s);
++            cudaStreamSynchronize(s);
++            cudaMemcpy(a.data(), ya, std::size_t(nc) * n_out * 4, cudaMemcpyDeviceToHost);
++            cudaMemcpy(c.data(), yb, std::size_t(nc) * n_out * 4, cudaMemcpyDeviceToHost);
++            same = same && std::memcmp(a.data(), c.data(), std::size_t(nc) * n_out * 4) == 0;
++        }
++        cudaEvent_t e0, e1;
++        cudaEventCreate(&e0); cudaEventCreate(&e1);
++        for (int nc : {1, 2, 4}) {
++            std::vector<float> tb, tc;
++            for (int k = 0; k < 11; ++k) {
++                for (int pass = 0; pass < 2; ++pass) {
++                    const bool cand = (pass == 0) == (k % 2 == 1);
++                    g_q6_bypass = !cand;
++                    cudaEventRecord(e0, s);
++                    for (int it = 0; it < 5; ++it) native_q6_k_mmvq(weights, dx, (float*) (cand ? yb : ya), n_in, n_out, nc, s);
++                    cudaEventRecord(e1, s);
++                    cudaEventSynchronize(e1);
++                    float ms = 0; cudaEventElapsedTime(&ms, e0, e1);
++                    (cand ? tc : tb).push_back(ms * 1000.0f / 5);
++                }
++            }
++            g_q6_bypass = false;
++            std::sort(tb.begin(), tb.end()); std::sort(tc.begin(), tc.end());
++            std::fprintf(stderr, "strata: Q6_K packed self-test %s ncols %d: GGUF %.1f us (%.1f-%.1f), packed %.1f us "
++                         "(%.1f-%.1f), 11 paired samples\n", what, nc, tb[5], tb[0], tb[10], tc[5], tc[0], tc[10]);
++        }
++        std::fprintf(stderr, "strata: Q6_K packed self-test %s: outputs %s (1-4 columns)\n", what,
++                     same ? "BITWISE EQUAL" : "DIFFER");
++        if (v[0] == '2') {   // grid sweep of the packed kernel
++            for (int grid : {160, 320, 640, 1280, 2560, 5120, 20480}) {
++                g_q6p_grid_override = grid;
++                for (int nc : {1, 2, 4}) {
++                    std::vector<float> tc;
++                    for (int k = 0; k < 7; ++k) {
++                        cudaEventRecord(e0, s);
++                        for (int it = 0; it < 5; ++it) native_q6_k_mmvq(weights, dx, (float*) yb, n_in, n_out, nc, s);
++                        cudaEventRecord(e1, s);
++                        cudaEventSynchronize(e1);
++                        float ms = 0; cudaEventElapsedTime(&ms, e0, e1);
++                        tc.push_back(ms * 1000.0f / 5);
++                    }
++                    std::sort(tc.begin(), tc.end());
++                    std::fprintf(stderr, "strata: Q6_K packed grid sweep %s grid %d ncols %d: %.1f us (%.1f-%.1f)\n",
++                                 what, grid, nc, tc[3], tc[0], tc[6]);
++                }
++            }
++            g_q6p_grid_override = 0;
++        }
++        cudaEventDestroy(e0); cudaEventDestroy(e1);
++        cudaFree(dx); cudaFree(ya); cudaFree(yb);
++        cudaStreamDestroy(s);
++        if (!same) { native_q6_k_unpack(weights); return false; }
++    }
++    return true;
++}
++
++void native_q6_k_unpack(const void* weights) {
++    auto& registry = q6_packed_registry();
++    const auto found = registry.find(weights);
++    if (found == registry.end()) return;
++    cudaFree(found->second.base);
++    registry.erase(found);
++}
++
++void native_mmvq_set_multi_exact(bool exact) { g_multi_exact = exact; }
++bool native_mmvq_multi_exact() { return g_multi_exact; }
++
++std::size_t native_q8_1_bytes(int n_in, int ncols) {
++    validate_shape(n_in, ncols);
++    return std::size_t(ncols) * std::size_t(n_in / Q8K) * sizeof(Q81Block);
++}
++
++void native_quantize_q8_1(const float* x, void* x_q8_1, int n_in, int ncols, void* stream) {
++    validate_shape(n_in, ncols);
++    validate_pointer(x);
++    validate_pointer(x_q8_1);
++    validate_stream(stream);
++    // Columns are contiguous and n_in is a multiple of 32, so ncols columns quantize as one vector of
++    // ncols * n_in elements: every 32-element block stays inside one column.
++    const int n_total = n_in * ncols;
++    const unsigned blocks = unsigned((std::size_t(n_total) + QUANT_THREADS - 1) / QUANT_THREADS);
++    launch_pdl(native_quantize_q8_1_kernel, dim3(blocks), dim3(QUANT_THREADS), 0, static_cast<cudaStream_t>(stream), x,
++               static_cast<Q81Block*>(x_q8_1), n_total);
++    launch_check();
++}
++
++void native_swiglu_quantize_q8_1(const float* gate, const float* up, void* x_q8_1,
++                                 int n_in, int ncols, void* stream) {
++    validate_shape(n_in, ncols);
++    validate_pointer(gate);
++    validate_pointer(up);
++    validate_pointer(x_q8_1);
++    validate_stream(stream);
++    const int n_total = n_in * ncols;
++    const unsigned blocks = unsigned((std::size_t(n_total) + QUANT_THREADS - 1) / QUANT_THREADS);
++    native_swiglu_quantize_q8_1_kernel<<<blocks, QUANT_THREADS, 0,
++                                         static_cast<cudaStream_t>(stream)>>>(
++        gate, up, static_cast<Q81Block*>(x_q8_1), n_total);
++    launch_check();
++}
++
++void native_q5_k_mmvq(const void* weights, const void* x_q8_1, float* y,
++                      int n_in, int n_out, int ncols, void* stream) {
++    validate_shape(n_in, ncols, QK);
++    if (n_out <= 0) throw std::invalid_argument("native MMVQ requires n_out > 0");
++    validate_pointer(weights);
++    validate_pointer(x_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    FREETOKEN_GGUF_WAVE_MMVQ(Q5KTraits)
++    if (ncols > 1) {
++        launch_multi<Q5KTraits>(weights, x_q8_1, y, n_in, n_out, ncols, stream);
++        launch_check();
++        return;
++    }
++    const auto* w = static_cast<const Q5KBlock*>(weights);
++    const auto* x = static_cast<const Q81Block*>(x_q8_1);
++    const auto s = static_cast<cudaStream_t>(stream);
++    const dim3 threads(WARP, WARPS);
++    if (n_in / QK < VDR * WARPS * WARP / QI) {
++        const unsigned blocks = unsigned((std::size_t(n_out) + WARPS - 1) / WARPS);
++        native_q5_k_mmvq_kernel<true><<<blocks, threads, 0, s>>>(w, x, y, n_in, n_out);
++    } else {
++        native_q5_k_mmvq_kernel<false><<<unsigned(n_out), threads, 0, s>>>(w, x, y, n_in, n_out);
++    }
++    launch_check();
++}
++
++void native_q5_k_f32(const void* weights, const float* x, void* scratch_q8_1,
++                     float* y, int n_in, int n_out, int ncols, void* stream) {
++    // Validate all outputs before enqueueing the first operation.
++    validate_shape(n_in, ncols, QK);
++    if (n_out <= 0) throw std::invalid_argument("native MMVQ requires n_out > 0");
++    validate_pointer(weights);
++    validate_pointer(x);
++    validate_pointer(scratch_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    native_quantize_q8_1(x, scratch_q8_1, n_in, ncols, stream);
++    native_q5_k_mmvq(weights, scratch_q8_1, y, n_in, n_out, ncols, stream);
++}
++
++void native_q2_0_mmvq(const void* weights, const void* x_q8_1, float* y,
++                      int n_in, int n_out, int ncols, void* stream) {
++    validate_shape(n_in, ncols, 64);
++    if (n_out <= 0) throw std::invalid_argument("native MMVQ requires n_out > 0");
++    validate_pointer(weights);
++    validate_pointer(x_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    FREETOKEN_GGUF_WAVE_MMVQ(Q20Traits)
++    if (ncols > 1) {
++        launch_multi<Q20Traits>(weights, x_q8_1, y, n_in, n_out, ncols, stream);
++        launch_check();
++        return;
++    }
++    const auto* w = static_cast<const Q20Block*>(weights);
++    const auto* x = static_cast<const Q81Block*>(x_q8_1);
++    const auto s = static_cast<cudaStream_t>(stream);
++    const dim3 threads(WARP, WARPS);
++    if (n_in / 64 < WARPS * WARP / 2) {
++        const unsigned blocks = unsigned((std::size_t(n_out) + WARPS - 1) / WARPS);
++        native_q2_0_mmvq_kernel<true><<<blocks, threads, 0, s>>>(w, x, y, n_in, n_out);
++    } else {
++        native_q2_0_mmvq_kernel<false><<<unsigned(n_out), threads, 0, s>>>(w, x, y, n_in, n_out);
++    }
++    launch_check();
++}
++
++void native_q2_0_f32(const void* weights, const float* x, void* scratch_q8_1,
++                     float* y, int n_in, int n_out, int ncols, void* stream) {
++    validate_shape(n_in, ncols, 64);
++    if (n_out <= 0) throw std::invalid_argument("native MMVQ requires n_out > 0");
++    validate_pointer(weights);
++    validate_pointer(x);
++    validate_pointer(scratch_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    native_quantize_q8_1(x, scratch_q8_1, n_in, ncols, stream);
++    native_q2_0_mmvq(weights, scratch_q8_1, y, n_in, n_out, ncols, stream);
++}
++
++void native_q3_k_mmvq(const void* weights, const void* x_q8_1, float* y,
++                      int n_in, int n_out, int ncols, void* stream) {
++    validate_shape(n_in, ncols, 256);
++    if (n_out <= 0) throw std::invalid_argument("native MMVQ requires n_out > 0");
++    validate_pointer(weights);
++    validate_pointer(x_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    FREETOKEN_GGUF_WAVE_MMVQ(Q3KTraits)
++    if (ncols > 1) {
++        launch_multi<Q3KTraits>(weights, x_q8_1, y, n_in, n_out, ncols, stream);
++        launch_check();
++        return;
++    }
++    const auto* w = static_cast<const Q3KBlock*>(weights);
++    const auto* x = static_cast<const Q81Block*>(x_q8_1);
++    const auto s = static_cast<cudaStream_t>(stream);
++    const dim3 threads(WARP, WARPS);
++    if (n_in / 256 < WARPS * WARP / 16) {
++        const unsigned blocks = unsigned((std::size_t(n_out) + WARPS - 1) / WARPS);
++        native_q3_k_mmvq_kernel<true><<<blocks, threads, 0, s>>>(w, x, y, n_in, n_out);
++    } else {
++        native_q3_k_mmvq_kernel<false><<<unsigned(n_out), threads, 0, s>>>(w, x, y, n_in, n_out);
++    }
++    launch_check();
++}
++
++void native_q3_k_f32(const void* weights, const float* x, void* scratch_q8_1,
++                     float* y, int n_in, int n_out, int ncols, void* stream) {
++    validate_shape(n_in, ncols, 256);
++    if (n_out <= 0) throw std::invalid_argument("native MMVQ requires n_out > 0");
++    validate_pointer(weights);
++    validate_pointer(x);
++    validate_pointer(scratch_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    native_quantize_q8_1(x, scratch_q8_1, n_in, ncols, stream);
++    native_q3_k_mmvq(weights, scratch_q8_1, y, n_in, n_out, ncols, stream);
++}
++
++void native_iq4_xs_mmvq(const void* weights, const void* x_q8_1, float* y,
++                       int n_in, int n_out, int ncols, void* stream) {
++    validate_shape(n_in, ncols, 256);
++    if (n_out <= 0) throw std::invalid_argument("native MMVQ requires n_out > 0");
++    validate_pointer(weights);
++    validate_pointer(x_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    FREETOKEN_GGUF_WAVE_MMVQ(IQ4XSTraits)
++    if (ncols > 1) {
++        launch_multi<IQ4XSTraits>(weights, x_q8_1, y, n_in, n_out, ncols, stream);
++        launch_check();
++        return;
++    }
++    const auto* w = static_cast<const IQ4XSBlock*>(weights);
++    const auto* x = static_cast<const Q81Block*>(x_q8_1);
++    const auto s = static_cast<cudaStream_t>(stream);
++    const dim3 threads(WARP, WARPS);
++    if (n_in / 256 < 4 * WARPS * WARP / 32) {
++        const unsigned blocks = unsigned((std::size_t(n_out) + WARPS - 1) / WARPS);
++        native_iq4_xs_mmvq_kernel<true><<<blocks, threads, 0, s>>>(w, x, y, n_in, n_out);
++    } else {
++        native_iq4_xs_mmvq_kernel<false><<<unsigned(n_out), threads, 0, s>>>(w, x, y, n_in, n_out);
++    }
++    launch_check();
++}
++
++void native_iq4_xs_f32(const void* weights, const float* x, void* scratch_q8_1,
++                      float* y, int n_in, int n_out, int ncols, void* stream) {
++    validate_shape(n_in, ncols, 256);
++    if (n_out <= 0) throw std::invalid_argument("native MMVQ requires n_out > 0");
++    validate_pointer(weights);
++    validate_pointer(x);
++    validate_pointer(scratch_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    native_quantize_q8_1(x, scratch_q8_1, n_in, ncols, stream);
++    native_iq4_xs_mmvq(weights, scratch_q8_1, y, n_in, n_out, ncols, stream);
++}
++
++void native_q4_k_mmvq(const void* weights, const void* x_q8_1, float* y,
++                      int n_in, int n_out, int ncols, void* stream) {
++    validate_shape(n_in, ncols, 256);
++    if (n_out <= 0) throw std::invalid_argument("native MMVQ requires n_out > 0");
++    validate_pointer(weights);
++    validate_pointer(x_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    FREETOKEN_GGUF_WAVE_MMVQ(Q4KTraits)
++    if (ncols > 1) {
++        launch_multi<Q4KTraits>(weights, x_q8_1, y, n_in, n_out, ncols, stream);
++        launch_check();
++        return;
++    }
++    const auto* w = static_cast<const Q4KBlock*>(weights);
++    const auto* x = static_cast<const Q81Block*>(x_q8_1);
++    const auto s = static_cast<cudaStream_t>(stream);
++    const dim3 threads(WARP, WARPS);
++    if (n_in / 256 < WARPS * WARP / 16) {
++        const unsigned blocks = unsigned((std::size_t(n_out) + WARPS - 1) / WARPS);
++        native_q4_k_mmvq_kernel<true><<<blocks, threads, 0, s>>>(w, x, y, n_in, n_out);
++    } else {
++        native_q4_k_mmvq_kernel<false><<<unsigned(n_out), threads, 0, s>>>(w, x, y, n_in, n_out);
++    }
++    launch_check();
++}
++
++void native_q4_k_f32(const void* weights, const float* x, void* scratch_q8_1,
++                     float* y, int n_in, int n_out, int ncols, void* stream) {
++    validate_shape(n_in, ncols, 256);
++    if (n_out <= 0) throw std::invalid_argument("native MMVQ requires n_out > 0");
++    validate_pointer(weights);
++    validate_pointer(x);
++    validate_pointer(scratch_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    native_quantize_q8_1(x, scratch_q8_1, n_in, ncols, stream);
++    native_q4_k_mmvq(weights, scratch_q8_1, y, n_in, n_out, ncols, stream);
++}
++
++void native_q6_k_mmvq(const void* weights, const void* x_q8_1, float* y,
++                      int n_in, int n_out, int ncols, void* stream) {
++    if (q6_packed_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream)) return;   // FREETOKEN_GGUF_Q6_PACKED=1 heads
++    validate_shape(n_in, ncols, 256);
++    if (n_out <= 0) throw std::invalid_argument("native MMVQ requires n_out > 0");
++    validate_pointer(weights);
++    validate_pointer(x_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    FREETOKEN_GGUF_WAVE_MMVQ(Q6KTraits)
++    if (ncols > 1) {
++        launch_multi<Q6KTraits>(weights, x_q8_1, y, n_in, n_out, ncols, stream);
++        launch_check();
++        return;
++    }
++    const auto* w = static_cast<const Q6KBlock*>(weights);
++    const auto* x = static_cast<const Q81Block*>(x_q8_1);
++    const auto s = static_cast<cudaStream_t>(stream);
++    const dim3 threads(WARP, WARPS);
++    if (n_in / 256 < WARPS * WARP / 32) {
++        const unsigned blocks = unsigned((std::size_t(n_out) + WARPS - 1) / WARPS);
++        native_q6_k_mmvq_kernel<true><<<blocks, threads, 0, s>>>(w, x, y, n_in, n_out);
++    } else {
++        native_q6_k_mmvq_kernel<false><<<unsigned(n_out), threads, 0, s>>>(w, x, y, n_in, n_out);
++    }
++    launch_check();
++}
++
++void native_q6_k_f32(const void* weights, const float* x, void* scratch_q8_1,
++                     float* y, int n_in, int n_out, int ncols, void* stream) {
++    validate_shape(n_in, ncols, 256);
++    if (n_out <= 0) throw std::invalid_argument("native MMVQ requires n_out > 0");
++    validate_pointer(weights);
++    validate_pointer(x);
++    validate_pointer(scratch_q8_1);
++    validate_pointer(y);
++    validate_stream(stream);
++    native_quantize_q8_1(x, scratch_q8_1, n_in, ncols, stream);
++    native_q6_k_mmvq(weights, scratch_q8_1, y, n_in, n_out, ncols, stream);
++}
++
++void native_q4_0_mmvq(const void* weights, const void* x_q8_1, float* y,
++                       int n_in, int n_out, int ncols, void* stream) {
++    small_mmvq<Q40Block, 4>(weights, x_q8_1, y, n_in, n_out, ncols, stream);
++}
++
++void native_q4_0_f32(const void* weights, const float* x, void* scratch_q8_1,
++                      float* y, int n_in, int n_out, int ncols, void* stream) {
++    small_f32<Q40Block, 4>(weights, x, scratch_q8_1, y, n_in, n_out, ncols, stream);
++}
++
++void native_q5_0_mmvq(const void* weights, const void* x_q8_1, float* y,
++                       int n_in, int n_out, int ncols, void* stream) {
++    small_mmvq<Q50Block, 4>(weights, x_q8_1, y, n_in, n_out, ncols, stream);
++}
++
++void native_q5_0_f32(const void* weights, const float* x, void* scratch_q8_1,
++                      float* y, int n_in, int n_out, int ncols, void* stream) {
++    small_f32<Q50Block, 4>(weights, x, scratch_q8_1, y, n_in, n_out, ncols, stream);
++}
++
++template<int NCOLS>
++void q8_0_pair_launch(const Q80Block* w1, const Q80Block* w2, const Q81Block* x, float* y1, float* y2, int n_in, int n_out,
++                      cudaStream_t s) {
++    using F = SmallTraits<Q80Block, 8>;
++    const dim3 threads(WARP, WARPS);
++    if (s26_tsum_on())
++        native_mmvq_multi_kernel<F, NCOLS, WARPS, 1, true, true><<<unsigned(2 * n_out), threads, 0, s>>>(w1, x, y1, n_in, n_out, w2, y2);
++    else
++        native_mmvq_multi_kernel<F, NCOLS, WARPS, 1, false, true><<<unsigned(2 * n_out), threads, 0, s>>>(w1, x, y1, n_in, n_out, w2, y2);
++}
++
++bool native_mmvq_pair(int ggml_type, const void* w1, const void* w2, const void* x_q8_1, float* y1, float* y2,
++                      int n_in, int n_out, int ncols, void* stream) {
++    using F = SmallTraits<Q80Block, 8>;
++    // only where both calls would run native_mmvq_multi_kernel<F, ncols, WARPS, 1> (exact layout, not packed)
++    if (ggml_type != 8 || !g_multi_exact || ncols < 2 || ncols > 8 || n_out <= 0 || n_in <= 0 || n_in % 32 != 0 ||
++        n_in / F::DIV < F::BPI || !w1 || !w2 || !x_q8_1 || !y1 || !y2 || !stream)
++        return false;
++    const auto& reg = q8_packed_registry();
++    if (reg.count(w1) || reg.count(w2)) return false;
++    const auto* a = static_cast<const Q80Block*>(w1);
++    const auto* b = static_cast<const Q80Block*>(w2);
++    const auto* x = static_cast<const Q81Block*>(x_q8_1);
++    const auto s = static_cast<cudaStream_t>(stream);
++    switch (ncols) {
++        case 2: q8_0_pair_launch<2>(a, b, x, y1, y2, n_in, n_out, s); break;
++        case 3: q8_0_pair_launch<3>(a, b, x, y1, y2, n_in, n_out, s); break;
++        case 4: q8_0_pair_launch<4>(a, b, x, y1, y2, n_in, n_out, s); break;
++        case 5: q8_0_pair_launch<5>(a, b, x, y1, y2, n_in, n_out, s); break;
++        case 6: q8_0_pair_launch<6>(a, b, x, y1, y2, n_in, n_out, s); break;
++        case 7: q8_0_pair_launch<7>(a, b, x, y1, y2, n_in, n_out, s); break;
++        default: q8_0_pair_launch<8>(a, b, x, y1, y2, n_in, n_out, s); break;
++    }
++    launch_check();
++    return true;
++}
++
++void native_q8_0_mmvq(const void* weights, const void* x_q8_1, float* y,
++                       int n_in, int n_out, int ncols, void* stream) {
++    if (q8_packed_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream)) return;   // FREETOKEN_GGUF_Q8_PACKED=1 tensors
++    small_mmvq<Q80Block, 8>(weights, x_q8_1, y, n_in, n_out, ncols, stream);
++}
++
++void native_q8_0_f32(const void* weights, const float* x, void* scratch_q8_1,
++                      float* y, int n_in, int n_out, int ncols, void* stream) {
++    small_f32<Q80Block, 8>(weights, x, scratch_q8_1, y, n_in, n_out, ncols, stream);
++}
++
++void native_iq4_nl_mmvq(const void* weights, const void* x_q8_1, float* y,
++                       int n_in, int n_out, int ncols, void* stream) {
++    small_mmvq<IQ4NLBlock, 4>(weights, x_q8_1, y, n_in, n_out, ncols, stream);
++}
++
++void native_iq4_nl_f32(const void* weights, const float* x, void* scratch_q8_1,
++                      float* y, int n_in, int n_out, int ncols, void* stream) {
++    small_f32<IQ4NLBlock, 4>(weights, x, scratch_q8_1, y, n_in, n_out, ncols, stream);
++}
++
++bool native_mmvq_supported(int ggml_type) noexcept {
++    return ggml_type == 2 || ggml_type == 6 || ggml_type == 7 || ggml_type == 8 || ggml_type == 11 ||
++           ggml_type == 12 || ggml_type == 13 || ggml_type == 14 || ggml_type == 20 ||
++           ggml_type == 23 || ggml_type == 42 || ggml_type == 16 || ggml_type == 17 || ggml_type == 18 ||
++           ggml_type == 21 || ggml_type == 22 || ggml_type == 29;
++}
++
++std::size_t native_mmvq_weight_bytes(int ggml_type, int n_in, int n_out) {
++    int block_elems, block_bytes;
++    switch (ggml_type) {
++    case 2: block_elems = 32; block_bytes = 18; break;
++    case 6: block_elems = 32; block_bytes = 22; break;
++    case 7: block_elems = 32; block_bytes = 24; break;
++    case 8: block_elems = 32; block_bytes = 34; break;
++    case 20: block_elems = 32; block_bytes = 18; break;
++    case 11: block_elems = 256; block_bytes = 110; break;
++    case 12: block_elems = 256; block_bytes = 144; break;
++    case 13: block_elems = 256; block_bytes = 176; break;
++    case 14: block_elems = 256; block_bytes = 210; break;
++    case 23: block_elems = 256; block_bytes = 136; break;
++    case 42: block_elems = 64; block_bytes = 18; break;
++    case 16: case 17: case 18: case 21: case 22: case 29:
++        block_elems = 256; block_bytes = (int) iq_row_bytes(ggml_type, 256); break;
++    default: throw std::invalid_argument("unsupported native MMVQ GGML type");
++    }
++    validate_shape(n_in, 1, block_elems);
++    if (n_out <= 0) throw std::invalid_argument("native MMVQ requires n_out > 0");
++    const std::size_t row_bytes = std::size_t(n_in / block_elems) * block_bytes;
++    if (row_bytes > std::numeric_limits<std::size_t>::max() / std::size_t(n_out)) {
++        throw std::length_error("native MMVQ weight byte count overflows size_t");
++    }
++    return row_bytes * std::size_t(n_out);
++}
++
++void native_mmvq(int ggml_type, const void* weights, const void* x_q8_1, float* y,
++                 int n_in, int n_out, int ncols, void* stream) {
++    switch (ggml_type) {
++    case 2: native_q4_0_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
++    case 6: native_q5_0_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
++    case 7: iq_mmvq(ggml_type, weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
++    case 8: native_q8_0_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
++    case 20: native_iq4_nl_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
++    case 11: native_q3_k_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
++    case 12: native_q4_k_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
++    case 13: native_q5_k_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
++    case 14: native_q6_k_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
++    case 23: native_iq4_xs_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
++    case 42: native_q2_0_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
++    case 16: case 17: case 18: case 21: case 22: case 29:
++        iq_mmvq(ggml_type, weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
++    default: throw std::invalid_argument("unsupported native MMVQ GGML type");
++    }
++}
++
++#if !defined(__HIPCC__)
++std::size_t native_q8_1_il_bytes(int n_in, int ncols) {
++    validate_shape(n_in, ncols);
++    return std::size_t(n_in / Q8K) * std::size_t(native_q8_1_il_cp(ncols)) * (16 * sizeof(int) + sizeof(float));
++}
++
++void native_q8_1_interleave(const void* x_q8_1, void* x_il, int n_in, int ncols, void* stream) {
++    validate_shape(n_in, ncols);
++    if (ncols < 2 || ncols > 4) throw std::invalid_argument("native_q8_1_interleave requires 2 <= ncols <= 4");
++    validate_pointer(x_q8_1);
++    validate_pointer(x_il);
++    validate_stream(stream);
++    const int nb = n_in / Q8K, cp = native_q8_1_il_cp(ncols);
++    const Q81IlParts parts = q8_1_il_parts(x_il, n_in, ncols);
++    const int n_total = nb * 8 * ncols;
++    native_q8_1_interleave_kernel<<<unsigned((n_total + 255) / 256), 256, 0, static_cast<cudaStream_t>(stream)>>>(
++        static_cast<const Q81Block*>(x_q8_1), const_cast<int*>(parts.bm), const_cast<int*>(parts.pm),
++        const_cast<float*>(parts.d), nb, n_total, cp);
++    launch_check();
++}
++
++namespace {
++// Rows a warp at 2-4 columns ([ncols - 2]) by the matrix's row count, in classes: below 2048 (the keys' 512), 4096 (the
++// output projections' 2560), 8192 (the gate projection's 6144), 12288 (qkv's 10240), and more (the queries' 12288, the
++// head's 248K); 0: native_mmvq's kernels. The fork tuned its table on an RTX 3090. This one is read off
++// mmvq_il_parity --bench on an RTX 3060 (sm_86) and an RTX 5070 (sm_120) together: per cell the rows count (1/2/4) whose
++// worse card still takes at least 3% off native_mmvq's time, else 0; classes without a measured shape take their
++// neighbour's value. Every choice is bitwise the same output, so the table is only speed.
++struct IlRows { int type; uint8_t r[3][5]; };
++constexpr IlRows kIlRows[] = {
++    {23, {{0, 0, 0, 0, 0}, {0, 0, 2, 4, 4}, {0, 1, 1, 1, 1}}},   // IQ4_XS
++    {12, {{0, 0, 1, 1, 1}, {0, 1, 1, 1, 1}, {0, 1, 1, 1, 1}}},   // Q4_K
++    {13, {{0, 0, 1, 1, 1}, {0, 4, 1, 1, 1}, {0, 1, 1, 1, 2}}},   // Q5_K
++    {14, {{0, 0, 1, 1, 0}, {0, 0, 1, 1, 2}, {0, 0, 1, 1, 1}}},   // Q6_K
++};
++int il_rows(int type, int ncols, int n_out) {
++    const int cls = n_out < 2048 ? 0 : n_out < 4096 ? 1 : n_out < 8192 ? 2 : n_out < 12288 ? 3 : 4;
++    for (const IlRows& e : kIlRows)
++        if (e.type == type) return e.r[ncols - 2][cls];
++    return 0;
++}
++int g_tune_rows = 0;   // native_mmvq_il_tune (tests, benchmarks): rows a warp for every shape (0: the table)
++}  // namespace
++void native_mmvq_il_tune(int rows) { g_tune_rows = rows; }
++
++namespace {
++// sm_80 and newer only (measured on sm_86 and sm_120): Pascal/Volta/Turing keep native_mmvq's kernels unchanged
++bool il_arch_ok() {
++    static int ok[16] = {};   // 0 unknown, 1 yes, -1 no, by device ordinal
++    int dev = 0;
++    if (cudaGetDevice(&dev) != cudaSuccess || dev < 0 || dev >= 16) return false;
++    if (ok[dev] == 0) {
++        int major = 0;
++        ok[dev] = (cudaDeviceGetAttribute(&major, cudaDevAttrComputeCapabilityMajor, dev) == cudaSuccess && major >= 8) ? 1 : -1;
++    }
++    return ok[dev] > 0;
++}
++}  // namespace
++
++bool native_mmvq_il_supported(int ggml_type, int ncols, int n_out) {
++    if (ncols < 2 || ncols > 4 || !g_multi_exact || !il_arch_ok()) return false;
++    return (g_tune_rows ? g_tune_rows : il_rows(ggml_type, ncols, n_out)) != 0 &&
++           (ggml_type == 23 || ggml_type == 12 || ggml_type == 13 || ggml_type == 14);
++}
++
++void native_mmvq_il(int ggml_type, const void* weights, const void* x_q8_1, const void* x_il, float* y, int n_in,
++                    int n_out, int ncols, void* stream) {
++    if (!native_mmvq_il_supported(ggml_type, ncols, n_out)) {
++        native_mmvq(ggml_type, weights, x_q8_1, y, n_in, n_out, ncols, stream);
++        return;
++    }
++    const int r = g_tune_rows ? g_tune_rows : il_rows(ggml_type, ncols, n_out);
++    validate_shape(n_in, ncols, QK);
++    validate_pointer(weights);
++    validate_pointer(x_il);
++    validate_pointer(y);
++    validate_stream(stream);
++    const auto s = static_cast<cudaStream_t>(stream);
++    switch (ggml_type) {
++    case 23: launch_il_rows<IlIQ4XS>(r, weights, x_il, y, n_in, n_out, ncols, s); break;
++    case 12: launch_il_rows<IlQ4K>(r, weights, x_il, y, n_in, n_out, ncols, s); break;
++    case 13: launch_il_rows<IlQ5K>(r, weights, x_il, y, n_in, n_out, ncols, s); break;
++    case 14: launch_il_rows<IlQ6K>(r, weights, x_il, y, n_in, n_out, ncols, s); break;
++    }
++    launch_check();
++}
++
++#else  // HIP: no interleaved path
++std::size_t native_q8_1_il_bytes(int n_in, int ncols) { return native_q8_1_bytes(n_in, ncols) * 2; }
++void native_q8_1_interleave(const void*, void*, int, int, void*) {
++    throw std::invalid_argument("native_q8_1_interleave is CUDA only");
++}
++bool native_mmvq_il_supported(int, int, int) { return false; }
++void native_mmvq_il(int ggml_type, const void* weights, const void* x_q8_1, const void*, float* y, int n_in, int n_out,
++                    int ncols, void* stream) {
++    native_mmvq(ggml_type, weights, x_q8_1, y, n_in, n_out, ncols, stream);
++}
++void native_mmvq_il_tune(int) {}
++#endif  // !__HIPCC__
++
++} // namespace freetoken::gguf_native
+diff --git a/python/freetoken/kernel/csrc/third_party/strata_mmvq/src/kernels/cuda/q8_1_il.cuh b/python/freetoken/kernel/csrc/third_party/strata_mmvq/src/kernels/cuda/q8_1_il.cuh
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/kernel/csrc/third_party/strata_mmvq/src/kernels/cuda/q8_1_il.cuh
+@@ -0,0 +1,99 @@
++// src/kernels/cuda/q8_1_il.cuh - the interleaved copy of 2..8 q8_1 activation columns (native_mmvq.hpp) as the
++// multi-column dot products read it, for native_mmvq.cu and iq_kernels.cu.
++#pragma once
++
++#include "strata/kernels/native_mmvq.hpp"
++
++#include <cuda_fp16.h>
++#include <cuda_runtime.h>
++
++#include <cstddef>
++#include <cstdint>
++
++namespace freetoken::gguf_native {
++namespace {
++
++// NC columns of the block-major (PM false) or position-major copy: u(b, p, o) = int p of q8_1 block b of every column,
++// scales(b, o) = their scales
++template <int NC, bool PM> struct Q81Il {
++    static constexpr int CP = native_q8_1_il_cp(NC);
++    const int* __restrict__ q;
++    const float* __restrict__ d;
++    int nb;   // blocks a column
++    __device__ __forceinline__ void u(int b, int p, int (&o)[NC]) const {
++        const int* s = q + std::size_t(PM ? p * nb + b : b * 8 + p) * CP;
++        if constexpr (CP == 2) {
++            const int2 a = *reinterpret_cast<const int2*>(s);
++            o[0] = a.x;
++            o[1] = a.y;
++        } else {
++            const int4 a = *reinterpret_cast<const int4*>(s);
++            o[0] = a.x;
++            if constexpr (NC > 1) o[1] = a.y;
++            if constexpr (NC > 2) o[2] = a.z;
++            if constexpr (NC > 3) o[3] = a.w;
++            if constexpr (NC > 4) {
++                const int4 e = *reinterpret_cast<const int4*>(s + 4);
++                o[4] = e.x;
++                if constexpr (NC > 5) o[5] = e.y;
++                if constexpr (NC > 6) o[6] = e.z;
++                if constexpr (NC > 7) o[7] = e.w;
++            }
++        }
++    }
++    __device__ __forceinline__ void scales(int b, float (&o)[NC]) const {
++        const float* s = d + std::size_t(b) * CP;
++        if constexpr (CP == 2) {
++            const float2 a = *reinterpret_cast<const float2*>(s);
++            o[0] = a.x;
++            o[1] = a.y;
++        } else {
++            const float4 a = *reinterpret_cast<const float4*>(s);
++            o[0] = a.x;
++            if constexpr (NC > 1) o[1] = a.y;
++            if constexpr (NC > 2) o[2] = a.z;
++            if constexpr (NC > 3) o[3] = a.w;
++            if constexpr (NC > 4) {
++                const float4 e = *reinterpret_cast<const float4*>(s + 4);
++                o[4] = e.x;
++                if constexpr (NC > 5) o[5] = e.y;
++                if constexpr (NC > 6) o[6] = e.z;
++                if constexpr (NC > 7) o[7] = e.w;
++            }
++        }
++    }
++};
++
++// One column's plain q8_1 blocks (36 bytes: the half2 scale and sum, then 32 codes) behind Q81Il's interface
++struct Q81One {
++    const uint8_t* __restrict__ x;
++    __device__ __forceinline__ void u(int b, int p, int (&o)[1]) const {
++        o[0] = reinterpret_cast<const int*>(x + std::size_t(b) * 36 + 4)[p];
++    }
++    __device__ __forceinline__ void scales(int b, float (&o)[1]) const {
++        o[0] = __low2float(*reinterpret_cast<const half2*>(x + std::size_t(b) * 36));
++    }
++};
++
++// The activations a kernel for NC columns reads: one column's q8_1 blocks, 2+ columns' interleaved copy (nb blocks a
++// column)
++template <int NC, bool PM>
++__device__ __forceinline__ auto q8_1_cols(const void* xq, const float* xd, int nb) {
++    if constexpr (NC == 1) return Q81One{static_cast<const uint8_t*>(xq)};
++    else return Q81Il<NC, PM>{static_cast<const int*>(xq), xd, nb};
++}
++
++// The copy's parts inside the buffer native_q8_1_il_bytes sizes: bm, pm (int32) and d (float).
++struct Q81IlParts {
++    const int* bm;
++    const int* pm;
++    const float* d;
++};
++inline Q81IlParts q8_1_il_parts(const void* x_il, int n_in, int ncols) {
++    const std::size_t words = std::size_t(n_in / 32) * 8 * std::size_t(native_q8_1_il_cp(ncols));
++    const int* bm = static_cast<const int*>(x_il);
++    return {bm, bm + words, reinterpret_cast<const float*>(bm + 2 * words)};
++}
++
++}  // namespace
++}  // namespace freetoken::gguf_native
+diff --git a/python/freetoken/kernel/csrc/third_party/strata_mmvq/src/kernels/cuda/s26_tsum.cuh b/python/freetoken/kernel/csrc/third_party/strata_mmvq/src/kernels/cuda/s26_tsum.cuh
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/kernel/csrc/third_party/strata_mmvq/src/kernels/cuda/s26_tsum.cuh
+@@ -0,0 +1,71 @@
++// S26: several warp sums at once (P per-lane values -> P sums), bitwise equal to P separate xor-butterfly warp sums
++// (`for (o = 16; o > 0; o >>= 1) v += shfl_xor(v, o)`).  At offset 16 a lane keeps half of its P values and adds the
++// partner's copy of that half, at 8 half again, ... until one value is left, then plain xor steps for the remaining
++// offsets.  Every level adds the same pair of values as the butterfly does (fp add commutes, so x + y == y + x
++// bitwise), only each lane carries fewer of them: P - 1 + (5 - log2 P) cross-lane moves instead of 5 P.  Value j's sum
++// ends in the lanes whose bits 4, 3, .. (MSB first) spell j: tsum_lane<P>(j) is one of them.  On AMD the moves are
++// DPP row_xmask / permlanex16 instead of ds_bpermute.
++#pragma once
++
++#include <cuda_runtime.h>   // (before the first use of __forceinline__ / __float_as_int: a gfx906 build gets them from its shim)
++
++namespace freetoken::gguf_native::s26ts {
++
++#if defined(__HIP_PLATFORM_AMD__) && !defined(FREETOKEN_GGUF_HIP_GFX906)   // (permlanex16 / DPP row_xmask: gfx10+ only)
++__device__ __forceinline__ float xmov16(float v) {
++    return __int_as_float(__builtin_amdgcn_permlanex16(__float_as_int(v), __float_as_int(v), 0x76543210u, 0xfedcba98u,
++                                                       false, false));
++}
++template <int O>
++__device__ __forceinline__ float xmov(float v) {
++    if constexpr (O == 16) return xmov16(v);
++    else return __int_as_float(__builtin_amdgcn_update_dpp(0, __float_as_int(v), 0x160 + O, 0xf, 0xf, false));
++}
++#else
++template <int O>
++__device__ __forceinline__ float xmov(float v) { return __shfl_xor_sync(0xffffffffu, v, O); }
++#endif
++
++__host__ __device__ constexpr int pow2_ceil(int t) { return t <= 1 ? 1 : t <= 2 ? 2 : t <= 4 ? 4 : t <= 8 ? 8 : t <= 16 ? 16 : 32; }
++__host__ __device__ constexpr int log2c(int p) { return p <= 1 ? 0 : p == 2 ? 1 : p == 4 ? 2 : p == 8 ? 3 : p == 16 ? 4 : 5; }
++
++template <int O>
++__device__ __forceinline__ float tplain(float x) {
++    if constexpr (O >= 1) { x += xmov<O>(x); return tplain<O / 2>(x); }
++    else return x;
++}
++// v[0..CNT) (CNT a power of two <= 32): this lane's values; returns the sum of value tsum_token<CNT>(lane)
++template <int CNT, int O = 16>
++__device__ __forceinline__ float tsum(float* v, int lane) {
++    if constexpr (CNT > 1) {
++        constexpr int H = CNT / 2;
++        const bool hi = (lane & O) != 0;
++#pragma unroll
++        for (int j = 0; j < H; ++j) {
++            const float send = hi ? v[j] : v[j + H];
++            const float keep = hi ? v[j + H] : v[j];
++            v[j] = keep + xmov<O>(send);
++        }
++        return tsum<H, O / 2>(v, lane);
++    } else {
++        return tplain<O>(v[0]);
++    }
++}
++template <int P>
++__device__ __forceinline__ int tsum_token(int lane) {
++    constexpr int L = log2c(P);
++    int k = 0;
++#pragma unroll
++    for (int b = 0; b < L; ++b) k = (k << 1) | ((lane >> (4 - b)) & 1);
++    return k;
++}
++template <int P>
++__device__ __forceinline__ int tsum_lane(int k) {
++    constexpr int L = log2c(P);
++    int lane = 0;
++#pragma unroll
++    for (int b = 0; b < L; ++b) lane |= ((k >> (L - 1 - b)) & 1) << (4 - b);
++    return lane;
++}
++
++}  // namespace freetoken::gguf_native::s26ts
+diff --git a/python/freetoken/kernel/csrc/third_party/strata_mmvq/UPSTREAM.json b/python/freetoken/kernel/csrc/third_party/strata_mmvq/UPSTREAM.json
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/kernel/csrc/third_party/strata_mmvq/UPSTREAM.json
+@@ -0,0 +1,67 @@
++{
++  "upstream": "https://github.com/Niko1221/Strata",
++  "commit": "6674a0065fb96bacde33e3eb10f91a1df86f95f2",
++  "ggml_commit": "3cf03257f219afbe7334045ff7c6a06ac68c627d",
++  "files": [
++    {
++      "upstream_path": "src/kernels/cuda/native_mmvq.cu",
++      "upstream_blob_sha256": "222d897f638039bb2f410d3499fef4227236afe78d504fe9ddb3103eeb477465",
++      "ported_lf_sha256": "e5e45b00b65acb20484fc42a9e8bad871380c9a4201197e4a63b48798666b635"
++    },
++    {
++      "upstream_path": "src/kernels/cuda/s26_tsum.cuh",
++      "upstream_blob_sha256": "9d48c241a67096c4d57d10e0a0e7f8f20197ac91754c32889527c0550ce0a695",
++      "ported_lf_sha256": "57b54dcb6989df4927d408c6f9d0b837b8aca12a2fd9298cb7fdc0ea886f38ad"
++    },
++    {
++      "upstream_path": "src/kernels/cuda/q8_1_il.cuh",
++      "upstream_blob_sha256": "dcadd11672258a9307daf71ad214f5931127f49abb935e7ccf580277b2bf010b",
++      "ported_lf_sha256": "119ff59dc9d6d2c06368fa8ba96e15c778fff15e9dc1774009712de7f881d6f7"
++    },
++    {
++      "upstream_path": "include/strata/kernels/native_mmvq.hpp",
++      "upstream_blob_sha256": "9422f41002723c43ba396c26aa93f377a67c74a24255b9319167c5cc01eb6c4d",
++      "ported_lf_sha256": "c6936273a840945fcbb55772bf68c80a18d9c6b6255a40c2dfc00413aa80db36"
++    },
++    {
++      "upstream_path": "include/strata/kernels/dp4a.hpp",
++      "upstream_blob_sha256": "b4ca42cf7b4d99dcaf69ff7d8153112f1e1ce6dc32e486fd8b152ddf915366ab",
++      "ported_lf_sha256": "daa2d5a3ee504d83c47c9bc2292e7920bd9a0383a4339a36c16651f26b1034aa"
++    },
++    {
++      "upstream_path": "include/strata/kernels/q8_1_finite.hpp",
++      "upstream_blob_sha256": "6789c75d692ef1cf21a07d8d602e5cf35ad40657b715f8d510cf7ddad1162598",
++      "ported_lf_sha256": "2f15bc57fcc16e87952da9bdbeaa02a1fb4d09fc9b229b2013092e9243082e6a"
++    },
++    {
++      "upstream_path": "include/strata/kernels/iq_kernels.hpp",
++      "upstream_blob_sha256": "e3750f39de3957ff8bbd0ecc9d77d0e394f34984935f528c908d107aa62a62b3",
++      "ported_lf_sha256": "ca1dd40ca67b78512c385657dcbbc68f9b91974ec36ef2a36134d6fe0dc10058"
++    },
++    {
++      "upstream_path": "include/strata/kernels/pdl.hpp",
++      "upstream_blob_sha256": "fd3e1d2122aa3c8dbd2abd45089139e8f22852664c75b694acf7f96903d07c08",
++      "ported_lf_sha256": "622be5b52785116a75cbb0bd423651d4d5e59f9fe5e52f2da3dee86d176da267"
++    },
++    {
++      "upstream_path": "LICENSE",
++      "upstream_blob_sha256": "949b9b0aada7476006469e58ee4ffb0e0f68c2d9137e90a356757b61a09d37f0",
++      "ported_path": "LICENSE-strata.txt",
++      "ported_lf_sha256": "949b9b0aada7476006469e58ee4ffb0e0f68c2d9137e90a356757b61a09d37f0"
++    },
++    {
++      "upstream_path": "third_party/ggml/LICENSE",
++      "upstream_blob_sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
++      "ported_path": "LICENSE-ggml.txt",
++      "ported_lf_sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
++    }
++  ],
++  "transformations": [
++    "C++ namespace strata::kernels -> freetoken::gguf_native",
++    "STRATA_ macro/environment names -> FREETOKEN_GGUF_",
++    "Allow explicit CUDA default-stream handle 0; CUDA launch errors remain checked"
++  ],
++  "external_runtime_dependency": false,
++  "license": "MIT",
++  "scope": "GGUF GPU Q8_1 quantizer and MMVQ only. External IQ dispatcher is unsupported and rejected; PDL disabled for FreeToken graph ordering."
++}
+diff --git a/python/freetoken/kernel/gguf_native.py b/python/freetoken/kernel/gguf_native.py
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/kernel/gguf_native.py
+@@ -0,0 +1,92 @@
++"""GGUF GPU vector kernels through FreeToken's versioned AOT/JIT module loader."""
++from functools import lru_cache
++
++import torch
++import triton
++import triton.language as tl
++
++from .utils import KERNEL_PATH, load_jit
++
++NATIVE_TYPES = frozenset((2, 6, 8, 11, 12, 13, 14, 20, 23, 42))
++
++
++@lru_cache(maxsize=1)
++def _module(*, build_directory=None):
++    return load_jit(
++        "gguf_mmvq_r1", cuda_files=["gguf_mmvq.cuh"],
++        cuda_wrappers=[("quantize", "GGUFNativeMMVQ::quantize"), ("project", "GGUFNativeMMVQ::project")],
++        extra_cuda_cflags=["--use_fast_math"],
++        extra_include_paths=[str(KERNEL_PATH / "third_party/strata_mmvq/include")],
++        build_directory=build_directory,
++    )
++
++
++def quantize_q8_1(x):
++    if x.ndim != 2 or x.dtype != torch.float32 or not x.is_cuda or x.shape[1] % 32:
++        raise ValueError("Native Q8_1 requires a CUDA FP32 matrix of width divisible by 32")
++    q = torch.empty((len(x), x.shape[1] // 32, 36), device=x.device, dtype=torch.uint8)
++    if len(x):
++        with torch.cuda.device(x.device):
++            _module().quantize(x.contiguous(), q, torch.cuda.current_stream(x.device).cuda_stream)
++    return q
++
++
++def mmvq(packed, q8, rows, type_id, *, out=None):
++    if type_id not in NATIVE_TYPES:
++        raise ValueError("Native MMVQ does not implement this GGUF format")
++    if q8.ndim != 3 or q8.shape[2] != 36 or q8.dtype != torch.uint8 or not q8.is_cuda:
++        raise ValueError("Native MMVQ requires a packed CUDA Q8_1 matrix")
++    if rows <= 0:
++        raise ValueError("Native MMVQ output width must be positive")
++    if out is None:
++        out = torch.empty((len(q8), rows), device=q8.device, dtype=torch.float32)
++    if out.shape != (len(q8), rows) or out.dtype != torch.float32 or out.device != q8.device:
++        raise ValueError("Native MMVQ output shape, device or precision differs")
++    if not len(q8):
++        return out
++    target = out if out.is_contiguous() else torch.empty((len(q8), rows), device=q8.device, dtype=torch.float32)
++    with torch.cuda.device(q8.device):
++        _module().project(packed, q8.contiguous(), target, type_id, q8.shape[1] * 32,
++                          torch.cuda.current_stream(q8.device).cuda_stream)
++        if target is not out:
++            out.copy_(target)
++    return out
++
++
++@triton.jit
++def _bf16_rows(W0, W1, X, Y, N0: tl.constexpr, N: tl.constexpr, K: tl.constexpr,
++               XS0: tl.constexpr, XS1: tl.constexpr, YS0: tl.constexpr, YS1: tl.constexpr,
++               BK: tl.constexpr):
++    row, token = tl.program_id(0), tl.program_id(1)
++    cols = tl.arange(0, BK)
++    w = tl.where(row < N0, W0 + row * K, W1 + (row - N0) * K)
++    acc = tl.full((BK,), 0., tl.float32)
++    for first in range(triton.cdiv(K, BK)):
++        ks = first * BK + cols
++        weight = tl.load(w + ks, ks < K, 0).to(tl.float32)
++        x = tl.load(X + token * XS0 + ks * XS1, ks < K, 0).to(tl.float32)
++        acc += weight * x
++    tl.store(Y + token * YS0 + row * YS1, tl.sum(acc, 0))
++
++
++def bf16_gemv(packed, x, rows, *, out=None, packed1=None, first_rows=None):
++    if x.ndim != 2 or x.dtype != torch.float32 or not x.is_cuda or rows <= 0:
++        raise ValueError("BF16 GEMV requires a CUDA FP32 matrix and positive output width")
++    if out is None:
++        out = torch.empty((len(x), rows), device=x.device, dtype=torch.float32)
++    if out.shape != (len(x), rows) or out.dtype != torch.float32 or out.device != x.device:
++        raise ValueError("BF16 GEMV output geometry differs")
++    if not len(x):
++        return out
++    n0 = rows if first_rows is None else first_rows
++    if not 0 < n0 <= rows:
++        raise ValueError("BF16 GEMV segment split is invalid")
++    p1 = packed if packed1 is None else packed1
++    if (packed.dtype != torch.uint8 or packed.device != x.device or not packed.is_contiguous()
++            or packed.numel() != n0 * x.shape[1] * 2
++            or p1.dtype != torch.uint8 or p1.device != x.device or not p1.is_contiguous()
++            or (n0 < rows and (packed1 is None or p1.numel() != (rows - n0) * x.shape[1] * 2))):
++        raise ValueError("BF16 GEMV packed segment geometry differs")
++    _bf16_rows[(rows, len(x))](packed.view(torch.bfloat16), p1.view(torch.bfloat16), x, out,
++        n0, rows, x.shape[1], *x.stride(), *out.stride(), 256, num_warps=4, enable_fp_fusion=False)
++    return out
+diff --git a/python/freetoken/kernel/gguf_quant.py b/python/freetoken/kernel/gguf_quant.py
+--- a/python/freetoken/kernel/gguf_quant.py
++++ b/python/freetoken/kernel/gguf_quant.py
+@@ -281,10 +281,16 @@
+     return gate
+ 
+ 
+-def compressed_linear(packed, x, rows, type_id, *, quantize_input=True, out=None, q8_source=None):
++def compressed_linear(packed, x, rows, type_id, *, quantize_input=True, out=None, q8_source=None, native_q8=None):
+     """压缩权重直接参与 FP32 GEMV；BF16/F16/F32 权重保留 FP32 激活。"""
+     block, size = _geometry(type_id)
+     width = x.shape[-1]
++    from .gguf_native import NATIVE_TYPES, bf16_gemv, mmvq, quantize_q8_1
++    if type_id == 30:
++        return bf16_gemv(packed, x, rows, out=out)
++    if type_id in NATIVE_TYPES and (quantize_input or native_q8 is not None):
++        q8 = quantize_q8_1(x) if native_q8 is None else native_q8
++        return mmvq(packed, q8, rows, type_id, out=out)
+     if quantize_input and type_id not in (0, 1, 30):
+         q8_source = x
+         x = quantize_activation(x)
+diff --git a/python/freetoken/layers/quantization/linear/gguf.py b/python/freetoken/layers/quantization/linear/gguf.py
+--- a/python/freetoken/layers/quantization/linear/gguf.py
++++ b/python/freetoken/layers/quantization/linear/gguf.py
+@@ -16,20 +16,30 @@
+ 
+     def apply(self, layer, x):
+         """同一输入只量化一次，各投影段写入对应切片，HC 对齐尾部显式填零。"""
+-        from freetoken.kernel.gguf_quant import compressed_linear, quantize_activation
++        from freetoken.kernel.gguf_quant import compressed_linear
++        from freetoken.kernel.gguf_native import NATIVE_TYPES, bf16_gemv, quantize_q8_1
+         cfg = layer.quant_method.cfg
+         output = torch.empty((x.shape[0], cfg.out_features), device=x.device, dtype=torch.float32)
+         quantized = None
+         cursor = 0
++        if len(cfg.segments) == 2 and all(t.type_id == 30 for t in cfg.segments):
++            sizes = [t.nbytes // t.row_bytes for t in cfg.segments]
++            cursor = sum(sizes)
++            bf16_gemv(layer.packed_0, x, cursor, out=output[:, :cursor],
++                      packed1=layer.packed_1, first_rows=sizes[0])
++            if cursor < cfg.out_features:
++                output[:, cursor:].zero_()
++            if layer.bias is not None:
++                output += layer.bias
++            return output
+         for index, tensor in enumerate(cfg.segments):
+             count = tensor.nbytes // tensor.row_bytes
+-            activation = x
+-            if tensor.type_id not in (0, 1, 30):
++            if tensor.type_id in NATIVE_TYPES:
+                 if quantized is None:
+-                    quantized = quantize_activation(x)
+-                activation = quantized
+-            compressed_linear(getattr(layer, f"packed_{index}"), activation, count, tensor.type_id,
+-                              quantize_input=False, out=output[:, cursor:cursor + count], q8_source=x)
++                    quantized = quantize_q8_1(x)
++            compressed_linear(getattr(layer, f"packed_{index}"), x, count, tensor.type_id,
++                              quantize_input=False, out=output[:, cursor:cursor + count],
++                              native_q8=quantized if tensor.type_id in NATIVE_TYPES else None)
+             cursor += count
+         if cursor < cfg.out_features:
+             output[:, cursor:].zero_()
+diff --git a/python/freetoken/version.py b/python/freetoken/version.py
+--- a/python/freetoken/version.py
++++ b/python/freetoken/version.py
+@@ -1 +1 @@
+-__version__ = "0.1.3+speed.strataq2dev3"
++__version__ = "0.1.3+speed.strataq2dev4"
+diff --git a/tests/models/qwen4_exp/test_gguf_execution.py b/tests/models/qwen4_exp/test_gguf_execution.py
+--- a/tests/models/qwen4_exp/test_gguf_execution.py
++++ b/tests/models/qwen4_exp/test_gguf_execution.py
+@@ -5,6 +5,71 @@
+ 
+ @unittest.skipUnless(torch.cuda.is_available(), "requires CUDA")
+ class GGUFExecutionConsistencyTests(unittest.TestCase):
++    def test_native_q8_graph_and_layout(self):
++        from freetoken.kernel.gguf_native import quantize_q8_1, mmvq
++        stream = torch.cuda.Stream()
++        with torch.cuda.stream(stream):
++            torch.manual_seed(839)
++            raw = torch.randn((19, 512), device="cuda")
++            x = raw[:, ::2]
++            q = quantize_q8_1(x)
++            weight = torch.zeros((17, 4, 18), device="cuda", dtype=torch.uint8)
++            weight[..., :2] = torch.full((17, 4), .125, device="cuda").half().view(torch.uint8).reshape(17, 4, 2)
++            weight[..., 2:] = 0b10110100
++            p = weight.flatten()
++            a = mmvq(p, q, 17, 42)
++            separate = torch.cat([mmvq(p, quantize_q8_1(x[i:i+1]), 17, 42) for i in range(len(x))])
++            torch.testing.assert_close(a, separate, rtol=3e-5, atol=3e-5)
++            out = torch.empty((19, 40), device="cuda")[:, 2:36:2]
++            mmvq(p, q, 17, 42, out=out)
++            torch.testing.assert_close(out, a, rtol=0, atol=0)
++            # A replay must read changed inputs rather than a captured output.
++            fixed = x.contiguous()
++            quantize_q8_1(fixed)
++            graph = torch.cuda.CUDAGraph()
++            with torch.cuda.graph(graph, stream=stream):
++                captured = mmvq(p, quantize_q8_1(fixed), 17, 42)
++            fixed.mul_(1.5)
++            graph.replay()
++            expected = mmvq(p, quantize_q8_1(fixed), 17, 42)
++            torch.testing.assert_close(captured, expected, rtol=0, atol=0)
++        stream.synchronize()
++
++    def test_native_mmvq_rejects_bad_binding_geometry(self):
++        from freetoken.kernel.gguf_native import _module, quantize_q8_1, mmvq
++        stream = torch.cuda.Stream()
++        with torch.cuda.stream(stream):
++            x = torch.zeros((2, 256), device="cuda")
++            q = quantize_q8_1(x)
++            p = torch.zeros(17 * 4 * 18, device="cuda", dtype=torch.uint8)
++            y = torch.empty((2, 17), device="cuda")
++            with self.assertRaises((RuntimeError, ValueError)):
++                _module().project(p[:-1], q, y, 42, 256, stream.cuda_stream)
++            with self.assertRaises((RuntimeError, ValueError)):
++                _module().project(p, q, y, 29, 256, stream.cuda_stream)
++            alias = torch.empty(2 * 256 * 4, device="cuda", dtype=torch.uint8)
++            with self.assertRaises((RuntimeError, ValueError)):
++                _module().quantize(alias.view(torch.float32).reshape(2, 256),
++                                   alias[:2*8*36].reshape(2, 8, 36), stream.cuda_stream)
++            self.assertEqual(mmvq(p, q[:0], 17, 42).shape, (0, 17))
++        stream.synchronize()
++
++    def test_bf16_fusion_bias_padding_and_strides(self):
++        from types import SimpleNamespace
++        from freetoken.layers.quantization.linear.gguf import GGUFLinearKernel
++        torch.manual_seed(151)
++        x = torch.randn((11, 512), device="cuda")[:, ::2]
++        w0 = torch.randn((17, 256), device="cuda").bfloat16()
++        w1 = torch.randn((3, 256), device="cuda").bfloat16()
++        segments = tuple(SimpleNamespace(type_id=30, nbytes=n*256*2, row_bytes=256*2) for n in (17,3))
++        bias = torch.randn(24, device="cuda")
++        layer = SimpleNamespace(quant_method=SimpleNamespace(cfg=SimpleNamespace(out_features=24, segments=segments)),
++            packed_0=w0.view(torch.uint8).flatten(), packed_1=w1.view(torch.uint8).flatten(), bias=bias)
++        got = GGUFLinearKernel().apply(layer, x)
++        reference = torch.cat([x@w0.float().T, x@w1.float().T], dim=1)+bias[:20]
++        torch.testing.assert_close(got[:, :20], reference, rtol=3e-4, atol=3e-4)
++        torch.testing.assert_close(got[:, 20:], bias[20:].expand(11,4), rtol=0, atol=0)
++
+     def test_qk_norm_is_independent_of_batch_size(self):
+         from freetoken.layers.norm import GemmaPlusOneRMSNorm
+         from freetoken.models.qwen4_exp.gguf_weight import declare_fp32_small_parameters

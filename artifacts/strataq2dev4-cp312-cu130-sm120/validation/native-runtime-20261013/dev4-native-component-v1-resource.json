@@ -1,0 +1,2260 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\speed-strata-q2-dev4\\Scripts\\python.exe",
+    "-X",
+    "utf8",
+    "-B",
+    "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4_native_component_validation.py"
+  ],
+  "baseline": {
+    "commit_used": 13101756416,
+    "commit_limit": 70357860352,
+    "physical_available": 56267034624
+  },
+  "samples": [
+    {
+      "commit_used": 13123616768,
+      "commit_limit": 70357860352,
+      "physical_available": 56244035584,
+      "seconds": 0.0345509999897331,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4272128,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        }
+      ],
+      "gpu": {
+        "temperature": 46,
+        "power_mw": 16866,
+        "sm_clock_mhz": 210,
+        "memory_clock_mhz": 405
+      }
+    },
+    {
+      "commit_used": 13140279296,
+      "commit_limit": 70357860352,
+      "physical_available": 56219164672,
+      "seconds": 0.14010149997193366,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 25051136,
+          "private": 15839232,
+          "cpu_user": 0.046875,
+          "cpu_system": 0.015625,
+          "read_bytes": 1973590,
+          "write_bytes": 0
+        }
+      ]
+    },
+    {
+      "commit_used": 13393207296,
+      "commit_limit": 70357860352,
+      "physical_available": 56108691456,
+      "seconds": 0.2443838999606669,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 135163904,
+          "private": 262647808,
+          "cpu_user": 0.109375,
+          "cpu_system": 0.03125,
+          "read_bytes": 2453793,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 13851246592,
+      "commit_limit": 70357860352,
+      "physical_available": 55892594688,
+      "seconds": 0.34825489996001124,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 324186112,
+          "private": 720683008,
+          "cpu_user": 0.140625,
+          "cpu_system": 0.109375,
+          "read_bytes": 2453793,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 13932560384,
+      "commit_limit": 70357860352,
+      "physical_available": 55818170368,
+      "seconds": 0.45409839996136725,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 391102464,
+          "private": 804155392,
+          "cpu_user": 0.21875,
+          "cpu_system": 0.125,
+          "read_bytes": 2453793,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14754217984,
+      "commit_limit": 70357860352,
+      "physical_available": 55760605184,
+      "seconds": 0.5587492999620736,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 446365696,
+          "private": 1625096192,
+          "cpu_user": 0.3125,
+          "cpu_system": 0.15625,
+          "read_bytes": 3379771,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14752690176,
+      "commit_limit": 70357860352,
+      "physical_available": 55753977856,
+      "seconds": 0.663136699993629,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 463966208,
+          "private": 1639575552,
+          "cpu_user": 0.40625,
+          "cpu_system": 0.15625,
+          "read_bytes": 4678572,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14760796160,
+      "commit_limit": 70357860352,
+      "physical_available": 55740887040,
+      "seconds": 0.767879199993331,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 467275776,
+          "private": 1641037824,
+          "cpu_user": 0.46875,
+          "cpu_system": 0.1875,
+          "read_bytes": 6198971,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14770143232,
+      "commit_limit": 70357860352,
+      "physical_available": 55734284288,
+      "seconds": 0.872613099985756,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 476626944,
+          "private": 1650307072,
+          "cpu_user": 0.53125,
+          "cpu_system": 0.21875,
+          "read_bytes": 7936584,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14774222848,
+      "commit_limit": 70357860352,
+      "physical_available": 55737151488,
+      "seconds": 0.9771961999940686,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 481607680,
+          "private": 1654337536,
+          "cpu_user": 0.59375,
+          "cpu_system": 0.25,
+          "read_bytes": 8916010,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14776545280,
+      "commit_limit": 70357860352,
+      "physical_available": 55732486144,
+      "seconds": 1.0815637999912724,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 483512320,
+          "private": 1656446976,
+          "cpu_user": 0.703125,
+          "cpu_system": 0.25,
+          "read_bytes": 10944191,
+          "write_bytes": 260
+        }
+      ],
+      "gpu": {
+        "temperature": 46,
+        "power_mw": 19248,
+        "sm_clock_mhz": 180,
+        "memory_clock_mhz": 405
+      }
+    },
+    {
+      "commit_used": 14778466304,
+      "commit_limit": 70357860352,
+      "physical_available": 55722942464,
+      "seconds": 1.1859500000136904,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 485421056,
+          "private": 1658556416,
+          "cpu_user": 0.78125,
+          "cpu_system": 0.25,
+          "read_bytes": 12304338,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14780448768,
+      "commit_limit": 70357860352,
+      "physical_available": 55721791488,
+      "seconds": 1.289822099963203,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 488124416,
+          "private": 1660657664,
+          "cpu_user": 0.875,
+          "cpu_system": 0.25,
+          "read_bytes": 13260970,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14784901120,
+      "commit_limit": 70357860352,
+      "physical_available": 55719456768,
+      "seconds": 1.3946592999855056,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 492666880,
+          "private": 1664847872,
+          "cpu_user": 0.984375,
+          "cpu_system": 0.25,
+          "read_bytes": 14486869,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14789394432,
+      "commit_limit": 70357860352,
+      "physical_available": 55718207488,
+      "seconds": 1.4987552000093274,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 495620096,
+          "private": 1668599808,
+          "cpu_user": 1.0625,
+          "cpu_system": 0.25,
+          "read_bytes": 15555750,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14793191424,
+      "commit_limit": 70357860352,
+      "physical_available": 55715127296,
+      "seconds": 1.6024514999589883,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 499646464,
+          "private": 1672224768,
+          "cpu_user": 1.171875,
+          "cpu_system": 0.25,
+          "read_bytes": 16612415,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14798663680,
+      "commit_limit": 70357860352,
+      "physical_available": 55703236608,
+      "seconds": 1.7060742999892682,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 506228736,
+          "private": 1678487552,
+          "cpu_user": 1.234375,
+          "cpu_system": 0.265625,
+          "read_bytes": 17599947,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14800769024,
+      "commit_limit": 70357860352,
+      "physical_available": 55698173952,
+      "seconds": 1.8102845000103116,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 508125184,
+          "private": 1680588800,
+          "cpu_user": 1.328125,
+          "cpu_system": 0.265625,
+          "read_bytes": 18345396,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14801821696,
+      "commit_limit": 70357860352,
+      "physical_available": 55695237120,
+      "seconds": 1.9145286999992095,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 509739008,
+          "private": 1681637376,
+          "cpu_user": 1.375,
+          "cpu_system": 0.328125,
+          "read_bytes": 19209679,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14813249536,
+      "commit_limit": 70357860352,
+      "physical_available": 55685652480,
+      "seconds": 2.0182358999736607,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 524619776,
+          "private": 1697497088,
+          "cpu_user": 1.46875,
+          "cpu_system": 0.328125,
+          "read_bytes": 19422000,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14811054080,
+      "commit_limit": 70357860352,
+      "physical_available": 55679909888,
+      "seconds": 2.1224827999831177,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 518520832,
+          "private": 1690996736,
+          "cpu_user": 1.578125,
+          "cpu_system": 0.328125,
+          "read_bytes": 19883511,
+          "write_bytes": 260
+        }
+      ],
+      "gpu": {
+        "temperature": 46,
+        "power_mw": 17094,
+        "sm_clock_mhz": 180,
+        "memory_clock_mhz": 405
+      }
+    },
+    {
+      "commit_used": 14818533376,
+      "commit_limit": 70357860352,
+      "physical_available": 55685861376,
+      "seconds": 2.226471900008619,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 524881920,
+          "private": 1697914880,
+          "cpu_user": 1.6875,
+          "cpu_system": 0.328125,
+          "read_bytes": 20279744,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14822903808,
+      "commit_limit": 70357860352,
+      "physical_available": 55680778240,
+      "seconds": 2.330303399998229,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 530219008,
+          "private": 1702154240,
+          "cpu_user": 1.75,
+          "cpu_system": 0.359375,
+          "read_bytes": 20958973,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14831345664,
+      "commit_limit": 70357860352,
+      "physical_available": 55679401984,
+      "seconds": 2.434004799986724,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 536784896,
+          "private": 1709158400,
+          "cpu_user": 1.8125,
+          "cpu_system": 0.375,
+          "read_bytes": 21900856,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14832226304,
+      "commit_limit": 70357860352,
+      "physical_available": 55680524288,
+      "seconds": 2.538219799986109,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 539455488,
+          "private": 1711341568,
+          "cpu_user": 1.875,
+          "cpu_system": 0.390625,
+          "read_bytes": 22752507,
+          "write_bytes": 260
+        }
+      ]
+    },
+    {
+      "commit_used": 14836879360,
+      "commit_limit": 70357860352,
+      "physical_available": 55671943168,
+      "seconds": 2.6425927999662235,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 543965184,
+          "private": 1716412416,
+          "cpu_user": 1.921875,
+          "cpu_system": 0.421875,
+          "read_bytes": 23966266,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14851223552,
+      "commit_limit": 70357860352,
+      "physical_available": 55652556800,
+      "seconds": 2.7472923999885097,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 545267712,
+          "private": 1718149120,
+          "cpu_user": 2.015625,
+          "cpu_system": 0.421875,
+          "read_bytes": 23990480,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14840934400,
+      "commit_limit": 70357860352,
+      "physical_available": 55666712576,
+      "seconds": 2.8520057999994606,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 548843520,
+          "private": 1720897536,
+          "cpu_user": 2.125,
+          "cpu_system": 0.421875,
+          "read_bytes": 24834279,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14844649472,
+      "commit_limit": 70357860352,
+      "physical_available": 55661154304,
+      "seconds": 2.956247899972368,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 552452096,
+          "private": 1724112896,
+          "cpu_user": 2.21875,
+          "cpu_system": 0.421875,
+          "read_bytes": 25951123,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14846775296,
+      "commit_limit": 70357860352,
+      "physical_available": 55656407040,
+      "seconds": 3.0608999999822117,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 552525824,
+          "private": 1725169664,
+          "cpu_user": 2.265625,
+          "cpu_system": 0.4375,
+          "read_bytes": 26192294,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14846660608,
+      "commit_limit": 70357860352,
+      "physical_available": 55645540352,
+      "seconds": 3.1652337000123225,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 552570880,
+          "private": 1725177856,
+          "cpu_user": 2.28125,
+          "cpu_system": 0.484375,
+          "read_bytes": 26910664,
+          "write_bytes": 264
+        }
+      ],
+      "gpu": {
+        "temperature": 46,
+        "power_mw": 16739,
+        "sm_clock_mhz": 180,
+        "memory_clock_mhz": 405
+      }
+    },
+    {
+      "commit_used": 14854385664,
+      "commit_limit": 70357860352,
+      "physical_available": 55637647360,
+      "seconds": 3.269405299972277,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 555548672,
+          "private": 1727320064,
+          "cpu_user": 2.375,
+          "cpu_system": 0.484375,
+          "read_bytes": 28632142,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14849732608,
+      "commit_limit": 70357860352,
+      "physical_available": 55639973888,
+      "seconds": 3.3736729999654926,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 555773952,
+          "private": 1727320064,
+          "cpu_user": 2.390625,
+          "cpu_system": 0.484375,
+          "read_bytes": 34548768,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14849826816,
+      "commit_limit": 70357860352,
+      "physical_available": 55636807680,
+      "seconds": 3.477246699971147,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 555941888,
+          "private": 1727320064,
+          "cpu_user": 2.421875,
+          "cpu_system": 0.53125,
+          "read_bytes": 40870872,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14849785856,
+      "commit_limit": 70357860352,
+      "physical_available": 55633620992,
+      "seconds": 3.580651099968236,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 556163072,
+          "private": 1727320064,
+          "cpu_user": 2.4375,
+          "cpu_system": 0.59375,
+          "read_bytes": 47103468,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14853705728,
+      "commit_limit": 70357860352,
+      "physical_available": 55655591936,
+      "seconds": 3.684116799966432,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 556363776,
+          "private": 1727320064,
+          "cpu_user": 2.46875,
+          "cpu_system": 0.65625,
+          "read_bytes": 53898733,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14853234688,
+      "commit_limit": 70357860352,
+      "physical_available": 55639633920,
+      "seconds": 3.7884487999835983,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 556367872,
+          "private": 1727320064,
+          "cpu_user": 2.484375,
+          "cpu_system": 0.6875,
+          "read_bytes": 60634285,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14854336512,
+      "commit_limit": 70357860352,
+      "physical_available": 55634903040,
+      "seconds": 3.8920796999591403,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 556642304,
+          "private": 1728368640,
+          "cpu_user": 2.546875,
+          "cpu_system": 0.71875,
+          "read_bytes": 64937290,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14856073216,
+      "commit_limit": 70357860352,
+      "physical_available": 55617118208,
+      "seconds": 3.996549299976323,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 556830720,
+          "private": 1728368640,
+          "cpu_user": 2.609375,
+          "cpu_system": 0.765625,
+          "read_bytes": 80973487,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14858153984,
+      "commit_limit": 70357860352,
+      "physical_available": 55614902272,
+      "seconds": 4.100534099969082,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 558067712,
+          "private": 1729421312,
+          "cpu_user": 2.6875,
+          "cpu_system": 0.796875,
+          "read_bytes": 94660122,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14860144640,
+      "commit_limit": 70357860352,
+      "physical_available": 55611555840,
+      "seconds": 4.2043823999702,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 563871744,
+          "private": 1735348224,
+          "cpu_user": 2.78125,
+          "cpu_system": 0.796875,
+          "read_bytes": 95962891,
+          "write_bytes": 264
+        }
+      ],
+      "gpu": {
+        "temperature": 46,
+        "power_mw": 17162,
+        "sm_clock_mhz": 180,
+        "memory_clock_mhz": 405
+      }
+    },
+    {
+      "commit_used": 14863409152,
+      "commit_limit": 70357860352,
+      "physical_available": 55607857152,
+      "seconds": 4.308101299975533,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 564953088,
+          "private": 1735364608,
+          "cpu_user": 2.84375,
+          "cpu_system": 0.8125,
+          "read_bytes": 96834172,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14877855744,
+      "commit_limit": 70357860352,
+      "physical_available": 55585452032,
+      "seconds": 4.411817399959546,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 577810432,
+          "private": 1748426752,
+          "cpu_user": 2.953125,
+          "cpu_system": 0.8125,
+          "read_bytes": 97686298,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14869340160,
+      "commit_limit": 70357860352,
+      "physical_available": 55584919552,
+      "seconds": 4.516807199979667,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 569233408,
+          "private": 1740886016,
+          "cpu_user": 3.046875,
+          "cpu_system": 0.8125,
+          "read_bytes": 98789603,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14873849856,
+      "commit_limit": 70357860352,
+      "physical_available": 55582633984,
+      "seconds": 4.62144909997005,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 574291968,
+          "private": 1744928768,
+          "cpu_user": 3.140625,
+          "cpu_system": 0.8125,
+          "read_bytes": 100237410,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14880362496,
+      "commit_limit": 70357860352,
+      "physical_available": 55573696512,
+      "seconds": 4.7258898000000045,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 581390336,
+          "private": 1751797760,
+          "cpu_user": 3.21875,
+          "cpu_system": 0.8125,
+          "read_bytes": 101389063,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14883524608,
+      "commit_limit": 70357860352,
+      "physical_available": 55568228352,
+      "seconds": 4.830556400003843,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 583950336,
+          "private": 1754951680,
+          "cpu_user": 3.3125,
+          "cpu_system": 0.8125,
+          "read_bytes": 102345631,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14892421120,
+      "commit_limit": 70357860352,
+      "physical_available": 55556710400,
+      "seconds": 4.935112499981187,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 586842112,
+          "private": 1757077504,
+          "cpu_user": 3.421875,
+          "cpu_system": 0.8125,
+          "read_bytes": 103367655,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14899974144,
+      "commit_limit": 70357860352,
+      "physical_available": 55590760448,
+      "seconds": 5.039900399977341,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 593543168,
+          "private": 1763680256,
+          "cpu_user": 3.515625,
+          "cpu_system": 0.828125,
+          "read_bytes": 104289288,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14898802688,
+      "commit_limit": 70357860352,
+      "physical_available": 55583072256,
+      "seconds": 5.144779899972491,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 594022400,
+          "private": 1763680256,
+          "cpu_user": 3.609375,
+          "cpu_system": 0.828125,
+          "read_bytes": 105508255,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14932389888,
+      "commit_limit": 70357860352,
+      "physical_available": 55566602240,
+      "seconds": 5.2495641999994405,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 598036480,
+          "private": 1768759296,
+          "cpu_user": 3.703125,
+          "cpu_system": 0.828125,
+          "read_bytes": 106489080,
+          "write_bytes": 264
+        }
+      ],
+      "gpu": {
+        "temperature": 46,
+        "power_mw": 16891,
+        "sm_clock_mhz": 180,
+        "memory_clock_mhz": 405
+      }
+    },
+    {
+      "commit_used": 14959579136,
+      "commit_limit": 70357860352,
+      "physical_available": 55540813824,
+      "seconds": 5.354667100007646,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 602226688,
+          "private": 1772843008,
+          "cpu_user": 3.8125,
+          "cpu_system": 0.828125,
+          "read_bytes": 107714257,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14985490432,
+      "commit_limit": 70357860352,
+      "physical_available": 55520768000,
+      "seconds": 5.459390199976042,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 602226688,
+          "private": 1772843008,
+          "cpu_user": 3.921875,
+          "cpu_system": 0.828125,
+          "read_bytes": 108053695,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 15011434496,
+      "commit_limit": 70357860352,
+      "physical_available": 55499591680,
+      "seconds": 5.564626400009729,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 603529216,
+          "private": 1773891584,
+          "cpu_user": 4.0,
+          "cpu_system": 0.828125,
+          "read_bytes": 109002061,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 15019986944,
+      "commit_limit": 70357860352,
+      "physical_available": 55487152128,
+      "seconds": 5.669716599979438,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 605286400,
+          "private": 1775992832,
+          "cpu_user": 4.09375,
+          "cpu_system": 0.84375,
+          "read_bytes": 110114379,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14921854976,
+      "commit_limit": 70357860352,
+      "physical_available": 55564484608,
+      "seconds": 5.774845300009474,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 615522304,
+          "private": 1785806848,
+          "cpu_user": 4.171875,
+          "cpu_system": 0.84375,
+          "read_bytes": 111198783,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14923366400,
+      "commit_limit": 70357860352,
+      "physical_available": 55554437120,
+      "seconds": 5.879540599999018,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 622465024,
+          "private": 1788461056,
+          "cpu_user": 4.265625,
+          "cpu_system": 0.84375,
+          "read_bytes": 111852886,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14930186240,
+      "commit_limit": 70357860352,
+      "physical_available": 55545970688,
+      "seconds": 5.984068399993703,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 625483776,
+          "private": 1790562304,
+          "cpu_user": 4.359375,
+          "cpu_system": 0.84375,
+          "read_bytes": 113076251,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14933340160,
+      "commit_limit": 70357860352,
+      "physical_available": 55542943744,
+      "seconds": 6.088063600007445,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 627658752,
+          "private": 1793716224,
+          "cpu_user": 4.46875,
+          "cpu_system": 0.84375,
+          "read_bytes": 113820928,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14932967424,
+      "commit_limit": 70357860352,
+      "physical_available": 55534923776,
+      "seconds": 6.192466199980117,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 628588544,
+          "private": 1793716224,
+          "cpu_user": 4.546875,
+          "cpu_system": 0.84375,
+          "read_bytes": 114966636,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14935007232,
+      "commit_limit": 70357860352,
+      "physical_available": 55535366144,
+      "seconds": 6.296176899981219,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 629985280,
+          "private": 1795817472,
+          "cpu_user": 4.625,
+          "cpu_system": 0.859375,
+          "read_bytes": 115522806,
+          "write_bytes": 264
+        }
+      ],
+      "gpu": {
+        "temperature": 46,
+        "power_mw": 16573,
+        "sm_clock_mhz": 180,
+        "memory_clock_mhz": 405
+      }
+    },
+    {
+      "commit_used": 14940540928,
+      "commit_limit": 70357860352,
+      "physical_available": 55545294848,
+      "seconds": 6.400576499989256,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 635457536,
+          "private": 1800515584,
+          "cpu_user": 4.703125,
+          "cpu_system": 0.890625,
+          "read_bytes": 116367737,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14949810176,
+      "commit_limit": 70357860352,
+      "physical_available": 55539724288,
+      "seconds": 6.505078899965156,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 646238208,
+          "private": 1811537920,
+          "cpu_user": 4.8125,
+          "cpu_system": 0.890625,
+          "read_bytes": 117195068,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14947155968,
+      "commit_limit": 70357860352,
+      "physical_available": 55542411264,
+      "seconds": 6.610167499980889,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 646242304,
+          "private": 1811537920,
+          "cpu_user": 4.90625,
+          "cpu_system": 0.890625,
+          "read_bytes": 117623354,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14947164160,
+      "commit_limit": 70357860352,
+      "physical_available": 55542448128,
+      "seconds": 6.714824599970598,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 646688768,
+          "private": 1811574784,
+          "cpu_user": 4.984375,
+          "cpu_system": 0.890625,
+          "read_bytes": 118307367,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 14946246656,
+      "commit_limit": 70357860352,
+      "physical_available": 55536627712,
+      "seconds": 6.819061199959833,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 655675392,
+          "private": 1813778432,
+          "cpu_user": 5.0625,
+          "cpu_system": 0.890625,
+          "read_bytes": 118951212,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 15500472320,
+      "commit_limit": 70357860352,
+      "physical_available": 55455072256,
+      "seconds": 6.923215899965726,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 766308352,
+          "private": 2395332608,
+          "cpu_user": 5.078125,
+          "cpu_system": 0.953125,
+          "read_bytes": 129878834,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 15501492224,
+      "commit_limit": 70357860352,
+      "physical_available": 55455825920,
+      "seconds": 7.0282725999713875,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 766312448,
+          "private": 2395332608,
+          "cpu_user": 5.15625,
+          "cpu_system": 0.984375,
+          "read_bytes": 135252786,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 15559417856,
+      "commit_limit": 70357860352,
+      "physical_available": 55442489344,
+      "seconds": 7.13119749998441,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 779988992,
+          "private": 2466942976,
+          "cpu_user": 5.25,
+          "cpu_system": 0.984375,
+          "read_bytes": 139437240,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 15937978368,
+      "commit_limit": 70357860352,
+      "physical_available": 55407394816,
+      "seconds": 7.236504799977411,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 802152448,
+          "private": 2830827520,
+          "cpu_user": 5.3125,
+          "cpu_system": 1.015625,
+          "read_bytes": 198813363,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 15939571712,
+      "commit_limit": 70357860352,
+      "physical_available": 55404544000,
+      "seconds": 7.342352600011509,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 800358400,
+          "private": 2829230080,
+          "cpu_user": 5.359375,
+          "cpu_system": 1.03125,
+          "read_bytes": 271191519,
+          "write_bytes": 264
+        }
+      ],
+      "gpu": {
+        "temperature": 47,
+        "power_mw": 23140,
+        "sm_clock_mhz": 727,
+        "memory_clock_mhz": 13801
+      }
+    },
+    {
+      "commit_used": 15976710144,
+      "commit_limit": 70357860352,
+      "physical_available": 55381598208,
+      "seconds": 7.447134199959692,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 828702720,
+          "private": 2862419968,
+          "cpu_user": 5.4375,
+          "cpu_system": 1.046875,
+          "read_bytes": 303063129,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 16180858880,
+      "commit_limit": 70357860352,
+      "physical_available": 55231766528,
+      "seconds": 7.552677600004245,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 986935296,
+          "private": 3070713856,
+          "cpu_user": 5.5,
+          "cpu_system": 1.046875,
+          "read_bytes": 303063129,
+          "write_bytes": 264
+        }
+      ]
+    },
+    {
+      "commit_used": 16317513728,
+      "commit_limit": 70357860352,
+      "physical_available": 55091425280,
+      "seconds": 7.657812399964314,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 1125888000,
+          "private": 3207168000,
+          "cpu_user": 5.53125,
+          "cpu_system": 1.078125,
+          "read_bytes": 320837748,
+          "write_bytes": 8052
+        }
+      ]
+    },
+    {
+      "commit_used": 16339181568,
+      "commit_limit": 70357860352,
+      "physical_available": 55057534976,
+      "seconds": 7.762421999999788,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 1160736768,
+          "private": 3218006016,
+          "cpu_user": 5.546875,
+          "cpu_system": 1.125,
+          "read_bytes": 329047668,
+          "write_bytes": 103230
+        },
+        {
+          "pid": 15880,
+          "rss": 22269952,
+          "private": 15020032,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 14570,
+          "write_bytes": 0
+        }
+      ]
+    },
+    {
+      "commit_used": 16323805184,
+      "commit_limit": 70357860352,
+      "physical_available": 55069810688,
+      "seconds": 7.867230399977416,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 1162248192,
+          "private": 3218952192,
+          "cpu_user": 5.578125,
+          "cpu_system": 1.140625,
+          "read_bytes": 349142580,
+          "write_bytes": 229071
+        }
+      ]
+    },
+    {
+      "commit_used": 16765992960,
+      "commit_limit": 70357860352,
+      "physical_available": 54934695936,
+      "seconds": 7.971785000001546,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 1362239488,
+          "private": 3657748480,
+          "cpu_user": 5.625,
+          "cpu_system": 1.140625,
+          "read_bytes": 360321133,
+          "write_bytes": 339899
+        }
+      ]
+    },
+    {
+      "commit_used": 16997650432,
+      "commit_limit": 70357860352,
+      "physical_available": 54393540608,
+      "seconds": 8.076025699963793,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 1600303104,
+          "private": 3657748480,
+          "cpu_user": 5.625,
+          "cpu_system": 1.171875,
+          "read_bytes": 360321133,
+          "write_bytes": 339899
+        }
+      ]
+    },
+    {
+      "commit_used": 16771309568,
+      "commit_limit": 70357860352,
+      "physical_available": 54617657344,
+      "seconds": 8.179670799989253,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 1600303104,
+          "private": 3657748480,
+          "cpu_user": 5.625,
+          "cpu_system": 1.203125,
+          "read_bytes": 360321133,
+          "write_bytes": 339899
+        }
+      ]
+    },
+    {
+      "commit_used": 17171902464,
+      "commit_limit": 70357860352,
+      "physical_available": 54633918464,
+      "seconds": 8.284970899985638,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 1600303104,
+          "private": 4061192192,
+          "cpu_user": 5.625,
+          "cpu_system": 1.3125,
+          "read_bytes": 797364333,
+          "write_bytes": 339899
+        }
+      ]
+    },
+    {
+      "commit_used": 16735870976,
+      "commit_limit": 70357860352,
+      "physical_available": 55064629248,
+      "seconds": 8.392803800001275,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 1163284480,
+          "private": 3623284736,
+          "cpu_user": 5.671875,
+          "cpu_system": 1.359375,
+          "read_bytes": 797364333,
+          "write_bytes": 368379
+        }
+      ],
+      "gpu": {
+        "temperature": 48,
+        "power_mw": 67711,
+        "sm_clock_mhz": 2497,
+        "memory_clock_mhz": 13801
+      }
+    },
+    {
+      "commit_used": 16735924224,
+      "commit_limit": 70357860352,
+      "physical_available": 55060381696,
+      "seconds": 8.497796299983747,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 1163321344,
+          "private": 3623284736,
+          "cpu_user": 5.78125,
+          "cpu_system": 1.359375,
+          "read_bytes": 797364333,
+          "write_bytes": 368379
+        }
+      ]
+    },
+    {
+      "commit_used": 16734941184,
+      "commit_limit": 70357860352,
+      "physical_available": 55058878464,
+      "seconds": 8.602783099981025,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 1163350016,
+          "private": 3623284736,
+          "cpu_user": 5.875,
+          "cpu_system": 1.359375,
+          "read_bytes": 797364333,
+          "write_bytes": 368379
+        }
+      ]
+    },
+    {
+      "commit_used": 15812476928,
+      "commit_limit": 70357860352,
+      "physical_available": 55181262848,
+      "seconds": 8.708303899969906,
+      "processes": [
+        {
+          "pid": 20536,
+          "rss": 4354048,
+          "private": 811008,
+          "cpu_user": 0.015625,
+          "cpu_system": 0.0,
+          "read_bytes": 2015,
+          "write_bytes": 0
+        },
+        {
+          "pid": 20344,
+          "rss": 1039339520,
+          "private": 2701836288,
+          "cpu_user": 5.96875,
+          "cpu_system": 1.359375,
+          "read_bytes": 797364333,
+          "write_bytes": 368379
+        }
+      ]
+    }
+  ],
+  "sampling_interval_seconds": 0.1,
+  "returncode": 0,
+  "wall_seconds": 8.81343179999385,
+  "peak_commit_used": 17171902464,
+  "min_commit_available": 53185957888,
+  "min_physical_available": 54393540608
+}

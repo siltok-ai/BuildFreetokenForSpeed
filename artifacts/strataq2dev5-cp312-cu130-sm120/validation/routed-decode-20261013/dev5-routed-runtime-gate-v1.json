@@ -1,0 +1,398 @@
+{
+  "passed": true,
+  "gates": {
+    "actual_version": true,
+    "wheel_identity": true,
+    "native_base_identity": true,
+    "independent_integer_reference_and_graph_tests": true,
+    "bounded_expert_precision": true,
+    "actual_outputs": true,
+    "sparse_long_prefix": true,
+    "cancel_reuse": true,
+    "execution_logits": true,
+    "long_component_finite_bounded": true,
+    "qsa_selection": true,
+    "quality_protocol_identity": true,
+    "no_new_quality_failures": true
+  },
+  "version": "0.1.3+speed.strataq2dev5",
+  "wheel_sha256": "cb8a235b0eb2845361dbf93a8f296d5ab6bada9a11c1a02a5a7849300db4bf12",
+  "scope": "Actual installed dev5 routed-expert wheel: bounded component/FP32 agreement, real graph/prefix/cancellation, sparse long context and fixed 20-case quality. Permits standalone decode measurement, not full release or Speed acceptance.",
+  "native_engine_only": true,
+  "process_engine_override": false,
+  "no_bitwise_component_gate": true,
+  "full_runtime_acceptance": false,
+  "speed_acceptance": false,
+  "legacy_gpu_suite": {
+    "passed": 18,
+    "failed": 1,
+    "failed_test": "test_experts_are_independent_of_prefill_and_tail_length",
+    "reason": "Frozen test requires bitwise prefill/decode equality, which is outside the explicitly accepted numerical contract",
+    "preserved_log": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev5-installed-gpu-tests-v1-resource.stdout.log"
+  },
+  "required_before_release": "Update the obsolete bitwise test contract in a NEW frozen revision; preserve this failed test and all dev5 bytes.",
+  "quality": {
+    "candidate": 15,
+    "previous": 15,
+    "strata": 15,
+    "total": 20,
+    "candidate_only_failures": []
+  },
+  "long_component_count": 662,
+  "qsa_slots": 12,
+  "max_long_component_relative_l2": 0.0,
+  "logits_checks": [
+    {
+      "label": "technical-hot",
+      "passed": true,
+      "positions": 32,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_35",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_36",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_37",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_38",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_39",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_40",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_41",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_42",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_43",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_44",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_45",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_46",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_47",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_48",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_49",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_50",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_51",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_52",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_53",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_54",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_55",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_56",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_57",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_58",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_59",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_60",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_61",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_62",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_63",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_64",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_65",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_66",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    },
+    {
+      "label": "prefix-hot",
+      "passed": true,
+      "positions": 5,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_107",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_108",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_109",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_110",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_111",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    },
+    {
+      "label": "prefix-restored",
+      "passed": true,
+      "positions": 5,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_107",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_108",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_109",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_110",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_111",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    },
+    {
+      "label": "long-hot",
+      "passed": true,
+      "positions": 5,
+      "max_error": 0.0,
+      "max_relative_l2": 0.0,
+      "rows": [
+        {
+          "position": "position_2720",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2721",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2722",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2723",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        },
+        {
+          "position": "position_2724",
+          "max_error": 0.0,
+          "relative_l2": 0.0,
+          "top1_equal": true
+        }
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev5-installed-state-v1.json",
+      "sha256": "547b6d1cc09b7e531f7144d205a8792d9b8fad6e796b1ac1290d9514a8ee02b1"
+    },
+    {
+      "path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev5-installed-state-v1-diagnostic.json",
+      "sha256": "e772707285903e853b756485e4a813cff6a67447c5216aff2f3d71032c615049"
+    },
+    {
+      "path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev5-precision-contract-v1.json",
+      "sha256": "19c721bcd4960dff7e98f2248217ddffb0155945672bd615b157c8ae29b62913"
+    },
+    {
+      "path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev5-native-base-identity-v1.log",
+      "sha256": "e544910a88d3e66e634e732d9f8c1fe34c20cbda7d08a8cd8b984ddc8358ecb7"
+    },
+    {
+      "path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev5-installed-gpu-tests-v1-resource.stdout.log",
+      "sha256": "96f8d7429ff6e3964e6dc3b5602aea6a4b08f76cbd32385ac349075aac4c193d"
+    },
+    {
+      "path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\quality-gate-dev5\\freetoken.json",
+      "sha256": "3ded03891125a52116686378ec418c62375833f22f0d53824dfd22bb14972c86"
+    },
+    {
+      "path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\quality-gate-dev5\\protocol.json",
+      "sha256": "33025d04036c68b3d74c75228b01f25a75f39f99cfd5afceab8ad1bfd0d63548"
+    },
+    {
+      "path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\quality-gate-dev3\\strata.json",
+      "sha256": "86eea78060404df76759c15f74cce9bbf83fb00c440f47d3a5a8e478473ab82d"
+    }
+  ]
+}

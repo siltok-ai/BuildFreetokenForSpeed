@@ -1,0 +1,48 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\speed-strata-q2-dev4\\Scripts\\python.exe",
+    "-X",
+    "utf8",
+    "-B",
+    "-m",
+    "pytest",
+    "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\candidate-source-dev5-working\\build-source\\tests\\moe\\test_q2_grouped.py",
+    "-q"
+  ],
+  "baseline": {
+    "commit_used": 13054414848,
+    "commit_limit": 70357860352,
+    "physical_available": 56406491136
+  },
+  "samples": [
+    {
+      "commit_used": 13073989632,
+      "commit_limit": 70357860352,
+      "physical_available": 56381698048,
+      "seconds": 0.03322829998796806,
+      "processes": [
+        {
+          "pid": 5696,
+          "rss": 4272128,
+          "private": 806912,
+          "cpu_user": 0.0,
+          "cpu_system": 0.0,
+          "read_bytes": 2170,
+          "write_bytes": 0
+        }
+      ],
+      "gpu": {
+        "temperature": 43,
+        "power_mw": 15415,
+        "sm_clock_mhz": 180,
+        "memory_clock_mhz": 405
+      }
+    }
+  ],
+  "sampling_interval_seconds": 0.1,
+  "returncode": 1,
+  "wall_seconds": 0.13941240002168342,
+  "peak_commit_used": 13073989632,
+  "min_commit_available": 57283870720,
+  "min_physical_available": 56381698048
+}

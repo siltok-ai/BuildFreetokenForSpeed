@@ -1,0 +1,6 @@
+Using Python 3.12.13 environment at: C:\workspace\envs\speed-strata-q2-dev5
+Resolved 6 packages in 30ms
+Installed 3 packages in 191ms
+ + iniconfig==2.3.1
+ + pluggy==1.6.0
+ + pytest==9.1.1

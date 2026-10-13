@@ -1,0 +1,7 @@
+{
+  "affected_run": "prototype-expert-dp4a-v14-state.json",
+  "model_failure_proven": false,
+  "harness_failure": "diagnose_long_prefix.install classifies cached_len > 0 as hot; chunk128 on the first long request therefore reaches the final tail without any cold capture and raises KeyError qsa0.indices",
+  "corrected_configuration": "Use the established chunk4096 setting for this diagnostic; assess chunk128 using separate execution/logit comparisons without that diagnostic wrapper",
+  "evidence_preserved": true
+}

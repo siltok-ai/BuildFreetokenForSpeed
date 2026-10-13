@@ -1,0 +1,101 @@
+Flash Next Strata Q2：第一版性能、主要退化与修复原型
+记录日期：2026-10-13；FreeToken 已安装修订仍为 strataq2dev3。
+
+当前结论
+完整 Q2 路径已经完成第一版正式测量，但约 9.6 token/s 明显不合理。
+近期工作是修复改造中主要的执行效率问题：trace 定位 + 完整流程对照 + 多轮原型测量。
+在性能恢复到合理范围前，不进入 MTP、细节调参或 Speed 接入。
+以下原型都是进程内诊断覆盖，没有修改安装目录、冻结源码、旧 wheel 或 Speed；没有宣称新修订验收。
+
+正式测量（无 MTP；每配置 12 个请求，每请求实际 512 个可见 token）
+同机、冻结输入、贪心、短上下文 70 token / 长上下文 4096 token，冷/热各三次。
+decode 按 (N-1)/(末 token 到达时间 - 首 token 到达时间)；启动和分词不计入 TTFT。
+不忽略 EOS。性能任务实际输出 512 token 后按长度停止，EOS=false；不是自然结束的回答。
+
+配置                                短上下文中位数     4K 中位数
+FreeToken dev3 / 1024 GPU 专家槽      9.68 token/s       9.57 token/s
+Strata / 1024槽 / mmap CPU-GPU混合    57.52 token/s      59.67 token/s
+Strata / 自动槽位 / resident混合     125.80 token/s     122.31 token/s
+Strata / 1024槽 / resident全GPU      59.89 token/s      57.04 token/s
+
+Strata 自动模式实际 13563 个 GPU 槽，主机只保留 GPU 专家缓存的补集。
+本次 --spec 2 是 serve 缓冲要求；没有启用 MTP/草拟，所有请求 offered/accepted 均为 0。
+自动配置加载后只余 221 MiB VRAM；证明本机无 MTP 可超过 100 tps，不等于这个紧预算配置已完成部署稳定性验收。
+1024 resident 全GPU的分配过程最低物理可用内存约 340 MB，资源代价保留在日志。
+原生 Strata 冷请求重置前缀、保留自适应专家缓存；FreeToken 冷请求还重置专家缓存。
+不同引擎以及原生冷/热输出不保证相同，不把缓存命中变化归因于单独一个配置变量。
+
+历史 FreeToken 参照
+历史 q2opt2 主干 BF16、专家 Q2、PLE HF FP8；不能称为纯 NVFP4。
+已有同机 256-token 正式参照约短上下文 49.2–49.6、4K 47.8–48.2 tps。
+本轮 q2opt2 和 dev3+历史混合权重诊断的短请求都约 47 tps，GPU 工作约 19.9 ms/token。
+这两项诊断在 4K 冷/热输出一致性断言处失败，保留失败，不声明整项正确性通过。
+dev3 轮子运行历史混合路径仍保持上述速度，说明 5倍退化主要发生在新 GGUF 计算分派，而非所有模型共同的全局修复。
+
+流程对照与证据
+1. 主干投影：当前 _gemm 固定 BM16/BN32/BK64，单 token 也算 16-token tile。
+   HC down K10240/N320 仅 10 CTA，inject N4 仅 1 CTA，K方向160轮循环。
+   不是禁用了 tensor core：现路径确实调用 tf32x3；问题是计算组织不适合 decode。
+   trace 主干约 88.5 ms/token，占 GPU 工作约87%；HC down+inject 约50.7 ms/token。
+   历史主干约8.3 ms/token；当前整个GPU工作约102 ms/token。
+2. Strata HC：BF16存储、FP32激活，40个down block各8个输出warp，加1个inject block。
+   每行由warp线程分担K归约；down/inject同次launch，权重指针分开，不要求物理拼接。
+   measured serve路径启用staged：cp.async双缓冲、权重预取；启动时与plain逐位自测后使用。
+   HC_SPLIT默认不是任意split-K：主要拆分norm并保持原有归约次序。
+   普通BF16另有MMVF；压缩矩阵有按格式专用MMVQ。prefill使用矩阵路径。
+3. 压缩：专家CPU bank和GPU cache都保留Q2压缩字节；主干只在tile内解量化。
+   没有常驻展开主干BF16/F32副本；FP32/Q8激活缓冲不应误报成展开权重。
+4. 专家：Q2×Q8 GPU专用内核存在；当前FT CPU格式注册表没有Q2，Q2策略也拒绝CPU。
+   本次CPU专家数为0；Strata有Q2 CPU实现和CPU/GPU协同。
+   当前expert compute约3.8 ms/token，专家copy约6.7–7.7 ms/token，仍在同一GPU流顺序运行。
+   历史路径也采用GPU专家，所以CPU缺失是相对Strata的差距，不是本次新增的历史退化。
+5. CUDA graph/AOT：每decode token一次真实cudaGraphLaunch仍有效；历史匹配AOT copy内核仍在使用。
+   不能据26个AOT DLL已加载推断新Triton主干也享有旧路径的高效实现。
+   CPU event同步时间与GPU执行重叠，不把等待时间再次加到GPU耗时上。
+6. 缓存/资源：历史与当前均为1024槽，每槽1382400字节；专家历史已经是Q2。
+   当前Q2减少约5.86 GiB的已分配GPU内存，但moe_cache_auto=False，缓存容量没有增加。
+   FT仍全量pin约31.64 GiB主机专家；Strata只保留缓存补集，并进行跨层驻留交换。
+   增大FT GPU缓存必须联合预算Windows commit、主机bank、prefill峰值和KV，不只检查空闲VRAM。
+7. PLE/状态/布局：已验收dev3修复继续保留；新投影验证实际strides和批大小。
+   本轮尚无证据认为PLE等待或KV分页是超过80ms的主因，不提前归咎这些流程。
+8. 调度与Speed：核心修复仍在FreeToken；Speed工作树未改动。HTTP/打包不作为当前诊断入口。
+
+修复原型与多轮trace（诊断32-token，不能作为正式长输出吞吐验收）
+原型v1：真实HC投影，融合BF16 GEMV单项约3.6us，旧内核约448us。
+  五个候选在28个真实输入、chunk1/3/17/28、非连续feature stride上逐位一致；native相对误差约7e-8。
+原型v2：尝试prefill多token复用权重；改变token tile后归约出现约1.5e-5绝对差。
+  v2未通过批大小逐位门槛，保留失败，不把它纳入可接收实现。
+原型v3：固定BT4覆盖所有token批大小，HC down/inject合并。
+  组件chunk1/2/3/4/7/8/17/28和stride门槛通过。
+  整模型诊断四个短/4K冷热请求，decode约18 tps；冷热完整输出相同，703回归通过。
+  trace：HC新融合约2.18 ms/token，剩余_gemm约37.6–37.9 ms/token，GPU工作约54 ms/token。
+原型v4：在v3之外，把N<8192的投影改成固定归约GEMV；现有Q8激活和Q4/Q5原始sum修正保留。
+  12项代表性矩阵通过native组件及chunk1/3/17/28门槛；不是全部层组件验收。
+  四个诊断请求约31.2–33.9 tps；冷热完整输出相同，703回归通过。
+  trace：GPU工作约28 ms/token，其中剩余_gemm约7.8ms、_gemv约3.9–4.0ms、HC约2.2ms。
+  4K prefill发生退化：所记录prefill GPU区间约4.25s→12.49s，新_gemv约9.19s。
+  这说明按token重复读权重的GEMV不能直接充当长prefill实现。v4不能直接作为新轮子交付。
+原型v5：剩余大投影的真实权重、真实HC派生输入；三项组件和batch门槛通过。
+  HC up：旧GEMM19.5us、通用GEMV6.2us、Strata MMVF5.7us。
+  GDN QKV IQ4_XS：旧72.9us、通用GEMV42.1us、Strata MMVQ6.5us。
+  全词表Q5_K head：旧2285.9us、通用GEMV1063.2us、Strata MMVQ346.5us。
+  进一步证明压缩专用向量算法与通用解量化向量算法仍有实质差距。
+  单项timing复用固定矩阵并用GPU event/graph计时；不推导整模型相同倍率提升。
+
+下一项实现要求
+补齐适合decode的BF16 GEMV/HC融合与压缩MMVQ，并为prefill保留权重复用的矩阵路径。
+两种路径要有明确的共同量化与归约约定，验证批大小、缓存复用、真实strides及全组件/状态/质量。
+不能简单按T切换旧GEMM和新GEMV而忽略归约变化；也不能牺牲prefill来制造decode改善。
+之后再形成新的可重放补丁/profile/版本/wheel，重新采集整模型trace和足够长实际输出。
+专家缓存容量/主机重复驻留、搬运与CPU协同保留在主要问题列表，按新的耗时排序推进。
+MTP、细节优化与Speed接入仍后置；当前没有声称达到100 tps或完成整体goal。
+
+证据入口
+实验根：C:\workspace\artifacts\flash-next-strata-q2-20261012
+first-performance-comparison-and-regression-analysis.json：四配置正式测量、资源及限制。
+first-decode-structural-trace-analysis-v2.json：14份当前/历史/标记projection trace归因。
+prototype-hc-fused-fixed-v3-trace-analysis.json、prototype-small-projection-gemv-v4-trace-analysis.json：两轮整模型诊断。
+prototype-prefill-regression-analysis-v5.json：prefill退化的有界GPU区间归因；不是TTFT。
+prototype-large-projection-gemv-v5.json：三个大投影的组件与耗时。
+本仓库artifacts/strataq2dev3-cp312-cu130-sm120/validation/first-performance-20261013/evidence-index.json：正式证据和早期原型归档。
+后续prototype-repair-20261013/evidence-index.json补充v4/v5，不修改前一个不可变索引。

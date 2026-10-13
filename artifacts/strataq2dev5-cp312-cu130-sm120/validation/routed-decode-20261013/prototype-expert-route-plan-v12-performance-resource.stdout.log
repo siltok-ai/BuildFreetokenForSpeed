@@ -1,0 +1,28 @@
+[1m[2026-10-13|13:28:26|core|rank=0][0m [32mINFO    [0m Enabled expandable_segments (override via PYTORCH_ALLOC_CONF)
+[1m[2026-10-13|13:28:26|core|rank=0][0m [33mWARNING [0m Page size is overridden to 64 for the qsa_sparse backend
+[1m[2026-10-13|13:28:26|core|rank=0][0m [32mINFO    [0m Resolved config: moe_strategy='offload', attention_backend='qsa_sparse', cache_type='hybrid_radix', page_size=64
+[1m[2026-10-13|13:28:27|core|rank=0][0m [32mINFO    [0m Free memory before loading model: 22.29 GiB
+[1m[2026-10-13|13:28:30|core|rank=0][0m [32mINFO    [0m PLE disk backend: ReadFile pool x16, NO_BUFFERING, wait-sync
+[1m[2026-10-13|13:28:30|core|rank=0][0m [32mINFO    [0m MoE experts: q2_0 via triton
+[1m[2026-10-13|13:28:30|core|rank=0][0m [32mINFO    [0m expert banks: slow path (serial build)
+[1m[2026-10-13|13:28:59|core|rank=0][0m [32mINFO    [0m Multimodal disabled: --text-model-only
+[1m[2026-10-13|13:28:59|core|rank=0][0m [32mINFO    [0m Allocating 8192 tokens for KV cache, K + V = 0.20 GiB
+[1m[2026-10-13|13:28:59|core|rank=0][0m [32mINFO    [0m qsa_sparse block top-k: triton qsa_block_topk
+[1m[2026-10-13|13:28:59|core|rank=0][0m [32mINFO    [0m Free memory after initialization: 12.12 GiB
+[1m[2026-10-13|13:28:59|core|rank=0][0m [32mINFO    [0m Start capturing CUDA graphs with sizes: [1]
+[1m[2026-10-13|13:28:59|core|rank=0][0m [32mINFO    [0m Free GPU memory before capturing CUDA graphs: 12.12 GiB
+[1m[2026-10-13|13:29:00|core|rank=0][0m [32mINFO    [0m Free GPU memory after capturing CUDA graphs: 12.11 GiB
+[1m[2026-10-13|13:29:01|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 70, #cached-token: 0, token usage: 0.02, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 77.15
+[1m[2026-10-13|13:29:02|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 70, #cached-token: 0, token usage: 0.02, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 80.69
+{"label": "short-0-cold", "input_tokens": 70, "output_tokens": 512, "eos": false, "truncated": true, "ttft_ms": 733.1745999981649, "decode_tps": 70.14187202492299, "prefix_cached_tokens": 0}
+[1m[2026-10-13|13:29:09|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 6, #cached-token: 64, token usage: 0.02, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 0.79
+[1m[2026-10-13|13:29:16|core|rank=0][0m [32mINFO    [0m Decode batch, #running-req: 1, #token: 576, token usage: 0.07, #mamba-slot: 4/8, mamba usage: 0.50, gen throughput (token/s): 61.42, #queue-req: 0
+{"label": "short-0-hot", "input_tokens": 70, "output_tokens": 512, "eos": false, "truncated": true, "ttft_ms": 266.8934999965131, "decode_tps": 69.36714076957472, "prefix_cached_tokens": 64}
+[1m[2026-10-13|13:29:24|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 4096, #cached-token: 0, token usage: 0.51, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 286.15
+[1m[2026-10-13|13:29:31|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 4096, #cached-token: 0, token usage: 0.51, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 582.06
+{"label": "diverse4096-0-cold", "input_tokens": 4096, "output_tokens": 512, "eos": false, "truncated": true, "ttft_ms": 6904.981900006533, "decode_tps": 66.71292879702762, "prefix_cached_tokens": 0}
+[1m[2026-10-13|13:29:39|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 64, #cached-token: 4032, token usage: 0.51, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 7.57
+[1m[2026-10-13|13:29:46|core|rank=0][0m [32mINFO    [0m Decode batch, #running-req: 1, #token: 4608, token usage: 0.56, #mamba-slot: 4/8, mamba usage: 0.50, gen throughput (token/s): 33.82, #queue-req: 0
+{"label": "diverse4096-0-hot", "input_tokens": 4096, "output_tokens": 512, "eos": false, "truncated": true, "ttft_ms": 776.2073000194505, "decode_tps": 67.06962957613896, "prefix_cached_tokens": 4032}
+[1m[2026-10-13|13:29:48|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 40, #cached-token: 0, token usage: 0.01, #mamba-slot: 3/8, mamba usage: 0.38, #running-req: 1, #queue-req: 0, input throughput (token/s): 4.77
+{"status": "native_decode_repair_performance_measured", "runs": 4, "sufficient": true}

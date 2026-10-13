@@ -15,6 +15,35 @@ def tree_hashes(root):
     return {path.relative_to(root).as_posix(): sha256(path) for path in root.rglob("*") if path.is_file()}
 
 
+def validate_strata_research_source(profile_path=None):
+    """重放并核验研究源码；此检查不授予 GPU、wheel 或 Speed 验收状态。"""
+    profile_path = profile_path or ROOT / 'build/profiles/strataq2dev1.json'
+    profile, series = load_profile(profile_path)
+    with tempfile.TemporaryDirectory(prefix='speed-strata-source-') as temporary:
+        temporary = Path(temporary)
+        source, _ = prepare(profile_path,temporary/'candidate')
+        base, _ = prepare(ROOT/'build/profiles/q2opt2.json',temporary/'base')
+        from importlib.util import spec_from_file_location, module_from_spec
+        spec = spec_from_file_location('strata_python_materials',ROOT/'build/derive_python_materials.py')
+        derive = module_from_spec(spec)
+        spec.loader.exec_module(derive)
+        changed = derive.validate_python_only_changes(base,source)
+        _, base_series = load_profile(ROOT/'build/profiles/q2opt2.json')
+        research_patches = series['patches'][len(base_series['patches']):]
+        catalogued = {name for patch in research_patches for name in patch['files']}
+        if changed != catalogued:
+            raise ValueError('Strata research catalog differs from actual source delta')
+        for name in changed:
+            ast.parse((source/name).read_text(encoding='utf-8'),filename=name)
+        version_ast = ast.parse((source/'python/freetoken/version.py').read_text(encoding='utf-8'))
+        versions = [node.value.value for node in version_ast.body if isinstance(node,ast.Assign)
+                    and isinstance(node.value,ast.Constant) and isinstance(node.value.value,str)]
+        if profile['custom_version'] not in versions:
+            raise ValueError('Strata research source/profile version mismatch')
+        return dict(version=profile['custom_version'],source_replay_verified=True,
+                    python_only_changed_files=len(changed),runtime_acceptance=False)
+
+
 def validate_packaged_evidence(contract):
     """核对追加证据与消费合同的身份，不将离线校验当作重新执行硬件验收。"""
     record_path = repository_path(contract["speed_source_identity"])
@@ -126,10 +155,46 @@ def main():
     for directory in ("build", "tools", "tests"):
         for path in (ROOT / directory).rglob("*.py"):
             ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    research = validate_strata_research_source()
+    research_materials = ROOT/'artifacts/strataq2dev1-cp312-cu130-sm120'
+    if research_materials.exists():
+        validate_python_revision(ROOT/'build/profiles/strataq2dev1.json',research_materials)
+        research['wheel_and_binary_identity_verified'] = True
+    research_dev2 = None
+    dev2_profile = ROOT/'build/profiles/strataq2dev2.json'
+    if dev2_profile.exists():
+        research_dev2 = validate_strata_research_source(dev2_profile)
+        dev2_materials = ROOT/'artifacts/strataq2dev2-cp312-cu130-sm120'
+        if dev2_materials.exists():
+            validate_python_revision(dev2_profile,dev2_materials)
+            research_dev2['wheel_and_binary_identity_verified'] = True
+    research_dev3 = None
+    dev3_profile = ROOT/'build/profiles/strataq2dev3.json'
+    if dev3_profile.exists():
+        research_dev3 = validate_strata_research_source(dev3_profile)
+        dev3_materials = ROOT/'artifacts/strataq2dev3-cp312-cu130-sm120'
+        if dev3_materials.exists():
+            validate_python_revision(dev3_profile,dev3_materials)
+            research_dev3['wheel_and_binary_identity_verified'] = True
+    research_dev4 = None
+    dev4_profile = ROOT/'build/profiles/strataq2dev4.json'
+    if dev4_profile.exists():
+        from validate_native_revision import validate as validate_native_revision
+        dev4_materials = ROOT/'artifacts/strataq2dev4-cp312-cu130-sm120'
+        research_dev4 = validate_native_revision(dev4_profile,dev4_materials if dev4_materials.exists() else None)
+    research_dev5 = None
+    dev5_profile = ROOT/'build/profiles/strataq2dev5.json'
+    if dev5_profile.exists():
+        from validate_routed_revision import validate as validate_routed_revision
+        dev5_materials = ROOT/'artifacts/strataq2dev5-cp312-cu130-sm120'
+        research_dev5 = validate_routed_revision(dev5_profile,dev5_materials if dev5_materials.exists() else None)
     print(json.dumps({"official_files": len(original_hashes), "changed_files": len(changed),
                       "patches": len(series["patches"]), "split_equals_historical": True,
                       "wheel_python_matches_prepared_source": True, "aot_count": len(specs),
-                      "packaged_acceptance_evidence_verified": True, "verified": True}))
+                      "packaged_acceptance_evidence_verified": True, "strata_research":research,
+                      "strata_research_dev2":research_dev2,
+                      "strata_research_dev3":research_dev3, "strata_research_dev4":research_dev4,
+                      "strata_research_dev5":research_dev5, "verified": True}))
 
 
 if __name__ == "__main__":

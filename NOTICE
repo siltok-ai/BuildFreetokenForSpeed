@@ -11,3 +11,15 @@ identified in patches/series.json and docs/changes.md. The customized wheel
 Repository-owned tooling and patches are provided under the root Apache-2.0
 LICENSE. Model weights are not included. Third-party runtime dependencies
 must be obtained and distributed under their own licenses.
+
+The strataq2dev4 research patch also includes adapted CUDA components from
+https://github.com/Niko1221/Strata at commit
+6674a0065fb96bacde33e3eb10f91a1df86f95f2, and its pinned ggml-derived code at
+3cf03257f219afbe7334045ff7c6a06ac68c627d. These components retain their MIT
+licenses and attribution; the repository's Apache-2.0 license does not replace
+them. The replayed FreeToken source contains LICENSE-strata.txt,
+LICENSE-ggml.txt and per-file provenance in
+python/freetoken/kernel/csrc/third_party/strata_mmvq/UPSTREAM.json.
+The corresponding wheel includes those license files. This integrates native
+kernels into FreeToken and does not distribute or replace it with the Strata
+inference engine. Model weights are not included.

@@ -1,0 +1,197 @@
+diff --git a/python/freetoken/kernel/gguf_quant.py b/python/freetoken/kernel/gguf_quant.py
+--- a/python/freetoken/kernel/gguf_quant.py
++++ b/python/freetoken/kernel/gguf_quant.py
+@@ -227,6 +227,30 @@
+     return out
+ 
+ 
++@triton.jit
++def _gguf_plus_one_norm(X, W, OUT, H: tl.constexpr, EPS: tl.constexpr,
++                        XS: tl.constexpr, OS: tl.constexpr, BLOCK: tl.constexpr):
++    row = tl.program_id(0)
++    col = tl.arange(0, BLOCK)
++    x = tl.load(X + row * XS + col, col < H, 0).to(tl.float32)
++    gamma = 1.0 + tl.load(W + col, col < H, 0).to(tl.float32)
++    inv = tl.rsqrt(tl.sum(x * x, 0) / H + EPS)
++    tl.store(OUT + row * OS + col, x * inv * gamma, col < H)
++
++
++def gguf_gemma_rmsnorm(x, weight, eps=1e-6, out=None):
++    """The GGUF Q/K norm has one fixed FP32 reduction for every batch size."""
++    if x.ndim != 2 or x.dtype != torch.float32 or not x.is_cuda or x.stride(-1) != 1:
++        raise ValueError("GGUF norm requires a CUDA FP32 matrix with unit feature stride")
++    if out is None:
++        out = torch.empty_like(x)
++    if out.shape != x.shape or out.dtype != x.dtype or out.stride(-1) != 1:
++        raise ValueError("GGUF norm output geometry or precision differs from its input")
++    _gguf_plus_one_norm[(x.shape[0],)](x,weight,out,x.shape[1],eps,x.stride(0),out.stride(0),
++        triton.next_power_of_2(x.shape[1]),num_warps=4,enable_fp_fusion=False)
++    return out
++
++
+ def compressed_linear(packed, x, rows, type_id, *, quantize_input=True, out=None, q8_source=None):
+     """压缩权重直接参与 FP32 GEMV；BF16/F16/F32 权重保留 FP32 激活。"""
+     block, size = _geometry(type_id)
+@@ -236,14 +260,12 @@
+         x = quantize_activation(x)
+     if out is None:
+         out = torch.empty((x.shape[0], rows), dtype=torch.float32, device=x.device)
+-    if x.shape[0] >= 16:
+-        _gemm[(triton.cdiv(x.shape[0], 16), triton.cdiv(rows, 32))](packed, x, out, x.shape[0], rows, width,
+-            type_id, block, size, *x.stride(), *out.stride(), 16, 32, 64, num_warps=4,
+-            enable_fp_fusion=False)
+-    else:
+-        _gemv[(triton.cdiv(rows, 4), x.shape[0])](packed, x, out, x.shape[0], rows, width,
+-            type_id, block, size, *x.stride(), *out.stride(), min(1024, triton.next_power_of_2(width)),
+-            4, num_warps=4, enable_fp_fusion=False)
++    if x.shape[0] == 0:
++        return out
++    # A fixed accumulation also covers single-token decode and cache-tail prefill.
++    _gemm[(triton.cdiv(x.shape[0], 16), triton.cdiv(rows, 32))](packed, x, out, x.shape[0], rows, width,
++        type_id, block, size, *x.stride(), *out.stride(), 16, 32, 64, num_warps=4,
++        enable_fp_fusion=False)
+     if type_id in (2, 6) and q8_source is not None:
+         _affine_sum_correction[(x.shape[0], rows)](packed, q8_source, x, out, width, rows,
+             size, 8 if type_id == 2 else 16, *q8_source.stride(), *out.stride(),
+diff --git a/python/freetoken/kernel/triton/qsa/attend.py b/python/freetoken/kernel/triton/qsa/attend.py
+--- a/python/freetoken/kernel/triton/qsa/attend.py
++++ b/python/freetoken/kernel/triton/qsa/attend.py
+@@ -286,9 +286,9 @@
+         block_n, target_splits, partial_warps = 64, 1, 2
+ 
+     if q.dtype == torch.float32:
+-        # TF32x3 的 FP32 tiles 比 BF16 大；限制宽度以适配 SM120 的 shared-memory 上限。
+-        block_n = min(block_n, 32)
+-        partial_warps = max(partial_warps, 4)
++        # Keep the reduction independent of batching and prefix-cache hit length.
++        # Small attention rounding changes can cross downstream Q8 boundaries.
++        block_n, target_splits, partial_warps = 32, 8, 4
+     num_tiles = triton.cdiv(logical_indices.shape[1], block_n)
+     # Avoid empty splits when the selection width is smaller than the profile.
+     max_useful_splits = 1 << (num_tiles.bit_length() - 1)
+diff --git a/python/freetoken/models/qwen4_exp/gguf_weight.py b/python/freetoken/models/qwen4_exp/gguf_weight.py
+--- a/python/freetoken/models/qwen4_exp/gguf_weight.py
++++ b/python/freetoken/models/qwen4_exp/gguf_weight.py
+@@ -18,6 +18,10 @@
+ 
+ def declare_fp32_small_parameters(model):
+     """GGUF 主干已是 uint8 buffer；剩余 norm/conv/状态参数声明 FP32，阻止 loader 降精度。"""
++    from freetoken.layers.norm import GemmaPlusOneRMSNorm
++    if isinstance(model, GemmaPlusOneRMSNorm):
++        from freetoken.kernel.gguf_quant import gguf_gemma_rmsnorm
++        model.gemma_rmsnorm = gguf_gemma_rmsnorm
+     for name, value in tuple(vars(model).items()):
+         if name.startswith("_"):
+             continue
+diff --git a/python/freetoken/moe/fused_q2_q8.py b/python/freetoken/moe/fused_q2_q8.py
+--- a/python/freetoken/moe/fused_q2_q8.py
++++ b/python/freetoken/moe/fused_q2_q8.py
+@@ -105,21 +105,16 @@
+     active = torch.empty((routes, intermediate), dtype=torch.float32, device=x.device)
+     routed = torch.empty((routes, hidden), dtype=torch.float32, device=x.device)
+     out = torch.empty_like(x)
+-    grouped = is_prefill and tokens >= 128
+-    if grouped:
+-        from freetoken.moe.fused import moe_align_block_size
+-        sorted_ids, experts, padded = moe_align_block_size(topk_ids, 16, gate_up.shape[0])
++    # Batch-dependent reduction orders can change subsequent Q8 codes and routing.
++    # Use the same integer-dot / FP32 accumulation for prefill, cache tails and decode.
++    from freetoken.moe.fused import moe_align_block_size
++    sorted_ids, experts, padded = moe_align_block_size(topk_ids, 16, gate_up.shape[0])
+     def project(value, bank, result, input_topk):
+         q, scales = quantize_expert_activation(value)
+         k, n = value.shape[1], result.shape[1]
+-        if grouped:
+-            _grouped[(triton.cdiv(sorted_ids.numel(), 16), triton.cdiv(n, 32))](
+-                q, scales, bank, sorted_ids, experts, padded, result,
+-                routes, n, k, input_topk, 16, 32, num_warps=4, enable_fp_fusion=False)
+-        else:
+-            _vector[(routes, triton.cdiv(n, 4))](q, scales, bank, topk_ids, result,
+-                k, n, input_topk, 4, triton.next_power_of_2(k // 32), num_warps=4,
+-                enable_fp_fusion=False)
++        _grouped[(triton.cdiv(sorted_ids.numel(), 16), triton.cdiv(n, 32))](
++            q, scales, bank, sorted_ids, experts, padded, result,
++            routes, n, k, input_topk, 16, 32, num_warps=4, enable_fp_fusion=False)
+     project(x, gate_up, gate_values, topk)
+     _grouped_gate_act[(triton.cdiv(routes * intermediate, 256),)](
+         gate_values, active, intermediate, routes * intermediate, 256, enable_fp_fusion=False)
+diff --git a/python/freetoken/version.py b/python/freetoken/version.py
+--- a/python/freetoken/version.py
++++ b/python/freetoken/version.py
+@@ -1 +1 @@
+-__version__ = "0.1.3+speed.strataq2dev1"
++__version__ = "0.1.3+speed.strataq2dev2"
+diff --git a/tests/models/qwen4_exp/test_gguf_execution.py b/tests/models/qwen4_exp/test_gguf_execution.py
+new file mode 100644
+--- /dev/null
++++ b/tests/models/qwen4_exp/test_gguf_execution.py
+@@ -0,0 +1,69 @@
++"""Batch size must not select a different arithmetic contract in the GGUF path."""
++import unittest
++import torch
++
++
++@unittest.skipUnless(torch.cuda.is_available(), "requires CUDA")
++class GGUFExecutionConsistencyTests(unittest.TestCase):
++    def test_qk_norm_is_independent_of_batch_size(self):
++        from freetoken.layers.norm import GemmaPlusOneRMSNorm
++        from freetoken.models.qwen4_exp.gguf_weight import declare_fp32_small_parameters
++        import freetoken.kernel.backend as backend
++        original=backend.is_flashinfer_installed
++        backend.is_flashinfer_installed=lambda:False
++        try:
++            norm=GemmaPlusOneRMSNorm(256,1e-6)
++        finally:
++            backend.is_flashinfer_installed=original
++        declare_fp32_small_parameters(norm)
++        torch.manual_seed(403)
++        norm.weight=torch.randn(256,device="cuda")*.1
++        x=torch.randn((2721,24,256),device="cuda")
++        full=norm.forward(x)
++        tail=norm.forward(x[-33:].contiguous())
++        torch.testing.assert_close(full[-33:],tail,rtol=0,atol=0)
++
++    def test_compressed_projection_is_independent_of_batch_size(self):
++        from freetoken.kernel.gguf_quant import compressed_linear
++        torch.manual_seed(317)
++        x=torch.randn((19,256),device="cuda",dtype=torch.float32)
++        weight=torch.randn((32,256),device="cuda").bfloat16().view(torch.uint8).flatten()
++        full=compressed_linear(weight,x,32,30)
++        tail=compressed_linear(weight,x[-1:],32,30)
++        torch.testing.assert_close(full[-1:],tail,rtol=0,atol=0)
++
++    def test_experts_are_independent_of_prefill_and_tail_length(self):
++        from freetoken.moe.fused_q2_q8 import fused_experts_q2_q8
++        torch.manual_seed(941)
++        hidden,intermediate=256,128
++        def bank(rows,width):
++            blocks=torch.randint(0,256,(3,rows,width//64,18),device="cuda",dtype=torch.uint8)
++            scale=(torch.rand((3,rows,width//64),device="cuda")*.02+.001).half()
++            blocks[...,:2]=scale.view(torch.uint8).reshape(3,rows,width//64,2)
++            return blocks.flatten(2)
++        gu=bank(2*intermediate,hidden);down=bank(hidden,intermediate)
++        x=torch.randn((129,hidden),device="cuda")
++        ids=torch.stack([torch.arange(129,device="cuda")%3,(torch.arange(129,device="cuda")+1)%3],-1).to(torch.int32)
++        weights=torch.tensor([.3,.7],device="cuda").repeat(129,1)
++        full=fused_experts_q2_q8(x,gu,down,weights,ids,is_prefill=True)
++        tail=fused_experts_q2_q8(x[-3:].contiguous(),gu,down,weights[-3:].contiguous(),ids[-3:].contiguous(),is_prefill=True)
++        decode=fused_experts_q2_q8(x[-1:],gu,down,weights[-1:],ids[-1:],is_prefill=False)
++        torch.testing.assert_close(full[-3:],tail,rtol=0,atol=0)
++        torch.testing.assert_close(full[-1:],decode,rtol=0,atol=0)
++
++    def test_fp32_attention_is_independent_of_batch_size(self):
++        from freetoken.kernel.triton.qsa.attend import qsa_sparse_paged_attention
++        torch.manual_seed(218)
++        q=torch.randn((257,24,256),device="cuda")
++        k=torch.randn((4,64,2,256),device="cuda").half();v=torch.randn_like(k)
++        table=torch.tensor([[2,0,3,1]],device="cuda",dtype=torch.int32)
++        ids=torch.arange(2051,device="cuda",dtype=torch.int32).repeat(257,1)
++        ids[:,193:]=-1
++        req=torch.zeros(257,device="cuda",dtype=torch.int32)
++        full=qsa_sparse_paged_attention(q,k,v,ids,table,req)
++        tail=qsa_sparse_paged_attention(q[-1:],k,v,ids[-1:],table,req[-1:])
++        torch.testing.assert_close(full[-1:],tail,rtol=0,atol=0)
++
++
++if __name__=="__main__":
++    unittest.main()

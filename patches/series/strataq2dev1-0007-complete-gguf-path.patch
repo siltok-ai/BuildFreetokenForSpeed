@@ -1,0 +1,1680 @@
+diff --git a/python/freetoken/attention/qsa_sparse.py b/python/freetoken/attention/qsa_sparse.py
+--- a/python/freetoken/attention/qsa_sparse.py
++++ b/python/freetoken/attention/qsa_sparse.py
+@@ -112,7 +112,7 @@
+             f"qsa_sparse backend needs a QSA pool, got {type(self.kvcache).__name__}"
+         )
+         self.device = self.kvcache.device
+-        self.dtype = self.kvcache.dtype
++        self.dtype = self.kvcache.index_dtype
+         self.index_head_dim = self.kvcache.index_head_dim
+         self.ratio = self.kvcache.index_ratio
+         self.ring_capacity = self.kvcache.ring_capacity
+@@ -287,7 +287,8 @@
+         md = batch.attn_metadata
+         assert isinstance(md, QSASparseMetadata)
+         slot = self._idx_slot[layer_id]
+-        self.kvcache.store_kv(k, v, batch.out_loc, layer_id)
++        # GGUF 投影输出 FP32；AOT store 要求输入与 KV 存储 dtype 一致。
++        self.kvcache.store_kv(k.to(self.kvcache.dtype), v.to(self.kvcache.dtype), batch.out_loc, layer_id)
+         if md.block_table is None:
+             self._snapshot_decode(md, batch)
+         if slot == 0 or md.cmp_rows is None:
+diff --git a/python/freetoken/engine/engine.py b/python/freetoken/engine/engine.py
+--- a/python/freetoken/engine/engine.py
++++ b/python/freetoken/engine/engine.py
+@@ -33,7 +33,7 @@
+ from freetoken.kvcache.base import CacheRebuildRejected
+ from freetoken.kvcache.cache_status import _supports_swa_ratio
+ from freetoken.kvcache.linear_state_pool import (
+-    _linear_pool_min_slots, _linear_pool_num_slots, state_pool_bytes,
++    _linear_pool_min_slots, _linear_pool_num_slots, state_pool_bytes, linear_state_dtypes,
+ )
+ 
+ logger = init_logger(__name__)
+@@ -431,10 +431,12 @@
+         if linear_group is not None:
+             from freetoken.kvcache.linear_state_pool import LinearStatePool
+ 
++            conv_dtype, rec_dtype = linear_state_dtypes(config)
+             self.linear_state_pool = LinearStatePool(
+                 group=linear_group,
+                 num_slots=_linear_pool_num_slots(config),
+-                dtype=self.dtype,
++                dtype=conv_dtype,
++                recurrent_dtype=rec_dtype,
+                 device=self.device,
+                 tp_size=config.tp_info.size,
+                 slot_states=config.model_config.slot_states,
+diff --git a/python/freetoken/kernel/gguf_quant.py b/python/freetoken/kernel/gguf_quant.py
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/kernel/gguf_quant.py
+@@ -0,0 +1,251 @@
++"""GGUF 压缩矩阵和稀疏行的 Triton 算子，输出/累积保持 FP32。
++
++块布局依据冻结 Strata 的 artifact/dequant.hpp（ggml 3cf03257）；
++解量化只发生在寄存器/调用方要求的稀疏行，不创建常驻 BF16 主干副本。
++"""
++import torch
++import triton
++import triton.language as tl
++
++
++@triton.jit
++def _u16(P, offset, mask):
++    lo = tl.load(P + offset, mask, 0).to(tl.uint32)
++    hi = tl.load(P + offset + 1, mask, 0).to(tl.uint32)
++    return (lo | hi << 8).to(tl.uint16)
++
++
++@triton.jit
++def _half(P, offset, mask):
++    return _u16(P, offset, mask).to(tl.float16, bitcast=True).to(tl.float32)
++
++
++@triton.jit
++def _iq4(code):
++    # 查表用 select，避免为每层创建重复 GPU 常量张量。
++    value = tl.where(code == 0, -127, -104)
++    value = tl.where(code == 2, -83, value)
++    value = tl.where(code == 3, -65, value)
++    value = tl.where(code == 4, -49, value)
++    value = tl.where(code == 5, -35, value)
++    value = tl.where(code == 6, -22, value)
++    value = tl.where(code == 7, -10, value)
++    value = tl.where(code == 8, 1, value)
++    value = tl.where(code == 9, 13, value)
++    value = tl.where(code == 10, 25, value)
++    value = tl.where(code == 11, 38, value)
++    value = tl.where(code == 12, 53, value)
++    value = tl.where(code == 13, 69, value)
++    value = tl.where(code == 14, 89, value)
++    return tl.where(code == 15, 113, value).to(tl.float32)
++
++
++@triton.jit
++def _decode(P, row, col, mask, K: tl.constexpr, TYPE: tl.constexpr,
++            BLOCK: tl.constexpr, BYTES: tl.constexpr):
++    """以逻辑行列定位压缩块；所有 scale 先转 FP32，避免 BF16 二次舍入。"""
++    base = row * (K // BLOCK * BYTES) + col // BLOCK * BYTES
++    j = col % BLOCK
++    if TYPE == 0:
++        a = _u16(P, base, mask).to(tl.uint32)
++        b = _u16(P, base + 2, mask).to(tl.uint32)
++        value = (a | (b << 16)).to(tl.float32, bitcast=True)
++    elif TYPE == 1:
++        value = _half(P, base, mask)
++    elif TYPE == 30:
++        value = _u16(P, base, mask).to(tl.bfloat16, bitcast=True).to(tl.float32)
++    elif TYPE == 42:
++        q = tl.load(P + base + 2 + j // 4, mask, 0).to(tl.int32)
++        value = (((q >> (2 * (j % 4))) & 3) - 1).to(tl.float32) * _half(P, base, mask)
++    elif TYPE == 8:
++        q = tl.load(P + base + 2 + j, mask, 0).to(tl.int8, bitcast=True).to(tl.float32)
++        value = q * _half(P, base, mask)
++    elif TYPE == 2 or TYPE == 6 or TYPE == 20:
++        if TYPE == 6:
++            q = tl.load(P + base + 6 + j % 16, mask, 0).to(tl.int32)
++            high = tl.load(P + base + 2 + j // 8, mask, 0).to(tl.int32)
++            code = ((q >> (4 * (j // 16))) & 15) | (((high >> (j % 8)) & 1) << 4)
++            v = (code - 16).to(tl.float32)
++        else:
++            q = tl.load(P + base + 2 + j % 16, mask, 0).to(tl.int32)
++            code = (q >> (4 * (j // 16))) & 15
++            if TYPE == 20:
++                v = _iq4(code)
++            else:
++                v = (code - 8).to(tl.float32)
++        value = v * _half(P, base, mask)
++    elif TYPE == 12 or TYPE == 13:
++        group = j // 32
++        lo = tl.load(P + base + 4 + tl.where(group < 4, group, group + 4), mask, 0).to(tl.int32)
++        hi_d = tl.load(P + base + 4 + tl.where(group < 4, group, group - 4), mask, 0).to(tl.int32)
++        hi_m = tl.load(P + base + 4 + tl.where(group < 4, group + 4, group), mask, 0).to(tl.int32)
++        scale = tl.where(group < 4, lo & 63, (lo & 15) | ((hi_d >> 6) << 4))
++        minimum = tl.where(group < 4, hi_m & 63, (lo >> 4) | ((hi_m >> 6) << 4))
++        if TYPE == 13:
++            q = tl.load(P + base + 48 + j // 64 * 32 + j % 32, mask, 0).to(tl.int32)
++            high = tl.load(P + base + 16 + j % 32, mask, 0).to(tl.int32)
++            code = ((q >> (4 * (group % 2))) & 15) | (((high >> group) & 1) << 4)
++        else:
++            q = tl.load(P + base + 16 + j // 64 * 32 + j % 32, mask, 0).to(tl.int32)
++            code = (q >> (4 * (group % 2))) & 15
++        value = _half(P, base, mask) * scale.to(tl.float32) * code.to(tl.float32)
++        value -= _half(P, base + 2, mask) * minimum.to(tl.float32)
++    elif TYPE == 11:
++        group = j // 16
++        low = tl.load(P + base + 96 + group % 8, mask, 0).to(tl.int32)
++        high = tl.load(P + base + 104 + group % 4, mask, 0).to(tl.int32)
++        scale = (((low >> (4 * (group // 8))) & 15) | (((high >> (2 * (group // 4))) & 3) << 4)) - 32
++        q = tl.load(P + base + 32 + j // 128 * 32 + j % 32, mask, 0).to(tl.int32)
++        hm = tl.load(P + base + j % 32, mask, 0).to(tl.int32)
++        code = ((q >> (2 * ((j % 128) // 32))) & 3) - tl.where(((hm >> (j // 32)) & 1) != 0, 0, 4)
++        value = _half(P, base + 108, mask) * scale.to(tl.float32) * code.to(tl.float32)
++    elif TYPE == 14:
++        low = tl.load(P + base + j // 128 * 64 + j % 32 + (j % 64 // 32) * 32, mask, 0).to(tl.int32)
++        high = tl.load(P + base + 128 + j // 128 * 32 + j % 32, mask, 0).to(tl.int32)
++        scale = tl.load(P + base + 192 + j // 16, mask, 0).to(tl.int8, bitcast=True).to(tl.float32)
++        code = (((low >> (4 * ((j % 128) // 64))) & 15) | (((high >> (2 * ((j % 128) // 32))) & 3) << 4)) - 32
++        value = _half(P, base + 208, mask) * scale * code.to(tl.float32)
++    elif TYPE == 23:
++        group = j // 32
++        low = tl.load(P + base + 4 + group // 2, mask, 0).to(tl.int32)
++        high = _u16(P, base + 2, mask).to(tl.int32)
++        scale = (((low >> (4 * (group % 2))) & 15) | (((high >> (2 * group)) & 3) << 4)) - 32
++        q = tl.load(P + base + 8 + group * 16 + j % 16, mask, 0).to(tl.int32)
++        code = (q >> (4 * ((j % 32) // 16))) & 15
++        value = _half(P, base, mask) * scale.to(tl.float32) * _iq4(code)
++    return tl.where(mask, value, 0)
++
++
++@triton.jit
++def _rows(P, IDS, OUT, COUNT: tl.constexpr, K: tl.constexpr, TYPE: tl.constexpr,
++          BLOCK: tl.constexpr, BYTES: tl.constexpr, TILE: tl.constexpr):
++    row = tl.program_id(0)
++    col = tl.program_id(1) * TILE + tl.arange(0, TILE)
++    index = tl.load(IDS + row)
++    value = _decode(P, index, col, col < K, K, TYPE, BLOCK, BYTES)
++    tl.store(OUT + row * K + col, value, col < K)
++
++
++@triton.jit
++def _q8_activation(X, OUT, T: tl.constexpr, K: tl.constexpr, XS0: tl.constexpr,
++                   XS1: tl.constexpr, HALF_SCALE: tl.constexpr):
++    token, block = tl.program_id(0), tl.program_id(1)
++    cols = block * 32 + tl.arange(0, 32)
++    x = tl.load(X + token * XS0 + cols * XS1).to(tl.float32)
++    amax = tl.max(tl.abs(x), 0)
++    d = tl.minimum(amax / 127.0, 65504.0) if HALF_SCALE else amax / 127.0
++    inv = tl.where(amax == 0, 0.0, 1.0 / d)
++    z = x * inv
++    q = tl.minimum(tl.maximum((z + tl.where(z >= 0, .5, -.5)).to(tl.int32), -127), 127)
++    ds = d.to(tl.float16).to(tl.float32) if HALF_SCALE else d
++    tl.store(OUT + token * K + cols, q.to(tl.float32) * ds)
++
++
++@triton.jit
++def _gemv(P, X, OUT, T: tl.constexpr, N: tl.constexpr, K: tl.constexpr,
++          TYPE: tl.constexpr, BLOCK: tl.constexpr, BYTES: tl.constexpr,
++          XS0: tl.constexpr, XS1: tl.constexpr, OS0: tl.constexpr, OS1: tl.constexpr,
++          BK: tl.constexpr, BN: tl.constexpr):
++    token = tl.program_id(1)
++    row = tl.program_id(0) * BN + tl.arange(0, BN)
++    col = tl.arange(0, BK)
++    acc = tl.full((BN, BK), 0, tl.float32)
++    for begin in range(triton.cdiv(K, BK)):
++        k = begin * BK + col
++        w = _decode(P, row[:, None], k[None, :], (row[:, None] < N) & (k[None, :] < K), K, TYPE, BLOCK, BYTES)
++        x = tl.load(X + token * XS0 + k * XS1, k < K, 0).to(tl.float32)
++        acc += w * x[None, :]
++    value = tl.sum(acc, 1)
++    tl.store(OUT + token * OS0 + row * OS1, value, row < N)
++
++
++@triton.jit
++def _gemm(P, X, OUT, T: tl.constexpr, N: tl.constexpr, K: tl.constexpr,
++          TYPE: tl.constexpr, BLOCK: tl.constexpr, BYTES: tl.constexpr,
++          XS0: tl.constexpr, XS1: tl.constexpr, OS0: tl.constexpr, OS1: tl.constexpr,
++          BM: tl.constexpr, BN: tl.constexpr, BK: tl.constexpr):
++    """prefill 按 tile 解量化，用 TF32x3 tensor core 保持 FP32 乘加精度。"""
++    tokens = tl.program_id(0) * BM + tl.arange(0, BM)
++    rows = tl.program_id(1) * BN + tl.arange(0, BN)
++    cols = tl.arange(0, BK)
++    acc = tl.full((BM, BN), 0, tl.float32)
++    for begin in range(triton.cdiv(K, BK)):
++        k = begin * BK + cols
++        a = tl.load(X + tokens[:, None] * XS0 + k[None, :] * XS1,
++                    (tokens[:, None] < T) & (k[None, :] < K), 0).to(tl.float32)
++        w = _decode(P, rows[:, None], k[None, :], (rows[:, None] < N) & (k[None, :] < K),
++                    K, TYPE, BLOCK, BYTES)
++        acc += tl.dot(a, tl.trans(w), input_precision="tf32x3")
++    tl.store(OUT + tokens[:, None] * OS0 + rows[None, :] * OS1, acc,
++             (tokens[:, None] < T) & (rows[None, :] < N))
++
++
++@triton.jit
++def _affine_sum_correction(P, ORIGINAL, QUANTIZED, OUT, K: tl.constexpr, N: tl.constexpr,
++                           BYTES: tl.constexpr, BIAS: tl.constexpr,
++                           XS0: tl.constexpr, XS1: tl.constexpr,
++                           OS0: tl.constexpr, OS1: tl.constexpr, BG: tl.constexpr):
++    """Q4_0/Q5_0 的 offset 消费 Q8_1 原始输入 sum，不能用量化整数 sum 替代。"""
++    token, row = tl.program_id(0), tl.program_id(1)
++    group = tl.arange(0, BG)
++    col = group[:, None] * 32 + tl.arange(0, 32)[None, :]
++    original = tl.load(ORIGINAL + token * XS0 + col * XS1, col < K, 0).to(tl.float32)
++    quantized = tl.load(QUANTIZED + token * K + col, col < K, 0)
++    total = tl.sum(original, 1)
++    total = tl.minimum(tl.maximum(total, -65504.0), 65504.0).to(tl.float16).to(tl.float32)
++    offset = row * (K // 32) * BYTES + group * BYTES
++    d = _half(P, offset, group < K // 32)
++    correction = tl.sum(d * BIAS * (tl.sum(quantized, 1) - total), 0)
++    output = tl.load(OUT + token * OS0 + row * OS1)
++    tl.store(OUT + token * OS0 + row * OS1, output + correction)
++
++
++def _geometry(type_id):
++    from freetoken.models.qwen4_exp.gguf_source import GGUF_TYPES
++    _, block, size = GGUF_TYPES[type_id]
++    return block, size
++
++
++def dequantize_rows(packed, row_ids, width, type_id, out=None):
++    """仅展开选中的行，供压缩 embedding 和 RowStore IQ4_NL 缓冲使用。"""
++    block, size = _geometry(type_id)
++    ids = row_ids.reshape(-1)
++    if out is None:
++        out = torch.empty((ids.numel(), width), dtype=torch.float32, device=packed.device)
++    _rows[(ids.numel(), triton.cdiv(width, 256))](packed, ids, out, ids.numel(), width,
++                                               type_id, block, size, 256, num_warps=4)
++    return out
++
++
++def quantize_activation(x, *, half_scale=True):
++    """32 元素一组，round-away-from-zero；dense Q8_1 用 FP16 scale，专家用 FP32。"""
++    if x.shape[-1] % 32:
++        raise ValueError("Q8 activation width must be divisible by 32")
++    out = torch.empty(x.shape, dtype=torch.float32, device=x.device)
++    _q8_activation[(x.shape[0], x.shape[1] // 32)](x, out, *x.shape, *x.stride(), half_scale,
++                                                num_warps=4, enable_fp_fusion=False)
++    return out
++
++
++def compressed_linear(packed, x, rows, type_id, *, quantize_input=True, out=None, q8_source=None):
++    """压缩权重直接参与 FP32 GEMV；BF16/F16/F32 权重保留 FP32 激活。"""
++    block, size = _geometry(type_id)
++    width = x.shape[-1]
++    if quantize_input and type_id not in (0, 1, 30):
++        q8_source = x
++        x = quantize_activation(x)
++    if out is None:
++        out = torch.empty((x.shape[0], rows), dtype=torch.float32, device=x.device)
++    if x.shape[0] >= 16:
++        _gemm[(triton.cdiv(x.shape[0], 16), triton.cdiv(rows, 32))](packed, x, out, x.shape[0], rows, width,
++            type_id, block, size, *x.stride(), *out.stride(), 16, 32, 64, num_warps=4,
++            enable_fp_fusion=False)
++    else:
++        _gemv[(triton.cdiv(rows, 4), x.shape[0])](packed, x, out, x.shape[0], rows, width,
++            type_id, block, size, *x.stride(), *out.stride(), min(1024, triton.next_power_of_2(width)),
++            4, num_warps=4, enable_fp_fusion=False)
++    if type_id in (2, 6) and q8_source is not None:
++        _affine_sum_correction[(x.shape[0], rows)](packed, q8_source, x, out, width, rows,
++            size, 8 if type_id == 2 else 16, *q8_source.stride(), *out.stride(),
++            triton.next_power_of_2(width // 32), num_warps=4, enable_fp_fusion=False)
++    return out
+diff --git a/python/freetoken/kernel/triton/gguf_gdn.py b/python/freetoken/kernel/triton/gguf_gdn.py
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/kernel/triton/gguf_gdn.py
+@@ -0,0 +1,76 @@
++"""GGUF GDN：循环 GQA 头布局、FP32 状态与按请求顺序更新。"""
++import torch
++import triton
++import triton.language as tl
++
++
++@triton.jit
++def _recurrent(Q, K, V, A, B, NEG_A, DT, STATE, CU, SLOTS, OUT,
++               TRACK_BOUNDARY, TRACK_DST, HK: tl.constexpr, HV: tl.constexpr,
++               D: tl.constexpr, QS: tl.constexpr, QH: tl.constexpr, QD: tl.constexpr,
++               KS: tl.constexpr, KH: tl.constexpr, KD: tl.constexpr,
++               VS: tl.constexpr, VH: tl.constexpr, VD: tl.constexpr,
++               AS: tl.constexpr, BS: tl.constexpr, TRACK_COUNT: tl.constexpr,
++               DECODE: tl.constexpr):
++    req, head = tl.program_id(0), tl.program_id(1)
++    begin, end = tl.load(CU + req), tl.load(CU + req + 1)
++    slot = tl.load(SLOTS + req).to(tl.int64)
++    offset = tl.arange(0, D)
++    state_offset = (slot * HV + head) * D * D + offset[:, None] * D + offset[None, :]
++    state = tl.load(STATE + state_offset).to(tl.float32)
++    negative_a = tl.load(NEG_A + head)
++    dt = tl.load(DT + head)
++    # GGUF value heads 为循环排列，Q/K 保持原顺序；不使用 HF 的 contiguous repeat。
++    q_head = head % HK
++    for row in range(begin, end):
++        # prefill 卷积返回 channels-first 的转置视图，head/feature 不一定连续。
++        q = tl.load(Q + row * QS + q_head * QH + offset * QD).to(tl.float32)
++        k = tl.load(K + row * KS + q_head * KH + offset * KD).to(tl.float32)
++        v = tl.load(V + row * VS + head * VH + offset * VD).to(tl.float32)
++        q *= tl.rsqrt(tl.sum(q * q, 0) + 1.0e-6)
++        k *= tl.rsqrt(tl.sum(k * k, 0) + 1.0e-6)
++        a = tl.load(A + row * AS + head).to(tl.float32) + dt
++        b = tl.load(B + row * BS + head).to(tl.float32)
++        softplus = tl.where(a > 20.0, a, tl.log(1.0 + tl.exp(a)))
++        decay = tl.exp(negative_a * softplus)
++        beta = 1.0 / (1.0 + tl.exp(-b))
++        kv = tl.sum(state * k[:, None], 0)
++        delta = (v - decay * kv) * beta
++        state = decay * state + k[:, None] * delta[None, :]
++        output = tl.sum(state * q[:, None], 0) * (D ** -.5)
++        tl.store(OUT + (row * HV + head) * D + offset, output)
++        if not DECODE:
++            for track in tl.static_range(TRACK_COUNT):
++                if row + 1 == tl.load(TRACK_BOUNDARY + track):
++                    dst = tl.load(TRACK_DST + track).to(tl.int64)
++                    dst_offset = (dst * HV + head) * D * D + offset[:, None] * D + offset[None, :]
++                    tl.store(STATE + dst_offset, state)
++    tl.store(STATE + state_offset, state)
++
++
++def gguf_gdn_forward(q, k, v, a, b, negative_a, dt_bias, state, fla, *, is_decode):
++    """decode/prefill 共用 FP32 递推，直接写 live 与 track slot，保留池的 COW 生命周期。"""
++    if any(t.dtype != torch.float32 for t in (q, k, v, a, b, negative_a, dt_bias, state)):
++        raise ValueError("GGUF GDN requires FP32 activation, parameters and recurrent state")
++    tensors = (q,k,v,a,b,negative_a,dt_bias,state)
++    if any(not t.is_cuda or t.device != q.device for t in tensors):
++        raise ValueError("GGUF GDN tensors must share one CUDA device")
++    if q.ndim != 3 or v.ndim != 3 or state.ndim != 4:
++        raise ValueError("incompatible GGUF GDN tensor ranks")
++    total, hk, dim = q.shape
++    hv = v.shape[1]
++    if (hk <= 0 or hv <= 0 or k.shape != q.shape or v.shape != (total,hv,dim)
++            or a.shape != (total,hv) or b.shape != (total,hv)
++            or negative_a.shape != (hv,) or dt_bias.shape != (hv,) or hv % hk
++            or state.shape[1:] != (hv, dim, dim) or dim <= 0 or dim & (dim - 1)
++            or not state.is_contiguous() or not negative_a.is_contiguous()
++            or not dt_bias.is_contiguous() or a.stride(-1) != 1 or b.stride(-1) != 1):
++        raise ValueError("incompatible GGUF GDN state/head geometry")
++    output = torch.empty((total, hv, dim), dtype=torch.float32, device=q.device)
++    track_count = 0 if fla.track_dst is None else fla.track_dst.numel()
++    _recurrent[(fla.cache_indices.numel(), hv)](
++        q, k, v, a, b, negative_a, dt_bias, state, fla.cu_seqlens, fla.cache_indices, output,
++        fla.track_boundary_row, fla.track_dst, hk, hv, dim, *q.stride(), *k.stride(),
++        *v.stride(), a.stride(0), b.stride(0), track_count, is_decode,
++        num_warps=8, enable_fp_fusion=False)
++    return output
+diff --git a/python/freetoken/kernel/triton/qsa/attend.py b/python/freetoken/kernel/triton/qsa/attend.py
+--- a/python/freetoken/kernel/triton/qsa/attend.py
++++ b/python/freetoken/kernel/triton/qsa/attend.py
+@@ -119,7 +119,10 @@
+             mask=valid[:, None],
+             other=0.0,
+         )
+-        scores = tl.dot(query, keys)
++        if query.dtype == tl.float32:
++            scores = tl.dot(query, keys.to(tl.float32), input_precision="tf32x3")
++        else:
++            scores = tl.dot(query, keys)
+         # Scaling scores avoids re-quantizing a scaled query to BF16.
+         scores *= softmax_scale_log2
+         scores = tl.where(valid[None, :], scores, -1.0e20)
+@@ -128,11 +131,15 @@
+         probabilities = tl.where(
+             valid[None, :], tl.math.exp2(scores - next_max[:, None]), 0.0
+         )
+-        accumulator = tl.dot(
+-            probabilities.to(values.dtype),
+-            values,
+-            acc=accumulator * alpha[:, None],
+-        )
++        if query.dtype == tl.float32:
++            accumulator = tl.dot(probabilities, values.to(tl.float32),
++                acc=accumulator * alpha[:, None], input_precision="tf32x3")
++        else:
++            accumulator = tl.dot(
++                probabilities.to(values.dtype),
++                values,
++                acc=accumulator * alpha[:, None],
++            )
+         normalizer = normalizer * alpha + tl.sum(probabilities, axis=1)
+         max_value = next_max
+ 
+@@ -247,7 +254,8 @@
+         raise ValueError("QSA sparse attention requires valid grouped-query heads")
+     head_dim = q.shape[2]
+     assert head_dim >= 16 and (head_dim & (head_dim - 1)) == 0
+-    assert q.dtype == k_cache.dtype == v_cache.dtype
++    assert k_cache.dtype == v_cache.dtype
++    assert q.dtype == k_cache.dtype or (q.dtype == torch.float32 and k_cache.dtype in (torch.float16, torch.bfloat16))
+     assert logical_indices.dtype == block_table.dtype == torch.int32
+     assert token_to_req.dtype == torch.int32
+     assert q.stride(2) == k_cache.stride(3) == v_cache.stride(3) == 1
+@@ -277,6 +285,10 @@
+     else:
+         block_n, target_splits, partial_warps = 64, 1, 2
+ 
++    if q.dtype == torch.float32:
++        # TF32x3 的 FP32 tiles 比 BF16 大；限制宽度以适配 SM120 的 shared-memory 上限。
++        block_n = min(block_n, 32)
++        partial_warps = max(partial_warps, 4)
+     num_tiles = triton.cdiv(logical_indices.shape[1], block_n)
+     # Avoid empty splits when the selection width is smaller than the profile.
+     max_useful_splits = 1 << (num_tiles.bit_length() - 1)
+diff --git a/python/freetoken/kernel/triton/qsa/score.py b/python/freetoken/kernel/triton/qsa/score.py
+--- a/python/freetoken/kernel/triton/qsa/score.py
++++ b/python/freetoken/kernel/triton/qsa/score.py
+@@ -105,7 +105,10 @@
+             other=0.0,
+             eviction_policy="evict_first",
+         )
+-        scores = tl.dot(keys, query, out_dtype=tl.float32)
++        if query.dtype == tl.float32:
++            scores = tl.dot(keys.to(tl.float32), query, out_dtype=tl.float32, input_precision="tf32x3")
++        else:
++            scores = tl.dot(keys, query, out_dtype=tl.float32)
+         scores = tl.where(heads[None, :] < NUM_HEADS, tl.maximum(scores, 0.0), 0.0)
+         score = tl.sum(scores, axis=1) / score_divisor
+         tl.store(
+diff --git a/python/freetoken/kvcache/__init__.py b/python/freetoken/kvcache/__init__.py
+--- a/python/freetoken/kvcache/__init__.py
++++ b/python/freetoken/kvcache/__init__.py
+@@ -1,11 +1,11 @@
+ from __future__ import annotations
+ 
+ from typing import TYPE_CHECKING, Protocol
++import torch
+ 
+ from freetoken.utils import Registry
+ 
+ if TYPE_CHECKING:
+-    import torch
+     from freetoken.models import ModelConfig
+ 
+ from .base import (
+@@ -210,13 +210,14 @@
+         spec = kv_specs[0]
+         if num_req_slots is None:
+             raise ValueError("QSA pools need num_req_slots (max_running_req + 1)")
++        gguf = getattr(model_config.quant, "dialect", None) == "gguf_strata"
+         return QSAKVCache(
+             num_kv_heads=spec.num_kv_heads,
+             num_layers=model_config.num_layers,
+             head_dim=spec.head_dim,
+             num_pages=num_pages,
+             page_size=page_size,
+-            dtype=dtype,
++            dtype=torch.float16 if gguf else dtype,
+             device=device,
+             index_head_dim=spec.index_head_dim,
+             num_index_layers=spec.num_index_layers,
+@@ -224,6 +225,7 @@
+             num_req_slots=num_req_slots,
+             layer_ids=spec.layer_ids,
+             mrope=model_config.model_is_mrope,
++            index_dtype=torch.float32 if gguf else dtype,
+         )
+ 
+     if len(kv_specs) == 1 and kv_specs[0].mla:
+diff --git a/python/freetoken/kvcache/base.py b/python/freetoken/kvcache/base.py
+--- a/python/freetoken/kvcache/base.py
++++ b/python/freetoken/kvcache/base.py
+@@ -32,7 +32,8 @@
+         * config.dtype.itemsize
+         * spec.num_layers
+     )
+-    return per_token + spec.index_head_dim * spec.num_index_layers * 2 // spec.index_ratio
++    index_bytes = 4 if getattr(config.model_config.quant, "dialect", None) == "gguf_strata" else 2
++    return per_token + spec.index_head_dim * spec.num_index_layers * index_bytes // spec.index_ratio
+ 
+ 
+ @dataclass(frozen=True)
+diff --git a/python/freetoken/kvcache/linear_state_pool.py b/python/freetoken/kvcache/linear_state_pool.py
+--- a/python/freetoken/kvcache/linear_state_pool.py
++++ b/python/freetoken/kvcache/linear_state_pool.py
+@@ -52,6 +52,7 @@
+         device: torch.device,
+         tp_size: int | None = None,
+         slot_states: tuple[SlotStateSpec, ...] = (),
++        recurrent_dtype: torch.dtype | None = None,
+     ) -> None:
+         if tp_size is None:
+             tp_size = get_tp_info().size
+@@ -73,7 +74,7 @@
+         # overridable via FREETOKEN_MAMBA_SSM_DTYPE (see ssm_state_dtype).
+         self.recurrent_states = torch.zeros(
+             (n_layers, num_slots, local_v_heads, group.key_head_dim, group.value_head_dim),
+-            dtype=ssm_state_dtype(),
++            dtype=recurrent_dtype or ssm_state_dtype(),
+             device=device,
+         )
+         self._local_index = {layer_id: i for i, layer_id in enumerate(group.layer_ids)}
+@@ -240,6 +241,7 @@
+     tp_size: int,
+     dtype: torch.dtype,
+     slot_states: tuple[SlotStateSpec, ...] = (),
++    recurrent_dtype: torch.dtype | None = None,
+ ) -> int:
+     """Linear-state bytes for one request across all linear layers (TP-local), plus any
+     declared slot_states."""
+@@ -248,7 +250,7 @@
+     conv_elems = local_conv_dim * (group.conv_kernel_dim - 1)
+     rec_elems = local_v_heads * group.key_head_dim * group.value_head_dim
+     conv_bytes = conv_elems * dtype.itemsize  # conv state in model dtype
+-    rec_bytes = rec_elems * ssm_state_dtype().itemsize  # recurrent state (default fp32)
++    rec_bytes = rec_elems * (recurrent_dtype or ssm_state_dtype()).itemsize
+     total = n_layers * (conv_bytes + rec_bytes)
+ 
+     for spec in slot_states:
+@@ -258,6 +260,13 @@
+ 
+ 
+ __all__ = ["LinearStatePool", "linear_state_bytes_per_req"]
++
++
++def linear_state_dtypes(config):
++    """GGUF 卷积、PLE 与递推统一 FP32；其他模型继续遵循原 dtype/env 约定。"""
++    if getattr(config.model_config.quant, "dialect", None) == "gguf_strata":
++        return torch.float32, torch.float32
++    return config.dtype, ssm_state_dtype()
+ 
+ 
+ def state_pool_bytes(config, num_slots: int | None = None) -> int:
+@@ -271,8 +280,9 @@
+             raise ValueError("slot_states ride the linear-state slots; model has no linear group")
+         return 0
+     slots = num_slots if num_slots is not None else _linear_pool_num_slots(config)
++    conv_dtype, rec_dtype = linear_state_dtypes(config)
+     per_req = linear_state_bytes_per_req(
+-        linear_group, config.tp_info.size, config.dtype, slot_states
++        linear_group, config.tp_info.size, conv_dtype, slot_states, rec_dtype
+     )
+     return per_req * slots
+ 
+diff --git a/python/freetoken/kvcache/qsa_pool.py b/python/freetoken/kvcache/qsa_pool.py
+--- a/python/freetoken/kvcache/qsa_pool.py
++++ b/python/freetoken/kvcache/qsa_pool.py
+@@ -66,6 +66,7 @@
+         ring_capacity: int | None = None,
+         layer_ids: Sequence[int] | None = None,
+         mrope: bool = False,
++        index_dtype: torch.dtype | None = None,
+     ) -> None:
+         if index_ratio < 1 or page_size % index_ratio != 0:
+             # slot // index_ratio only names one group when a group never straddles a page.
+@@ -90,7 +91,7 @@
+         self._index_ratio = index_ratio
+         self._num_req_slots = num_req_slots
+         self._ring_capacity = ring_capacity
+-        self._index_dtype = dtype
++        self._index_dtype = index_dtype or dtype
+         self._page_size = page_size
+         self._mrope = mrope
+         super().__init__(
+@@ -172,7 +173,8 @@
+             per_token += spec_kv_bytes_per_token(spec, config)
+             if spec.attn_type is AttnType.QSA:
+                 # One index-key row = all index layers at one position.
+-                row = spec.index_head_dim * spec.num_index_layers * _INDEX_DTYPE_BYTES
++                index_bytes = 4 if getattr(config.model_config.quant, "dialect", None) == "gguf_strata" else _INDEX_DTYPE_BYTES
++                row = spec.index_head_dim * spec.num_index_layers * index_bytes
+                 fixed += num_req_slots * row * (cls.ring_capacity_for(spec.index_ratio) + 1)
+                 if config.model_config.model_is_mrope:
+                     per_token += _ROPE_POS_BYTES
+@@ -212,6 +214,11 @@
+         return self._cmp_scratch_base
+ 
+     @property
++    def index_dtype(self):
++        """GGUF 的 index keys 保留 FP32，主 K/V 独立使用 FP16。"""
++        return self._index_dtype
++
++    @property
+     def index_ratio(self) -> int:
+         return self._index_ratio
+ 
+diff --git a/python/freetoken/layers/quantization/configs/base.py b/python/freetoken/layers/quantization/configs/base.py
+--- a/python/freetoken/layers/quantization/configs/base.py
++++ b/python/freetoken/layers/quantization/configs/base.py
+@@ -106,6 +106,9 @@
+         """``unquantized`` lists the modules the family keeps bf16 when the checkpoint's config does not (DeepSeek-V4's compressors).
+ 
+         ``hf_config`` comes from ``cached_load_hf_config``, which folds an old ModelOpt ``hf_quant_config.json`` into ``quantization_config``."""
++        if cfg_get(hf_config, "freetoken_gguf_source") is not None:
++            from .gguf import GGUFQuantConfig
++            return GGUFQuantConfig(hf_config, name_map=name_map)
+         q = quantization_config_of(hf_config)
+         if q is None:
+             return _expert_override(hf_config, NoQuantConfig(name_map, unquantized))
+diff --git a/python/freetoken/layers/quantization/configs/gguf.py b/python/freetoken/layers/quantization/configs/gguf.py
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/layers/quantization/configs/gguf.py
+@@ -0,0 +1,109 @@
++"""完整 Flash Next GGUF 契约，融合段类型由目录决定，不套用 HF quant 标签。"""
++from collections import defaultdict
++from pathlib import Path
++
++from .base import QuantConfig, cfg_get
++from ..registry import LayerKind
++from ..scheme import QuantKind, QuantScheme, WeightDesc
++
++
++class GGUFQuantConfig(QuantConfig):
++    dialect = "gguf_strata"
++    STORAGE = {}
++
++    def __init__(self, hf_config, *, name_map=None):
++        """校验两片来源回执并绑定完整目录，忽略 checkpoint 遗留的 NVFP4 标签。"""
++        super().__init__(name_map)
++        from freetoken.models.qwen4_exp.gguf_source import GGUFModelSource, map_tensor
++        contract = cfg_get(hf_config, "freetoken_gguf_source")
++        if cfg_get(hf_config, "model_type") != "qwen4_exp" or contract.get("format") != "gguf_strata":
++            raise ValueError("complete GGUF source requires explicit qwen4_exp contract")
++        paths = []
++        for shard in contract["shards"]:
++            path = Path(shard["path"])
++            stat = path.stat()
++            if not path.is_absolute() or stat.st_size != shard["size"] or stat.st_mtime_ns != shard["verified_mtime_ns"]:
++                raise ValueError("GGUF source changed after verification; reverify complete SHA256")
++            digest = shard["sha256"]
++            if len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
++                raise ValueError("GGUF source requires a full SHA256 receipt")
++            if shard["revision"] != contract["revision"]:
++                raise ValueError("GGUF shard revision mismatch")
++            paths.append(path)
++        self.source = GGUFModelSource(paths)
++        self._validate_geometry(hf_config)
++        self.groups = defaultdict(list)
++        self.mapping = {}
++        for name, tensor in self.source.tensors.items():
++            mapping = map_tensor(name)
++            self.mapping[name] = mapping
++            if mapping.semantics in ("expert_bank", "iq4_nl_row_table"):
++                continue
++            if (mapping.target.endswith(".weight") and mapping.semantics == "identity"
++                    and (len(tensor.shape) == 2 or mapping.target.endswith("shared_expert_gate.weight"))):
++                target = mapping.target if mapping.target == "lm_head.weight" else "model." + mapping.target
++                self.groups[target.removesuffix(".weight")].append((mapping.segment, tensor))
++        order = {"q": 0, "k": 1, "v": 2, "qkv": 0, "z": 1,
++                 "b": 0, "a": 1, "gate": 0, "up": 1, "down": 0, "inject": 1, None: 0}
++        self.groups = {target: tuple(t for segment, t in sorted(parts, key=lambda p:order[p[0]]))
++                       for target, parts in self.groups.items()}
++
++    def _validate_geometry(self, hf_config):
++        """HF 文件只提供模型配置与 tokenizer，不能覆盖 GGUF 的真实几何和 hashing 边界。"""
++        text = cfg_get(hf_config, "text_config", hf_config)
++        fields = {
++            "block_count": "num_hidden_layers", "embedding_length": "hidden_size",
++            "attention.head_count": "num_attention_heads", "attention.head_count_kv": "num_key_value_heads",
++            "attention.key_length": "head_dim", "attention.value_length": "head_dim",
++            "expert_count": "num_experts", "expert_used_count": "num_experts_per_tok",
++            "expert_feed_forward_length": "moe_intermediate_size",
++            "expert_shared_feed_forward_length": "shared_expert_intermediate_size",
++            "ssm.conv_kernel": "linear_conv_kernel_dim", "ssm.state_size": "linear_key_head_dim",
++            "ssm.group_count": "linear_num_key_heads", "ssm.time_step_rank": "linear_num_value_heads",
++            "full_attention_interval": "full_attention_interval",
++            "hyper_connection.count": "hc_count", "hyper_connection.low_rank": "hc_lowrank",
++            "attention.indexer.head_count": "indexer_n_heads", "attention.indexer.key_length": "indexer_head_dim",
++            "attention.indexer.top_k": "indexer_budget", "ple.ngram_size": "ngram_size",
++            "ple.heads_per_ngram": "heads_per_ngram", "ple.conv_kernel": "ple_conv_kernel_size",
++        }
++        metadata = self.source.metadata
++        for key, field in fields.items():
++            if metadata.get("qwen4exp." + key) != cfg_get(text, field):
++                raise ValueError(f"GGUF/config geometry mismatch: {key} vs {field}")
++        heads = (cfg_get(text, "ngram_size") - 1) * cfg_get(text, "heads_per_ngram")
++        sizes, offsets = metadata["qwen4exp.ple.head_vocab_sizes"], metadata["qwen4exp.ple.head_offsets"]
++        if len(sizes) != heads or offsets != [sum(sizes[:i]) for i in range(heads)]:
++            raise ValueError("GGUF PLE head sizes/offsets mismatch")
++        table = self.source.tensors["per_layer_token_embd.weight"]
++        divisor = cfg_get(text, "make_ngram_vocab_size_divisible_by")
++        padded_rows = (sum(sizes) + divisor - 1) // divisor * divisor
++        if (table.type_id != 20 or table.shape[0] * heads != cfg_get(text, "ple_embed_dim")
++                or table.shape[1] != padded_rows):
++            raise ValueError("GGUF IQ4_NL PLE table/config mismatch")
++
++    def scheme_for_name(self, name):
++        """模型配置仅询问 routed expert 精度；其他调用使用运行时 prefix 目录。"""
++        from ..names import is_routed_expert
++        if is_routed_expert(name):
++            return QuantScheme(QuantKind.Q2_0, WeightDesc("q2_0_q8", (1, 64), "f16"), {"weight"})
++        return QuantScheme(QuantKind.GGUF, WeightDesc("gguf", None, None), {"packed"})
++
++    def scheme_for(self, prefix):
++        from ..names import is_routed_expert
++        if is_routed_expert(prefix):
++            return self.scheme_for_name(prefix)
++        if prefix not in self.groups:
++            raise ValueError(f"GGUF has no linear binding for {prefix}")
++        return self.scheme_for_name(prefix)
++
++    def get_quant_method(self, layer, prefix):
++        """线性层绑定显式分段 method；专家保留 FreeToken 的 bank/cache 生命周期。"""
++        if layer.quant_layer_kind is LayerKind.MOE:
++            return super().get_quant_method(layer, prefix)
++        from ..linear.gguf import GGUFLinearConfig, GGUFLinearMethod
++        segments = self.groups[prefix]
++        rows = sum(t.nbytes // t.row_bytes for t in segments)
++        padding = (-rows) % 16 if prefix.endswith("input_mix_weight_down_block_inject") else 0
++        cfg = GGUFLinearConfig(layer.in_features, layer.out_features, tuple(layer.output_sizes),
++                               self.scheme_for(prefix), segments, padding)
++        return GGUFLinearMethod(cfg, "triton")
+diff --git a/python/freetoken/layers/quantization/linear/gguf.py b/python/freetoken/layers/quantization/linear/gguf.py
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/layers/quantization/linear/gguf.py
+@@ -0,0 +1,55 @@
++"""保留每段 GGUF 原始类型的线性层；不同类型不拼接压缩字节。"""
++from dataclasses import dataclass
++import torch
++
++from .base import LinearConfig, LinearKernel, LinearMethod
++
++
++@dataclass(frozen=True)
++class GGUFLinearConfig(LinearConfig):
++    segments: tuple = ()
++    padding_rows: int = 0
++
++
++class GGUFLinearKernel(LinearKernel):
++    name = "triton"
++
++    def apply(self, layer, x):
++        """同一输入只量化一次，各投影段写入对应切片，HC 对齐尾部显式填零。"""
++        from freetoken.kernel.gguf_quant import compressed_linear, quantize_activation
++        cfg = layer.quant_method.cfg
++        output = torch.empty((x.shape[0], cfg.out_features), device=x.device, dtype=torch.float32)
++        quantized = None
++        cursor = 0
++        for index, tensor in enumerate(cfg.segments):
++            count = tensor.nbytes // tensor.row_bytes
++            activation = x
++            if tensor.type_id not in (0, 1, 30):
++                if quantized is None:
++                    quantized = quantize_activation(x)
++                activation = quantized
++            compressed_linear(getattr(layer, f"packed_{index}"), activation, count, tensor.type_id,
++                              quantize_input=False, out=output[:, cursor:cursor + count], q8_source=x)
++            cursor += count
++        if cursor < cfg.out_features:
++            output[:, cursor:].zero_()
++        if layer.bias is not None:
++            output += layer.bias
++        return output
++
++
++class GGUFLinearMethod(LinearMethod):
++    candidates = (GGUFLinearKernel,)
++
++    def create_weights(self, layer):
++        """只声明压缩 byte buffer；LM head 的基类 BF16 占位必须释放。"""
++        cfg = self.cfg
++        if any(t.shape[0] != cfg.in_features for t in cfg.segments):
++            raise ValueError("GGUF linear input geometry mismatch")
++        rows = sum(t.nbytes // t.row_bytes for t in cfg.segments)
++        if rows + cfg.padding_rows != cfg.out_features:
++            raise ValueError("GGUF linear output geometry mismatch")
++        if hasattr(layer, "weight"):
++            del layer.weight
++        for index, tensor in enumerate(cfg.segments):
++            setattr(layer, f"packed_{index}", torch.empty(tensor.nbytes, dtype=torch.uint8))
+diff --git a/python/freetoken/layers/quantization/moe/q2_0.py b/python/freetoken/layers/quantization/moe/q2_0.py
+--- a/python/freetoken/layers/quantization/moe/q2_0.py
++++ b/python/freetoken/layers/quantization/moe/q2_0.py
+@@ -21,7 +21,7 @@
+             return "Q2_0 input dimensions must be divisible by 64"
+         if cfg.strategy != "offload":
+             return "Q2_0 currently requires pure GPU offload"
+-        if cfg.dtype != torch.bfloat16:
++        if cfg.dtype != torch.bfloat16 and not (cfg.scheme and cfg.scheme.weight.elem == "q2_0_q8"):
+             return "Q2_0 mixed-precision path currently requires BF16 activations"
+         return None
+ 
+@@ -40,6 +40,10 @@
+ 
+     def apply(self, layer, x, topk_weights, topk_ids, view, *, is_prefill):
+         """保留 decode 向量路径，仅在 prefill 大批输入启用专家分组。"""
++        if layer.quant_method.cfg.scheme.weight.elem == "q2_0_q8":
++            from freetoken.moe.fused_q2_q8 import fused_experts_q2_q8
++            return fused_experts_q2_q8(x, view.tensors["gate_up"], view.tensors["down"],
++                                      topk_weights, topk_ids, is_prefill=is_prefill)
+         from freetoken.moe.fused_q2_0 import fused_experts_q2_0
+ 
+         return fused_experts_q2_0(x, view.tensors["gate_up"], view.tensors["down"], topk_weights, topk_ids,
+diff --git a/python/freetoken/layers/quantization/scheme.py b/python/freetoken/layers/quantization/scheme.py
+--- a/python/freetoken/layers/quantization/scheme.py
++++ b/python/freetoken/layers/quantization/scheme.py
+@@ -21,6 +21,7 @@
+     NVFP4 = "nvfp4"
+     MXFP4 = "mxfp4"
+     Q2_0 = "q2_0"
++    GGUF = "gguf"
+ 
+     def __str__(self) -> str:
+         return self.value
+diff --git a/python/freetoken/models/qwen4_exp/gdn.py b/python/freetoken/models/qwen4_exp/gdn.py
+--- a/python/freetoken/models/qwen4_exp/gdn.py
++++ b/python/freetoken/models/qwen4_exp/gdn.py
+@@ -35,6 +35,7 @@
+         *, quant_config: QuantConfig | None = None, prefix: str = "",
+     ):
+         self.layer_id = layer_id
++        self._gguf = getattr(quant_config, "dialect", None) == "gguf_strata"
+         # The fla chunk/decode kernels read+write the recurrent state and the per-chunk h as
+         # [V, K] while the LinearStatePool declares it [K, V]; these coincide (and the
+         # hybrid-radix snapshot scatter h[h_row]->slot is a plain copy) only when the two head
+@@ -151,7 +152,9 @@
+         z = z.reshape(total, self.num_v_heads, self.head_v_dim)
+         li = pool.local_index(self.layer_id)
+ 
+-        if batch.is_decode:
++        if self._gguf:
++            core_out = self._gguf_core(conv_in, a, b, pool, li, fla, batch.is_decode)
++        elif batch.is_decode:
+             # Fused fla decode kernel: gating + in-kernel l2norm + recurrent update +
+             # per-request state read/write-by-index, all in one kernel (no gather/scatter,
+             # no clone, no external l2norm). q/k stay at num_k_heads (kernel handles GQA).
+@@ -199,5 +202,28 @@
+         out = self.norm.forward(core_out, z).reshape(total, -1)
+         return self.out_proj.forward(out)
+ 
++    def _gguf_core(self, conv_in, a, b, pool, li, fla, is_decode):
++        """GGUF 循环头布局和 FP32 状态分支；快照写入仍由原状态池管理。"""
++        from freetoken.kernel.triton.gguf_gdn import gguf_gdn_forward
++        if pool.conv_states.dtype != torch.float32:
++            raise ValueError("GGUF GDN convolution state must be FP32")
++        if is_decode:
++            mixed = self._conv_decode(conv_in, fla.cache_indices, pool)
++        else:
++            mixed = self._conv_prefill(conv_in, pool, fla.cu_seqlens,
++                                       fla.cache_indices, fla.has_initial_state)
++            if fla.fresh_state_indices is not None:
++                pool.recurrent_states[li].index_fill_(0, fla.fresh_state_indices, 0.0)
++        q, k, v = torch.split(mixed, [self.key_dim, self.key_dim, self.value_dim], dim=-1)
++        result = gguf_gdn_forward(
++            q.reshape(-1, self.num_k_heads, self.head_k_dim),
++            k.reshape(-1, self.num_k_heads, self.head_k_dim),
++            v.reshape(-1, self.num_v_heads, self.head_v_dim),
++            a, b, self.A_log, self.dt_bias, pool.recurrent_states[li], fla, is_decode=is_decode)
++        if not is_decode and fla.track_dst is not None:
++            conv_window = conv_in[fla.track_conv_src].transpose(-1, -2).contiguous()
++            pool.conv_states[li].index_copy_(0, fla.track_dst, conv_window)
++        return result
++
+ 
+ __all__ = ["Qwen4ExpGatedDeltaNet"]
+diff --git a/python/freetoken/models/qwen4_exp/gguf_source.py b/python/freetoken/models/qwen4_exp/gguf_source.py
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/models/qwen4_exp/gguf_source.py
+@@ -0,0 +1,262 @@
++"""Flash Next 的完整 GGUF 目录、压缩行读取和显式张量映射。
++
++格式依据冻结 Strata 6674a006 的 gguf_reader.hpp；不依赖它的运行时。
++GGUF 的维度按最内层在前记录，本模块保留该顺序，torch_shape 显式反转。
++"""
++from __future__ import annotations
++
++from dataclasses import dataclass
++import math
++from pathlib import Path
++import re
++import struct
++
++
++# 只接受当前 GSQ 模型实际使用且计算层有明确布局的类型。
++GGUF_TYPES = {
++    0: ("F32", 1, 4), 1: ("F16", 1, 2), 2: ("Q4_0", 32, 18),
++    6: ("Q5_0", 32, 22), 8: ("Q8_0", 32, 34),
++    11: ("Q3_K", 256, 110), 12: ("Q4_K", 256, 144),
++    13: ("Q5_K", 256, 176), 14: ("Q6_K", 256, 210),
++    20: ("IQ4_NL", 32, 18), 23: ("IQ4_XS", 256, 136),
++    30: ("BF16", 1, 2), 42: ("Q2_0", 64, 18),
++}
++_SCALARS = {0: "B", 1: "b", 2: "H", 3: "h", 4: "I", 5: "i",
++            6: "f", 7: "?", 10: "Q", 11: "q", 12: "d"}
++
++
++def _read(stream, count):
++    data = stream.read(count)
++    if len(data) != count:
++        raise ValueError("truncated GGUF")
++    return data
++
++
++def _unpack(stream, fmt):
++    return struct.unpack("<" + fmt, _read(stream, struct.calcsize("<" + fmt)))
++
++
++def _string(stream):
++    size, = _unpack(stream, "Q")
++    if size > 16 << 20:
++        raise ValueError("oversized GGUF string")
++    return _read(stream, size).decode("utf-8")
++
++
++def _value(stream, kind=None, *, keep=True):
++    if kind is None:
++        kind, = _unpack(stream, "I")
++    if kind == 8:
++        value = _string(stream)
++        return value if keep else None
++    if kind == 9:
++        elem, count = _unpack(stream, "IQ")
++        if count > 10_000_000:
++            raise ValueError("oversized GGUF metadata array")
++        if not keep and elem in _SCALARS:
++            stream.seek(count * struct.calcsize("<" + _SCALARS[elem]), 1)
++            return None
++        values = [_value(stream, elem, keep=keep) for _ in range(count)]
++        return values if keep else None
++    if kind not in _SCALARS:
++        raise ValueError(f"unsupported GGUF metadata type {kind}")
++    return _unpack(stream, _SCALARS[kind])[0]
++
++
++@dataclass(frozen=True)
++class GGUFTensor:
++    path: Path
++    name: str
++    shape: tuple[int, ...]
++    type_id: int
++    start: int
++
++    @property
++    def type_name(self):
++        return GGUF_TYPES[self.type_id][0]
++
++    @property
++    def torch_shape(self):
++        return self.shape[::-1]
++
++    @property
++    def row_bytes(self):
++        _, block, size = GGUF_TYPES[self.type_id]
++        return self.shape[0] // block * size
++
++    @property
++    def nbytes(self):
++        return math.prod(self.shape[1:]) * self.row_bytes
++
++    def read_rows(self, first, count):
++        """仅读取请求的连续压缩行；embedding/PLE 无需整表解量化。"""
++        rows = math.prod(self.shape[1:])
++        if first < 0 or count < 0 or first + count > rows:
++            raise ValueError(f"{self.name}: invalid row range {first}:{first + count}")
++        with self.path.open("rb", buffering=0) as stream:
++            stream.seek(self.start + first * self.row_bytes)
++            return _read(stream, count * self.row_bytes)
++
++
++class GGUFShard:
++    def __init__(self, path):
++        """解析目录并检查所有张量边界、块宽度和重叠，不只检查专家。"""
++        self.path = Path(path).resolve()
++        self.metadata, self.tensors = {}, {}
++        with self.path.open("rb") as stream:
++            magic, version, tensors, values = _unpack(stream, "IIQQ")
++            if magic != 0x46554747 or version != 3 or tensors > 100_000 or values > 100_000:
++                raise ValueError("invalid GGUF v3 header")
++            for _ in range(values):
++                key = _string(stream)
++                if key in self.metadata:
++                    raise ValueError(f"duplicate GGUF metadata {key}")
++                value = _value(stream, keep=not key.startswith("tokenizer."))
++                self.metadata[key] = value
++            directory = []
++            for _ in range(tensors):
++                name = _string(stream)
++                dims, = _unpack(stream, "I")
++                if not 1 <= dims <= 4:
++                    raise ValueError(f"{name}: invalid GGUF rank")
++                shape = _unpack(stream, "Q" * dims)
++                kind, offset = _unpack(stream, "IQ")
++                directory.append((name, shape, kind, offset))
++            alignment = self.metadata.get("general.alignment", 32)
++            if alignment <= 0 or alignment & (alignment - 1):
++                raise ValueError("invalid GGUF alignment")
++            self.data_start = (stream.tell() + alignment - 1) // alignment * alignment
++        source_size, spans = self.path.stat().st_size, []
++        for name, shape, kind, offset in directory:
++            if name in self.tensors:
++                raise ValueError(f"duplicate GGUF tensor {name}")
++            if kind not in GGUF_TYPES:
++                raise ValueError(f"{name}: unsupported GGUF tensor type {kind}")
++            if any(d <= 0 for d in shape) or shape[0] % GGUF_TYPES[kind][1]:
++                raise ValueError(f"{name}: incompatible GGUF block geometry {shape}")
++            tensor = GGUFTensor(self.path, name, shape, kind, self.data_start + offset)
++            if offset % alignment or offset < 0 or tensor.start + tensor.nbytes > source_size:
++                raise ValueError(f"{name}: out-of-bounds or misaligned GGUF tensor")
++            self.tensors[name] = tensor
++            spans.append((tensor.start, tensor.start + tensor.nbytes))
++        spans.sort()
++        if any(a[1] > b[0] for a, b in zip(spans, spans[1:])):
++            raise ValueError("overlapping GGUF tensors")
++
++
++class GGUFModelSource:
++    def __init__(self, paths):
++        """所有分片齐备且目录、架构一致才允许作为完整模型来源。"""
++        shards = [GGUFShard(p) for p in paths]
++        if not shards:
++            raise ValueError("empty GGUF model source")
++        # GGUF 后续片允许只携带 split 元数据，模型元数据只在第零片。
++        shards.sort(key=lambda s: s.metadata.get("split.no", 0))
++        self.metadata = shards[0].metadata
++        if self.metadata.get("general.architecture") != "qwen4exp":
++            raise ValueError("GGUF primary shard is not qwen4exp")
++        count = self.metadata.get("split.count", 1)
++        if len(shards) != count or {s.metadata.get("split.no", 0) for s in shards} != set(range(count)):
++            raise ValueError("incomplete or duplicate GGUF split set")
++        self.tensors = {}
++        geometry = {k: v for k, v in self.metadata.items() if k.startswith("qwen4exp.")}
++        for shard in shards:
++            if shard.metadata.get("general.architecture", "qwen4exp") != "qwen4exp":
++                raise ValueError("GGUF source is not qwen4exp")
++            if shard.metadata.get("split.count", 1) != count:
++                raise ValueError("GGUF split count mismatch")
++            for key, value in shard.metadata.items():
++                if key.startswith("qwen4exp.") and geometry.get(key) != value:
++                    raise ValueError(f"GGUF split geometry mismatch: {key}")
++            if shard.metadata.get("split.tensors.count", len(self.tensors)) != self.metadata.get("split.tensors.count", len(self.tensors)):
++                raise ValueError("GGUF declared split tensor count mismatch")
++            for name, tensor in shard.tensors.items():
++                if name in self.tensors:
++                    raise ValueError(f"duplicate split tensor {name}")
++                self.tensors[name] = tensor
++        expected = self.metadata.get("split.tensors.count", len(self.tensors))
++        if len(self.tensors) != expected:
++            raise ValueError(f"GGUF tensor count mismatch: {len(self.tensors)} != {expected}")
++
++
++@dataclass(frozen=True)
++class TensorMapping:
++    target: str
++    semantics: str = "identity"
++    # 保留不同量化类型的独立段，由线性层按 output offset 拼接，禁止拼原始字节。
++    segment: str | None = None
++    head_layout: str = "native"
++
++
++_GLOBAL = {
++    "token_embd.weight": "embed_tokens.weight", "output.weight": "lm_head.weight",
++    "output_hc_down.weight": "hyper_connection_mixer.input_mix_weight_down.weight",
++    "output_hc_up.weight": "hyper_connection_mixer.input_mix_weight_up.weight",
++    "output_hc_norm.weight": "hyper_connection_mixer.hc_norm.weight",
++}
++_LAYER = {
++    "ffn_gate_inp.weight": "mlp.gate.weight",
++    "ffn_gate_inp_shexp.weight": "mlp.shared_expert_gate.weight",
++    "ffn_gate_shexp.weight": "mlp.shared_expert.gate_up_proj.weight:gate",
++    "ffn_up_shexp.weight": "mlp.shared_expert.gate_up_proj.weight:up",
++    "ffn_down_shexp.weight": "mlp.shared_expert.down_proj.weight",
++    "attn_qkv.weight": "linear_attn.in_proj_qkvz.weight:qkv",
++    "attn_gate.weight": "linear_attn.in_proj_qkvz.weight:z",
++    "ssm_alpha.weight": "linear_attn.in_proj_ba.weight:a",
++    "ssm_beta.weight": "linear_attn.in_proj_ba.weight:b",
++    "ssm_out.weight": "linear_attn.out_proj.weight",
++    "ssm_conv1d.weight": "linear_attn.conv1d.weight",
++    "ssm_dt.bias": "linear_attn.dt_bias",
++    "ssm_a": "linear_attn.A_log", "ssm_norm.weight": "linear_attn.norm.weight",
++    "attn_q.weight": "self_attn.qkv_proj.weight:q",
++    "attn_k.weight": "self_attn.qkv_proj.weight:k",
++    "attn_v.weight": "self_attn.qkv_proj.weight:v",
++    "attn_output.weight": "self_attn.o_proj.weight",
++    "attn_q_norm.weight": "self_attn.q_norm.weight",
++    "attn_k_norm.weight": "self_attn.k_norm.weight",
++    "indexer.q_proj.weight": "self_attn.indexer.index_qk_proj.weight:q",
++    "indexer.k_proj.weight": "self_attn.indexer.index_qk_proj.weight:k",
++    "indexer.q_norm.weight": "self_attn.indexer.q_layernorm.weight",
++    "indexer.k_norm.weight": "self_attn.indexer.k_layernorm.weight",
++    "ple_key.weight": "ple.key_proj.weight", "ple_value.weight": "ple.value_proj.weight",
++    "ple_conv1d.weight": "ple.conv1d.weight",
++    "ple_norm_key.weight": "ple.norm_key.weight",
++    "ple_norm_query.weight": "ple.norm_query.weight",
++    "ple_norm_conv.weight": "ple.norm_conv.weight",
++}
++for _kind, _module in (("attn", "attn_hyper_connection"), ("ffn", "mlp_hyper_connection")):
++    for _role, _target in (("down", "input_mix_weight_down_block_inject.weight:down"),
++                           ("inject", "input_mix_weight_down_block_inject.weight:inject"),
++                           ("up", "input_mix_weight_up.weight"), ("norm", "hc_norm.weight")):
++        _LAYER[f"hc_{_kind}_{_role}.weight"] = f"{_module}.{_target}"
++
++
++def map_tensor(name):
++    """返回运行时目标和语义变换；未声明张量必须报错，不能静默丢弃。"""
++    if name == "per_layer_token_embd.weight":
++        return TensorMapping("ple_row_table", "iq4_nl_row_table")
++    if name in _GLOBAL:
++        target = _GLOBAL[name]
++    else:
++        match = re.fullmatch(r"blk\.(\d+)\.(.+)", name)
++        if match is None:
++            raise ValueError(f"unmapped GGUF tensor {name}")
++        layer, suffix = match.groups()
++        expert = re.fullmatch(r"ffn_(gate|up|down)_exps\.weight", suffix)
++        if expert:
++            return TensorMapping(f"layers.{layer}.mlp.experts.{expert[1]}", "expert_bank")
++        if suffix not in _LAYER:
++            raise ValueError(f"unmapped GGUF tensor {name}")
++        target = f"layers.{layer}.{_LAYER[suffix]}"
++    target, _, segment = target.partition(":")
++    semantics = "identity"
++    if target.endswith("A_log"):
++        semantics = "negative_exp_A"
++    elif target.endswith(("hc_norm.weight", "q_norm.weight", "k_norm.weight",
++                          "q_layernorm.weight", "k_layernorm.weight",
++                          "norm_key.weight", "norm_query.weight", "norm_conv.weight")):
++        semantics = "folded_plus_one_norm"
++    elif target.endswith("conv1d.weight"):
++        semantics = "depthwise_conv"
++    layout = "ggml_cyclic_gdn" if ".linear_attn." in target else "native"
++    return TensorMapping(target, semantics, segment or None, layout)
+diff --git a/python/freetoken/models/qwen4_exp/gguf_weight.py b/python/freetoken/models/qwen4_exp/gguf_weight.py
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/models/qwen4_exp/gguf_weight.py
+@@ -0,0 +1,67 @@
++"""完整 GGUF 与 FreeToken state_dict 的加载接口；专家和 PLE 保持独立 bank。"""
++import torch
++from freetoken.layers.base import BaseOP
++
++
++class GGUFEmbedding(BaseOP):
++    def __init__(self, tensor):
++        """embedding 常驻压缩字节，按 token 解量化，输出 FP32 residual。"""
++        self.num_embeddings = tensor.shape[1]
++        self.embedding_dim = tensor.shape[0]
++        self._type = tensor.type_id
++        self.packed_0 = torch.empty(tensor.nbytes, dtype=torch.uint8)
++
++    def forward(self, ids):
++        from freetoken.kernel.gguf_quant import dequantize_rows
++        return dequantize_rows(self.packed_0, ids, self.embedding_dim, self._type)
++
++
++def declare_fp32_small_parameters(model):
++    """GGUF 主干已是 uint8 buffer；剩余 norm/conv/状态参数声明 FP32，阻止 loader 降精度。"""
++    for name, value in tuple(vars(model).items()):
++        if name.startswith("_"):
++            continue
++        if isinstance(value, torch.Tensor) and value.is_floating_point():
++            setattr(model, name, value.float())
++        elif isinstance(value, BaseOP):
++            declare_fp32_small_parameters(value)
++        elif isinstance(value, (tuple, list)):
++            for child in value:
++                if isinstance(child, BaseOP):
++                    declare_fp32_small_parameters(child)
++
++
++def iter_gguf_weights(quant, device):
++    """读取完整主干压缩段、小参数和 GGUF hashing 常量；不读取 HF 主干。"""
++    for prefix, segments in quant.groups.items():
++        for index, tensor in enumerate(segments):
++            rows = tensor.nbytes // tensor.row_bytes
++            raw = torch.frombuffer(bytearray(tensor.read_rows(0, rows)), dtype=torch.uint8)
++            yield f"{prefix}.packed_{index}", raw.to(device)
++    grouped = {t.name for segments in quant.groups.values() for t in segments}
++    dtype = {0: torch.float32, 1: torch.float16, 30: torch.bfloat16}
++    for name, tensor in quant.source.tensors.items():
++        if name in grouped:
++            continue
++        mapping = quant.mapping[name]
++        if mapping.semantics in ("expert_bank", "iq4_nl_row_table"):
++            continue
++        raw = bytearray(tensor.read_rows(0, tensor.nbytes // tensor.row_bytes))
++        value = torch.frombuffer(raw, dtype=dtype[tensor.type_id]).float().reshape(tensor.torch_shape)
++        if mapping.semantics == "folded_plus_one_norm":
++            value = value - 1.0
++        elif mapping.semantics == "negative_exp_A":
++            if not bool((value < 0).all()):
++                raise ValueError(f"{name}: GDN decay parameters must be negative")
++            # GGUF 专用递推直接消费负的 exp(A)，避免 log/exp 往返改变权重。
++        elif mapping.semantics == "depthwise_conv":
++            value = value.unsqueeze(1)
++        yield "model." + mapping.target, value.to(device)
++    metadata = quant.source.metadata
++    for layer in metadata["qwen4exp.ple.layers"]:
++        prefix = f"model.layers.{layer}.ple.ple_embedding"
++        for suffix, key in (("layer_multipliers", "layer_multipliers"),
++                            ("ngram_heads_vocab_sizes", "head_vocab_sizes"),
++                            ("ngram_heads_offsets", "head_offsets")):
++            values = metadata["qwen4exp.ple." + key]
++            yield prefix + "." + suffix, torch.tensor(values, dtype=torch.int64, device=device)
+diff --git a/python/freetoken/models/qwen4_exp/model.py b/python/freetoken/models/qwen4_exp/model.py
+--- a/python/freetoken/models/qwen4_exp/model.py
++++ b/python/freetoken/models/qwen4_exp/model.py
+@@ -89,10 +89,14 @@
+ class Qwen4ExpModel(BaseOP):
+     def __init__(self, config: ModelConfig, *, prefix: str = "model") -> None:
+         self.hc_count = config.qwen4_args.hc_count
+-        self.embed_tokens = VocabParallelEmbedding(
+-            num_embeddings=config.vocab_size,
+-            embedding_dim=config.hidden_size,
+-        )
++        if getattr(config.quant, "dialect", None) == "gguf_strata":
++            from .gguf_weight import GGUFEmbedding
++            self.embed_tokens = GGUFEmbedding(config.quant.source.tensors["token_embd.weight"])
++        else:
++            self.embed_tokens = VocabParallelEmbedding(
++                num_embeddings=config.vocab_size,
++                embedding_dim=config.hidden_size,
++            )
+         self.layers = OPList(
+             [
+                 Qwen4ExpDecoderLayer(config, layer_id, prefix=f"{prefix}.layers.{layer_id}")
+@@ -139,6 +143,9 @@
+             quant_config=config.quant,
+             prefix="lm_head",
+         )
++        if getattr(config.quant, "dialect", None) == "gguf_strata":
++            from .gguf_weight import declare_fp32_small_parameters
++            declare_fp32_small_parameters(self)
+         super().__init__()
+ 
+     def load_host_tables(self, engine_config) -> int:
+@@ -190,6 +197,7 @@
+                 constants,
+                 max_graph_rows=max(256, engine_config.cuda_graph_max_bs or 0),
+                 max_extend_tokens=engine_config.max_extend_tokens,
++                dtype=torch.float32 if getattr(self._config.quant, "dialect", None) == "gguf_strata" else torch.bfloat16,
+             )
+             self._ple_table = disk_table
+             for ple in ple_layers:
+diff --git a/python/freetoken/models/qwen4_exp/moe.py b/python/freetoken/models/qwen4_exp/moe.py
+--- a/python/freetoken/models/qwen4_exp/moe.py
++++ b/python/freetoken/models/qwen4_exp/moe.py
+@@ -16,12 +16,26 @@
+     Same weights, same state dict. The gate reduction stays ahead of the routed experts, which may write into ``hidden_states`` in place.
+     """
+ 
++    def __init__(self, config, layer_id=None, *, prefix=""):
++        """GGUF router 使用压缩线性接口，保持 BF16 权重配 FP32 激活的直接计算。"""
++        super().__init__(config, layer_id, prefix=prefix)
++        self._gguf = getattr(config.quant, "dialect", None) == "gguf_strata"
++        if self._gguf:
++            from freetoken.layers import LinearReplicated
++            self.gate = LinearReplicated(config.hidden_size, config.num_experts, has_bias=False,
++                                          quant_config=config.quant, prefix=f"{prefix}.gate")
++            self.shared_expert_gate = LinearReplicated(config.hidden_size, 1, has_bias=False,
++                                                       quant_config=config.quant, prefix=f"{prefix}.shared_expert_gate")
++
+     def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
+         num_tokens, hidden_dim = hidden_states.shape
+         hidden_states = hidden_states.view(-1, hidden_dim)
+         router_logits = self.gate.forward(hidden_states)
+         shared = self.shared_expert.forward(hidden_states)
+-        gate = shared_gate_sigmoid(hidden_states, self.shared_expert_gate.weight.view(-1))
++        if self._gguf:
++            gate = self.shared_expert_gate.forward(hidden_states).sigmoid().view(-1)
++        else:
++            gate = shared_gate_sigmoid(hidden_states, self.shared_expert_gate.weight.view(-1))
+         routed = self.experts.forward(hidden_states=hidden_states, router_logits=router_logits)
+         return shared_gate_mul_add(routed, shared, gate).view(num_tokens, hidden_dim)
+ 
+diff --git a/python/freetoken/models/qwen4_exp/ple_disk.py b/python/freetoken/models/qwen4_exp/ple_disk.py
+--- a/python/freetoken/models/qwen4_exp/ple_disk.py
++++ b/python/freetoken/models/qwen4_exp/ple_disk.py
+@@ -50,6 +50,8 @@
+     row_bytes: int
+     row_stride: int
+     scale: float
++    logical_dim: int | None = None
++    format: str = "fp8_e4m3"
+ 
+     @property
+     def total_rows(self) -> int:
+@@ -97,6 +99,14 @@
+ 
+ def resolve_row_source(folder: str) -> PleRowSource:
+     """Pick the row source for a checkpoint; the seam where a repacked format would plug in."""
++    from freetoken.layers.quantization import get_quant_config
++    quant = get_quant_config()
++    if getattr(quant, "dialect", None) == "gguf_strata":
++        tensor = quant.source.tensors["per_layer_token_embd.weight"]
++        if tensor.type_name != "IQ4_NL" or len(tensor.shape) != 2:
++            raise ValueError("GGUF PLE requires an IQ4_NL row matrix")
++        return PleRowSource([str(tensor.path)], [0], [tensor.start], tensor.shape[1],
++                            tensor.row_bytes, tensor.row_bytes, 1.0, tensor.shape[0], "iq4_nl")
+     return source_from_safetensors(folder)
+ 
+ 
+@@ -115,7 +125,8 @@
+         from freetoken.kernel.row_store import PleStore
+ 
+         self.num_rows = source.total_rows
+-        self.head_dim = source.row_bytes  # fp8: one byte per element
++        self.head_dim = source.logical_dim or source.row_bytes
++        self._format = source.format
+         self.dtype = dtype
+         self.heads = int(hash_constants["num_ngram_heads"])
+         self.scale = source.scale
+@@ -142,7 +153,7 @@
+             use_io_uring=os.getenv(_IO_URING_ENV, "1") != "0",
+         )
+         self._device = torch.device("cuda", torch.cuda.current_device())
+-        self._token_bytes = self.heads * self.head_dim
++        self._token_bytes = self.heads * source.row_bytes
+         # allocated up front: pinned alloc inside stream capture is illegal; one replay consumes it at a time
+         self._graph_pinned = alloc_pinned_tensor(max_graph_rows * self._token_bytes, dtype=torch.uint8)
+         self._graph_pinned.zero_()  # padded decode lanes read whatever sits here
+@@ -272,9 +283,15 @@
+         dev[:nbytes].copy_(pinned[:nbytes], non_blocking=True)
+         if not capturing:
+             self._eager_read[self._eager_slot].record(stream)
+-        values = dev[:nbytes].view(torch.float8_e4m3fn).to(self.dtype)
+-        if self.scale != 1.0:
+-            values = values * self.scale
++        if self._format == "iq4_nl":
++            from freetoken.kernel.gguf_quant import dequantize_rows
++            # RowStore 已按请求/head 顺序填充压缩行，这里的索引是 staging 行号。
++            staging_ids = torch.arange(row_ids.numel(), device=self._device, dtype=torch.int64)
++            values = dequantize_rows(dev[:nbytes], staging_ids, self.head_dim, 20).to(self.dtype)
++        else:
++            values = dev[:nbytes].view(torch.float8_e4m3fn).to(self.dtype)
++            if self.scale != 1.0:
++                values = values * self.scale
+         values = values.view(*row_ids.shape[:-1], -1)
+         if out is None:
+             return values
+diff --git a/python/freetoken/models/qwen4_exp/weight.py b/python/freetoken/models/qwen4_exp/weight.py
+--- a/python/freetoken/models/qwen4_exp/weight.py
++++ b/python/freetoken/models/qwen4_exp/weight.py
+@@ -206,6 +206,12 @@
+     if get_tp_info().size > 1:
+         raise NotImplementedError("qwen4_exp weight loading supports TP=1 only")
+     if not include_non_moe:
++        return
++
++    quant = get_quant_config()
++    if getattr(quant, "dialect", None) == "gguf_strata":
++        from .gguf_weight import iter_gguf_weights
++        yield from iter_gguf_weights(quant, device)
+         return
+ 
+     hf_config = cached_load_hf_config(model_path)
+diff --git a/python/freetoken/moe/fused_q2_q8.py b/python/freetoken/moe/fused_q2_q8.py
+new file mode 100644
+--- /dev/null
++++ b/python/freetoken/moe/fused_q2_q8.py
+@@ -0,0 +1,129 @@
++"""GGUF 专家 Q2×Q8 路径；bank/cache 字节不变，激活及状态保留 FP32。"""
++from __future__ import annotations
++
++import torch
++import triton
++import triton.language as tl
++
++
++@triton.jit
++def _quantize(X, Q, S, K: tl.constexpr, XS0: tl.constexpr, XS1: tl.constexpr):
++    token, block = tl.program_id(0), tl.program_id(1)
++    col = block * 32 + tl.arange(0, 32)
++    x = tl.load(X + token * XS0 + col * XS1).to(tl.float32)
++    d = tl.max(tl.abs(x), 0) / 127.0
++    inv = tl.where(d > 0, 1.0 / d, 0.0)
++    z = x * inv
++    q = (z + tl.where(z >= 0, .5, -.5)).to(tl.int32)
++    q = tl.minimum(tl.maximum(q, -127), 127).to(tl.int8)
++    tl.store(Q + token * K + col, q)
++    tl.store(S + token * (K // 32) + block, d)
++
++
++@triton.jit
++def _codes(W, expert, rows, cols, N: tl.constexpr, K: tl.constexpr):
++    offset = expert * N * (K // 64 * 18) + rows * (K // 64 * 18) + (cols // 64) * 18
++    valid = (rows < N) & (cols < K)
++    lo = tl.load(W + offset, valid, 0).to(tl.uint16)
++    hi = tl.load(W + offset + 1, valid, 0).to(tl.uint16)
++    d = (lo | (hi << 8)).to(tl.float16, bitcast=True).to(tl.float32)
++    byte = tl.load(W + offset + 2 + cols % 64 // 4, valid, 0).to(tl.int32)
++    q = (((byte >> ((cols % 4) * 2)) & 3) - 1).to(tl.int8)
++    return q, d
++
++
++@triton.jit
++def _vector(Q, S, W, IDS, Y, K: tl.constexpr, N: tl.constexpr,
++            INPUT_TOPK: tl.constexpr, BN: tl.constexpr, BG: tl.constexpr):
++    route = tl.program_id(0)
++    token = route // INPUT_TOPK
++    expert = tl.load(IDS + route).to(tl.int64)
++    rows = tl.program_id(1) * BN + tl.arange(0, BN)
++    groups = tl.arange(0, BG)
++    cols = groups[:, None] * 32 + tl.arange(0, 32)[None, :]
++    x = tl.load(Q + token * K + cols, cols < K, 0).to(tl.int32)
++    dx = tl.load(S + token * (K // 32) + groups, groups < K // 32, 0)
++    w, dw = _codes(W, expert, rows[:, None, None], cols[None, :, :], N, K)
++    dot = tl.sum(w.to(tl.int32) * x[None, :, :], 2).to(tl.float32)
++    value = tl.sum(dot * tl.sum(dw, 2) * (1.0 / 32.0) * dx[None, :], 1)
++    tl.store(Y + route * N + rows, value, rows < N)
++
++
++@triton.jit
++def _grouped(Q, S, W, SORTED, EXPERTS, PADDED, Y,
++             ROUTES: tl.constexpr, N: tl.constexpr, K: tl.constexpr,
++             INPUT_TOPK: tl.constexpr, BM: tl.constexpr, BN: tl.constexpr):
++    block = tl.program_id(0)
++    if block * BM >= tl.load(PADDED):
++        return
++    routes = tl.load(SORTED + block * BM + tl.arange(0, BM))
++    tokens = routes // INPUT_TOPK
++    expert = tl.load(EXPERTS + block).to(tl.int64)
++    rows = tl.program_id(1) * BN + tl.arange(0, BN)
++    cols = tl.arange(0, 32)
++    acc = tl.zeros((BM, BN), tl.float32)
++    for group in range(K // 32):
++        k = group * 32 + cols
++        a = tl.load(Q + tokens[:, None] * K + k[None, :], routes[:, None] < ROUTES, 0)
++        b, unused = _codes(W, expert, rows[:, None], k[None, :], N, K)
++        # int8 tensor core 的块内点积为整数；块外使用原生 FP16 W scale 和 FP32 X scale。
++        dot = tl.dot(a, tl.trans(b)).to(tl.float32)
++        dx = tl.load(S + tokens * (K // 32) + group, routes < ROUTES, 0)
++        _, dw = _codes(W, expert, rows, tl.full((BN,), group * 32, tl.int32), N, K)
++        acc += dot * dw[None, :] * dx[:, None]
++    tl.store(Y + routes[:, None] * N + rows[None, :], acc,
++             (routes[:, None] < ROUTES) & (rows[None, :] < N))
++
++
++def quantize_expert_activation(x):
++    """专家 scale 为 FP32，舍入遵循冻结 Strata 的 GPU Q8 scaled 路径。"""
++    if x.ndim != 2 or x.shape[1] % 32 or not x.is_cuda or x.dtype != torch.float32:
++        raise ValueError("GGUF expert Q8 expects a CUDA FP32 matrix with width divisible by 32")
++    q = torch.empty(x.shape, device=x.device, dtype=torch.int8)
++    scales = torch.empty((x.shape[0], x.shape[1] // 32), device=x.device, dtype=torch.float32)
++    _quantize[(x.shape[0], x.shape[1] // 32)](x, q, scales, x.shape[1], *x.stride(),
++                                           num_warps=4, enable_fp_fusion=False)
++    return q, scales
++
++
++def fused_experts_q2_q8(x, gate_up, down, topk_weights, topk_ids, *, is_prefill=False):
++    """复用完整真实专家及 GPU 路由，只改变计算契约，不创建 BF16 专家副本。"""
++    from freetoken.moe.fused_q2_0 import _grouped_gate_act, _reduce
++    if x.dtype != torch.float32 or gate_up.dtype != torch.uint8 or down.dtype != torch.uint8:
++        raise ValueError("GGUF Q2×Q8 requires FP32 activation and uint8 expert banks")
++    if not all(t.is_contiguous() and t.is_cuda for t in (x, gate_up, down, topk_weights, topk_ids)):
++        raise ValueError("GGUF Q2×Q8 requires contiguous CUDA inputs")
++    tokens, hidden = x.shape
++    intermediate = gate_up.shape[1] // 2
++    topk = topk_ids.shape[1]
++    routes = tokens * topk
++    if (hidden % 64 or intermediate % 64 or gate_up.shape[2] != hidden // 64 * 18
++            or down.shape != (gate_up.shape[0], hidden, intermediate // 64 * 18)
++            or topk_ids.shape[0] != tokens or topk_weights.shape != topk_ids.shape):
++        raise ValueError("incompatible GGUF Q2×Q8 expert/routing geometry")
++    gate_values = torch.empty((routes, 2 * intermediate), dtype=torch.float32, device=x.device)
++    active = torch.empty((routes, intermediate), dtype=torch.float32, device=x.device)
++    routed = torch.empty((routes, hidden), dtype=torch.float32, device=x.device)
++    out = torch.empty_like(x)
++    grouped = is_prefill and tokens >= 128
++    if grouped:
++        from freetoken.moe.fused import moe_align_block_size
++        sorted_ids, experts, padded = moe_align_block_size(topk_ids, 16, gate_up.shape[0])
++    def project(value, bank, result, input_topk):
++        q, scales = quantize_expert_activation(value)
++        k, n = value.shape[1], result.shape[1]
++        if grouped:
++            _grouped[(triton.cdiv(sorted_ids.numel(), 16), triton.cdiv(n, 32))](
++                q, scales, bank, sorted_ids, experts, padded, result,
++                routes, n, k, input_topk, 16, 32, num_warps=4, enable_fp_fusion=False)
++        else:
++            _vector[(routes, triton.cdiv(n, 4))](q, scales, bank, topk_ids, result,
++                k, n, input_topk, 4, triton.next_power_of_2(k // 32), num_warps=4,
++                enable_fp_fusion=False)
++    project(x, gate_up, gate_values, topk)
++    _grouped_gate_act[(triton.cdiv(routes * intermediate, 256),)](
++        gate_values, active, intermediate, routes * intermediate, 256, enable_fp_fusion=False)
++    project(active, down, routed, 1)
++    _reduce[(tokens, triton.cdiv(hidden, 128))](routed, topk_weights, out, hidden,
++        topk, triton.next_power_of_2(topk), 128, num_warps=4, enable_fp_fusion=False)
++    return out
+diff --git a/python/freetoken/version.py b/python/freetoken/version.py
+--- a/python/freetoken/version.py
++++ b/python/freetoken/version.py
+@@ -1 +1 @@
+-__version__ = "0.1.3+speed.q2opt2"
++__version__ = "0.1.3+speed.strataq2dev1"
+diff --git a/tests/models/qwen4_exp/test_gguf_gdn.py b/tests/models/qwen4_exp/test_gguf_gdn.py
+new file mode 100644
+--- /dev/null
++++ b/tests/models/qwen4_exp/test_gguf_gdn.py
+@@ -0,0 +1,57 @@
++"""GGUF GDN 对独立逐 token Torch 参考，覆盖真实卷积视图和状态续接。"""
++import unittest
++from types import SimpleNamespace
++import torch
++import torch.nn.functional as F
++
++
++@unittest.skipUnless(torch.cuda.is_available(), "requires CUDA")
++class GGUFStateTests(unittest.TestCase):
++    def test_channels_first_view_varlen_snapshot_and_resume(self):
++        from freetoken.kernel.triton.gguf_gdn import gguf_gdn_forward
++        torch.manual_seed(17)
++        hk,hv,d,total = 2,6,128,12
++        raw = torch.randn((2*hk*d+hv*d,total),device='cuda')
++        q,k,v = raw.T.split([hk*d,hk*d,hv*d],-1)
++        q,k,v = q.reshape(total,hk,d),k.reshape(total,hk,d),v.reshape(total,hv,d)
++        self.assertEqual(q.stride(-1),total)
++        a,b = torch.randn((total,hv),device='cuda'),torch.randn((total,hv),device='cuda')
++        decay = -torch.rand(hv,device='cuda')
++        dt = torch.randn(hv,device='cuda')
++        state = torch.randn((4,hv,d,d),device='cuda')*.01
++        expected_state = state.clone()
++        expected = torch.empty_like(v)
++        def step(row,slot):
++            # Strata L2 epsilon is inside sqrt; do not borrow candidate normalization.
++            qh = q[row]*torch.rsqrt(q[row].square().sum(-1,keepdim=True)+1e-6)
++            kh = k[row]*torch.rsqrt(k[row].square().sum(-1,keepdim=True)+1e-6)
++            head = torch.arange(hv,device='cuda')%hk
++            qh,kh = qh[head],kh[head]
++            g = torch.exp(decay*F.softplus(a[row]+dt))
++            s = expected_state[slot]*g[:,None,None]
++            delta = (v[row]-torch.einsum('hkv,hk->hv',s,kh))*b[row].sigmoid()[:,None]
++            s = s+kh[:,:,None]*delta[:,None,:]
++            expected_state[slot].copy_(s)
++            return torch.einsum('hkv,hk->hv',s,qh)*d**-.5
++        for begin,end,slot in ((0,9,1),(9,12,3)):
++            for row in range(begin,end):
++                expected[row] = step(row,slot)
++                if row == 4:
++                    expected_state[2].copy_(expected_state[slot])
++        fla = SimpleNamespace(cu_seqlens=torch.tensor([0,9,12],device='cuda',dtype=torch.int32),
++            cache_indices=torch.tensor([1,3],device='cuda',dtype=torch.int32),
++            track_boundary_row=torch.tensor([5],device='cuda',dtype=torch.int64),
++            track_dst=torch.tensor([2],device='cuda',dtype=torch.int64))
++        got = gguf_gdn_forward(q,k,v,a,b,decay,dt,state,fla,is_decode=False)
++        torch.testing.assert_close(got,expected,rtol=5e-5,atol=3e-6)
++        torch.testing.assert_close(state,expected_state,rtol=5e-5,atol=3e-6)
++        one = SimpleNamespace(cu_seqlens=torch.tensor([0,1],device='cuda',dtype=torch.int32),
++            cache_indices=torch.tensor([2],device='cuda',dtype=torch.int32),track_boundary_row=None,track_dst=None)
++        reference = step(5,2)
++        got = gguf_gdn_forward(q[5:6],k[5:6],v[5:6],a[5:6],b[5:6],decay,dt,state,one,is_decode=True)
++        torch.testing.assert_close(got[0],reference,rtol=5e-5,atol=3e-6)
++        torch.testing.assert_close(state[2],expected_state[2],rtol=5e-5,atol=3e-6)
++
++
++if __name__ == '__main__':
++    unittest.main()
+diff --git a/tests/models/qwen4_exp/test_gguf_source.py b/tests/models/qwen4_exp/test_gguf_source.py
+new file mode 100644
+--- /dev/null
++++ b/tests/models/qwen4_exp/test_gguf_source.py
+@@ -0,0 +1,96 @@
++"""完整 GGUF 来源的失败边界；不使用大权重或 GPU。"""
++import struct
++import tempfile
++from pathlib import Path
++import unittest
++from freetoken.models.qwen4_exp.gguf_source import GGUFShard, GGUFModelSource, map_tensor
++
++
++def string(value):
++    data=value.encode()
++    return struct.pack("<Q",len(data))+data
++
++
++def write_shard(path,metadata,tensors,body):
++    data=struct.pack("<IIQQ",0x46554747,3,len(tensors),len(metadata))
++    for key,value in metadata.items():
++        data+=string(key)
++        data+=struct.pack("<I",8)+string(value) if isinstance(value,str) else struct.pack("<II",4,value)
++    for name,shape,kind,offset in tensors:
++        data+=string(name)+struct.pack("<I",len(shape))+struct.pack("<"+"Q"*len(shape),*shape)+struct.pack("<IQ",kind,offset)
++    data+=bytes((-len(data))%32)+body
++    path.write_bytes(data)
++
++
++class CompleteGGUFSourceTests(unittest.TestCase):
++    def setUp(self):
++        self.temp=tempfile.TemporaryDirectory()
++        self.addCleanup(self.temp.cleanup)
++        self.root=Path(self.temp.name)
++
++    def pair(self):
++        primary=self.root/"a.gguf";ple=self.root/"b.gguf"
++        meta={"general.architecture":"qwen4exp","split.count":2,"split.no":0,
++              "split.tensors.count":2,"qwen4exp.embedding_length":64}
++        write_shard(primary,meta,[("token_embd.weight",(64,2),42,0)],bytes(range(36)))
++        write_shard(ple,{"split.count":2,"split.no":1,"split.tensors.count":2},
++                    [("per_layer_token_embd.weight",(32,3),20,0)],bytes(54))
++        return primary,ple
++
++    def test_secondary_split_can_omit_architecture_and_order_is_irrelevant(self):
++        a,b=self.pair()
++        source=GGUFModelSource([b,a])
++        self.assertEqual(source.metadata["qwen4exp.embedding_length"],64)
++        self.assertEqual(source.tensors["token_embd.weight"].read_rows(1,1),bytes(range(18,36)))
++        self.assertEqual(source.tensors["per_layer_token_embd.weight"].row_bytes,18)
++
++    def test_missing_or_duplicate_split_is_rejected(self):
++        a,b=self.pair()
++        for paths in ([a],[b],[a,a]):
++            with self.subTest(paths=paths),self.assertRaises(ValueError):
++                GGUFModelSource(paths)
++
++    def test_conflicting_split_geometry_is_rejected(self):
++        a,b=self.pair()
++        write_shard(b,{"split.count":2,"split.no":1,"split.tensors.count":2,"qwen4exp.embedding_length":128},
++                    [("per_layer_token_embd.weight",(32,3),20,0)],bytes(54))
++        with self.assertRaisesRegex(ValueError,"geometry mismatch"):
++            GGUFModelSource([a,b])
++
++    def test_actual_tensor_count_must_match_declaration(self):
++        a,b=self.pair()
++        write_shard(b,{"split.count":2,"split.no":1,"split.tensors.count":2},[],b"")
++        with self.assertRaisesRegex(ValueError,"tensor count mismatch"):
++            GGUFModelSource([a,b])
++
++    def test_overlapping_nonexpert_tensors_are_rejected(self):
++        path=self.root/"overlap.gguf"
++        write_shard(path,{},[("x",(32,2),20,0),("y",(32,2),20,32)],bytes(68))
++        with self.assertRaisesRegex(ValueError,"overlapping"):
++            GGUFShard(path)
++
++    def test_truncation_misalignment_and_block_width_are_rejected(self):
++        cases=[((64,2),42,0,bytes(35)),((64,1),42,1,bytes(32)),((63,1),42,0,bytes(32))]
++        for index,(shape,kind,offset,body) in enumerate(cases):
++            path=self.root/f"bad-{index}.gguf"
++            write_shard(path,{},[("x",shape,kind,offset)],body)
++            with self.subTest(index=index),self.assertRaises(ValueError):
++                GGUFShard(path)
++
++    def test_row_read_cannot_cross_tensor_boundary(self):
++        a,b=self.pair();tensor=GGUFModelSource([a,b]).tensors["token_embd.weight"]
++        for first,count in ((-1,1),(1,2),(0,-1)):
++            with self.subTest(first=first,count=count),self.assertRaises(ValueError):
++                tensor.read_rows(first,count)
++
++    def test_unknown_tensor_fails_and_norm_and_gdn_semantics_are_explicit(self):
++        with self.assertRaisesRegex(ValueError,"unmapped"):
++            map_tensor("blk.0.surprise.weight")
++        self.assertEqual(map_tensor("blk.0.attn_q_norm.weight").semantics,"folded_plus_one_norm")
++        mapping=map_tensor("blk.0.ssm_a")
++        self.assertEqual(mapping.semantics,"negative_exp_A")
++        self.assertEqual(mapping.head_layout,"ggml_cyclic_gdn")
++
++
++if __name__ == "__main__":
++    unittest.main()

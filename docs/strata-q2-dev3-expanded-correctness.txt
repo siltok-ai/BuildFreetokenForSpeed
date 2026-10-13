@@ -1,0 +1,18 @@
+Flash Next Strata Q2：网络复查与 dev3 扩展正确性证据（2026-10-12）
+网络复查：完整两片GGUF大小/mtime与既有完整SHA回执一致；重新计算dev3 wheel与Strata.exe SHA一致；固定GGML HEAD和git fsck通过。没有重新下载、替换权重，也未验证互联网本身的可用性。
+固定任务烟雾检查：FreeToken 7/7，冻结Strata 7/7。包含算术、中文、排序、JSON、Python结构、多轮记忆和2134-token长上下文检索；实际输出长度、EOS和截断另记。不是广泛质量基准。
+逐层/logits对照：将FreeToken实际输出原样追加到固定prompt，由Strata teacher forcing，比较相同输入。实际采样与选择行head重算一致。全部49个残差位置流有观察。
+Strata参考同时保留观察版本（dump-layers关闭fused GR）和正常fused版本；不能把它们的算术差异误当成网络或未定义行为。
+新采集脚本失败记录：第一版计入终止后的未使用流水线forward；第二版挂钩offline_send_result而实际调度使用已绑定send_result；现均修复，保留失败日志，未改引擎。
+真实GDN状态：504项检查，passed=True，最大relative L2=2.01627e-06。覆盖全部36层cold/restored prefill/decode，实际128-token前缀恢复及conv/recurrent快照；冻结Strata CUDA使用相同实际中间输入和起始状态。
+arithmetic：输入29，相同输入采样7位置；FT vs正常Strata relative L2=0.0612341，平均KL=0.000205666，最大KL=0.00122705，top1 7/7；参考观察差异平均KL=0.000176035。
+chinese：输入31，相同输入采样5位置；FT vs正常Strata relative L2=0.0413875，平均KL=0.000266265，最大KL=0.00122705，top1 5/5；参考观察差异平均KL=0.000249735。
+sorting：输入48，相同输入采样18位置；FT vs正常Strata relative L2=0.0511791，平均KL=8.13391e-05，最大KL=0.00122705，top1 18/18；参考观察差异平均KL=7.02599e-05。
+json：输入56，相同输入采样17位置；FT vs正常Strata relative L2=0.0545209，平均KL=0.000418306，最大KL=0.00362476，top1 17/17；参考观察差异平均KL=0.000305686。
+code：输入38，相同输入采样20位置；FT vs正常Strata relative L2=0.050166，平均KL=0.000413949，最大KL=0.00624207，top1 20/20；参考观察差异平均KL=9.5135e-05。
+multi_turn：输入50，相同输入采样6位置；FT vs正常Strata relative L2=0.0286424，平均KL=0.000212682，最大KL=0.00122705，top1 6/6；参考观察差异平均KL=0.000182966。
+long_retrieval：输入2134，相同输入采样34位置；FT vs正常Strata relative L2=0.136779，平均KL=0.00307574，最大KL=0.052509，top1 34/34；参考观察差异平均KL=0.000973428。
+整体正确性仍待验收；未开始正式Q2测速、MTP或Speed接入。
+证据：C:\workspace\artifacts\flash-next-strata-q2-20261012\expanded-correctness-dev3-v3\comparison.json
+材料归档：C:\workspace\worktrees\build-freetoken-flash-next-strata-q2\artifacts\strataq2dev3-cp312-cu130-sm120\validation\expanded-correctness-20261012\evidence-index.json
+长上下文原生控制：[{"label": "native_cpu_order_vs_native_observed", "relative_l2": 0.09716835618019104, "max_error": 5.890028476715088, "centered_relative_l2": 0.15794238448143005, "mean_kl": 0.0006474087131209671, "max_kl": 0.0072564431466162205, "top1_matches": 34, "rows": 34}, {"label": "native_fused_vs_native_observed", "relative_l2": 0.10034965723752975, "max_error": 6.0869832038879395, "centered_relative_l2": 0.16123181581497192, "mean_kl": 0.0009734275517985225, "max_kl": 0.010384704917669296, "top1_matches": 34, "rows": 34}, {"label": "freetoken_vs_native_observed", "relative_l2": 0.14428788423538208, "max_error": 9.418220520019531, "centered_relative_l2": 0.22214148938655853, "mean_kl": 0.0009023529710248113, "max_kl": 0.008146093226969242, "top1_matches": 34, "rows": 34}, {"label": "freetoken_vs_native_fused", "relative_l2": 0.13677872717380524, "max_error": 10.646486282348633, "centered_relative_l2": 0.21130457520484924, "mean_kl": 0.0030757447239011526, "max_kl": 0.05250898748636246, "top1_matches": 34, "rows": 34}, {"label": "freetoken_vs_native_cpu-order", "relative_l2": 0.13942812383174896, "max_error": 9.982441902160645, "centered_relative_l2": 0.2165190875530243, "mean_kl": 0.001346287433989346, "max_kl": 0.01964479312300682, "top1_matches": 34, "rows": 34}]

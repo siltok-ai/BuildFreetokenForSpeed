@@ -1,0 +1,634 @@
+{
+  "created_at_utc": "2026-10-13T05:22:12.645732+00:00",
+  "version": "0.1.3+speed.strataq2dev4",
+  "scope": "Fresh installed native revision, bounded runtime gate, standalone decode measurements and cache capacity experiment",
+  "runtime_acceptance_scope": "Allows independent major-repair evaluation only",
+  "full_runtime_acceptance": false,
+  "speed_acceptance": false,
+  "files": [
+    {
+      "path": "analyze_dev4_capacity_traces.py",
+      "bytes": 1477,
+      "sha256": "b45fbb0d369c04ed0deb99d89ef858230aa9d65b9f13fd6b2ab8ad85c92f5a4f"
+    },
+    {
+      "path": "analyze_freetoken_decode_traces.py",
+      "bytes": 5334,
+      "sha256": "0fdc975d9b0d4e941bfc489d786dc9edee6c5ac795a04afee815bc265106979c"
+    },
+    {
+      "path": "archive_dev4_native_runtime.py",
+      "bytes": 6002,
+      "sha256": "0c05b8434550d0cdaed9f09a0870494813ba00a56de1ad7946be528a28b54a49"
+    },
+    {
+      "path": "build_dev4_native_probe.ps1",
+      "bytes": 1299,
+      "sha256": "372d12bd2875038168baab0e1bac297975605ee6b220b9231bba9bb2f3e07529"
+    },
+    {
+      "path": "candidate_native_probe.py",
+      "bytes": 13564,
+      "sha256": "82bc909900fd3cc8f30b8d5c921f4e1d960db91f1fddb88418f5223b8a90f76e"
+    },
+    {
+      "path": "capture_freetoken_reference.py",
+      "bytes": 3286,
+      "sha256": "d457e7003798279893302341677e6cde4d7f4f73aca417704d69632419d484f3"
+    },
+    {
+      "path": "compare_execution_logits.py",
+      "bytes": 2629,
+      "sha256": "19a6b9eb16bd9aa5af617fcc1af6d76cb365274ff9718b5d31862de6272cae8b"
+    },
+    {
+      "path": "dev4-capacity-experiment-summary-v1.json",
+      "bytes": 4168,
+      "sha256": "6ff348bcbdbf9d6c62a7e5d50a0c6397f4ffe6cd745bb591c977fdc7fb3f5325"
+    },
+    {
+      "path": "dev4-capacity-trace-analysis-v1.json",
+      "bytes": 107391,
+      "sha256": "44a2bafcb67c2943d64b0213da380a73a661179a43320841beeb986ddbec3d48"
+    },
+    {
+      "path": "dev4-environment-prepare-v2.log",
+      "bytes": 1671,
+      "sha256": "408926e6022db276fe5b316241080c904c0c43508f628861cbc09018f5dee411"
+    },
+    {
+      "path": "dev4-environment-prepare.log",
+      "bytes": 844,
+      "sha256": "11919d5734ad9d2944ec9c0a27d6c215eff6d12e0e5b686c4801e405d771b60a"
+    },
+    {
+      "path": "dev4-final-producer-validator-v1.log",
+      "bytes": 3764,
+      "sha256": "e777d22b0053dae63192611a154be5afa30b001fbb8be9f6371252fe16bf01e4"
+    },
+    {
+      "path": "dev4-full-material-identity-v1.log",
+      "bytes": 954,
+      "sha256": "059aa20ea01d71f38ef344af678bb5f5a296040340253cffad95638ca23a6194"
+    },
+    {
+      "path": "dev4-full-material-identity-v2.log",
+      "bytes": 824,
+      "sha256": "c8dbf4288700f66068e7447546de961bcbe8f3b7081bcf0864929627c879bd1b"
+    },
+    {
+      "path": "dev4-full-native-build-v1-resource.json",
+      "bytes": 2425,
+      "sha256": "95b8a1a0eba97e2173c373916889e5980dc7f0ea8c12d10784bffc6a9e06958c"
+    },
+    {
+      "path": "dev4-full-native-build-v1-resource.stderr.log",
+      "bytes": 415,
+      "sha256": "6919a4ba5455bd7feac5437a30ac05b8d9d3afb42a2b1d4c51f5f3a05e2d9ef0"
+    },
+    {
+      "path": "dev4-full-native-build-v1-resource.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dev4-full-native-build-v2-resource.json",
+      "bytes": 4068088,
+      "sha256": "03b48de6a48d79c77c3e8a45fd141bf9019b8f6c43e85060909bae579c4ca057"
+    },
+    {
+      "path": "dev4-full-native-build-v2-resource.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dev4-full-native-build-v2-resource.stdout.log",
+      "bytes": 393,
+      "sha256": "21d046cae8c627c47188164944864a3c1abee69d41695eaa79b5f4817b332d45"
+    },
+    {
+      "path": "dev4-graph-matrix-v1-resource.json",
+      "bytes": 424018,
+      "sha256": "d98b9f9375aa15cfb53f6222baed4d5e98df00ba6f079431b4f99e81ac2da818"
+    },
+    {
+      "path": "dev4-graph-matrix-v1-resource.stderr.log",
+      "bytes": 1167,
+      "sha256": "f87600b6e95e1b1413516146eabee70aea04f3cbd128eaf85c0e2088ab4b9161"
+    },
+    {
+      "path": "dev4-graph-matrix-v1-resource.stdout.log",
+      "bytes": 19065,
+      "sha256": "30e0f905300e30c2b65840bb66f5fa2e5df032094fa8b8ca6d7602cb1448620f"
+    },
+    {
+      "path": "dev4-graph-matrix-v1.json",
+      "bytes": 32730,
+      "sha256": "6cb22d5d88021d59c0133993574fd094ddd6148764ee67d0a9a9b36421bac702"
+    },
+    {
+      "path": "dev4-installed-binding-gpu-tests-v2-resource.json",
+      "bytes": 103857,
+      "sha256": "f4a51fd2279b751754e9a5198f6707ce4b1db278dffa2dfb5a394443ebd1f33a"
+    },
+    {
+      "path": "dev4-installed-binding-gpu-tests-v2-resource.stderr.log",
+      "bytes": 1170,
+      "sha256": "2a8e1a3580dfc6cbbf862fae7b9efad1c1bf1b5ad84ca31a1342e3a0037d8f9e"
+    },
+    {
+      "path": "dev4-installed-binding-gpu-tests-v2-resource.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dev4-long-matrix-v1-diagnostic.json",
+      "bytes": 39,
+      "sha256": "7e554e2ea967b900afd6ad2c792499f053468a3e02b0f2f90b9dfba380f1f6fe"
+    },
+    {
+      "path": "dev4-long-matrix-v1-resource.json",
+      "bytes": 470505,
+      "sha256": "7668c13d00573310bab7e17a68019524f201a06c6a0e7171f4849053d07f4cbf"
+    },
+    {
+      "path": "dev4-long-matrix-v1-resource.stderr.log",
+      "bytes": 749,
+      "sha256": "0b4bb227311eea1c18230a60c17f129010e15f6638f103a48e145310e620dc5f"
+    },
+    {
+      "path": "dev4-long-matrix-v1-resource.stdout.log",
+      "bytes": 18320,
+      "sha256": "51454e6871f95858b4a77393542a77d3e6b0515cb6f4c118b4dfaa392b7d5b51"
+    },
+    {
+      "path": "dev4-long-matrix-v1-stop-reason.json",
+      "bytes": 410,
+      "sha256": "129884e51cdcbafa5f931ce294b6c76d65ca81ab4723cd464f0aa52d24bed484"
+    },
+    {
+      "path": "dev4-long-matrix-v1.json",
+      "bytes": 31546,
+      "sha256": "30198db5098a91ed07cfd0995c645ffbecae819c9ee993c631397c0c5a778702"
+    },
+    {
+      "path": "dev4-long-matrix-v2-diagnostic.json",
+      "bytes": 434938,
+      "sha256": "e772707285903e853b756485e4a813cff6a67447c5216aff2f3d71032c615049"
+    },
+    {
+      "path": "dev4-long-matrix-v2-resource.json",
+      "bytes": 495987,
+      "sha256": "5c1517371e1a6250fe7605c27f2206494b996344f7e33533ffd0be9d87cfbb51"
+    },
+    {
+      "path": "dev4-long-matrix-v2-resource.stderr.log",
+      "bytes": 749,
+      "sha256": "2a923288d29f455a58377f5824969df4f535034dacf93fc243105f719c5cf990"
+    },
+    {
+      "path": "dev4-long-matrix-v2-resource.stdout.log",
+      "bytes": 21600,
+      "sha256": "d3752984e06fe529157b026c91e04f014b7511673dc0bf14fd506a88808ca0ff"
+    },
+    {
+      "path": "dev4-long-matrix-v2.json",
+      "bytes": 37053,
+      "sha256": "12360f31b79d9c64a3d879c09ddc61418170ab945c0870461fe81723192db041"
+    },
+    {
+      "path": "dev4-native-aot-probe-v1-resource.json",
+      "bytes": 646754,
+      "sha256": "881e71a6fc8bf9f01e97cb1069313ca3c5d0c1ef0b2146ba3f5159a302d412f6"
+    },
+    {
+      "path": "dev4-native-aot-probe-v1-resource.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dev4-native-aot-probe-v1-resource.stdout.log",
+      "bytes": 251,
+      "sha256": "cdffc6b959c6edfdc120193a1a818e02ec44e4433193da2398a7816024b7ffcb"
+    },
+    {
+      "path": "dev4-native-binding-gpu-tests-v1-resource.json",
+      "bytes": 223686,
+      "sha256": "e7b8806ddf9b43cf11e476ab4977eb85ab6c2bad4dd359f686bc8ff2a6b943f0"
+    },
+    {
+      "path": "dev4-native-binding-gpu-tests-v1-resource.stderr.log",
+      "bytes": 1170,
+      "sha256": "5f36a24ad20f00917913a0a0cc044af126dfc2c7169cd41350f0a5793407e88e"
+    },
+    {
+      "path": "dev4-native-binding-gpu-tests-v1-resource.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dev4-native-component-v1-resource.json",
+      "bytes": 57757,
+      "sha256": "6f62a4a1e4b24861fedb95b949cd089d1ba6b0619f8623ff3906db1b6ba6a083"
+    },
+    {
+      "path": "dev4-native-component-v1-resource.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dev4-native-component-v1-resource.stdout.log",
+      "bytes": 7412,
+      "sha256": "8421b96b999d714f8b9da9554a3e86acc3c619bd29682db826364f54e06a947b"
+    },
+    {
+      "path": "dev4-native-component-v1.json",
+      "bytes": 14021,
+      "sha256": "ac4a3170a1874be661b8dddf5512e1efc1bcdb9866f1e8f000a84bcb15ab010a"
+    },
+    {
+      "path": "dev4-native-decode-repair-summary-v1.json",
+      "bytes": 58197,
+      "sha256": "b435865bfec6d469bb143c7c0e492b84bf44a4672cba2fec219d8cc73404cd86"
+    },
+    {
+      "path": "dev4-native-diagnostic-1024-v1-resource.json",
+      "bytes": 340338,
+      "sha256": "4534bf992bb923682ac8dd3e102271ce29457985564b8ab1949d483ca418e188"
+    },
+    {
+      "path": "dev4-native-diagnostic-1024-v1-resource.stderr.log",
+      "bytes": 1445,
+      "sha256": "5ee8451ef22d424fa11ae7a595afd3a938cd27505ae50b9d6b1747590f52c985"
+    },
+    {
+      "path": "dev4-native-diagnostic-1024-v1-resource.stdout.log",
+      "bytes": 3034,
+      "sha256": "588bd4623877adc7d0fb5dfaf789ea7616809e3435d608954b81796953bae4c2"
+    },
+    {
+      "path": "dev4-native-diagnostic-1024-v1.json",
+      "bytes": 132335,
+      "sha256": "267977f409dbfb6340e990cbeda6abe3bea8fdd735cfe47b1d6f9db371963af3"
+    },
+    {
+      "path": "dev4-native-diagnostic-1024-v1.prompts.json",
+      "bytes": 173420,
+      "sha256": "a4a066558c5fc734e8c97b01a58cd19da4e49049410a027d881abbf5694b1f10"
+    },
+    {
+      "path": "dev4-native-diagnostic-4096-v1-resource.json",
+      "bytes": 379715,
+      "sha256": "3f33d059071b0565db135503b3fdcdf90ddf567410043c3d9f10e259af9a370b"
+    },
+    {
+      "path": "dev4-native-diagnostic-4096-v1-resource.stderr.log",
+      "bytes": 1445,
+      "sha256": "12c8ca7978b371a668fa4ced43141ed891144d04ba2ebaab6ccccb549a76c918"
+    },
+    {
+      "path": "dev4-native-diagnostic-4096-v1-resource.stdout.log",
+      "bytes": 3033,
+      "sha256": "814e4abb5dff4b2c7d44a7d2c1d617f8f2fe07abbd708e65d7b41097bb9bc0a1"
+    },
+    {
+      "path": "dev4-native-diagnostic-4096-v1.json",
+      "bytes": 132257,
+      "sha256": "8caa7812ae92bf6daf7e7c2ce05b23ad6ae72fe3cbfca7bc2ee14f9b8a887979"
+    },
+    {
+      "path": "dev4-native-diagnostic-4096-v1.prompts.json",
+      "bytes": 173420,
+      "sha256": "a4a066558c5fc734e8c97b01a58cd19da4e49049410a027d881abbf5694b1f10"
+    },
+    {
+      "path": "dev4-native-performance-1024-v1-resource.json",
+      "bytes": 1351204,
+      "sha256": "3e10ae6188ef336d9967c78a6d5b3c1f11a8c69d45e5c743ad7f14ebb90eba6b"
+    },
+    {
+      "path": "dev4-native-performance-1024-v1-resource.stderr.log",
+      "bytes": 1167,
+      "sha256": "cf94b0ac8c5dd27e80267ec64aecca4b66f876d898a01724de2c455abf1892b5"
+    },
+    {
+      "path": "dev4-native-performance-1024-v1-resource.stdout.log",
+      "bytes": 8983,
+      "sha256": "4be441aaf054fc797742110712ce56c62fe8402321efcf340bd8399d7e0181e7"
+    },
+    {
+      "path": "dev4-native-performance-1024-v1.json",
+      "bytes": 2985756,
+      "sha256": "787e8228c84571abad7aa1cc58eadf9fd84723573d916231940785f8fe38609d"
+    },
+    {
+      "path": "dev4-native-performance-1024-v1.prompts.json",
+      "bytes": 173420,
+      "sha256": "a4a066558c5fc734e8c97b01a58cd19da4e49049410a027d881abbf5694b1f10"
+    },
+    {
+      "path": "dev4-native-performance-4096-v1-resource.json",
+      "bytes": 667080,
+      "sha256": "a80793c35603efa17cab20af8916712d650e3359a9e6f1c509482e73825987cc"
+    },
+    {
+      "path": "dev4-native-performance-4096-v1-resource.stderr.log",
+      "bytes": 1167,
+      "sha256": "0bc6c36c96ddf3c7f908272f088ced2b70ed2514b477a9fe34ce397ce85852aa"
+    },
+    {
+      "path": "dev4-native-performance-4096-v1-resource.stdout.log",
+      "bytes": 4610,
+      "sha256": "a440ac6c88476fbe24e893efc23b0db38156353449e61502360b83d618e7bfc8"
+    },
+    {
+      "path": "dev4-native-performance-4096-v1.json",
+      "bytes": 1050625,
+      "sha256": "c67d498dd445322503d97e3c7e59c3b3a88a0cf2d458b01575dc993f41c581d6"
+    },
+    {
+      "path": "dev4-native-performance-4096-v1.prompts.json",
+      "bytes": 173420,
+      "sha256": "a4a066558c5fc734e8c97b01a58cd19da4e49049410a027d881abbf5694b1f10"
+    },
+    {
+      "path": "dev4-native-runtime-gate-v1.json",
+      "bytes": 31432,
+      "sha256": "75fd1880d8ff3a5b144c14e268ecf8f62ab20bd1e395b186ede331a321d6dba7"
+    },
+    {
+      "path": "dev4-performance-harness-derivation-v1.json",
+      "bytes": 661,
+      "sha256": "e5c66dba8d7fe7851fae2a5b33d9da3b972338ba14a5f6b1d51b0c9ec6d64181"
+    },
+    {
+      "path": "dev4-producer-validator-v1.log",
+      "bytes": 3764,
+      "sha256": "e777d22b0053dae63192611a154be5afa30b001fbb8be9f6371252fe16bf01e4"
+    },
+    {
+      "path": "dev4_native_component_validation.py",
+      "bytes": 4867,
+      "sha256": "c31416a2c0598d2b9f7b29521da95a163f57be47f685d1029396d81fb9510646"
+    },
+    {
+      "path": "diagnose_long_prefix.py",
+      "bytes": 4054,
+      "sha256": "4544008bbb039450cb994cbbc22029c3c903ab3ac44d1d5df6abad1e32690f8f"
+    },
+    {
+      "path": "first_freetoken_performance_dev4_v1.py",
+      "bytes": 13500,
+      "sha256": "68e0d0a6912012134e0ca54f91845bb0003545dd32fe0f46b08bceaf23e4e0a8"
+    },
+    {
+      "path": "freeze_dev4_native_materials.py",
+      "bytes": 3906,
+      "sha256": "e7de48bb6af8910e6d3af27e1f7f6fd1eb3fae401e1f3a82e4e6a26faa30c064"
+    },
+    {
+      "path": "prepare_dev4_native_source.py",
+      "bytes": 3810,
+      "sha256": "6c3de0b0ea52eae9a6aa3bee381a9bb7e17a9b26c050acf815452bbcd1f80c75"
+    },
+    {
+      "path": "prepare_dev4_performance_harness.py",
+      "bytes": 1629,
+      "sha256": "6e62de4d72c7322c0a7a618011cae95cb6fd8b00264490993db2e1df5acde70d"
+    },
+    {
+      "path": "summarize_dev4_capacity_experiment.py",
+      "bytes": 2417,
+      "sha256": "2af4703768ec65ddfdc89f0653d8f14f293aea4b502902782d526882a24414a2"
+    },
+    {
+      "path": "summarize_dev4_native_repair.py",
+      "bytes": 4887,
+      "sha256": "3a521ff33827c817b5a9ee3a53242fd221196baf2369a4a1c0f547afe1479ee5"
+    },
+    {
+      "path": "supervise.py",
+      "bytes": 5067,
+      "sha256": "e5b4d04301208b5f532e9c154f03dd44a9235950f7e619d216231363a30efb42"
+    },
+    {
+      "path": "validate_dev4_runtime_evidence.py",
+      "bytes": 3580,
+      "sha256": "ef4d0bcf1cecae2530aa8dc8858ae8c1a0ed003990f63b5f61941408206fe5c2"
+    },
+    {
+      "path": "strata-q2-dev4-native-decode.txt",
+      "bytes": 8112,
+      "sha256": "943030273675600dadd54fa139137de656734dacb9eb9c567df7aae5e552865b"
+    }
+  ],
+  "external_large_files": [
+    {
+      "path": "dev4-graph-matrix-v1-prefix-cold-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "61efe3c65a0ecc1f2cfa0b56a94c506401396d134eacbbd8995865636493a2b5",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-graph-matrix-v1-prefix-cold-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-graph-matrix-v1-prefix-diverged-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "a07965a98e971de656acdd10a3b823976c93e67477c020d90f59b5fed7392f70",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-graph-matrix-v1-prefix-diverged-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-graph-matrix-v1-prefix-hot-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "61efe3c65a0ecc1f2cfa0b56a94c506401396d134eacbbd8995865636493a2b5",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-graph-matrix-v1-prefix-hot-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-graph-matrix-v1-prefix-restored-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "61efe3c65a0ecc1f2cfa0b56a94c506401396d134eacbbd8995865636493a2b5",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-graph-matrix-v1-prefix-restored-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-graph-matrix-v1-quality-logits.safetensors",
+      "bytes": 4966904,
+      "sha256": "cbf9ec2c68b1f2cf412102b737bda556ff11c0e711fc20fe81fb65adfa5eeedc",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-graph-matrix-v1-quality-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-graph-matrix-v1-technical-cold-logits.safetensors",
+      "bytes": 31787664,
+      "sha256": "1ca6c69fc617c5c1f0a9a002eaa35c58eac3484a76dc0eaf2088117fb0bb95a9",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-graph-matrix-v1-technical-cold-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-graph-matrix-v1-technical-hot-logits.safetensors",
+      "bytes": 31787664,
+      "sha256": "1ca6c69fc617c5c1f0a9a002eaa35c58eac3484a76dc0eaf2088117fb0bb95a9",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-graph-matrix-v1-technical-hot-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v1-prefix-cold-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "61efe3c65a0ecc1f2cfa0b56a94c506401396d134eacbbd8995865636493a2b5",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v1-prefix-cold-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v1-prefix-diverged-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "a07965a98e971de656acdd10a3b823976c93e67477c020d90f59b5fed7392f70",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v1-prefix-diverged-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v1-prefix-hot-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "61efe3c65a0ecc1f2cfa0b56a94c506401396d134eacbbd8995865636493a2b5",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v1-prefix-hot-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v1-prefix-restored-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "61efe3c65a0ecc1f2cfa0b56a94c506401396d134eacbbd8995865636493a2b5",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v1-prefix-restored-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v1-quality-logits.safetensors",
+      "bytes": 4966904,
+      "sha256": "cbf9ec2c68b1f2cf412102b737bda556ff11c0e711fc20fe81fb65adfa5eeedc",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v1-quality-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v1-technical-cold-logits.safetensors",
+      "bytes": 31787664,
+      "sha256": "1ca6c69fc617c5c1f0a9a002eaa35c58eac3484a76dc0eaf2088117fb0bb95a9",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v1-technical-cold-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v1-technical-hot-logits.safetensors",
+      "bytes": 31787664,
+      "sha256": "1ca6c69fc617c5c1f0a9a002eaa35c58eac3484a76dc0eaf2088117fb0bb95a9",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v1-technical-hot-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v2-long-cold-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "7fc67eb267286156325e8aff1a41f9a897888f80362d2a8147cc83b74c012733",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v2-long-cold-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v2-long-hot-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "7fc67eb267286156325e8aff1a41f9a897888f80362d2a8147cc83b74c012733",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v2-long-hot-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v2-prefix-cold-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "61efe3c65a0ecc1f2cfa0b56a94c506401396d134eacbbd8995865636493a2b5",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v2-prefix-cold-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v2-prefix-diverged-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "a07965a98e971de656acdd10a3b823976c93e67477c020d90f59b5fed7392f70",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v2-prefix-diverged-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v2-prefix-hot-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "61efe3c65a0ecc1f2cfa0b56a94c506401396d134eacbbd8995865636493a2b5",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v2-prefix-hot-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v2-prefix-restored-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "61efe3c65a0ecc1f2cfa0b56a94c506401396d134eacbbd8995865636493a2b5",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v2-prefix-restored-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v2-quality-logits.safetensors",
+      "bytes": 4966904,
+      "sha256": "cbf9ec2c68b1f2cf412102b737bda556ff11c0e711fc20fe81fb65adfa5eeedc",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v2-quality-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v2-technical-cold-logits.safetensors",
+      "bytes": 31787664,
+      "sha256": "1ca6c69fc617c5c1f0a9a002eaa35c58eac3484a76dc0eaf2088117fb0bb95a9",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v2-technical-cold-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-long-matrix-v2-technical-hot-logits.safetensors",
+      "bytes": 31787664,
+      "sha256": "1ca6c69fc617c5c1f0a9a002eaa35c58eac3484a76dc0eaf2088117fb0bb95a9",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-long-matrix-v2-technical-hot-logits.safetensors",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-native-diagnostic-1024-v1.short-0-cold.trace.json",
+      "bytes": 59389843,
+      "sha256": "ffa15491838b619c9dc59571e1e39907a3d40ad7a83bbd4f7c3422584a33fe9c",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-native-diagnostic-1024-v1.short-0-cold.trace.json",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-native-diagnostic-1024-v1.short-0-hot.trace.json",
+      "bytes": 55308513,
+      "sha256": "88f03256645ff94f947949dadd4959c8b57a215f24ec91ca8982eb4a48c0e5f7",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-native-diagnostic-1024-v1.short-0-hot.trace.json",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-native-diagnostic-4096-v1.short-0-cold.trace.json",
+      "bytes": 59353399,
+      "sha256": "1a1282ad571deab7652a4845ea4cc641e6c0c619a3cfcc2265ee5a864b3ec7e3",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-native-diagnostic-4096-v1.short-0-cold.trace.json",
+      "reason": "Large diagnostic file retained at original immutable path"
+    },
+    {
+      "path": "dev4-native-diagnostic-4096-v1.short-0-hot.trace.json",
+      "bytes": 55282541,
+      "sha256": "9bfe8be42ae2dc76f1eabd2a461beb3965a1340a329e00cd017ec0c6a9cf628c",
+      "absolute_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev4-native-diagnostic-4096-v1.short-0-hot.trace.json",
+      "reason": "Large diagnostic file retained at original immutable path"
+    }
+  ],
+  "immutable_inputs": [
+    "Full fixed GGUF inventory",
+    "dev1/dev2/dev3 profiles/patches/materials",
+    "Historical q2opt2 environment"
+  ],
+  "failures_preserved": [
+    "Build v1 stopped before compilation using Windows PowerShell5; v2 uses pwsh7",
+    "Model long matrix v1 explicitly stopped due to incompatible diagnostic tail size; v2 uses established 3072 setting",
+    "Verifier v1 expected wrong extension log names; verifier v2 corrected without engine source change",
+    "Environment first attempt failed index metadata dependency resolution; offline pinned v2 succeeded"
+  ],
+  "producer_checks": {
+    "repository_validator": "dev4-producer-validator-v1.log: verified true",
+    "unit_tests": 16,
+    "unit_test_exit_code": 0,
+    "unit_test_command": "python -X utf8 -B -m unittest discover -s tests -v",
+    "note": "16 existing producer tests completed successfully in session 30708, 12.629 seconds; not GPU or Speed acceptance"
+  }
+}

@@ -1,0 +1,14 @@
+Flash Next Strata Q2：权重使用复核与 thinking 三方案对照（2026-10-13）
+两片权重来源、revision及既有完整SHA正确；当前大小/mtime保持。48×512专家转换逐层字节无损，embedding全表与原生GGUF CPU解量化一致；原GGUF主干、head、PLE由Strata --native启用。
+有效HF词表248077个词条逐项与GGUF对应，BPE merges全部相同。HF模板文件与GGUF模板字节略有差别，但20个实际任务开/关thinking共40次render的文本和token ID均完全一致。
+本机Strata参考使用固定源码、同一完整GGUF；数值参考的cache容量、pcie_frac及禁用MTP用于控制变量，不能据其短任务耗时解释公开速度。
+关闭thinking严格20题：FT15/20，Strata15/20，历史混合16/20，没有FT独有失败；分数及bitcount三者均错，chain只有混合对，不能把所有错误归因于Q2。
+开启thinking，仍使用原三道题的同一要求，仅改变template的enable_thinking=True，输出上限1024，temperature=0：
+chain：正确712；最终答案{"freetoken": "712", "strata": "712", "mixed": "712"}；实际输出token数{"freetoken": 79, "strata": 79, "mixed": 59}；三者均EOS、未截断。
+fraction：正确106；最终答案{"freetoken": "106", "strata": "106", "mixed": "106"}；实际输出token数{"freetoken": 78, "strata": 78, "mixed": 78}；三者均EOS、未截断。
+binary_count：正确4；最终答案{"freetoken": "4", "strata": "4", "mixed": "4"}；实际输出token数{"freetoken": 129, "strata": 129, "mixed": 121}；三者均EOS、未截断。
+FT Q2与Strata Q2完整token序列一致：True。这三题说明thinking模式是影响因素，不是广泛的数学质量结论；历史混合权重不是纯NVFP4。
+当前已进入独立FreeToken第一版长输出性能测量；先保持已验证的1024专家slot配置，再依据实际miss/搬运/PLE与资源数据评估主要优化。尚未适配MTP或Speed。
+数值验收及其限制：C:\workspace\artifacts\flash-next-strata-q2-20261012\dev3-correctness-quality-acceptance.json
+补充证据：C:\workspace\artifacts\flash-next-strata-q2-20261012\quality-thinking-dev3\comparison.json
+材料归档：C:\workspace\worktrees\build-freetoken-flash-next-strata-q2\artifacts\strataq2dev3-cp312-cu130-sm120\validation\thinking-model-use-20261013\evidence-index.json

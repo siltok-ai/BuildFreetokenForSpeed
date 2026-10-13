@@ -1,0 +1,11 @@
+{"custom_version": "0.1.3+speed.strataq2dev4", "aot_count": 27, "wheel_sha256": "102615fc21180ed7ae38c69b4260b6b56158ef3253538adf9e6bbeac70556611", "status": "built_requires_runtime_validation", "verified": true}
+Traceback (most recent call last):
+  File "C:\workspace\worktrees\build-freetoken-flash-next-strata-q2\tools\validate_native_revision.py", line 95, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "C:\workspace\worktrees\build-freetoken-flash-next-strata-q2\tools\validate_native_revision.py", line 93, in main
+    print(json.dumps(validate(args.profile,args.materials)))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\workspace\worktrees\build-freetoken-flash-next-strata-q2\tools\validate_native_revision.py", line 81, in validate
+    raise ValueError('Native extensions lack full compilation evidence')
+ValueError: Native extensions lack full compilation evidence

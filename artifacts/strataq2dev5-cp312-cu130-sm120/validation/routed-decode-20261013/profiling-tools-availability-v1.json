@@ -1,0 +1,18 @@
+{
+  "platform": "Windows x64",
+  "nsys_found": false,
+  "ncu_found": false,
+  "current_process_administrator": false,
+  "search_roots": [
+    "C:\\workspace\\tools",
+    "C:\\Program Files\\NVIDIA Corporation",
+    "C:\\Program Files (x86)\\NVIDIA Corporation"
+  ],
+  "actual_profiling_used": [
+    "PyTorch CPU/CUDA profiler with verified decode GPU annotation ranges and preserved Chrome traces",
+    "Frozen native Strata STRATA_DECODE_TIMING=1 and STRATA_VERIFY_PROFILE=1 CUDA-event/host stage diagnostics"
+  ],
+  "official_nsight_cli_documentation": "https://docs.nvidia.com/nsight-systems/UserGuide/index.html",
+  "official_windows_requirement": "Documentation specifies an administrator process for Windows CLI profiling",
+  "scope": "Tool availability only; not an automatic approval rejection, not a goal block, no installation or elevation performed"
+}

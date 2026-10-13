@@ -1,0 +1,219 @@
+{
+  "format": 1,
+  "upstream_commit": "078132480ea4a0424f677a27eb22085624d331e6",
+  "patches": [
+    {
+      "id": "FTREVIEW-001",
+      "path": "patches/series/q2opt2-0001-windows-runtime.patch",
+      "sha256": "5325ff493b375883453a4ab8e249fc54d5624d4a2fa6cb15030c66e84b45d3c6",
+      "kind": "platform",
+      "title": "Windows runtime and SSD row-store I/O",
+      "status": "active",
+      "upstream_status": "local; reassess against each upstream candidate",
+      "files": [
+        "python/freetoken/kernel/csrc/row_store/row_store_ext.cpp",
+        "python/freetoken/kernel/utils.py",
+        "python/freetoken/models/loader.py",
+        "python/freetoken/moe/host_banks.py",
+        "tests/kernels/test_row_store.py",
+        "tests/models/qwen4_exp/test_ple_disk.py"
+      ]
+    },
+    {
+      "id": "FTREVIEW-002",
+      "path": "patches/series/q2opt2-0002-windows-build.patch",
+      "sha256": "6d8f3c369939461b234bd18c352045325d98d47c79500e64e7ac95d168d7629d",
+      "kind": "platform",
+      "title": "MSVC native extensions and Windows AOT build",
+      "status": "active",
+      "upstream_status": "local; reassess against each upstream candidate",
+      "files": [
+        "python/freetoken/kernel/csrc/jit/batch_memcpy.cuh",
+        "python/freetoken/kernel/csrc/jit/fast_index_copy.cuh",
+        "python/freetoken/kernel/csrc/jit/index.cu",
+        "python/freetoken/kernel/csrc/jit/store.cu",
+        "setup.py",
+        "tools/build_windows_extensions.py",
+        "tools/build_windows_kernel_cache.py",
+        "tools/windows-compat/README.md",
+        "tools/windows-compat/sys/cdefs.h"
+      ]
+    },
+    {
+      "id": "FTREVIEW-003",
+      "path": "patches/series/q2opt2-0003-q2-routed-experts.patch",
+      "sha256": "379e10402ddfe7449644ec3a5e24e8283f3aab7f0322ccea9056309cce7a0d3b",
+      "kind": "feature",
+      "title": "Complete GSQ Q2_0 routed experts with explicit source geometry",
+      "status": "active",
+      "upstream_status": "local; reassess against each upstream candidate",
+      "files": [
+        "python/freetoken/layers/quantization/configs/base.py",
+        "python/freetoken/layers/quantization/moe/__init__.py",
+        "python/freetoken/layers/quantization/moe/q2_0.py",
+        "python/freetoken/layers/quantization/scheme.py",
+        "python/freetoken/models/config.py",
+        "python/freetoken/models/qwen4_exp/config.py",
+        "python/freetoken/models/qwen4_exp/q2_source.py",
+        "python/freetoken/moe/expert_banks.py",
+        "python/freetoken/moe/expert_pieces.py",
+        "python/freetoken/moe/fused_q2_0.py",
+        "python/freetoken/moe/legacy_format.py",
+        "python/freetoken/moe/offload_cache.py",
+        "tests/moe/test_q2_0.py",
+        "tests/moe/test_q2_source.py"
+      ]
+    },
+    {
+      "id": "FTREVIEW-004",
+      "path": "patches/series/q2opt2-0004-grouped-q2-prefill.patch",
+      "sha256": "4446b2e05d79806af13b6844e21ec5fa41075304321178fa8881a18cd93d5c74",
+      "kind": "performance",
+      "title": "Grouped BF16 Q2 prefill",
+      "status": "active",
+      "upstream_status": "local; reassess against each upstream candidate",
+      "files": [
+        "python/freetoken/layers/quantization/moe/q2_0.py",
+        "python/freetoken/moe/fused_q2_0.py",
+        "tests/moe/test_q2_grouped.py"
+      ]
+    },
+    {
+      "id": "FTREVIEW-005",
+      "path": "patches/series/q2opt2-0005-sparse-residual-prefill.patch",
+      "sha256": "3f61e68ce8b3541d96180fa5b9c4c1db35d6e42c7b015320a7c72aa7d680b29f",
+      "kind": "performance",
+      "title": "Load only routed experts for small residual prefill",
+      "status": "active",
+      "upstream_status": "local; reassess against each upstream candidate",
+      "files": [
+        "python/freetoken/layers/moe.py"
+      ]
+    },
+    {
+      "id": "FTREVIEW-006",
+      "path": "patches/series/q2opt2-0006-package-version.patch",
+      "sha256": "537b987fede644ddf66fdf65a62f09710c9f975fb23aba1f698f075ac7d18d03",
+      "kind": "version",
+      "title": "Distinct immutable q2opt2 wheel identity",
+      "status": "active",
+      "upstream_status": "local; reassess against each upstream candidate",
+      "files": [
+        "python/freetoken/version.py"
+      ]
+    },
+    {
+      "id": "FTSTRATA-001",
+      "path": "patches/series/strataq2dev1-0007-complete-gguf-path.patch",
+      "sha256": "f715e31b9867e89adce3f050e61cbbfb48c2e988d6036af3134f20f4e48aa3e8",
+      "kind": "model",
+      "title": "Explicit complete GGUF and Strata numeric research path",
+      "status": "active",
+      "upstream_status": "local research; no official FreeToken contribution",
+      "files": [
+        "python/freetoken/attention/qsa_sparse.py",
+        "python/freetoken/engine/engine.py",
+        "python/freetoken/kernel/gguf_quant.py",
+        "python/freetoken/kernel/triton/gguf_gdn.py",
+        "python/freetoken/kernel/triton/qsa/attend.py",
+        "python/freetoken/kernel/triton/qsa/score.py",
+        "python/freetoken/kvcache/__init__.py",
+        "python/freetoken/kvcache/base.py",
+        "python/freetoken/kvcache/linear_state_pool.py",
+        "python/freetoken/kvcache/qsa_pool.py",
+        "python/freetoken/layers/quantization/configs/base.py",
+        "python/freetoken/layers/quantization/configs/gguf.py",
+        "python/freetoken/layers/quantization/linear/gguf.py",
+        "python/freetoken/layers/quantization/moe/q2_0.py",
+        "python/freetoken/layers/quantization/scheme.py",
+        "python/freetoken/models/qwen4_exp/gdn.py",
+        "python/freetoken/models/qwen4_exp/gguf_source.py",
+        "python/freetoken/models/qwen4_exp/gguf_weight.py",
+        "python/freetoken/models/qwen4_exp/model.py",
+        "python/freetoken/models/qwen4_exp/moe.py",
+        "python/freetoken/models/qwen4_exp/ple_disk.py",
+        "python/freetoken/models/qwen4_exp/weight.py",
+        "python/freetoken/moe/fused_q2_q8.py",
+        "python/freetoken/version.py",
+        "tests/models/qwen4_exp/test_gguf_gdn.py",
+        "tests/models/qwen4_exp/test_gguf_source.py"
+      ]
+    },
+    {
+      "id": "FTSTRATA-002",
+      "path": "patches/series/strataq2dev2-0008-batch-invariant-arithmetic.patch",
+      "sha256": "7536900d7bf7349a8050785c59915e472af875ef78d7d2f8509d0c9092875634",
+      "kind": "model",
+      "title": "Batch-invariant GGUF reductions for prefix reuse correctness",
+      "status": "active",
+      "upstream_status": "local research; no official FreeToken contribution",
+      "files": [
+        "python/freetoken/kernel/gguf_quant.py",
+        "python/freetoken/kernel/triton/qsa/attend.py",
+        "python/freetoken/models/qwen4_exp/gguf_weight.py",
+        "python/freetoken/moe/fused_q2_q8.py",
+        "python/freetoken/version.py",
+        "tests/models/qwen4_exp/test_gguf_execution.py"
+      ]
+    },
+    {
+      "id": "FTSTRATA-003",
+      "path": "patches/series/strataq2dev3-0009-ple-batch-invariant-reduction.patch",
+      "sha256": "5a27c6193b3e594c13501b08325012677c62d8ffaaf84d1e34ee5780df9d7857",
+      "kind": "model",
+      "title": "Fixed FP32 PLE gate reduction for multi-request correctness",
+      "status": "active",
+      "upstream_status": "local research; no official FreeToken contribution",
+      "files": [
+        "python/freetoken/kernel/gguf_quant.py",
+        "python/freetoken/models/qwen4_exp/ple.py",
+        "python/freetoken/version.py",
+        "tests/models/qwen4_exp/test_gguf_ple.py"
+      ]
+    },
+    {
+      "id": "FTSTRATA-004",
+      "path": "patches/series/strataq2dev4-0010-native-gguf-decode.patch",
+      "sha256": "271990d6768ddba53c08d96fbc343d0a21ffb3f0e281f27ddde015fa9acc0b8a",
+      "kind": "performance",
+      "title": "Compressed native MMVQ AOT and FP32-activation BF16 GEMV",
+      "status": "active",
+      "upstream_status": "local candidate; licensed pinned Strata/ggml kernel port; no official FreeToken contribution",
+      "files": [
+        "pyproject.toml",
+        "python/freetoken/kernel/aot.py",
+        "python/freetoken/kernel/csrc/jit/gguf_mmvq.cuh",
+        "python/freetoken/kernel/csrc/third_party/strata_mmvq/LICENSE-ggml.txt",
+        "python/freetoken/kernel/csrc/third_party/strata_mmvq/LICENSE-strata.txt",
+        "python/freetoken/kernel/csrc/third_party/strata_mmvq/UPSTREAM.json",
+        "python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/dp4a.hpp",
+        "python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/iq_kernels.hpp",
+        "python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/native_mmvq.hpp",
+        "python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/pdl.hpp",
+        "python/freetoken/kernel/csrc/third_party/strata_mmvq/include/strata/kernels/q8_1_finite.hpp",
+        "python/freetoken/kernel/csrc/third_party/strata_mmvq/src/kernels/cuda/native_mmvq.cu",
+        "python/freetoken/kernel/csrc/third_party/strata_mmvq/src/kernels/cuda/q8_1_il.cuh",
+        "python/freetoken/kernel/csrc/third_party/strata_mmvq/src/kernels/cuda/s26_tsum.cuh",
+        "python/freetoken/kernel/gguf_native.py",
+        "python/freetoken/kernel/gguf_quant.py",
+        "python/freetoken/layers/quantization/linear/gguf.py",
+        "python/freetoken/version.py",
+        "tests/models/qwen4_exp/test_gguf_execution.py"
+      ]
+    },
+    {
+      "id": "FTSTRATA-005",
+      "path": "patches/series/strataq2dev5-0011-routed-q2-expert-decode.patch",
+      "sha256": "c0e945239d6dc9bccb10dfe9de79d6cac0662fc1a86753cb9548b510ecbb38b4",
+      "kind": "performance",
+      "title": "Routed Q2xQ8 DP4A decode without full-cache grouping or padded tensor-core tiles",
+      "status": "active",
+      "upstream_status": "local candidate; original Triton implementation informed by pinned Strata expert design; no official contribution",
+      "files": [
+        "python/freetoken/moe/fused_q2_q8.py",
+        "python/freetoken/version.py",
+        "tests/moe/test_q2_grouped.py"
+      ]
+    }
+  ]
+}

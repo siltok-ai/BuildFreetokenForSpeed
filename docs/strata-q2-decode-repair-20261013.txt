@@ -1,0 +1,67 @@
+Strata Q2：decode 优先的主要性能修复补充（2026-10-13）
+
+工作优先级
+用户明确要求优先优化 decode，同时继续关注 prefill 正确性和明显退化。
+数值微差的归约/layout 实验保留作为一个已探索案例；不对每项性能原型重复追求矩阵逐位一致。
+继续保留有限值、合理 native 误差、真实质量、固定输入状态和缓存复用检查。
+较小组件误差不能单独证明整模型状态正确，也不能据此直接忽略冷热输出差异。
+
+新增实验与结论
+v6/v7：显式 FP32 加法/乘法及共同归约树，定位编译 layout 的微小差异。
+  v6 当时未通过严格批大小门槛，失败保留；v7 的 16 项组件门槛通过。
+  v7 四个32-token诊断约39.94–40.40 tps；主干 shared_row 约9.42–9.46 ms/token。
+  相比 dev3 约88.5 ms/token 主干投影，大部分严重执行退化已经消除。
+v8/v8b：压缩整数 MMVQ 和 int8 tensor-core MMQ，权重仍为 GGUF bytes。
+  初始 v8 在测试脚本 exec 的 JIT 源码定位处失败，不是 GPU 数值失败。
+  v8b 组件通过，但 decode 因过细分块和过多串行 microblock 变慢至22.72–24.17 tps。
+  trace 中新 MMVQ 单独占约21.5 ms/token。淘汰该 decode 设计，保留实验和 prefill 参考。
+  其组件文件名误生成为 v8bb，源码 SHA 绑定实际 v8b；不隐去这个命名问题。
+v9：向量化 DP4A 原型的组件通过，保留高效 BF16 GEMV；压缩部分仍明显慢于原生专用内核。
+  无整模型 v9 结果，不能宣称其端到端吞吐。
+v10：仅在独立诊断进程中，让 FreeToken 的 GGUF decode 使用冻结 Strata CUDA MMVQ。
+  调度、CUDA graph、专家 Q2×Q8、专家缓存、QSA、GDN、PLE 和状态仍由 FreeToken 执行。
+  相同 QKV：v7约33us→native约6.6us；全词表head：约831us→347us。
+  组件16项通过有限值/native合理误差检查，批大小微差记录而非拒绝。
+  四个32-token诊断约50.82–51.51 tps；GPU decode工作约18.0–18.36 ms/token。
+  原生参考 DLL 只用于隔离设计差距，不是可交付的 FreeToken AOT 模块。
+  原严格512-token测试首个冷请求53.47 tps，随后短输入冷热序列不同，测试退出1。
+  该失败、局部输出和资源日志保留，不宣称严格测试通过。
+v11：同一计算原型，用单独的观察脚本记录序列差异并完成性能采集。
+  观察策略明确标记 correctness_acceptance=False，不把继续测量当作正确性通过。
+  短输入冷/热：53.46 / 53.28 tps；4K输入冷/热：51.12 / 51.12 tps。
+  四次均实际输出512 tokens，未EOS、达到长度上限，无MTP、1024专家槽、graph batch1。
+  仅各一组冷热请求，是长输出原型性能观察；不是新wheel的重复正式验收。
+  短输入冷热首次差异在token index68，4K冷热完整序列相同；703质量冒烟通过。
+  短输入差异仍需固定输入状态/缓存误差和质量验证后判断，当前不预设其无害。
+  peak Windows commit约58.83 GiB，最小commit余量约6.69 GiB；资源未越界。
+
+最新主要瓶颈
+专家 AOT copy 约7.35–7.60 ms/token，Q2×Q8 grouped compute约3.82–3.86 ms/token。
+512-token实测专家miss约52–58%，每decode token搬运约348–384 MB压缩专家payload。
+32-token短输入热请求的payload/对应copy GPU时间约49 GB/s，AOT copy仍实际使用。
+这不是直接测得的PCIe总线吞吐，但说明应先减少miss、改变驻留或重叠执行，避免优先钻copy指令细节。
+FT全量pin主机专家并额外分配GPU缓存；Strata采用缓存补集和驻留交换。
+GPU主干压缩后腾出的空间没有自动增加当前1024槽缓存，增容还受Windows commit和主机重复驻留约束。
+CPU Q2内核在当前FT注册表中仍缺失；CPU/GPU协同需有兼容格式、graph与状态约定，并以实际成本决定。
+
+下一项可交付设计
+在新生成的 FreeToken 候选源码中维护专用压缩 MMVQ AOT 模块，并保留高效 BF16/F32 GEMV。
+如移植 Strata/ggml 内核，固定来源commit、逐文件SHA、MIT署名/许可证，维护本地接口。
+使用 FreeToken/tvm-ffi 的模块加载与CUDA stream，启动预热后可进入graph，禁用C++ JIT仍能运行。
+显式保存Q8 scale/sum、Q4/Q5 affine修正及FP32计算约定，不扩展成常驻BF16权重。
+覆盖原Linear的prepared-Q8/q8_source语义、真实输入/输出strides、不同segment、bias、padding和尾批。
+prefill保留独立的批量权重复用途径，跟踪退化；优先获得可靠decode收益，再深入prefill优化。
+批量路径必须通过有限值和合理误差、固定输入状态、缓存与真实质量检查；不强求所有投影逐位相同。
+新增原生源码不允许走Python-only二进制继承；使用新profile、版本、wheel和匹配AOT素材，重新建立来源/ABI证明。
+落实后复测足够长实际输出，并优先研究专家缓存驻留、搬运/计算重叠和必要CPU协同。
+MTP、细节优化、Speed消费合同/HTTP/打包继续后置；目前尚无优化引擎验收，也未达到100 tps目标。
+
+证据
+实验根 C:\workspace\artifacts\flash-next-strata-q2-20261012
+decode-first-repair-observation-v11.json：工作优先级、四个长输出请求、限制及后续设计。
+prototype-native-decode-v10-trace-analysis.json：四份GPU decode区间归因。
+prototype-v7-v8b-cold-prefill-analysis.json：完整冷prefill归因，约7.87s/6.99s，dev3约4.25s。
+prototype-canonical-projection-v7-prefill-analysis.json仅为热前缀复用区间，不是完整4K prefill。
+v11冷4K TTFT约7.43s，热前缀TTFT约0.86s；prefill退化仍显式保留。
+artifacts/strataq2dev3-cp312-cu130-sm120/validation/decode-first-repair-20261013/evidence-index.json
+包含63个带SHA的追加文件和13个外部trace/DLL引用，不修改旧验收索引。

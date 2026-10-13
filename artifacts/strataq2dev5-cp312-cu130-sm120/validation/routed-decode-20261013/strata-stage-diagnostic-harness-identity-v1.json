@@ -1,0 +1,14 @@
+{
+  "source": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\benchmark_strata_q2_local_v2.py",
+  "source_sha256": "6678539b2c71fb3daf99c4deed9ffec8bd4da5ae3ef78a85af7ab1af446a863a",
+  "derived": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\benchmark_strata_gpu_stages_v1.py",
+  "derived_sha256": "83fcf32bda5ecacbf9ce04c08265a50b7b6546bcfa8ff1249e45c415c961425e",
+  "native_engine_source_changed": false,
+  "mtp_enabled": false,
+  "reference": "Frozen docs/DETAILS.md:297-304, native packs use serve-path CUDA events, not --gpu-stages",
+  "changes": [
+    "Enable native CPU and GPU stage timing environment flags",
+    "Diagnostic status and instrumented speed scope",
+    "Omit already frozen thinking suite from stage attribution job"
+  ]
+}

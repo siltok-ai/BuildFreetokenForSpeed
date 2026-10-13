@@ -1,0 +1,12 @@
+C:/workspace/worktrees/build-freetoken-flash-next-strata-q2/patches/series/q2opt2-0004-grouped-q2-prefill.patch:120: trailing whitespace.
+"""真实 GPU 参考验证，覆盖专家归组、padding 和不同路由分布。"""
+C:/workspace/worktrees/build-freetoken-flash-next-strata-q2/patches/series/q2opt2-0004-grouped-q2-prefill.patch:121: trailing whitespace.
+import pytest
+C:/workspace/worktrees/build-freetoken-flash-next-strata-q2/patches/series/q2opt2-0004-grouped-q2-prefill.patch:122: trailing whitespace.
+import torch
+C:/workspace/worktrees/build-freetoken-flash-next-strata-q2/patches/series/q2opt2-0004-grouped-q2-prefill.patch:123: trailing whitespace.
+
+C:/workspace/worktrees/build-freetoken-flash-next-strata-q2/patches/series/q2opt2-0004-grouped-q2-prefill.patch:124: trailing whitespace.
+from freetoken.moe.fused_q2_0 import grouped_experts_q2_0
+warning: squelched 39 whitespace errors
+warning: 44 lines add whitespace errors.
