@@ -9,7 +9,7 @@ from freetoken.core import Batch
 
 
 class TargetWindow:
-    def __init__(self,engine,req,initial_position,*,max_rows=4):
+    def __init__(self,engine,req,initial_position,*,max_rows=4,snapshots=None,decode_conv=False,scalar_projections=False,decode_ple=False):
         """预热并捕获每种窗口，使用causal元数据、all-row head及现有PLE graph staging。"""
         self.engine=engine
         self.req=req
@@ -18,10 +18,43 @@ class TargetWindow:
         import freetoken.models.qwen4_exp.gdn as gdn
         from freetoken.kernel.triton.causal_conv1d_triton import causal_conv1d_varlen
         original=gdn.causal_conv1d_varlen
+        original_prefill=gdn.Qwen4ExpGatedDeltaNet._conv_prefill
+        import freetoken.kernel.gguf_native as native
+        original_mmvq=native.mmvq
+        import freetoken.models.qwen4_exp.ple as ple_module
+        original_ple_conv=ple_module.PLELayer._prefill_conv
+        def decode_ple_conv(op,x,meta,states):
+            # Match the original decode tap layout and reduction, batched over
+            # one causal verification window instead of calling cuDNN conv1d.
+            if len(meta.seq_lens)!=1: raise ValueError('Verify PLE is single-request only')
+            old=op._read_state(meta,states,x.dtype)[0]
+            history=torch.cat([old.transpose(0,1),x],dim=0)
+            indices=torch.arange(len(x),device=x.device)[:,None]+torch.arange(
+                0,op.state_len+1,op.dilation,device=x.device)[None,:]
+            window=history[indices].transpose(-1,-2).contiguous().float()
+            out=(window*op.conv1d.weight.squeeze(1).float()).sum(-1)
+            states.index_copy_(0,meta.state_slots,history[-op.state_len:].transpose(0,1)[None].contiguous())
+            return torch.nn.functional.silu(out.to(x.dtype))
+        def scalar_mmvq(packed,q8,rows,type_id,*,out=None):
+            if len(q8)<=1: return original_mmvq(packed,q8,rows,type_id,out=out)
+            if out is None: out=torch.empty((len(q8),rows),device=q8.device,dtype=torch.float32)
+            for row in range(len(q8)):
+                original_mmvq(packed,q8[row:row+1],rows,type_id,out=out[row:row+1])
+            return out
         def static_conv(x,weight,states,cu,indices,initial):
             return causal_conv1d_varlen(x,weight,states,cu,indices,initial,
                 max_seq_len=x.shape[-1],batch=cu.numel()-1)
         gdn.causal_conv1d_varlen=static_conv
+        def serial_conv(op,conv,pool,cu,indices,initial):
+            # Diagnostic consistency option: reuse the exact existing decode conv per row.
+            # It avoids prefill exp2 versus decode exp differences without modifying either kernel.
+            if indices.numel()!=1:
+                raise ValueError('Serial verify conv is single-request only')
+            return torch.cat([op._conv_decode(conv[row:row+1],indices,pool)
+                for row in range(len(conv))],dim=0)
+        if decode_conv: gdn.Qwen4ExpGatedDeltaNet._conv_prefill=serial_conv
+        if scalar_projections: native.mmvq=scalar_mmvq
+        if decode_ple: ple_module.PLELayer._prefill_conv=decode_ple_conv
         try:
             for count in range(1,max_rows+1):
                 virtual=copy.copy(req)
@@ -35,6 +68,7 @@ class TargetWindow:
                 batch.positions=torch.arange(initial_position,initial_position+count,device=engine.device,dtype=torch.int32)
                 batch.out_loc=engine.page_table[req.table_idx,batch.positions.long()].clone()
                 batch.fla_metadata=build_fla_metadata(batch,engine.device)
+                if snapshots is not None: snapshots.bind(batch)
                 engine.attn_backend.prepare_metadata(batch)
                 for _ in range(2):
                     with engine.ctx.forward_batch(batch),engine.model.forward_host_ctx(batch,False):
@@ -51,6 +85,9 @@ class TargetWindow:
                 self.graphs[count]=(batch,graph,picks,host)
         finally:
             gdn.causal_conv1d_varlen=original
+            gdn.Qwen4ExpGatedDeltaNet._conv_prefill=original_prefill
+            native.mmvq=original_mmvq
+            ple_module.PLELayer._prefill_conv=original_ple_conv
 
     def replay(self,history,inputs,position):
         """更新原地址的输入/位置/长度/分页映射，再正确填多行PLE并重放。"""

@@ -20,7 +20,7 @@
 
 ## 状态事务、取消与采样
 
-验证前备份该请求的GDN recurrent、conv和全部声明slot_states（包括PLE ngram/conv）以及QSA pending ring。当前实际单请求快照为118,063,112字节，而非此前粗估75MB。全部接受可直接保留最终状态；部分接受先恢复原地址，再以正确输入重放已接受前缀，暂用这条完整可解释的正确实现。后续若需避免replay，应设计逐行状态checkpoint并实测总收益。
+单请求语义状态为118,063,112字节，包括GDN recurrent、conv、全部声明slot_states（PLE ngram/conv）及QSA pending ring。原型已经实现两种事务：恢复后重放有效前缀，以及逐行checkpoint后直接提交最后有效行。后者复用原GDN任意行track机制，再正确补足窗口前的conv/PLE历史和每行QSA ring。当前诊断借用池中4个空闲slot，不增加原池容量；正式引擎必须预留专属checkpoint所有权和预算，不能在prefix压力下假定总有4个空slot。
 
 分页KV及压缩index页按committed长度可见，未接受尾部不能发布到prefix tree；pending ring属于跨调用状态，必须回退或按有效前缀重建。专家LRU/驻留命中统计是性能缓存，可以保留预测验证中已搬运的专家；不能把它和语义状态混淆。取消在窗口提交边界处理，IPC只发送已验证token，prefix/GDN捐赠也只能来自已提交状态。异常恢复需使用同一事务，不能留下未验证token、悬挂PLE WAIT或槽所有权泄漏。
 
@@ -41,3 +41,13 @@
 v4用已知single-request窗口长度调用原有varlen conv静态参数，绕过host同步；专用graph同时正确提交多行PLE。位置72的暖重放中位约7.74/9.51/11.19/13.01 ms（1/2/3/4行），logits和GDN/conv/PLE/ring误差都是0。此时位置固定，尚须动态staging；这不是MTP最终速度。
 
 预测层完成FreeToken格式转换，总823,887,872字节；实际加载含8192-cell独立FP32 KV，所拥有GPU tensor总857,442,304字节，main R捕获另167,772,160字节。初次32-token、29个完整三草稿窗口的真实FreeToken算子校准，最长匹配前缀≥1/2/3的比例为82.76%/72.41%/58.62%，以每轮真实target R追齐草稿。暖eager三草稿链约5.4ms，prefill仅K/V构建约848ms；这些只是诊断数据，未减少target forward次数，也没有宣称交付速度提升。主模型32-token输出与无MTP基线完全相同。下一步实现动态窗口及实际speculative循环后，才能测最终性能。
+
+## 2026-10-14 实际循环与性能
+
+`speculative_loop.py` 已实现单请求greedy的实际草拟、causal窗口验证、部分提交、target R追齐及退出后恢复原请求。`row_snapshots.py` 提供逐行事务；`draft_graph.py` 将1/2/3草稿链和1/2/3有效行追齐放入私有CUDA graph，位置和候选传递保留在GPU，只在整链返回时读CPU。草稿注意力复用FreeToken分页FP32 GQA，GPU掩码仅允许读取当前cell及以前；SM120 FP32 KV使用num_stages=1以满足共享内存上限。主模型27个AOT、正式wheel和安装环境字节没有改变。
+
+验证窗口的PLE不能直接用普通prefill `conv1d` 替代原decode的四tap乘积求和。旧路径在第105个输出token分歧；恢复后replay与逐行checkpoint两条路径产生完全相同的512-token序列，单独改GDN conv或逐行MMVQ也未修复。将短窗口PLE向量化为原decode的tap布局/求和，并沿用原GDN decode conv逐行计算后，512-token输出完全匹配冷基线。独立原生decode审计覆盖64个实际输出：每个验证行的GDN recurrent/conv、PLE conv/ngram和QSA ring误差均为0。审计必须与性能测试分进程；混合审计/测量的首轮进程明显扰动了verify时间，原始低速结果仍保留。
+
+隔离审计后，8064永久专家、10112总槽的实际512-token原型测到短上下文123.12/123.00/114.86 token/s（中位123.00），首组4K上下文120.71。全部输出ID及恢复后的原生成均匹配对应无MTP冷基线。三草稿链中位约1.84ms，有效行追齐/提交约0.22–0.28ms；这些速度是同步提交后在独立循环中的实际token吞吐，**不是Speed worker或HTTP MTP性能**。prompt prime、每次新建graph及其预热单列，不包含在decode计时内。
+
+当前仍没有正式MTP profile、版本wheel、worker多token交付或Speed MTP开关。尚须实现可复用的动态请求/slot窗口图、专属事务池及资源准入；验证EOS/长度/stop、取消、prefix复用/分叉/压力、缓存重建、thinking和非greedy回退；随后绑定独立发布材料并测真实Speed/TCP。现有原型的强制事务归还和独占页预留只适用于诊断，不能直接作为生产调度器。短上下文/4K同容量对照和更多4K重复测量继续单独保存；不能只用一次最快值声明完整MTP验收。

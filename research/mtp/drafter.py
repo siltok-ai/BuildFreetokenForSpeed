@@ -91,11 +91,12 @@ class MtpDrafter:
             positions=torch.arange(start+offset,start+offset+len(tokens),device=self.device,dtype=torch.int32)
             self.key_value(x,positions)
 
-    def step(self,residual,token,cell):
+    def step(self,residual,token,cell,*,positions=None,attend=None):
         """在cell位置配下一token，预测cell+2；未提交草稿KV由后续正确cell覆盖。"""
         if not 0<=cell<self.max_context:
             raise ValueError('Calibration prototype cell is outside its own KV capacity')
-        positions=torch.tensor([cell],device=self.device,dtype=torch.int32)
+        if positions is None:
+            positions=torch.tensor([cell],device=self.device,dtype=torch.int32)
         r=self.initial_residual(residual,token.reshape(1))
         x,inject=self.mix('attn_hyper_connection',r)
         self.key_value(x,positions)
@@ -103,9 +104,12 @@ class MtpDrafter:
         q=qgate[:,:,:256].contiguous().reshape(-1,256)
         q=gguf_gemma_rmsnorm(q,self.weights['self_attn.q_norm.weight']).reshape(1,6144)
         q,_=self.rope.forward(positions,q,torch.zeros((1,512),device=self.device,dtype=torch.float32))
-        attended=F.scaled_dot_product_attention(q.reshape(1,24,1,256),
-            self.keys[:cell+1].permute(1,0,2).unsqueeze(0),
-            self.values[:cell+1].permute(1,0,2).unsqueeze(0),enable_gqa=True)
+        if attend is None:
+            attended=F.scaled_dot_product_attention(q.reshape(1,24,1,256),
+                self.keys[:cell+1].permute(1,0,2).unsqueeze(0),
+                self.values[:cell+1].permute(1,0,2).unsqueeze(0),enable_gqa=True)
+        else:
+            attended=attend(q,positions)
         attended=attended.reshape(1,6144)*qgate[:,:,256:].reshape(1,6144).sigmoid()
         r=hc_combine(r,self.linear('self_attn.o_proj.weight',attended),inject,4)
         x,inject=self.mix('mlp_hyper_connection',r)
