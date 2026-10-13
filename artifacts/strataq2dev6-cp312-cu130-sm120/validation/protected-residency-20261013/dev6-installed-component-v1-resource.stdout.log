@@ -1,0 +1,33 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0 -- C:\workspace\envs\speed-strata-q2-dev6\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\workspace\artifacts\flash-next-strata-q2-20261012\dev6-frozen-replay-v1\build-source
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collecting ... collected 23 items
+
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_residency.py::test_config_rejects_unsupported_contract_before_loading PASSED [  4%]
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_residency.py::test_owner_bytes_survive_graph_reset_prefill_and_rebuild[1] PASSED [  8%]
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_residency.py::test_owner_bytes_survive_graph_reset_prefill_and_rebuild[3] PASSED [ 13%]
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_residency.py::test_owner_bytes_survive_graph_reset_prefill_and_rebuild[8] PASSED [ 17%]
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_grouped.py::test_grouped_q2_matches_independent_bf16_reference[1-1-False] PASSED [ 21%]
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_grouped.py::test_grouped_q2_matches_independent_bf16_reference[19-3-False] PASSED [ 26%]
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_grouped.py::test_grouped_q2_matches_independent_bf16_reference[129-3-False] PASSED [ 30%]
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_grouped.py::test_grouped_q2_matches_independent_bf16_reference[257-3-True] PASSED [ 34%]
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_routed_experts_match_integer_reference[1-False-16] PASSED [ 39%]
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_routed_experts_match_integer_reference[3-False-16] PASSED [ 43%]
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_routed_experts_match_integer_reference[8-False-16] PASSED [ 47%]
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_routed_experts_match_integer_reference[9-False-16] PASSED [ 52%]
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_routed_experts_match_integer_reference[3-True-16] PASSED [ 56%]
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_routed_experts_match_integer_reference[1-False-4096] PASSED [ 60%]
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_decode_skips_full_cache_grouping_and_replays_graph PASSED [ 65%]
+dev6-frozen-replay-v1\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_zero_empty_and_invalid_precision PASSED [ 69%]
+dev6-frozen-replay-v1\build-source\tests\models\qwen4_exp\test_gguf_execution.py::GGUFExecutionConsistencyTests::test_bf16_fusion_bias_padding_and_strides PASSED [ 73%]
+dev6-frozen-replay-v1\build-source\tests\models\qwen4_exp\test_gguf_execution.py::GGUFExecutionConsistencyTests::test_compressed_projection_is_independent_of_batch_size PASSED [ 78%]
+dev6-frozen-replay-v1\build-source\tests\models\qwen4_exp\test_gguf_execution.py::GGUFExecutionConsistencyTests::test_experts_are_independent_of_prefill_and_tail_length PASSED [ 82%]
+dev6-frozen-replay-v1\build-source\tests\models\qwen4_exp\test_gguf_execution.py::GGUFExecutionConsistencyTests::test_fp32_attention_is_independent_of_batch_size PASSED [ 86%]
+dev6-frozen-replay-v1\build-source\tests\models\qwen4_exp\test_gguf_execution.py::GGUFExecutionConsistencyTests::test_native_mmvq_rejects_bad_binding_geometry PASSED [ 91%]
+dev6-frozen-replay-v1\build-source\tests\models\qwen4_exp\test_gguf_execution.py::GGUFExecutionConsistencyTests::test_native_q8_graph_and_layout PASSED [ 95%]
+dev6-frozen-replay-v1\build-source\tests\models\qwen4_exp\test_gguf_execution.py::GGUFExecutionConsistencyTests::test_qk_norm_is_independent_of_batch_size PASSED [100%]
+
+============================= 23 passed in 15.58s =============================

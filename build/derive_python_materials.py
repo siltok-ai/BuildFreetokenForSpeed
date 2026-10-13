@@ -52,6 +52,12 @@ PYTHON_ONLY_CHANGES = {
     'tests/models/qwen4_exp/test_gguf_source.py',
     'tests/models/qwen4_exp/test_gguf_execution.py',
     'tests/models/qwen4_exp/test_gguf_ple.py',
+    # 保护驻留修订只增加 Python/Triton、配置和固定排名数据，原生输入仍须逐字节一致。
+    'python/freetoken/engine/config.py',
+    'python/freetoken/server/args.py',
+    'python/freetoken/moe/q2_residency.py',
+    'python/freetoken/moe/configs/q2_residency/strata_flash_next.json',
+    'tests/moe/test_q2_residency.py',
 }
 
 
@@ -100,7 +106,8 @@ def derive(profile_path, base_profile_path, base_materials, output):
             if name.endswith('/RECORD'):
                 continue
             data = archive.read(name)
-            if name.startswith('freetoken/') and name.endswith('.py'):
+            if (name.startswith('freetoken/') and name.endswith('.py')) or (
+                    name.startswith('freetoken/moe/configs/') and name.endswith('.json')):
                 if data != (base_source / 'python' / name).read_bytes():
                     raise ValueError(f'base wheel differs from frozen source: {name}')
                 data = (source / 'python' / name).read_bytes()
@@ -109,6 +116,9 @@ def derive(profile_path, base_profile_path, base_materials, output):
                 data = re.sub(rb'(?m)^Version: [^\r\n]*', f"Version: {profile['custom_version']}".encode(), data)
             members[target] = data
     for path in (source / 'python/freetoken').rglob('*.py'):
+        members[path.relative_to(source / 'python').as_posix()] = path.read_bytes()
+    # 与 setuptools 的 package-data 规则一致；新排名必须进入 wheel 和 RECORD。
+    for path in (source / 'python/freetoken/moe/configs').rglob('*.json'):
         members[path.relative_to(source / 'python').as_posix()] = path.read_bytes()
     records = io.StringIO(newline='')
     writer = csv.writer(records, lineterminator='\n')

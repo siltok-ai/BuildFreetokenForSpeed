@@ -41,6 +41,38 @@ class PythonMaterials(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'binary reuse forbidden'):
                 validate_python_only_changes(before, after)
 
+    def test_protected_revision_includes_ranking_and_preserves_native_identity(self):
+        """实际封装新 JSON 资源并核对 RECORD，防止可导入却缺少专家排名。"""
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / 'derived'
+            derive(ROOT / 'build/profiles/strataq2dev6.json', ROOT / 'build/profiles/strataq2dev4.json',
+                   ROOT / 'artifacts/strataq2dev4-cp312-cu130-sm120', output)
+            record = json.loads((output / 'build-record.json').read_text(encoding='utf-8'))
+            with zipfile.ZipFile(output / 'wheels' / record['wheel_filename']) as wheel:
+                asset = 'freetoken/moe/configs/q2_residency/strata_flash_next.json'
+                data = wheel.read(asset)
+                self.assertEqual(data, (output / 'candidate-source/build-source/python' / asset).read_bytes())
+                profile = json.loads(data)
+                self.assertEqual(len({tuple(p) for p in profile['ranked']}), 48 * 512)
+                dist = f"freetoken-{record['custom_version']}.dist-info"
+                rows = {r[0]: r for r in csv.reader(io.StringIO(wheel.read(dist + '/RECORD').decode()))}
+                digest = base64.urlsafe_b64encode(hashlib.sha256(data).digest()).rstrip(b'=').decode()
+                self.assertEqual(rows[asset][1:], ['sha256=' + digest, str(len(data))])
+                self.assertEqual({name: hashlib.sha256(wheel.read(name)).hexdigest() for name in record['native_modules']},
+                                 record['binary_reuse']['native_sha256'])
+            self.assertEqual(record['status'], 'derived_requires_runtime_validation')
+
+    def test_unlisted_package_data_cannot_bypass_native_reuse_guard(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            before, after = root / 'before', root / 'after'
+            before.mkdir()
+            asset = after / 'python/freetoken/moe/configs/unknown.json'
+            asset.parent.mkdir(parents=True)
+            asset.write_text('{}')
+            with self.assertRaisesRegex(ValueError, 'binary reuse forbidden'):
+                validate_python_only_changes(before, after)
+
     def test_existing_artifacts_are_preserved(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

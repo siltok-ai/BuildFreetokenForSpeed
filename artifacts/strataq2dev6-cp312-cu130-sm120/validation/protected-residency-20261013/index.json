@@ -1,0 +1,329 @@
+{
+  "format": 1,
+  "copied_files": [
+    {
+      "path": "archive_dev6_completed_revision_v1.py",
+      "bytes": 6780,
+      "sha256": "f8c40b554ca7db4d049dfd0e4ca18d23587579505c3314e6bdc52f1d322dd649"
+    },
+    {
+      "path": "audit_dev6_installed_identity_v1.py",
+      "bytes": 1702,
+      "sha256": "47db15aff0f294936f0b638b36c1f555b51587db89714805190a387ffc386c3d"
+    },
+    {
+      "path": "dev6-installed-component-v1-resource.json",
+      "bytes": 108974,
+      "sha256": "cf01d35f55c91b1e2b698f4a4dc829cb4ae8e81614de272248d4ad08a9bd315d"
+    },
+    {
+      "path": "dev6-installed-component-v1-resource.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dev6-installed-component-v1-resource.stdout.log",
+      "bytes": 3972,
+      "sha256": "22843d31348b9a8c1db17baccb93818d0da3aa1192980d3caf21aa0ddb842fbd"
+    },
+    {
+      "path": "dev6-installed-environment-freeze-v1.txt",
+      "bytes": 1462,
+      "sha256": "5f64fdd0414e2a16a66f0460fcf5323a8d58b2bc49d4eba45fbdd60743dc3691"
+    },
+    {
+      "path": "dev6-installed-identity-v1.json",
+      "bytes": 50903,
+      "sha256": "4a3ffa1ae1ebe4e46234b7912e626117167cc61f6817a84c66045201f54177a5"
+    },
+    {
+      "path": "dev6-installed-probe-derivation-v1.json",
+      "bytes": 733,
+      "sha256": "65ea2d1dc753c47f172d6c70c3e7d37db6473af172bba47b7db374b225fb2729"
+    },
+    {
+      "path": "dev6-installed-runtime-gate-v1.json",
+      "bytes": 4515,
+      "sha256": "39cc9a5b9f0bd26017a031d32dea2bc4463ed9dbfac8ff7f1964d283d8935096"
+    },
+    {
+      "path": "dev6-installed-state-gate-v1.json",
+      "bytes": 25659,
+      "sha256": "b904e0092677154a2009ef48c39e74023a6eb7e84c36fb3a35f5cab9c4232045"
+    },
+    {
+      "path": "dev6-installed-state-v1-resource.json",
+      "bytes": 372820,
+      "sha256": "28a78a48860ede0d23b7d6cc5b9c649447e10afaad0379ee0d0fc712dca95b29"
+    },
+    {
+      "path": "dev6-installed-state-v1-resource.stderr.log",
+      "bytes": 2313,
+      "sha256": "9b3f94d6e77bf59830bb54eae3267d09995a771d9833b34059bc7c7aaaec5421"
+    },
+    {
+      "path": "dev6-installed-state-v1-resource.stdout.log",
+      "bytes": 6572,
+      "sha256": "47283e051dff112d173347df8b07e36ff882d9bc279cf76740b1601884fde2ca"
+    },
+    {
+      "path": "dev6-installed-state-v1.json",
+      "bytes": 664,
+      "sha256": "c55a15587937ca0c012d70452d03cc17d6692423457571e4871968c724028294"
+    },
+    {
+      "path": "dev6-installed-state-v2-diagnostic.json",
+      "bytes": 434938,
+      "sha256": "e772707285903e853b756485e4a813cff6a67447c5216aff2f3d71032c615049"
+    },
+    {
+      "path": "dev6-installed-state-v2-long-cold-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "d8d4481cb0a19fb35651365e9d1d1767057184fb8e2cfe3d8e1af912c15d7761"
+    },
+    {
+      "path": "dev6-installed-state-v2-long-hot-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "d8d4481cb0a19fb35651365e9d1d1767057184fb8e2cfe3d8e1af912c15d7761"
+    },
+    {
+      "path": "dev6-installed-state-v2-prefix-cold-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "804bab8310f87828bec4cb46e9911bb00dae88d121a0424e05663fcef93fa9f6"
+    },
+    {
+      "path": "dev6-installed-state-v2-prefix-diverged-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "f5024d39930da49bc7308e08a0208764b7a517948e0901b1299902c710b4045e"
+    },
+    {
+      "path": "dev6-installed-state-v2-prefix-hot-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "804bab8310f87828bec4cb46e9911bb00dae88d121a0424e05663fcef93fa9f6"
+    },
+    {
+      "path": "dev6-installed-state-v2-prefix-restored-logits.safetensors",
+      "bytes": 4966912,
+      "sha256": "804bab8310f87828bec4cb46e9911bb00dae88d121a0424e05663fcef93fa9f6"
+    },
+    {
+      "path": "dev6-installed-state-v2-quality-logits.safetensors",
+      "bytes": 4966904,
+      "sha256": "e9672f2c0e7c22e9de8bbfdaa1212ff55b25a37998984e82bd8789694ae6633a"
+    },
+    {
+      "path": "dev6-installed-state-v2-resource.json",
+      "bytes": 432062,
+      "sha256": "d128b92b656adaf9de6a57fd5c38ddaaeb15d3581edf948ed6e0cda6d7a340f1"
+    },
+    {
+      "path": "dev6-installed-state-v2-resource.stderr.log",
+      "bytes": 1579,
+      "sha256": "f6454b6c97951f1e9b2c9042783143be462717e90942f0020d8835a363497bbe"
+    },
+    {
+      "path": "dev6-installed-state-v2-resource.stdout.log",
+      "bytes": 26685,
+      "sha256": "294613a574d9252017f724972202db17949142a6bfa274cd7160b3acefda9d8d"
+    },
+    {
+      "path": "dev6-installed-state-v2.json",
+      "bytes": 36894,
+      "sha256": "c11c2a5c443242fe31eb79244bdc252227e1dee07fcc0dc3cbc053285180efcd"
+    },
+    {
+      "path": "dev6-installed-summary-v1.json",
+      "bytes": 3861,
+      "sha256": "d407981a74cfa166b7111528a00ffe7a02b8301c8890e2e21cff6ff01b2b648d"
+    },
+    {
+      "path": "dev6-native-performance-11264-v1-resource.json",
+      "bytes": 1008185,
+      "sha256": "48269866ef94417d20bc9bc26788b86023912572c6ef7d3af71b3f4903abe85f"
+    },
+    {
+      "path": "dev6-native-performance-11264-v1-resource.stderr.log",
+      "bytes": 1164,
+      "sha256": "f11949e577a00c2830b2944f519d64421b82e710cb756d430add8c34f14f8d48"
+    },
+    {
+      "path": "dev6-native-performance-11264-v1-resource.stdout.log",
+      "bytes": 13997,
+      "sha256": "68dd2f6d6c2ae12d3bd585d6d04784a27bbdbecd31cd149361374a382d720669"
+    },
+    {
+      "path": "dev6-native-performance-11264-v1.json",
+      "bytes": 2989641,
+      "sha256": "a96baeb0e44b00e2d039046b241af0f4a36cd94c71b28d8a1b87b9eca5e459b2"
+    },
+    {
+      "path": "dev6-native-performance-11264-v1.prompts.json",
+      "bytes": 173420,
+      "sha256": "a4a066558c5fc734e8c97b01a58cd19da4e49049410a027d881abbf5694b1f10"
+    },
+    {
+      "path": "dev6-offline-materials-validation-v1.log",
+      "bytes": 1020,
+      "sha256": "8023b0d80c0e4915d44ee32c86459c84c9125dc6645ecdc9d54883d9349b35c7"
+    },
+    {
+      "path": "dev6-producer-unit-tests-v1.log",
+      "bytes": 5047,
+      "sha256": "fbae85df3422e1f0b9762f22cf556e037142afdb1fcdf942c04a6929f0f89379"
+    },
+    {
+      "path": "dev6-producer-validator-v1.log",
+      "bytes": 5026,
+      "sha256": "23ac1fc86d5a27bc7e7f94af13562a56154c81740745155ea2e2bc5770ad2ab2"
+    },
+    {
+      "path": "dev6-quality-protocol-identity-v1.json",
+      "bytes": 549,
+      "sha256": "a9390467a4c404fac9adf8ea8aeef930c3a54d8f117967fb3ec2d396546012be"
+    },
+    {
+      "path": "dev6-quality-v1-resource.json",
+      "bytes": 597920,
+      "sha256": "27ee2af59fa84c925f9540ba5a17556f0ae6572e2b862ab02f3a2ce08fcf6033"
+    },
+    {
+      "path": "dev6-quality-v1-resource.stderr.log",
+      "bytes": 1164,
+      "sha256": "1dee7c4e4a540ff8b161672a1024204ddd320f879010814457395e7e2bcd9f66"
+    },
+    {
+      "path": "dev6-quality-v1-resource.stdout.log",
+      "bytes": 20731,
+      "sha256": "6f1d7bc61d88d5114ae596921cb1c723a5ec5b37142f2d166145e7da26754f36"
+    },
+    {
+      "path": "dev6-runtime-requirements-v1.txt",
+      "bytes": 1367,
+      "sha256": "d742a0c88759d53daefbde5324a0a62751e06b8d094aa6c2a6c5cf9eebc8e914"
+    },
+    {
+      "path": "dev6-source-port-v1.json",
+      "bytes": 414,
+      "sha256": "11eddfecdffb0b3defaae4454352ae4ee20ee4b7b6f6f9dab5d5023528526c01"
+    },
+    {
+      "path": "dev6-working-source-component-v1-resource.json",
+      "bytes": 142564,
+      "sha256": "e305f77b91d02a52d1ca85e2a8ab0d2088b5382e8ea5c8097459460be11266ee"
+    },
+    {
+      "path": "dev6-working-source-component-v1-resource.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "dev6-working-source-component-v1-resource.stdout.log",
+      "bytes": 4164,
+      "sha256": "20b851b841f40f90de510038e9d7a431e5ce5ff1e8a51236bfafabe0fd870519"
+    },
+    {
+      "path": "dev6-working-source-component-v1.json",
+      "bytes": 414,
+      "sha256": "84682e30ee0d1c676fc2ff8e36f592387d4ef15ace62a7ed176d6ed3190b264a"
+    },
+    {
+      "path": "dev6_installed_performance_v1.py",
+      "bytes": 13882,
+      "sha256": "ddbaaee4776459c46f7b9abf9d9ddfdac45bfc9d7b5ff2f50586907719c9be69"
+    },
+    {
+      "path": "dev6_installed_performance_v2.py",
+      "bytes": 13882,
+      "sha256": "5789334a3f786f6ba69059e62cfa0b04bf96bdf89eb70bf427a24e40f7627749"
+    },
+    {
+      "path": "dev6_installed_state_v1.py",
+      "bytes": 15702,
+      "sha256": "85bda1a413b2ddf08dfd56446dbf974a7e20d05026bc98e2cc8c16dc43721c5f"
+    },
+    {
+      "path": "dev6_installed_state_v2.py",
+      "bytes": 15702,
+      "sha256": "b0c65eff6dace8a0f1d53e2b2ae1a2762cde7bd3d6e79e96cfa2de44a97f0f84"
+    },
+    {
+      "path": "freeze_dev6_protected_materials_v1.py",
+      "bytes": 4615,
+      "sha256": "d920aa0feb21a3828d63daf04be22d0cab4421585f16523bff7e2d1fb0d14ebc"
+    },
+    {
+      "path": "port_protected_cache_dev6_v1.py",
+      "bytes": 14708,
+      "sha256": "3d4c52a1ef011a720bb269bee2852b014bdb42a2b121fd68cee0faa910012a22"
+    },
+    {
+      "path": "prepare_dev6_installed_probes_v1.py",
+      "bytes": 4349,
+      "sha256": "40e937bd53ed6ce54592cb42f3d9f74fe40fe27915ae46830b5f598a1a460665"
+    },
+    {
+      "path": "prepare_dev6_quality_v1.py",
+      "bytes": 1597,
+      "sha256": "653db87e84d3c858308c1a5cc2e40c1883c9da26b8096c163f51068f58648258"
+    },
+    {
+      "path": "quality-gate-dev6/freetoken.json",
+      "bytes": 17243,
+      "sha256": "b130052a72f5eb56736904ff38ba0e35c14b79bab7014e0bbbccfd3c600c6fdd"
+    },
+    {
+      "path": "quality-gate-dev6/protocol.json",
+      "bytes": 91409,
+      "sha256": "33025d04036c68b3d74c75228b01f25a75f39f99cfd5afceab8ad1bfd0d63548"
+    },
+    {
+      "path": "run_quality_gate_dev6_v1.py",
+      "bytes": 7762,
+      "sha256": "4be1e743255487255ea1a89a938334393f7515512bcbeecca659bb8dad14dd9e"
+    },
+    {
+      "path": "test_dev6_installed_component_v1.py",
+      "bytes": 401,
+      "sha256": "81d60c76734505510d0ee41d92003a14265840852d47ee94b8aa2d58b46296c3"
+    },
+    {
+      "path": "test_dev6_working_source_v1.py",
+      "bytes": 1749,
+      "sha256": "f2e1e73a714ceaf7f21fc3afa02485aa4da874a1a16450c748e61efe9755a394"
+    },
+    {
+      "path": "validate_dev6_installed_state_v1.py",
+      "bytes": 3326,
+      "sha256": "4919480bb3d735aa0dc317f33770f1b062b53e718394720671a9aa2bc79971c9"
+    },
+    {
+      "path": "validate_dev6_runtime_gate_v1.py",
+      "bytes": 2539,
+      "sha256": "1a3107cd4e37bad286647b4105d1fa8332755353480e7a14dbd06004c5b8edaf"
+    },
+    {
+      "path": "derive_python_materials.py",
+      "bytes": 10768,
+      "sha256": "ee92d3558241ad924239d57a3a0f7c7d8c3ceeca45db3c40a6c5626f6397f84c"
+    }
+  ],
+  "external_references": [
+    {
+      "path": "dev6-installed-state-v2-technical-cold-logits.safetensors",
+      "bytes": 31787664,
+      "sha256": "6eb2aaf7caaedcbfa2ba5a1c7abf2623f0553ec56b74489e28fb5c57b3728907",
+      "original_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev6-installed-state-v2-technical-cold-logits.safetensors"
+    },
+    {
+      "path": "dev6-installed-state-v2-technical-hot-logits.safetensors",
+      "bytes": 31787664,
+      "sha256": "6eb2aaf7caaedcbfa2ba5a1c7abf2623f0553ec56b74489e28fb5c57b3728907",
+      "original_path": "C:\\workspace\\artifacts\\flash-next-strata-q2-20261012\\dev6-installed-state-v2-technical-hot-logits.safetensors"
+    }
+  ],
+  "summary_sha256": "d407981a74cfa166b7111528a00ffe7a02b8301c8890e2e21cff6ff01b2b648d",
+  "build_record_sha256": "9bf988bdfcca5b96d4e4c24f70575bad837dc4ec94d485084d9412c63c4471ea",
+  "immutable": true,
+  "speed_acceptance": false,
+  "packaged_acceptance": false
+}
