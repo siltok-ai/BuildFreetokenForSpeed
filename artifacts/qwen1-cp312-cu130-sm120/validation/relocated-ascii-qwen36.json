@@ -1,0 +1,79 @@
+{
+  "cache_geometry": {
+    "moe_cache_size": 5070,
+    "num_mamba_slots": 8,
+    "num_pages": 8192,
+    "num_swa_pages": 0,
+    "page_size": 1,
+    "swa_page_size": 0
+  },
+  "cancel": {
+    "settle_ms": 31.62060002796352,
+    "worker_pid_after": 15040,
+    "worker_pid_before": 15040,
+    "worker_reused": true
+  },
+  "load_seconds": 21.809665100008715,
+  "long_runs": [
+    {
+      "decode_tokens_per_second": 136.0271546219661,
+      "elapsed_ms": 543.7521999701858,
+      "finish_reason": "length",
+      "input_tokens": 128,
+      "output_tokens": 16,
+      "reasoning_content": null,
+      "text": "Building a local AI runtime that coordinates model weights, expert routing, GPU memory,",
+      "text_prefix": "Building a local AI runtime that coordinates model weights, expert routing, GPU memory,",
+      "ttft_ms": 433.4371999721043
+    }
+  ],
+  "median_decode_tokens_per_second": 166.18160105871783,
+  "median_long_ttft_ms": 433.4371999721043,
+  "median_ttft_ms": 473.4277999959886,
+  "model": "C:\\workspace\\models\\qwen3.6-35b-a3b.nvfp4-modelscope",
+  "post_cancel": {
+    "decode_tokens_per_second": 73.889077577473,
+    "elapsed_ms": 499.17879997519776,
+    "finish_reason": "stop",
+    "input_tokens": 18,
+    "output_tokens": 2,
+    "reasoning_content": null,
+    "text": "worker reused",
+    "text_prefix": "worker reused",
+    "ttft_ms": 474.4716999703087
+  },
+  "profile": "qwen36",
+  "prompt_profile": {
+    "long_tokens": 128,
+    "short_tokens": 70
+  },
+  "quant": "nvfp4",
+  "runs": [
+    {
+      "decode_tokens_per_second": 166.18160105871783,
+      "elapsed_ms": 563.7028999626637,
+      "finish_reason": "length",
+      "input_tokens": 70,
+      "output_tokens": 16,
+      "reasoning_content": null,
+      "text": "A local inference engine balances GPU memory, host memory, and token latency through **",
+      "text_prefix": "A local inference engine balances GPU memory, host memory, and token latency through **",
+      "ttft_ms": 473.4277999959886
+    }
+  ],
+  "unload_seconds": 3.718853499973193,
+  "vram_bytes": 12618563584,
+  "warmup": {
+    "decode_tokens_per_second": 112.36687335670455,
+    "elapsed_ms": 614.1848000115715,
+    "finish_reason": "length",
+    "input_tokens": 70,
+    "output_tokens": 16,
+    "reasoning_content": null,
+    "text": "A local inference engine balances GPU memory, host memory, and token latency through **",
+    "text_prefix": "A local inference engine balances GPU memory, host memory, and token latency through **",
+    "ttft_ms": 480.67050002282485
+  },
+  "worker_pid": 15040,
+  "worker_pid_gone": true
+}

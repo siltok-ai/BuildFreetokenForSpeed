@@ -1,0 +1,234 @@
+{
+  "admission_overrides": {
+    "commit_safety_gib": 8.0,
+    "host_commit_estimate_gib": null,
+    "vram_estimate_gib": null,
+    "vram_safety_gib": 0.5
+  },
+  "admission_probe": {
+    "allowed": true,
+    "current": {
+      "commit_available_bytes": 53344645120,
+      "ram_available_bytes": 54251302912,
+      "vram_free_bytes": 23951572992,
+      "vram_total_bytes": 25642467328
+    },
+    "headroom_after_safety": {
+      "commit_bytes": 13255487488,
+      "ram_bytes": 43513884672,
+      "vram_bytes": 505413632
+    },
+    "reasons": [],
+    "required": {
+      "commit_peak_bytes": 22909288448,
+      "cpu_heap_peak_bytes": 8589934592,
+      "effective_commit_bytes": 31499223040,
+      "strict_commit_limit": true,
+      "vram_peak_bytes": 22909288448,
+      "weight_file_count": 3
+    },
+    "safety": {
+      "commit_bytes": 8589934592,
+      "ram_bytes": 2147483648,
+      "vram_bytes": 536870912
+    },
+    "usable_total_vram_bytes": 25105596416,
+    "warnings": []
+  },
+  "cache_geometry": {
+    "moe_cache_size": 0,
+    "num_mamba_slots": 8,
+    "num_pages": 4096,
+    "num_swa_pages": 0,
+    "page_size": 1,
+    "swa_page_size": 0
+  },
+  "model_id": "qwen3.8-27b.nvfp4-freetoken",
+  "profile": "qwen38",
+  "quant": "nvfp4",
+  "registered": 1,
+  "resource_baselines": {
+    "engine_after_cuda_init": {
+      "captured_unix_ns": 1791879967699292300,
+      "commit_available_bytes": 53927383040,
+      "process_private_bytes": 1744797696,
+      "ram_available_bytes": 54386229248,
+      "torch_allocated_bytes": 0,
+      "torch_reserved_bytes": 0,
+      "vram_free_bytes": 23951572992,
+      "vram_total_bytes": 25642467328
+    },
+    "machine_after_cuda_init": {
+      "captured_unix_ns": 1791879967747335700,
+      "gpus": [
+        {
+          "driver_version": "610.88",
+          "index": 0,
+          "memory_free_bytes": 23596105728,
+          "memory_free_mib": 22503,
+          "memory_total_bytes": 25642926080,
+          "memory_total_mib": 24455,
+          "name": "NVIDIA GeForce RTX 5090 D v2",
+          "uuid": "GPU-269009f4-4be7-e30f-6810-1626a7cbf5b4"
+        }
+      ],
+      "source": "nvidia-smi"
+    },
+    "machine_before_engine": {
+      "captured_unix_ns": 1791879966335749300,
+      "gpus": [
+        {
+          "driver_version": "610.88",
+          "index": 0,
+          "memory_free_bytes": 24048041984,
+          "memory_free_mib": 22934,
+          "memory_total_bytes": 25642926080,
+          "memory_total_mib": 24455,
+          "name": "NVIDIA GeForce RTX 5090 D v2",
+          "uuid": "GPU-269009f4-4be7-e30f-6810-1626a7cbf5b4"
+        }
+      ],
+      "source": "nvidia-smi"
+    }
+  },
+  "status": {
+    "gpu": {
+      "cuda_capability": [
+        12,
+        0
+      ],
+      "name": "NVIDIA GeForce RTX 5090 D v2"
+    },
+    "loaded_backends": [
+      {
+        "backend_class": "FreeTokenQwen36Backend",
+        "commit_delta_bytes": 26349297664,
+        "commit_delta_gb": 26.35,
+        "idle": true,
+        "model_id": "qwen3.8-27b.nvfp4-freetoken",
+        "private_delta_bytes": 106496,
+        "private_delta_gb": 0.0,
+        "refcount": 0,
+        "state": "loaded",
+        "vram_bytes": 22489858048,
+        "vram_gb": 22.49,
+        "weight_files": [
+          "C:\\workspace\\models\\qwen3.8-27b.nvfp4-radixark\\model-00001-of-00003.safetensors",
+          "C:\\workspace\\models\\qwen3.8-27b.nvfp4-radixark\\model-00002-of-00003.safetensors",
+          "C:\\workspace\\models\\qwen3.8-27b.nvfp4-radixark\\model-00003-of-00003.safetensors"
+        ]
+      }
+    ],
+    "queue": {
+      "depth": 0,
+      "running": 0
+    },
+    "ram": {
+      "available_bytes": 52366446592,
+      "available_gb": 52.37,
+      "total_bytes": 66197110784,
+      "total_gb": 66.2,
+      "used_bytes": 13830664192,
+      "used_gb": 13.83
+    },
+    "recent_durations": {},
+    "resources": {
+      "commit": {
+        "available_bytes": 26791927808,
+        "available_gb": 26.79,
+        "limit_bytes": 70357860352,
+        "limit_gb": 70.36,
+        "used_bytes": 43565932544,
+        "used_gb": 43.57
+      },
+      "pagefile": {
+        "allocated_bytes": 4160749568,
+        "allocated_gb": 4.16,
+        "current_bytes": 75776000,
+        "current_gb": 0.08,
+        "peak_bytes": 106954752,
+        "peak_gb": 0.11
+      },
+      "process": {
+        "private_bytes": 2575552512,
+        "private_gb": 2.58,
+        "virtual_bytes": 2575552512,
+        "virtual_gb": 2.58,
+        "working_set_bytes": 961433600,
+        "working_set_gb": 0.96
+      },
+      "ram": {
+        "available_bytes": 52366446592,
+        "available_gb": 52.37,
+        "total_bytes": 66197110784,
+        "total_gb": 66.2
+      },
+      "vram": {
+        "free_bytes": 23469334528,
+        "free_gb": 23.47,
+        "torch_allocated_bytes": 0,
+        "torch_allocated_gb": 0.0,
+        "torch_reserved_bytes": 0,
+        "torch_reserved_gb": 0.0,
+        "total_bytes": 25642467328,
+        "total_gb": 25.64
+      }
+    },
+    "started": true,
+    "task_service": {
+      "error_code": null,
+      "staged_bytes": 0,
+      "status": "ready"
+    },
+    "tasks": {
+      "queued": [],
+      "running": []
+    },
+    "uptime_seconds": 27.95,
+    "vram": {
+      "free_gb": 3.15,
+      "total_bytes": 25642467328,
+      "total_gb": 25.64,
+      "used_bytes": 22489858048,
+      "used_gb": 22.49
+    }
+  },
+  "stream": {
+    "chunks": 35,
+    "done_events": 1,
+    "finish_reason": "length",
+    "status_code": 200,
+    "text_prefix": "Local inference refers to the process of executing machine learning models directly on a user's device rather than sending data to a remote server, thereby enha",
+    "tpot_seconds": 2.5000002595686145e-06,
+    "ttft_seconds": 0.7318532000062987,
+    "usage": {
+      "completion_tokens": 32,
+      "prompt_tokens": 20,
+      "total_tokens": 52
+    }
+  },
+  "sync": {
+    "finish_reason": "length",
+    "status_code": 200,
+    "text_prefix": "Local inference refers to the process of executing machine learning models directly on a user's device rather than sending data to a remote server, thereby enha",
+    "usage": {
+      "completion_tokens": 32,
+      "prompt_tokens": 20,
+      "total_tokens": 52
+    },
+    "wall_seconds": 27.193068700027652
+  },
+  "unsupported_field": {
+    "code": "unsupported_feature",
+    "message": "Model 'qwen3.8-27b.nvfp4-freetoken' does not support request field 'presence_penalty' in its current release.",
+    "param": "presence_penalty",
+    "retryable": false,
+    "type": "invalid_request_error"
+  },
+  "wall_seconds": 30.508240399998613,
+  "worker_pids": [
+    4512,
+    6700
+  ],
+  "worker_pids_gone": true
+}

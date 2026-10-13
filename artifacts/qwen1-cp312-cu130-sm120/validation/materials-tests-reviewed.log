@@ -1,0 +1,11 @@
+test_archive_traversal_is_rejected_before_extraction (test_prepare_source.PreparationBoundaries.test_archive_traversal_is_rejected_before_extraction) ... ok
+test_changed_input_is_rejected_before_creating_output (test_prepare_source.PreparationBoundaries.test_changed_input_is_rejected_before_creating_output) ... ok
+test_existing_output_is_preserved (test_prepare_source.PreparationBoundaries.test_existing_output_is_preserved) ... ok
+test_failed_patch_stops_without_modifying_source (test_prepare_source.PreparationBoundaries.test_failed_patch_stops_without_modifying_source) ... ok
+test_patch_replay_does_not_depend_on_callers_git_line_endings (test_prepare_source.PreparationBoundaries.test_patch_replay_does_not_depend_on_callers_git_line_endings) ... ok
+test_unfrozen_declared_input_is_rejected (test_prepare_source.PreparationBoundaries.test_unfrozen_declared_input_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.288s
+
+OK

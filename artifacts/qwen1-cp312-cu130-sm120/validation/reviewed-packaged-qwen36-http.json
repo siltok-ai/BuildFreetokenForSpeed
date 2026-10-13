@@ -1,0 +1,234 @@
+{
+  "admission_overrides": {
+    "commit_safety_gib": 8.0,
+    "host_commit_estimate_gib": null,
+    "vram_estimate_gib": null,
+    "vram_safety_gib": 2.0
+  },
+  "admission_probe": {
+    "allowed": true,
+    "current": {
+      "commit_available_bytes": 53131522048,
+      "ram_available_bytes": 52800270336,
+      "vram_free_bytes": 23951572992,
+      "vram_total_bytes": 25642467328
+    },
+    "headroom_after_safety": {
+      "commit_bytes": 5350010880,
+      "ram_bytes": 24882982912,
+      "vram_bytes": 8382316544
+    },
+    "reasons": [],
+    "required": {
+      "commit_peak_bytes": 13421772800,
+      "cpu_heap_peak_bytes": 25769803776,
+      "effective_commit_bytes": 39191576576,
+      "strict_commit_limit": true,
+      "vram_peak_bytes": 13421772800,
+      "weight_file_count": 3
+    },
+    "safety": {
+      "commit_bytes": 8589934592,
+      "ram_bytes": 2147483648,
+      "vram_bytes": 2147483648
+    },
+    "usable_total_vram_bytes": 23494983680,
+    "warnings": []
+  },
+  "cache_geometry": {
+    "moe_cache_size": 5070,
+    "num_mamba_slots": 8,
+    "num_pages": 8192,
+    "num_swa_pages": 0,
+    "page_size": 1,
+    "swa_page_size": 0
+  },
+  "model_id": "qwen3.6-35b-a3b.nvfp4-freetoken",
+  "profile": "qwen36",
+  "quant": "nvfp4",
+  "registered": 1,
+  "resource_baselines": {
+    "engine_after_cuda_init": {
+      "captured_unix_ns": 1791881526222786600,
+      "commit_available_bytes": 53692162048,
+      "process_private_bytes": 1748938752,
+      "ram_available_bytes": 52880957440,
+      "torch_allocated_bytes": 0,
+      "torch_reserved_bytes": 0,
+      "vram_free_bytes": 23951572992,
+      "vram_total_bytes": 25642467328
+    },
+    "machine_after_cuda_init": {
+      "captured_unix_ns": 1791881526260415300,
+      "gpus": [
+        {
+          "driver_version": "610.88",
+          "index": 0,
+          "memory_free_bytes": 23968350208,
+          "memory_free_mib": 22858,
+          "memory_total_bytes": 25642926080,
+          "memory_total_mib": 24455,
+          "name": "NVIDIA GeForce RTX 5090 D v2",
+          "uuid": "GPU-269009f4-4be7-e30f-6810-1626a7cbf5b4"
+        }
+      ],
+      "source": "nvidia-smi"
+    },
+    "machine_before_engine": {
+      "captured_unix_ns": 1791881523821926000,
+      "gpus": [
+        {
+          "driver_version": "610.88",
+          "index": 0,
+          "memory_free_bytes": 24421335040,
+          "memory_free_mib": 23290,
+          "memory_total_bytes": 25642926080,
+          "memory_total_mib": 24455,
+          "name": "NVIDIA GeForce RTX 5090 D v2",
+          "uuid": "GPU-269009f4-4be7-e30f-6810-1626a7cbf5b4"
+        }
+      ],
+      "source": "nvidia-smi"
+    }
+  },
+  "status": {
+    "gpu": {
+      "cuda_capability": [
+        12,
+        0
+      ],
+      "name": "NVIDIA GeForce RTX 5090 D v2"
+    },
+    "loaded_backends": [
+      {
+        "backend_class": "FreeTokenQwen36Backend",
+        "commit_delta_bytes": 34615824384,
+        "commit_delta_gb": 34.62,
+        "idle": true,
+        "model_id": "qwen3.6-35b-a3b.nvfp4-freetoken",
+        "private_delta_bytes": 106496,
+        "private_delta_gb": 0.0,
+        "refcount": 0,
+        "state": "loaded",
+        "vram_bytes": 12618563584,
+        "vram_gb": 12.62,
+        "weight_files": [
+          "C:\\workspace\\models\\qwen3.6-35b-a3b.nvfp4-modelscope\\model-00001-of-00003.safetensors",
+          "C:\\workspace\\models\\qwen3.6-35b-a3b.nvfp4-modelscope\\model-00002-of-00003.safetensors",
+          "C:\\workspace\\models\\qwen3.6-35b-a3b.nvfp4-modelscope\\model-00003-of-00003.safetensors"
+        ]
+      }
+    ],
+    "queue": {
+      "depth": 0,
+      "running": 0
+    },
+    "ram": {
+      "available_bytes": 33178251264,
+      "available_gb": 33.18,
+      "total_bytes": 66197110784,
+      "total_gb": 66.2,
+      "used_bytes": 33018859520,
+      "used_gb": 33.02
+    },
+    "recent_durations": {},
+    "resources": {
+      "commit": {
+        "available_bytes": 18244730880,
+        "available_gb": 18.24,
+        "limit_bytes": 70357860352,
+        "limit_gb": 70.36,
+        "used_bytes": 52113129472,
+        "used_gb": 52.11
+      },
+      "pagefile": {
+        "allocated_bytes": 4160749568,
+        "allocated_gb": 4.16,
+        "current_bytes": 72269824,
+        "current_gb": 0.07,
+        "peak_bytes": null,
+        "peak_gb": null
+      },
+      "process": {
+        "private_bytes": 2574495744,
+        "private_gb": 2.57,
+        "virtual_bytes": 2574495744,
+        "virtual_gb": 2.57,
+        "working_set_bytes": 971870208,
+        "working_set_gb": 0.97
+      },
+      "ram": {
+        "available_bytes": 33178251264,
+        "available_gb": 33.18,
+        "total_bytes": 66197110784,
+        "total_gb": 66.2
+      },
+      "vram": {
+        "free_bytes": 23951572992,
+        "free_gb": 23.95,
+        "torch_allocated_bytes": 0,
+        "torch_allocated_gb": 0.0,
+        "torch_reserved_bytes": 0,
+        "torch_reserved_gb": 0.0,
+        "total_bytes": 25642467328,
+        "total_gb": 25.64
+      }
+    },
+    "started": true,
+    "task_service": {
+      "error_code": null,
+      "staged_bytes": 0,
+      "status": "ready"
+    },
+    "tasks": {
+      "queued": [],
+      "running": []
+    },
+    "uptime_seconds": 26.96,
+    "vram": {
+      "free_gb": 13.02,
+      "total_bytes": 25642467328,
+      "total_gb": 25.64,
+      "used_bytes": 12618563584,
+      "used_gb": 12.62
+    }
+  },
+  "stream": {
+    "chunks": 31,
+    "done_events": 1,
+    "finish_reason": "stop",
+    "status_code": 200,
+    "text_prefix": "Local inference is a statistical technique that estimates causal effects by comparing treated units to their most similar untreated counterparts within a specif",
+    "tpot_seconds": 0.005741629628809514,
+    "ttft_seconds": 0.42787590000079945,
+    "usage": {
+      "completion_tokens": 28,
+      "prompt_tokens": 20,
+      "total_tokens": 48
+    }
+  },
+  "sync": {
+    "finish_reason": "stop",
+    "status_code": 200,
+    "text_prefix": "Local inference is a statistical technique that estimates causal effects by comparing treated units to their most similar untreated counterparts within a specif",
+    "usage": {
+      "completion_tokens": 28,
+      "prompt_tokens": 20,
+      "total_tokens": 48
+    },
+    "wall_seconds": 25.825126299983822
+  },
+  "unsupported_field": {
+    "code": "unsupported_feature",
+    "message": "Model 'qwen3.6-35b-a3b.nvfp4-freetoken' does not support request field 'presence_penalty' in its current release.",
+    "param": "presence_penalty",
+    "retryable": false,
+    "type": "invalid_request_error"
+  },
+  "wall_seconds": 34.239998399978504,
+  "worker_pids": [
+    3416,
+    14276
+  ],
+  "worker_pids_gone": true
+}

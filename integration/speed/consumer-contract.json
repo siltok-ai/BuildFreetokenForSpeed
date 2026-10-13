@@ -35,7 +35,11 @@
   "quantization_validated": [
     "nvfp4"
   ],
-  "validation_status": "built_requires_runtime_validation",
+  "validation_status": "passed_nvfp4_text_source_and_compiled_package",
   "installer_validated": false,
-  "clean_machine_validated": false
+  "clean_machine_validated": false,
+  "validation_record": "artifacts/qwen1-cp312-cu130-sm120/validation/acceptance.json",
+  "speed_pr_commit": "d7b17fd5e9c285c10272b18f9f36cbc64d68d688",
+  "installation_path_constraint": "ASCII; spaces supported; TVM-FFI fails on Chinese paths",
+  "consumer_verification": "builder responsibility; no added Speed SHA checks or material lock"
 }

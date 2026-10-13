@@ -1,0 +1,227 @@
+{
+  "cache_geometry": {
+    "moe_cache_size": 0,
+    "num_mamba_slots": 8,
+    "num_pages": 4096,
+    "num_swa_pages": 0,
+    "page_size": 1,
+    "swa_page_size": 0
+  },
+  "cancel": {
+    "settle_ms": 50.84099998930469,
+    "worker_pid_after": 20124,
+    "worker_pid_before": 20124,
+    "worker_reused": true
+  },
+  "load_seconds": 39.905997599998955,
+  "long_runs": [
+    {
+      "decode_tokens_per_second": 56.781338474515124,
+      "elapsed_ms": 1099.7230000211857,
+      "finish_reason": "length",
+      "input_tokens": 2048,
+      "output_tokens": 16,
+      "reasoning_content": null,
+      "text": "# Local AI Runtime: Tradeoffs and Engineering Reasoning\n\nA local AI runtime",
+      "text_prefix": "# Local AI Runtime: Tradeoffs and Engineering Reasoning\n\nA local AI runtime",
+      "ttft_ms": 835.538599989377
+    },
+    {
+      "decode_tokens_per_second": 55.96288242876266,
+      "elapsed_ms": 1339.6569999749772,
+      "finish_reason": "length",
+      "input_tokens": 2048,
+      "output_tokens": 16,
+      "reasoning_content": null,
+      "text": "# Local AI Runtime: Tradeoffs and Engineering Reasoning\n\nA local AI runtime",
+      "text_prefix": "# Local AI Runtime: Tradeoffs and Engineering Reasoning\n\nA local AI runtime",
+      "ttft_ms": 1071.608499973081
+    },
+    {
+      "decode_tokens_per_second": 57.03422053726758,
+      "elapsed_ms": 341.1791999824345,
+      "finish_reason": "length",
+      "input_tokens": 2048,
+      "output_tokens": 16,
+      "reasoning_content": null,
+      "text": "# Local AI Runtime: Tradeoffs and Engineering Reasoning\n\nA local AI runtime",
+      "text_prefix": "# Local AI Runtime: Tradeoffs and Engineering Reasoning\n\nA local AI runtime",
+      "ttft_ms": 78.1377000384964
+    }
+  ],
+  "median_decode_tokens_per_second": 57.444616492889025,
+  "median_long_ttft_ms": 835.538599989377,
+  "median_ttft_ms": 75.10009995894507,
+  "model": "C:\\workspace\\models\\qwen3.8-27b.nvfp4-radixark",
+  "post_cancel": {
+    "decode_tokens_per_second": 56.866647824177605,
+    "elapsed_ms": 1353.2844000146724,
+    "finish_reason": "stop",
+    "input_tokens": 18,
+    "output_tokens": 2,
+    "reasoning_content": null,
+    "text": "worker reused",
+    "text_prefix": "worker reused",
+    "ttft_ms": 1317.7274000481702
+  },
+  "profile": "qwen38",
+  "prompt_profile": {
+    "long_tokens": 2048,
+    "short_tokens": 70
+  },
+  "quality_cases": [
+    {
+      "enable_thinking": false,
+      "id": "arithmetic_no_thinking",
+      "max_tokens": 32,
+      "prompt": "Answer with only one integer. A service handles 37 requests per minute for 19 minutes. How many requests does it handle?",
+      "result": {
+        "decode_tokens_per_second": 58.281341507947396,
+        "elapsed_ms": 969.4054000428878,
+        "finish_reason": "stop",
+        "input_tokens": 40,
+        "output_tokens": 3,
+        "reasoning_content": null,
+        "text": "703",
+        "text_prefix": "703",
+        "ttft_ms": 917.6648000138812
+      }
+    },
+    {
+      "enable_thinking": true,
+      "id": "reasoning_with_thinking",
+      "max_tokens": 2048,
+      "prompt": "A model server has 24 GiB of VRAM. It reserves 2 GiB, uses 3 GiB for runtime state, and each cache block costs 256 MiB. Determine the maximum whole number of cache blocks that fit. Explain the reasoning and end with a line formatted exactly as FINAL: <integer>.",
+      "result": {
+        "decode_tokens_per_second": 57.30223439995015,
+        "elapsed_ms": 5485.710800043307,
+        "finish_reason": "stop",
+        "input_tokens": 120,
+        "output_tokens": 307,
+        "reasoning_content": "We need answer simple arithmetic. Need compute maximum whole number cache blocks. VRAM 24 GiB. Reserves 2 GiB, uses 3 GiB runtime state. Available = 24 - 2 - 3 = 19 GiB. Each cache block 256 MiB. 1 GiB = 1024 MiB. 19 GiB = 19456 MiB. Divide by 256 = 75.999? 256*76 = 19456 exactly? 256*75=19200, plus 256=19456. Yes 76. Need explain reasoning and end with FINAL: 76. Ensure exact line.\n",
+        "text": "\n\nThe server has 24 GiB of VRAM.\n\n- Reserved: 2 GiB  \n- Runtime state: 3 GiB  \n- Available for cache blocks: 24 \u2212 2 \u2212 3 = 19 GiB  \n\nConvert to MiB:\n\n- 19 GiB \u00d7 1024 MiB/GiB = 19456 MiB  \n\nEach cache block costs 256 MiB:\n\n- 19456 \u00f7 256 = 76  \n\nSo the maximum whole number of cache blocks that fit is:\n\nFINAL: 76",
+        "text_prefix": "\n\nThe server has 24 GiB of VRAM.\n\n- Reserved: 2 GiB  \n- Runtime state: 3 GiB  \n- Available for cache blocks: 24 \u2212 2 \u2212 3 = 19 GiB  \n\nConvert to MiB:\n\n- 19 GiB \u00d7 ",
+        "ttft_ms": 128.1398000428453
+      }
+    },
+    {
+      "enable_thinking": false,
+      "id": "long_structured_no_thinking",
+      "max_tokens": 512,
+      "prompt": "Write a self-contained technical note in exactly five numbered sections about designing a local text-generation service. Cover, in order: model identity, resource admission, streaming, cancellation, and shutdown. Each section must state one invariant, one failure mode, and one concrete verification. Do not use a table.",
+      "result": {
+        "decode_tokens_per_second": 57.14371710776114,
+        "elapsed_ms": 8790.66389997024,
+        "finish_reason": "stop",
+        "input_tokens": 71,
+        "output_tokens": 495,
+        "reasoning_content": null,
+        "text": "1. Model Identity\nInvariant: The service must bind a specific model checkpoint hash to every active inference session to ensure deterministic behavior.\nFailure Mode: A background model reload or version mismatch causes the service to serve responses from an unintended or stale model variant.\nVerification: Execute a unit test that initializes the service with a specific checkpoint, generates a fixed prompt, and asserts that the output token sequence matches the expected golden file byte-for-byte.\n\n2. Resource Admission\nInvariant: The system must enforce a strict concurrency limit on active generation requests to prevent memory exhaustion on the GPU.\nFailure Mode: A burst of concurrent requests exceeds the available VRAM, causing out-of-memory errors that crash the inference engine or degrade latency for all users.\nVerification: Run a load test that submits requests equal to the configured concurrency limit plus one, and verify that the excess request is rejected with a 503 Service Unavailable status while existing requests complete successfully.\n\n3. Streaming\nInvariant: Each token chunk must be delivered to the client in the exact order it was generated by the model to maintain semantic coherence.\nFailure Mode: Network jitter or internal queueing delays cause token chunks to arrive out of order, resulting in garbled or nonsensical text for the end user.\nVerification: Implement a client-side integration test that records the sequence of received tokens and asserts that the sequence matches the server-side generation log exactly, including timestamps within a defined tolerance.\n\n4. Cancellation\nInvariant: Upon receiving a cancellation signal, the service must immediately stop generating new tokens and release all associated memory resources.\nFailure Mode: The cancellation signal is ignored or delayed, causing the model to continue consuming compute resources and memory for a request that the user has already abandoned.\nVerification: Initiate a long-running generation request, send a cancellation signal after the first token, and monitor the server logs to confirm that the generation loop terminates within a specified millisecond threshold and that memory usage returns to baseline.\n\n5. Shutdown\nInvariant: The service must drain all active requests gracefully before terminating the process to prevent data loss or client errors.\nFailure Mode: An immediate process kill during active inference causes clients to receive truncated responses or connection reset errors, violating the service level agreement.\nVerification: Trigger a graceful shutdown command while a batch of requests is in progress, and verify that all active requests complete their generation and flush their final tokens before the process exits with a zero status code.",
+        "text_prefix": "1. Model Identity\nInvariant: The service must bind a specific model checkpoint hash to every active inference session to ensure deterministic behavior.\nFailure ",
+        "ttft_ms": 127.90969997877255
+      }
+    },
+    {
+      "enable_thinking": false,
+      "id": "chinese",
+      "max_tokens": 256,
+      "prompt": "\u7528\u4e2d\u6587\u7b80\u8981\u89e3\u91ca\u4e3a\u4ec0\u4e48\u672c\u5730\u5927\u6a21\u578b\u63a8\u7406\u9700\u8981\u7ba1\u7406\u663e\u5b58\u3002",
+      "result": {
+        "decode_tokens_per_second": 57.508229314472665,
+        "elapsed_ms": 4516.242100042291,
+        "finish_reason": "length",
+        "input_tokens": 26,
+        "output_tokens": 256,
+        "reasoning_content": null,
+        "text": "\u672c\u5730\u5927\u6a21\u578b\u63a8\u7406\u9700\u8981\u7ba1\u7406\u663e\u5b58\uff0c\u4e3b\u8981\u57fa\u4e8e\u4ee5\u4e0b\u4e09\u4e2a\u6838\u5fc3\u539f\u56e0\uff1a\n\n1. **\u663e\u5b58\u5bb9\u91cf\u6709\u9650**\n   \u5927\u8bed\u8a00\u6a21\u578b\uff08LLM\uff09\u7684\u53c2\u6570\u91cf\u5de8\u5927\uff08\u5982 7B\u300113B\u300170B \u7b49\uff09\uff0c\u52a0\u8f7d\u6a21\u578b\u6743\u91cd\u672c\u8eab\u5c31\u9700\u8981\u5927\u91cf\u663e\u5b58\u3002\u82e5\u4e0d\u52a0\u7ba1\u7406\uff0c\u6781\u6613\u8d85\u51fa GPU \u663e\u5b58\u4e0a\u9650\uff0c\u5bfc\u81f4\u201cOut of Memory\u201d\uff08OOM\uff09\u9519\u8bef\uff0c\u7a0b\u5e8f\u5d29\u6e83\u3002\n\n2. **\u63a8\u7406\u8fc7\u7a0b\u52a8\u6001\u5360\u7528\u663e\u5b58**\n   \u9664\u4e86\u6a21\u578b\u6743\u91cd\uff0c\u63a8\u7406\u8fc7\u7a0b\u4e2d\u8fd8\u9700\u5b58\u50a8\uff1a\n   - **KV Cache**\uff1a\u7528\u4e8e\u52a0\u901f\u81ea\u56de\u5f52\u751f\u6210\uff0c\u5176\u5927\u5c0f\u968f\u4e0a\u4e0b\u6587\u957f\u5ea6\uff08Context Length\uff09\u7ebf\u6027\u589e\u957f\u3002\n   - **\u4e2d\u95f4\u6fc0\u6d3b\u503c**\uff1a\u524d\u5411\u4f20\u64ad\u8fc7\u7a0b\u4e2d\u7684\u4e34\u65f6\u6570\u636e\u3002\n   \u8fd9\u4e9b\u52a8\u6001\u6570\u636e\u4f1a\u4e0d\u65ad\u7d2f\u79ef\uff0c\u82e5\u4e0d\u53ca\u65f6\u6e05\u7406\u6216\u4f18\u5316\uff0c\u4f1a\u8fc5\u901f\u8017\u5c3d\u5269\u4f59\u663e\u5b58\u3002\n\n3. **\u63d0\u5347\u6548\u7387\u4e0e\u7a33\u5b9a\u6027**\n   \u901a\u8fc7\u663e\u5b58\u7ba1\u7406\u6280\u672f\uff08\u5982\u91cf\u5316\u3001PagedAttention\u3001Offloading \u7b49\uff09\uff0c\u53ef\u4ee5\uff1a\n   - \u5728\u6709\u9650\u663e\u5b58\u4e0b\u8fd0\u884c\u66f4\u5927\u6a21\u578b\u6216\u66f4\u957f\u4e0a\u4e0b\u6587\uff1b\n   - \u907f\u514d\u663e\u5b58\u788e\u7247\u5316\uff0c\u63d0\u9ad8\u5185\u5b58\u5206\u914d\u6548\u7387\uff1b\n   - \u652f\u6301\u591a\u7528\u6237/\u591a\u8bf7\u6c42\u5e76\u53d1\uff0c\u63d0\u5347\u541e\u5410\u91cf\u3002",
+        "text_prefix": "\u672c\u5730\u5927\u6a21\u578b\u63a8\u7406\u9700\u8981\u7ba1\u7406\u663e\u5b58\uff0c\u4e3b\u8981\u57fa\u4e8e\u4ee5\u4e0b\u4e09\u4e2a\u6838\u5fc3\u539f\u56e0\uff1a\n\n1. **\u663e\u5b58\u5bb9\u91cf\u6709\u9650**\n   \u5927\u8bed\u8a00\u6a21\u578b\uff08LLM\uff09\u7684\u53c2\u6570\u91cf\u5de8\u5927\uff08\u5982 7B\u300113B\u300170B \u7b49\uff09\uff0c\u52a0\u8f7d\u6a21\u578b\u6743\u91cd\u672c\u8eab\u5c31\u9700\u8981\u5927\u91cf\u663e\u5b58\u3002\u82e5\u4e0d\u52a0\u7ba1\u7406\uff0c\u6781\u6613\u8d85\u51fa GPU \u663e\u5b58\u4e0a\u9650\uff0c\u5bfc\u81f4\u201cOut of Memory\u201d\uff08OOM\uff09\u9519\u8bef\uff0c\u7a0b\u5e8f\u5d29\u6e83\u3002\n\n2. **\u63a8\u7406\u8fc7\u7a0b\u52a8\u6001\u5360\u7528",
+        "ttft_ms": 82.0784000097774
+      }
+    },
+    {
+      "enable_thinking": false,
+      "id": "json",
+      "max_tokens": 128,
+      "prompt": "\u53ea\u8f93\u51fa\u4e00\u4e2a\u5408\u6cd5JSON\u5bf9\u8c61\uff0c\u5305\u542bname\u4e3a\u5f20\u4e09\u3001city\u4e3a\u4e0a\u6d77\u3001age\u4e3a28\u3002",
+      "result": {
+        "decode_tokens_per_second": 57.51989075243389,
+        "elapsed_ms": 656.8891999777406,
+        "finish_reason": "stop",
+        "input_tokens": 33,
+        "output_tokens": 32,
+        "reasoning_content": null,
+        "text": "```json\n{\n  \"name\": \"\u5f20\u4e09\",\n  \"city\": \"\u4e0a\u6d77\",\n  \"age\": 28\n}\n```",
+        "text_prefix": "```json\n{\n  \"name\": \"\u5f20\u4e09\",\n  \"city\": \"\u4e0a\u6d77\",\n  \"age\": 28\n}\n```",
+        "ttft_ms": 100.52340000402182
+      }
+    },
+    {
+      "enable_thinking": false,
+      "id": "python",
+      "max_tokens": 256,
+      "prompt": "\u53ea\u8f93\u51faPython\u51fd\u6570factorial(n)\u7684\u4ee3\u7801\uff0c\u8ba1\u7b97\u975e\u8d1f\u6574\u6570\u7684\u9636\u4e58\uff0c0\u7684\u9636\u4e58\u4e3a1\u3002",
+      "result": {
+        "decode_tokens_per_second": 57.07276673127553,
+        "elapsed_ms": 1340.4481000034139,
+        "finish_reason": "stop",
+        "input_tokens": 37,
+        "output_tokens": 72,
+        "reasoning_content": null,
+        "text": "```python\ndef factorial(n):\n    if n < 0:\n        raise ValueError(\"n must be a non-negative integer\")\n    if n == 0:\n        return 1\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n```",
+        "text_prefix": "```python\ndef factorial(n):\n    if n < 0:\n        raise ValueError(\"n must be a non-negative integer\")\n    if n == 0:\n        return 1\n    result = 1\n    for i ",
+        "ttft_ms": 78.58239999040961
+      }
+    }
+  ],
+  "quant": "nvfp4",
+  "runs": [
+    {
+      "decode_tokens_per_second": 57.421830351043425,
+      "elapsed_ms": 3463.4023000253364,
+      "finish_reason": "length",
+      "input_tokens": 70,
+      "output_tokens": 128,
+      "reasoning_content": null,
+      "text": "A local inference engine balances these resources through **paged attention** (managing KV cache fragmentation), **continuous batching** (maximizing GPU utilization via dynamic batch assembly), and **prefill/decode separation** (optimizing compute vs. memory bandwidth).\n\n*   **GPU Memory**: Managed via virtual memory mapping (PagedAttention) to prevent fragmentation and enable efficient KV cache storage.\n*   **Host Memory**: Used for offloading inactive KV cache blocks or model weights (if using quantization/offloading strategies) to extend context length without exceeding VRAM.\n*   **Token Latency**: Minimized by prioritizing decode",
+      "text_prefix": "A local inference engine balances these resources through **paged attention** (managing KV cache fragmentation), **continuous batching** (maximizing GPU utiliza",
+      "ttft_ms": 1251.6760000144131
+    },
+    {
+      "decode_tokens_per_second": 57.53895296483857,
+      "elapsed_ms": 2282.3263999889605,
+      "finish_reason": "length",
+      "input_tokens": 70,
+      "output_tokens": 128,
+      "reasoning_content": null,
+      "text": "A local inference engine balances these resources through **paged attention** (managing KV cache fragmentation), **continuous batching** (maximizing GPU utilization via dynamic batch assembly), and **prefill/decode separation** (optimizing compute vs. memory bandwidth).\n\n*   **GPU Memory**: Managed via virtual memory mapping (PagedAttention) to prevent fragmentation and enable efficient KV cache storage.\n*   **Host Memory**: Used for offloading inactive KV cache blocks or model weights (if using quantization/offloading strategies) to extend context length without exceeding VRAM.\n*   **Token Latency**: Minimized by prioritizing decode",
+      "text_prefix": "A local inference engine balances these resources through **paged attention** (managing KV cache fragmentation), **continuous batching** (maximizing GPU utiliza",
+      "ttft_ms": 75.10009995894507
+    },
+    {
+      "decode_tokens_per_second": 57.444616492889025,
+      "elapsed_ms": 2282.879000005778,
+      "finish_reason": "length",
+      "input_tokens": 70,
+      "output_tokens": 128,
+      "reasoning_content": null,
+      "text": "A local inference engine balances these resources through **paged attention** (managing KV cache fragmentation), **continuous batching** (maximizing GPU utilization via dynamic batch assembly), and **prefill/decode separation** (optimizing compute vs. memory bandwidth).\n\n*   **GPU Memory**: Managed via virtual memory mapping (PagedAttention) to prevent fragmentation and enable efficient KV cache storage.\n*   **Host Memory**: Used for offloading inactive KV cache blocks or model weights (if using quantization/offloading strategies) to extend context length without exceeding VRAM.\n*   **Token Latency**: Minimized by prioritizing decode",
+      "text_prefix": "A local inference engine balances these resources through **paged attention** (managing KV cache fragmentation), **continuous batching** (maximizing GPU utiliza",
+      "ttft_ms": 72.02780002262443
+    }
+  ],
+  "unload_seconds": 0.8461911000194959,
+  "vram_bytes": 22624075776,
+  "warmup": {
+    "decode_tokens_per_second": 57.939508834598925,
+    "elapsed_ms": 389.57429997390136,
+    "finish_reason": "length",
+    "input_tokens": 70,
+    "output_tokens": 16,
+    "reasoning_content": null,
+    "text": "A local inference engine balances these resources through **paged attention** (managing KV",
+    "text_prefix": "A local inference engine balances these resources through **paged attention** (managing KV",
+    "ttft_ms": 130.63069997588173
+  },
+  "worker_pid": 20124,
+  "worker_pid_gone": true
+}

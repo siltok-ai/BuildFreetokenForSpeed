@@ -1,6 +1,6 @@
 # Speed dev 接入
 
-consumer-contract.json 是唯一当前消费合同。Speed 必须使用同次材料 wheel 和完整 kernel-cache，绑定实际 SHA，并在正式打包时核对。
+consumer-contract.json 记录本分支的来源、材料与验收。Speed 使用同次材料 wheel 和完整 kernel-cache，由构建者保证匹配；Speed 不增加材料 SHA 校验或运行时材料锁。
 
 Speed 文本 worker 关闭视觉/音频编码器，使用 moe_strategy，保持官方 0.1.3 quant_backend 与请求三元组；Windows MoE 指定 expert_load=serial。dense 的 MoE cache 为 0。
 

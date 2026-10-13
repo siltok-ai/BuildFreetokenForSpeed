@@ -1,0 +1,93 @@
+{
+  "speed_origin": "C:\\workspace\\worktrees\\speed-qwen013-dev\\silitok_speed\\__init__.py",
+  "runs": [
+    {
+      "ttft_ms": 108.63940004492179,
+      "elapsed_ms": 367.8508000448346,
+      "decode_tokens_per_second": 57.87273707795886,
+      "input_tokens": 45,
+      "output_tokens": 16,
+      "finish_reason": "length",
+      "text_prefix": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local L",
+      "text": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local L",
+      "reasoning_content": null,
+      "max_tokens": 16
+    },
+    {
+      "ttft_ms": 63.84769995929673,
+      "elapsed_ms": 2275.7801999687217,
+      "decode_tokens_per_second": 57.41650329198957,
+      "input_tokens": 45,
+      "output_tokens": 128,
+      "finish_reason": "length",
+      "text_prefix": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models (LLMs) locally has shifted from a hobbyi",
+      "text": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models (LLMs) locally has shifted from a hobbyist experiment to a viable production alternative for privacy-sensitive and low-latency applications. However, the primary bottleneck in local inference is not compute throughput (FLOPS), but rather **memory bandwidth** and **memory capacity**.\n\nA sophisticated local inference engine must act as a resource orchestrator, dynamically balancing three competing constraints:\n1.  **GPU Memory (VRAM):** High bandwidth, low capacity, high cost.\n2.  **Host Memory (RAM",
+      "reasoning_content": null,
+      "max_tokens": 128
+    },
+    {
+      "ttft_ms": 62.598399992566556,
+      "elapsed_ms": 2263.598899997305,
+      "decode_tokens_per_second": 57.70154832713948,
+      "input_tokens": 45,
+      "output_tokens": 128,
+      "finish_reason": "length",
+      "text_prefix": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models (LLMs) locally has shifted from a hobbyi",
+      "text": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models (LLMs) locally has shifted from a hobbyist experiment to a viable production alternative for privacy-sensitive and low-latency applications. However, the primary bottleneck in local inference is not compute throughput (FLOPS), but rather **memory bandwidth** and **memory capacity**.\n\nA sophisticated local inference engine must act as a resource orchestrator, dynamically balancing three competing constraints:\n1.  **GPU Memory (VRAM):** High bandwidth, low capacity, high cost.\n2.  **Host Memory (RAM",
+      "reasoning_content": null,
+      "max_tokens": 128
+    },
+    {
+      "ttft_ms": 76.22530002845451,
+      "elapsed_ms": 2280.352200032212,
+      "decode_tokens_per_second": 57.61973073900643,
+      "input_tokens": 45,
+      "output_tokens": 128,
+      "finish_reason": "length",
+      "text_prefix": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models (LLMs) locally has shifted from a hobbyi",
+      "text": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models (LLMs) locally has shifted from a hobbyist experiment to a viable production alternative for privacy-sensitive and low-latency applications. However, the primary bottleneck in local inference is not compute throughput (FLOPS), but rather **memory bandwidth** and **memory capacity**.\n\nA sophisticated local inference engine must act as a resource orchestrator, dynamically balancing three competing constraints:\n1.  **GPU Memory (VRAM):** High bandwidth, low capacity, high cost.\n2.  **Host Memory (RAM",
+      "reasoning_content": null,
+      "max_tokens": 128
+    },
+    {
+      "ttft_ms": 62.58329999400303,
+      "elapsed_ms": 9158.510499983095,
+      "decode_tokens_per_second": 56.179592458488116,
+      "input_tokens": 45,
+      "output_tokens": 512,
+      "finish_reason": "length",
+      "text_prefix": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models (LLMs) locally has shifted from a hobbyi",
+      "text": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models (LLMs) locally has shifted from a hobbyist experiment to a viable production alternative for privacy-sensitive and low-latency applications. However, the primary bottleneck in local inference is not compute throughput (FLOPS), but rather **memory bandwidth** and **memory capacity**.\n\nA sophisticated local inference engine must act as a resource orchestrator, dynamically balancing three competing constraints:\n1.  **GPU Memory (VRAM):** High bandwidth, low capacity, high cost.\n2.  **Host Memory (RAM):** Lower bandwidth, high capacity, low cost.\n3.  **Token Latency:** The time it takes to generate each subsequent token (Time Per Token, or TPT).\n\nThis article details the architectural strategies used by modern inference engines (such as those built on llama.cpp, vLLM, or custom CUDA kernels) to optimize this balance.\n\n---\n\n## 1. The Core Bottleneck: Memory Bandwidth vs. Compute\n\nTo understand why memory balancing is critical, we must first define the two phases of LLM inference:\n\n### Phase 1: Prefill (Prompt Processing)\n*   **Nature:** Compute-bound.\n*   **Process:** The model processes the entire input prompt in parallel.\n*   **Bottleneck:** GPU FLOPS.\n*   **Memory Impact:** Requires loading the entire prompt\u2019s Key-Value (KV) cache into memory.\n\n### Phase 2: Decode (Token Generation)\n*   **Nature:** Memory-bound.\n*   **Process:** The model generates one token at a time, sequentially.\n*   **Bottleneck:** Memory Bandwidth.\n*   **Memory Impact:** For every new token, the model must read the entire set of model weights and the accumulated KV cache from memory.\n\n**Key Insight:** In the Decode phase, the GPU is often idle, waiting for data to be streamed from memory. If the model weights are on the GPU, data moves at ~1\u20133 TB/s (HBM). If weights are on the CPU, data moves at ~50\u2013100 GB/s (DDR4/DDR5). This 20\u201350x difference in bandwidth directly translates to token latency.\n\n---\n\n## 2. Strategy 1: Quantization and Weight Offloading\n\nThe most fundamental balancing act is deciding *where* to store model",
+      "reasoning_content": null,
+      "max_tokens": 512
+    },
+    {
+      "ttft_ms": 63.548300007823855,
+      "elapsed_ms": 9015.398199961055,
+      "decode_tokens_per_second": 57.08392967526377,
+      "input_tokens": 45,
+      "output_tokens": 512,
+      "finish_reason": "length",
+      "text_prefix": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models (LLMs) locally has shifted from a hobbyi",
+      "text": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models (LLMs) locally has shifted from a hobbyist experiment to a viable production alternative for privacy-sensitive and low-latency applications. However, the primary bottleneck in local inference is not compute throughput (FLOPS), but rather **memory bandwidth** and **memory capacity**.\n\nA sophisticated local inference engine must act as a resource orchestrator, dynamically balancing three competing constraints:\n1.  **GPU Memory (VRAM):** High bandwidth, low capacity, high cost.\n2.  **Host Memory (RAM):** Lower bandwidth, high capacity, low cost.\n3.  **Token Latency:** The time it takes to generate each subsequent token (Time Per Token, or TPT).\n\nThis article details the architectural strategies used by modern inference engines (such as those built on llama.cpp, vLLM, or custom CUDA kernels) to optimize this balance.\n\n---\n\n## 1. The Core Bottleneck: Memory Bandwidth vs. Compute\n\nTo understand why memory balancing is critical, we must first define the two phases of LLM inference:\n\n### Phase 1: Prefill (Prompt Processing)\n*   **Nature:** Compute-bound.\n*   **Process:** The model processes the entire input prompt in parallel.\n*   **Bottleneck:** GPU FLOPS.\n*   **Memory Impact:** Requires loading the entire prompt\u2019s Key-Value (KV) cache into memory.\n\n### Phase 2: Decode (Token Generation)\n*   **Nature:** Memory-bound.\n*   **Process:** The model generates one token at a time, sequentially.\n*   **Bottleneck:** Memory Bandwidth.\n*   **Memory Impact:** For every new token, the model must read the entire set of model weights and the accumulated KV cache from memory.\n\n**Key Insight:** In the Decode phase, the GPU is often idle, waiting for data to be streamed from memory. If the model weights are on the GPU, data moves at ~1\u20133 TB/s (HBM). If weights are on the CPU, data moves at ~50\u2013100 GB/s (DDR4/DDR5). This 20\u201350x difference in bandwidth directly translates to token latency.\n\n---\n\n## 2. Strategy 1: Quantization and Weight Offloading\n\nThe most fundamental balancing act is deciding *where* to store model",
+      "reasoning_content": null,
+      "max_tokens": 512
+    },
+    {
+      "ttft_ms": 101.72989999409765,
+      "elapsed_ms": 9055.034899967723,
+      "decode_tokens_per_second": 57.0745769932145,
+      "input_tokens": 45,
+      "output_tokens": 512,
+      "finish_reason": "length",
+      "text_prefix": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models (LLMs) locally has shifted from a hobbyi",
+      "text": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models (LLMs) locally has shifted from a hobbyist experiment to a viable production alternative for privacy-sensitive and low-latency applications. However, the primary bottleneck in local inference is not compute throughput (FLOPS), but rather **memory bandwidth** and **memory capacity**.\n\nA sophisticated local inference engine must act as a resource orchestrator, dynamically balancing three competing constraints:\n1.  **GPU Memory (VRAM):** High bandwidth, low capacity, high cost.\n2.  **Host Memory (RAM):** Lower bandwidth, high capacity, low cost.\n3.  **Token Latency:** The time it takes to generate each subsequent token (Time Per Token, or TPT).\n\nThis article details the architectural strategies used by modern inference engines (such as those built on llama.cpp, vLLM, or custom CUDA kernels) to optimize this balance.\n\n---\n\n## 1. The Core Bottleneck: Memory Bandwidth vs. Compute\n\nTo understand why memory balancing is critical, we must first define the two phases of LLM inference:\n\n### Phase 1: Prefill (Prompt Processing)\n*   **Nature:** Compute-bound.\n*   **Process:** The model processes the entire input prompt in parallel.\n*   **Bottleneck:** GPU FLOPS.\n*   **Memory Impact:** Requires loading the entire prompt\u2019s Key-Value (KV) cache into memory.\n\n### Phase 2: Decode (Token Generation)\n*   **Nature:** Memory-bound.\n*   **Process:** The model generates one token at a time, sequentially.\n*   **Bottleneck:** Memory Bandwidth.\n*   **Memory Impact:** For every new token, the model must read the entire set of model weights and the accumulated KV cache from memory.\n\n**Key Insight:** In the Decode phase, the GPU is often idle, waiting for data to be streamed from memory. If the model weights are on the GPU, data moves at ~1\u20133 TB/s (HBM). If weights are on the CPU, data moves at ~50\u2013100 GB/s (DDR4/DDR5). This 20\u201350x difference in bandwidth directly translates to token latency.\n\n---\n\n## 2. Strategy 1: Quantization and Weight Offloading\n\nThe most fundamental balancing act is deciding *where* to store model",
+      "reasoning_content": null,
+      "max_tokens": 512
+    }
+  ],
+  "load_seconds": 13.169245299999602,
+  "vram_bytes": 22489858048,
+  "median_128_decode_tps": 57.61973073900643,
+  "median_512_decode_tps": 57.0745769932145
+}

@@ -1,0 +1,175 @@
+{
+  "load_seconds": 10.26380000001518,
+  "engine_kwargs": {
+    "max_running_req": "1",
+    "attention_backend": "triton",
+    "moe_strategy": "fused",
+    "mm": "MultimodalConfig(disabled_encoders=frozenset({'audio', 'vision'}), embed_cache_device='cpu', encoder_weights='host', image_min_tokens=None, image_max_tokens=None, processor_kwargs={})",
+    "quant_backend": "moe.nvfp4=triton",
+    "expert_load": "auto",
+    "moe_cache_size": "0",
+    "moe_cache_auto": "False",
+    "kv_reserve_tokens": "0",
+    "num_token_override": "4096",
+    "cuda_graph_max_bs": "1",
+    "memory_ratio": "0.9",
+    "max_seq_len_override": "262144",
+    "max_extend_tokens": "4096",
+    "cache_type": "radix",
+    "decode_log_interval": "1000"
+  },
+  "runs": [
+    {
+      "max_tokens": 16,
+      "input_tokens": 45,
+      "output_tokens": 16,
+      "events": 16,
+      "ttft_ms": 89.65040004113689,
+      "decode_tps": 56.16467183133606,
+      "wall_seconds": 0.35684560000663623,
+      "text_prefix": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local L"
+    },
+    {
+      "max_tokens": 128,
+      "input_tokens": 45,
+      "output_tokens": 128,
+      "events": 128,
+      "ttft_ms": 101.88119998201728,
+      "decode_tps": 57.057808275809016,
+      "wall_seconds": 2.3278306999709457,
+      "text_prefix": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models "
+    },
+    {
+      "max_tokens": 128,
+      "input_tokens": 45,
+      "output_tokens": 128,
+      "events": 128,
+      "ttft_ms": 62.349500018171966,
+      "decode_tps": 57.53616113728518,
+      "wall_seconds": 2.2697922000079416,
+      "text_prefix": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models "
+    },
+    {
+      "max_tokens": 128,
+      "input_tokens": 45,
+      "output_tokens": 128,
+      "events": 128,
+      "ttft_ms": 75.26830001734197,
+      "decode_tps": 57.641368748764336,
+      "wall_seconds": 2.2786775999702513,
+      "text_prefix": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models "
+    },
+    {
+      "max_tokens": 512,
+      "input_tokens": 45,
+      "output_tokens": 512,
+      "events": 512,
+      "ttft_ms": 100.2155999885872,
+      "decode_tps": 57.27626520539533,
+      "wall_seconds": 9.022137699997984,
+      "text_prefix": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models "
+    },
+    {
+      "max_tokens": 512,
+      "input_tokens": 45,
+      "output_tokens": 512,
+      "events": 512,
+      "ttft_ms": 101.56420001294464,
+      "decode_tps": 57.30631712419066,
+      "wall_seconds": 9.018815300019924,
+      "text_prefix": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models "
+    },
+    {
+      "max_tokens": 512,
+      "input_tokens": 45,
+      "output_tokens": 512,
+      "events": 512,
+      "ttft_ms": 100.74540000641719,
+      "decode_tps": 57.305440543710475,
+      "wall_seconds": 9.018139799998607,
+      "text_prefix": "# The Memory-Latency Tradeoff: Engineering a High-Performance Local LLM Inference Engine\n\nRunning Large Language Models "
+    }
+  ],
+  "tensor_devices": {
+    "cuda:0": 1302
+  },
+  "tensor_bytes_by_device": {
+    "cuda:0": 20161558532
+  },
+  "cpu_tensors": [],
+  "linear_methods": {
+    "freetoken.layers.quantization.linear.fp8_tensor.Fp8TensorLinearMethod": 128,
+    "freetoken.layers.quantization.linear.unquantized.UnquantizedLinearMethod": 48,
+    "freetoken.layers.quantization.linear.nvfp4.Nvfp4LinearMethod": 129
+  },
+  "linear_backend_attributes": [
+    {
+      "class": "Fp8TensorLinearMethod",
+      "attributes": {
+        "cfg": "LinearConfig(in_features=5120, out_features=16384, output_sizes=(10240, 6144), scheme=QuantScheme(fp8_tensor, WeightDesc(elem='e4m3', group=(-1, -1), scale='fp32'), roles=['input_scale', 'weight', 'weight_scale']))",
+        "requested": "auto",
+        "kernel": "<freetoken.layers.quantization.linear.fp8_tensor.TorchFp8TensorLinearKernel object at 0x0000018064583F20>"
+      }
+    },
+    {
+      "class": "UnquantizedLinearMethod",
+      "attributes": {
+        "cfg": "LinearConfig(in_features=5120, out_features=96, output_sizes=(48, 48), scheme=None)",
+        "requested": "auto",
+        "kernel": "<freetoken.layers.quantization.linear.unquantized.TorchLinearKernel object at 0x0000018064590AD0>"
+      }
+    },
+    {
+      "class": "Fp8TensorLinearMethod",
+      "attributes": {
+        "cfg": "LinearConfig(in_features=6144, out_features=5120, output_sizes=(5120,), scheme=QuantScheme(fp8_tensor, WeightDesc(elem='e4m3', group=(-1, -1), scale='fp32'), roles=['input_scale', 'weight', 'weight_scale']))",
+        "requested": "auto",
+        "kernel": "<freetoken.layers.quantization.linear.fp8_tensor.TorchFp8TensorLinearKernel object at 0x0000018064590140>"
+      }
+    },
+    {
+      "class": "Nvfp4LinearMethod",
+      "attributes": {
+        "cfg": "LinearConfig(in_features=5120, out_features=34816, output_sizes=(17408, 17408), scheme=QuantScheme(nvfp4, WeightDesc(elem='e2m1', group=(1, 16), scale='e4m3'), roles=['input_scale', 'weight', 'weight_global', 'weight_scale']))",
+        "requested": "auto",
+        "kernel": "<freetoken.layers.quantization.linear.nvfp4.TritonNvfp4LinearKernel object at 0x0000018064590380>"
+      }
+    },
+    {
+      "class": "Nvfp4LinearMethod",
+      "attributes": {
+        "cfg": "LinearConfig(in_features=17408, out_features=5120, output_sizes=(5120,), scheme=QuantScheme(nvfp4, WeightDesc(elem='e2m1', group=(1, 16), scale='e4m3'), roles=['input_scale', 'weight', 'weight_global', 'weight_scale']))",
+        "requested": "auto",
+        "kernel": "<freetoken.layers.quantization.linear.nvfp4.TritonNvfp4LinearKernel object at 0x0000018064590800>"
+      }
+    },
+    {
+      "class": "Fp8TensorLinearMethod",
+      "attributes": {
+        "cfg": "LinearConfig(in_features=5120, out_features=16384, output_sizes=(10240, 6144), scheme=QuantScheme(fp8_tensor, WeightDesc(elem='e4m3', group=(-1, -1), scale='fp32'), roles=['input_scale', 'weight', 'weight_scale']))",
+        "requested": "auto",
+        "kernel": "<freetoken.layers.quantization.linear.fp8_tensor.TorchFp8TensorLinearKernel object at 0x0000018064590EF0>"
+      }
+    },
+    {
+      "class": "UnquantizedLinearMethod",
+      "attributes": {
+        "cfg": "LinearConfig(in_features=5120, out_features=96, output_sizes=(48, 48), scheme=None)",
+        "requested": "auto",
+        "kernel": "<freetoken.layers.quantization.linear.unquantized.TorchLinearKernel object at 0x00000180645918B0>"
+      }
+    },
+    {
+      "class": "Fp8TensorLinearMethod",
+      "attributes": {
+        "cfg": "LinearConfig(in_features=6144, out_features=5120, output_sizes=(5120,), scheme=QuantScheme(fp8_tensor, WeightDesc(elem='e4m3', group=(-1, -1), scale='fp32'), roles=['input_scale', 'weight', 'weight_scale']))",
+        "requested": "auto",
+        "kernel": "<freetoken.layers.quantization.linear.fp8_tensor.TorchFp8TensorLinearKernel object at 0x0000018064591C10>"
+      }
+    }
+  ],
+  "cuda_allocated_bytes": 21963307008,
+  "cuda_reserved_bytes": 22489858048,
+  "median_128_decode_tps": 57.53616113728518,
+  "median_512_decode_tps": 57.305440543710475
+}

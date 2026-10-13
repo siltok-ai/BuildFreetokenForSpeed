@@ -1,0 +1,136 @@
+[
+  {
+    "profile": "qwen36",
+    "local_path": "C:\\workspace\\models\\qwen3.6-35b-a3b.nvfp4-modelscope",
+    "source_repository": "nvidia/Qwen3.6-35B-A3B-NVFP4",
+    "source_url": "https://huggingface.co/nvidia/Qwen3.6-35B-A3B-NVFP4",
+    "source_revision": null,
+    "revision_evidence": "ModelScope exact snapshot revision unproven; model card identifies NVIDIA checkpoint",
+    "architecture": [
+      "Qwen3_5MoeForConditionalGeneration"
+    ],
+    "text_geometry": {
+      "hidden_size": 2048,
+      "num_hidden_layers": 40,
+      "num_experts": 256,
+      "num_experts_per_tok": 8,
+      "intermediate_size": null,
+      "max_position_embeddings": 262144
+    },
+    "files": [
+      {
+        "name": "chat_template.jinja",
+        "bytes": 7764,
+        "sha256": "e84f32a23fdda27689f868aa4a1a5621f41133e51a48d7f3efcbea2839574259"
+      },
+      {
+        "name": "config.json",
+        "bytes": 58110,
+        "sha256": "58aefa1c9eff7989f431d748f2ddec39446cb1fd2a69acc46e285c6a37b0cecc"
+      },
+      {
+        "name": "hf_quant_config.json",
+        "bytes": 35085,
+        "sha256": "75fe7cc8d5836b58734e05ee67423a4ce91d602aaad45c8173a1b7597cd57663"
+      },
+      {
+        "name": "model-00001-of-00003.safetensors",
+        "bytes": 10006877608,
+        "sha256": "07141c2db92e47bc08777132cd1a0323faf300eab3a7d7c111bc2bf075fda050"
+      },
+      {
+        "name": "model-00002-of-00003.safetensors",
+        "bytes": 10003595752,
+        "sha256": "6dea9c759a0f941cf9e1cc1501216b0e107966a66c90425050e212efbd053f02"
+      },
+      {
+        "name": "model-00003-of-00003.safetensors",
+        "bytes": 3413864960,
+        "sha256": "9758875fc55e49561165f4a44342b654c123c3e25c6811b34abb83553fb1a164"
+      },
+      {
+        "name": "model.safetensors.index.json",
+        "bytes": 13726227,
+        "sha256": "d67403a4e9793c0ba8a136baf14b3b76ec7b32c822267978084895e07ebd8a3e"
+      },
+      {
+        "name": "README.md",
+        "bytes": 9936,
+        "sha256": "1ee59fc444f6935222966d9336d1b37c7a1f3bb237ad4a09793ecaa9b462e2ad"
+      },
+      {
+        "name": "tokenizer_config.json",
+        "bytes": 16718,
+        "sha256": "5186f0defcd7f232382c7f0aebcd2252d073bb921ab240e407b7ae8745d2b29b"
+      }
+    ],
+    "shard_bytes": 23424338320
+  },
+  {
+    "profile": "qwen38",
+    "local_path": "C:\\workspace\\models\\qwen3.8-27b.nvfp4-radixark",
+    "source_repository": "RadixArk/Qwen3.8-27B-NVFP4",
+    "source_url": "https://huggingface.co/RadixArk/Qwen3.8-27B-NVFP4",
+    "source_revision": "319f741cce68d7914884900c138a1fbb70a42f30",
+    "revision_evidence": "local Hugging Face download metadata",
+    "architecture": [
+      "Qwen3_5ForConditionalGeneration"
+    ],
+    "text_geometry": {
+      "hidden_size": 5120,
+      "num_hidden_layers": 64,
+      "num_experts": null,
+      "num_experts_per_tok": null,
+      "intermediate_size": 17408,
+      "max_position_embeddings": 262144
+    },
+    "files": [
+      {
+        "name": "chat_template.jinja",
+        "bytes": 8952,
+        "sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041"
+      },
+      {
+        "name": "config.json",
+        "bytes": 73003,
+        "sha256": "7ff41ec6f96ad50efea3c92751cd261b63839d39936eb6e6ffc9066db8672740"
+      },
+      {
+        "name": "hf_quant_config.json",
+        "bytes": 53749,
+        "sha256": "0f39e8cd23abdfb79adc89ac1b19acad990aa6ac32973f9ab0a67d1e3449535c"
+      },
+      {
+        "name": "model-00001-of-00003.safetensors",
+        "bytes": 9965652544,
+        "sha256": "fbcdb5ba1cdda462b5f38592d071e772c4d398afea61a0aa9188b32d1a239a79"
+      },
+      {
+        "name": "model-00002-of-00003.safetensors",
+        "bytes": 9985757064,
+        "sha256": "db6146a5464fb0a891181b93c81593f0ca65c602eb14120a1c2b1b09bca11f85"
+      },
+      {
+        "name": "model-00003-of-00003.safetensors",
+        "bytes": 1970287672,
+        "sha256": "d3cfb92742e30c8b46564665791dbe0a86ed64cfc02b1275081530793c0c9581"
+      },
+      {
+        "name": "model.safetensors.index.json",
+        "bytes": 214866,
+        "sha256": "7aa103a2582b7d26631988de33dea19e8a308ee9c239e8e14feb374af30905e2"
+      },
+      {
+        "name": "README.md",
+        "bytes": 4574,
+        "sha256": "3cfd18e07422e6eff20fcdf8dcdb3c864976dcef0e1e0f2c3f8bf788603203c2"
+      },
+      {
+        "name": "tokenizer_config.json",
+        "bytes": 1121,
+        "sha256": "e5d078b00e6c1223b32444db8c1001dc71d86ceef8ee706b5bf084c3a43a1f9c"
+      }
+    ],
+    "shard_bytes": 21921697280
+  }
+]

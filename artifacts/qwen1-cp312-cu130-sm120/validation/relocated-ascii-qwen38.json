@@ -1,0 +1,79 @@
+{
+  "cache_geometry": {
+    "moe_cache_size": 0,
+    "num_mamba_slots": 8,
+    "num_pages": 4096,
+    "num_swa_pages": 0,
+    "page_size": 1,
+    "swa_page_size": 0
+  },
+  "cancel": {
+    "settle_ms": 51.52119998820126,
+    "worker_pid_after": 15800,
+    "worker_pid_before": 15800,
+    "worker_reused": true
+  },
+  "load_seconds": 28.18695919995662,
+  "long_runs": [
+    {
+      "decode_tokens_per_second": 56.85317666915937,
+      "elapsed_ms": 409.28989998064935,
+      "finish_reason": "length",
+      "input_tokens": 128,
+      "output_tokens": 16,
+      "reasoning_content": null,
+      "text": "To design a robust local AI runtime that coordinates model weights, expert routing, GPU",
+      "text_prefix": "To design a robust local AI runtime that coordinates model weights, expert routing, GPU",
+      "ttft_ms": 145.42949997121468
+    }
+  ],
+  "median_decode_tokens_per_second": 56.933234400631655,
+  "median_long_ttft_ms": 145.42949997121468,
+  "median_ttft_ms": 147.56960002705455,
+  "model": "C:\\workspace\\models\\qwen3.8-27b.nvfp4-radixark",
+  "post_cancel": {
+    "decode_tokens_per_second": 57.914946156877,
+    "elapsed_ms": 146.34959999239072,
+    "finish_reason": "stop",
+    "input_tokens": 18,
+    "output_tokens": 2,
+    "reasoning_content": null,
+    "text": "worker reused",
+    "text_prefix": "worker reused",
+    "ttft_ms": 111.26660002628341
+  },
+  "profile": "qwen38",
+  "prompt_profile": {
+    "long_tokens": 128,
+    "short_tokens": 70
+  },
+  "quant": "nvfp4",
+  "runs": [
+    {
+      "decode_tokens_per_second": 56.933234400631655,
+      "elapsed_ms": 411.07720002764836,
+      "finish_reason": "length",
+      "input_tokens": 70,
+      "output_tokens": 16,
+      "reasoning_content": null,
+      "text": "A local inference engine balances these resources through **paged attention** (managing KV",
+      "text_prefix": "A local inference engine balances these resources through **paged attention** (managing KV",
+      "ttft_ms": 147.56960002705455
+    }
+  ],
+  "unload_seconds": 0.7895671000005677,
+  "vram_bytes": 22489858048,
+  "warmup": {
+    "decode_tokens_per_second": 58.27931488946341,
+    "elapsed_ms": 413.68099994724616,
+    "finish_reason": "length",
+    "input_tokens": 70,
+    "output_tokens": 16,
+    "reasoning_content": null,
+    "text": "A local inference engine balances these resources through **paged attention** (managing KV",
+    "text_prefix": "A local inference engine balances these resources through **paged attention** (managing KV",
+    "ttft_ms": 156.27919998951256
+  },
+  "worker_pid": 15800,
+  "worker_pid_gone": true
+}

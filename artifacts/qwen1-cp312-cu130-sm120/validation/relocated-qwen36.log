@@ -1,0 +1,178 @@
+{"speed_origin": "C:\\workspace\\artifacts\\speed-qwen013-dev-20261013\\Ǩ����֤\\���� app\\python\\Lib\\site-packages\\silitok_speed\\__init__.pyd", "packaged": true, "license_test_bypass": false}
+ERROR:silitok_speed.backends.freetoken_qwen36:FreeToken worker startup failure tail:
+[silitok-freetoken-worker] runtime waiting for load command
+
+[silitok-freetoken-worker] runtime accepted load command
+
+[silitok-freetoken-worker] kernel cache verified
+
+[silitok-freetoken-worker] importing torch
+
+[silitok-freetoken-worker] torch imported; importing FreeToken core
+
+[silitok-freetoken-worker] FreeToken core imported; importing streaming runtime
+
+[silitok-freetoken-worker] runtime imports verified; constructing engine
+
+C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\freetoken\engine\engine.py:1191: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+
+[2026-10-13|16:55:22|core|rank=0] INFO     Enabled expandable_segments (override via PYTORCH_ALLOC_CONF)
+
+[2026-10-13|16:55:22|core|rank=0] INFO     Resolved config: moe_strategy='offload', attention_backend='triton', cache_type='hybrid_radix', page_size=1
+
+[W1013 16:55:22.000000000 socket.cpp:764] [c10d] The client socket has failed to connect to [DESKTOP-6DNHREH]:2333 (system error: 10049 - \ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd��\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\u0135\ufffd\u05b7\ufffd\ufffd��\ufffd\ufffd).
+[2026-10-13|16:55:22|core|rank=0] INFO     Free memory before loading model: 22.29 GiB
+
+C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\torch\utils\_device.py:116: UserWarning: expandable_segments not supported on this platform (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\c10/cuda/CUDAAllocatorConfig.h:39.)
+
+  return func(*args, **kwargs)
+
+
+Loading weights:   0%|          | 0/3 [00:00<?, ?it/s]
+Loading weights:  33%|��������      | 1/3 [00:00<00:01,  1.06it/s]
+Loading weights:  67%|��������������   | 2/3 [00:01<00:00,  1.50it/s]
+Loading weights: 100%|��������������������| 3/3 [00:01<00:00,  2.22it/s]
+Loading weights: 100%|��������������������| 3/3 [00:01<00:00,  1.87it/s]
+
+[2026-10-13|16:55:24|core|rank=0] INFO     MoE experts: nvfp4 via triton
+
+[2026-10-13|16:55:24|core|rank=0] INFO     expert banks: slow path (serial build)
+
+
+Loading Qwen3.5 NVFP4 experts (modelopt):   0%|          | 0/3 [00:00<?, ?it/s]
+Loading Qwen3.5 NVFP4 experts (modelopt):  33%|��������      | 1/3 [00:03<00:07,  3.91s/it]
+Loading Qwen3.5 NVFP4 experts (modelopt):  67%|��������������   | 2/3 [00:20<00:11, 11.19s/it]
+Loading Qwen3.5 NVFP4 experts (modelopt): 100%|��������������������| 3/3 [00:24<00:00,  7.94s/it]
+Loading Qwen3.5 NVFP4 experts (modelopt): 100%|��������������������| 3/3 [00:24<00:00,  8.09s/it]
+
+[2026-10-13|16:55:49|core|rank=0] INFO     Multimodal disabled: --text-model-only
+
+[2026-10-13|16:55:49|core|rank=0] INFO     Allocating 8192 tokens for KV cache, K + V = 0.16 GiB
+
+[2026-10-13|16:55:49|core|rank=0] INFO     Free memory after initialization: 10.45 GiB
+
+[2026-10-13|16:55:49|core|rank=0] INFO     Start capturing CUDA graphs with sizes: [1]
+
+[2026-10-13|16:55:49|core|rank=0] INFO     Free GPU memory before capturing CUDA graphs: 10.45 GiB
+
+
+Preparing for capturing CUDA graphs...:   0%|          | 0/1 [00:00<?, ?batch/s]
+Capturing graphs: bs = 1   | avail_mem = 10.45 GiB:   0%|          | 0/1 [00:00<?, ?batch/s]
+Capturing graphs: bs = 1   | avail_mem = 10.45 GiB:   0%|          | 0/1 [00:00<?, ?batch/s]
+
+Traceback (most recent call last):
+
+  File ".artifacts/compiled-build/generated/qwen36/freetoken_worker.py", line 428, in silitok_speed.qwen36.freetoken_worker.main
+
+  File ".artifacts/compiled-build/generated/qwen36/freetoken_worker.py", line 397, in silitok_speed.qwen36.freetoken_worker._runtime_main
+
+  File ".artifacts/compiled-build/generated/qwen36/freetoken_worker.py", line 351, in silitok_speed.qwen36.freetoken_worker._build_llm
+
+  File ".artifacts/compiled-build/generated/qwen36/freetoken_worker.py", line 149, in silitok_speed.qwen36.freetoken_worker._build_streaming_llm_class.StreamingLLM.__init__
+
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\freetoken\llm\llm.py", line 39, in __init__
+
+    super().__init__(config)
+
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\freetoken\scheduler\scheduler.py", line 68, in __init__
+
+    self.engine = Engine(config)
+
+                  ^^^^^^^^^^^^^^
+
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\freetoken\engine\engine.py", line 485, in __init__
+
+    self.graph_runner = GraphRunner(
+
+                        ^^^^^^^^^^^^
+
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\freetoken\engine\graph.py", line 134, in __init__
+
+    self._capture_graphs(max_seq_len, vocab_size, model)
+
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\freetoken\engine\graph.py", line 190, in _capture_graphs
+
+    self.buffer.logits[:bs] = model.forward()
+
+                              ^^^^^^^^^^^^^^^
+
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\freetoken\models\qwen3_5_moe\model.py", line 114, in forward
+
+    output = self.model.forward(get_global_ctx().batch.input_ids)
+
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\freetoken\models\qwen3_5_moe\model.py", line 92, in forward
+
+    x = embed_input_ids(self.embed_tokens, input_ids, get_global_ctx().batch)
+
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\freetoken\models\blocks.py", line 54, in embed_input_ids
+
+    return embed_tokens.forward(input_ids)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\freetoken\utils\torch_utils.py", line 33, in wrapper
+
+    return fn(self, *args, **kwargs)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\freetoken\layers\embedding.py", line 44, in forward
+
+    y = indexing(
+
+        ^^^^^^^^^
+
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\freetoken\kernel\index.py", line 52, in indexing
+
+    module = _jit_index_module(element_size, num_splits=num_splits_for(element_size))
+
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\freetoken\kernel\index.py", line 23, in _jit_index_module
+
+    return load_jit(
+
+           ^^^^^^^^^
+
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\freetoken\kernel\utils.py", line 366, in load_jit
+
+    prebuilt = _load_prebuilt(name)
+
+               ^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\freetoken\kernel\utils.py", line 267, in _load_prebuilt
+
+    return tvm_ffi.load_module(str(so_path))
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\python\Lib\site-packages\tvm_ffi\module.py", line 474, in load_module
+
+    mod = _ffi_api.ModuleLoadFromFile(path)
+
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "python/tvm_ffi/cython/function.pxi", line 988, in tvm_ffi.core.Function.__call__
+
+  File "D:\a\tvm-ffi\tvm-ffi\src\ffi\extra\library_module_dynamic_lib.cc", line 79, in void __cdecl tvm::ffi::DSOLibrary::Load(const class tvm::ffi::String &)
+
+RuntimeError: Check failed: (lib_handle_ != nullptr) is false: Failed to load dynamic shared library C:\workspace\artifacts\speed-qwen013-dev-20261013\Ǩ����֤\���� app\runtime\kernel-cache\freetoken__index_4096_4_128_1_false\freetoken__index_4096_4_128_1_false.dll
+Traceback (most recent call last):
+  File "C:\workspace\artifacts\speed-qwen013-dev-20261013\run-validation.py", line 70, in <module>
+    raise SystemExit(module.main())
+                     ^^^^^^^^^^^^^
+  File "C:\workspace\worktrees\speed-qwen013-dev\tools\bench\benchmark_freetoken_qwen36.py", line 322, in main
+    backend.load(spec, config)
+  File ".artifacts/compiled-build/generated/backends/freetoken_qwen36.py", line 274, in silitok_speed.backends.freetoken_qwen36.FreeTokenQwen36Backend.load
+  File ".artifacts/compiled-build/generated/backends/freetoken_qwen36.py", line 261, in silitok_speed.backends.freetoken_qwen36.FreeTokenQwen36Backend.load
+  File ".artifacts/compiled-build/generated/backends/freetoken_qwen36.py", line 267, in silitok_speed.backends.freetoken_qwen36.FreeTokenQwen36Backend.load
+  File ".artifacts/compiled-build/generated/backends/freetoken_qwen36.py", line 442, in silitok_speed.backends.freetoken_qwen36.FreeTokenQwen36Backend._start_worker
+  File ".artifacts/compiled-build/generated/backends/freetoken_qwen36.py", line 472, in silitok_speed.backends.freetoken_qwen36.FreeTokenQwen36Backend._wait_startup_message
+silitok_speed.backends.base.ModelCorruptError: FreeToken worker rejected the model or runtime
+{"capacity_monitor": {"command": ["C:\\workspace\\artifacts\\speed-qwen013-dev-20261013\\\u8fc1\u79fb\u9a8c\u8bc1\\\u72ec\u7acb app\\python\\python.exe", "-I", "-B", "C:\\workspace\\artifacts\\speed-qwen013-dev-20261013\\run-validation.py", "--packaged", "--mode", "backend", "--source", "C:\\workspace\\worktrees\\speed-qwen013-dev", "--model", "C:\\workspace\\models\\qwen3.6-35b-a3b.nvfp4-modelscope", "--quant", "nvfp4", "--profile", "qwen36", "--kernel-cache", "C:\\workspace\\artifacts\\speed-qwen013-dev-20261013\\\u8fc1\u79fb\u9a8c\u8bc1\\\u72ec\u7acb app\\runtime\\kernel-cache", "--repeats", "1", "--tokens", "16", "--long-prompt-tokens", "128", "--long-repeats", "1", "--output", "C:\\workspace\\artifacts\\speed-qwen013-dev-20261013\\relocated-qwen36.json"], "returncode": 1, "interval_seconds": 0.1, "samples": 661, "baseline": {"commit_used": 14846046208, "commit_available": 55511814144, "physical_available": 54484267008, "gpu_used": 1222533120, "gpu_free": 24420392960}, "wall_seconds": 69.30733710003551, "owned_pids": [4420, 10800, 22032], "peak_gpu_used": 14410698752, "min_gpu_free": 11232227328, "peak_commit_used": 62295855104, "min_commit_available": 10027356160, "min_physical_available": 25592385536, "peak_tree_rss": 29355732992, "peak_tree_private": 39218040832}}

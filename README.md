@@ -35,8 +35,12 @@ python -B -m unittest discover -s tests -v
 
 ## Speed 消费
 
-`integration/speed/consumer-contract.json` 绑定 wheel、cache、来源和验收范围。Speed adapter 放在 Speed 仓库：更新版本和材料锁、纯文本关闭编码器、`moe_strategy` 映射、Windows Qwen MoE 串行读取。
+`integration/speed/consumer-contract.json` 记录 wheel、cache、来源和验收范围。Speed 文档指向本分支，由构建者保证材料匹配，不增加材料 SHA 校验。Speed adapter 放在 Speed 仓库：更新版本、纯文本关闭编码器、`moe_strategy` 映射、Windows Qwen MoE 串行读取。
 
 交付前必须执行真实生成、thinking、HTTP/SSE、取消后复用与卸载，并在 dev 正式编译运行目录中重复。离线校验成功不代表 GPU 或随包验收成功。
 
 状态与实际性能见 `artifacts/qwen1-cp312-cu130-sm120/validation/`。本机没有设备证书；用户授权的许可证临时绕过仅在外部验收进程中存在，未写入 Speed 正式源码或材料。安装器和干净机器验收另行记录。
+
+本轮 NVFP4 源码与正式编译包验收通过：Qwen3.6 最终 decode 约 205 token/s，Qwen3.8 约 57.4 token/s。Qwen3.8 独立 FreeToken 对照约 57.3–57.5 token/s，未观察到明显 Speed 额外开销；详细条件和容量见验收记录。
+
+安装和 kernel-cache 目录使用英文路径，可含空格。固定 TVM-FFI Windows loader 在中文路径下不能加载 DLL；该限制已记录，英文含空格的迁移包两模型已通过。

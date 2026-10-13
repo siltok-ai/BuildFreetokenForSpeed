@@ -1,0 +1,49 @@
+{
+  "command": [
+    "C:\\workspace\\build\\speed-qwen013-dev-002\\app\\python\\python.exe",
+    "-I",
+    "-B",
+    "C:\\workspace\\artifacts\\speed-qwen013-dev-20261013\\run-validation.py",
+    "--packaged",
+    "--mode",
+    "http",
+    "--source",
+    "C:\\workspace\\worktrees\\speed-qwen013-dev",
+    "--model",
+    "C:\\workspace\\models\\qwen3.8-27b.nvfp4-radixark",
+    "--quant",
+    "nvfp4",
+    "--profile",
+    "qwen38",
+    "--kernel-cache",
+    "C:\\workspace\\build\\speed-qwen013-dev-002\\app\\runtime\\kernel-cache",
+    "--output",
+    "C:\\workspace\\artifacts\\speed-qwen013-dev-20261013\\reviewed-packaged-qwen38-http.json",
+    "--tcp",
+    "--vram-safety-gib",
+    "0.5"
+  ],
+  "returncode": 0,
+  "interval_seconds": 0.1,
+  "samples": 258,
+  "baseline": {
+    "commit_used": 14850027520,
+    "commit_available": 55507832832,
+    "physical_available": 54473072640,
+    "gpu_used": 1222533120,
+    "gpu_free": 24420392960
+  },
+  "wall_seconds": 26.92920180002693,
+  "owned_pids": [
+    6912,
+    9076,
+    20472
+  ],
+  "peak_gpu_used": 24765612032,
+  "min_gpu_free": 877314048,
+  "peak_commit_used": 54393303040,
+  "min_commit_available": 15964557312,
+  "min_physical_available": 38293884928,
+  "peak_tree_rss": 16157847552,
+  "peak_tree_private": 39500599296
+}
