@@ -1,0 +1,138 @@
+{
+  "status": "installed_standalone_q2_revision_verified_speed_pending",
+  "version": "0.1.3+speed.strataq2dev7",
+  "wheel_sha256": "32c54404cbd61a435d7fb76e7c3f2185d2c08a92959ebf1462a244f9e635ba42",
+  "native_engine_only": true,
+  "process_engine_override": false,
+  "no_mtp": true,
+  "contexts": {
+    "short": {
+      "median_tps": 112.62645922626514,
+      "minimum_tps": 110.18996707180835,
+      "maximum_tps": 112.90433090125788,
+      "actual_output_tokens": [
+        512,
+        512,
+        512,
+        512,
+        512,
+        512
+      ],
+      "median_miss_rate": 0.060276011089367254,
+      "median_h2d_payload_per_token": 39996267.71037182
+    },
+    "diverse4096": {
+      "median_tps": 103.41559540044035,
+      "minimum_tps": 102.57100959866742,
+      "maximum_tps": 106.38024580077028,
+      "actual_output_tokens": [
+        512,
+        512,
+        512,
+        512,
+        512,
+        512
+      ],
+      "median_miss_rate": 0.10785632746249185,
+      "median_h2d_payload_per_token": 71568281.80039139
+    }
+  },
+  "output_comparisons": [
+    {
+      "label": "short-0-cold",
+      "input_matches": true,
+      "full_output_tokens_match": true
+    },
+    {
+      "label": "short-0-hot",
+      "input_matches": true,
+      "full_output_tokens_match": true
+    },
+    {
+      "label": "short-1-cold",
+      "input_matches": true,
+      "full_output_tokens_match": true
+    },
+    {
+      "label": "short-1-hot",
+      "input_matches": true,
+      "full_output_tokens_match": true
+    },
+    {
+      "label": "short-2-cold",
+      "input_matches": true,
+      "full_output_tokens_match": true
+    },
+    {
+      "label": "short-2-hot",
+      "input_matches": true,
+      "full_output_tokens_match": true
+    },
+    {
+      "label": "diverse4096-0-cold",
+      "input_matches": true,
+      "full_output_tokens_match": true
+    },
+    {
+      "label": "diverse4096-0-hot",
+      "input_matches": true,
+      "full_output_tokens_match": true
+    },
+    {
+      "label": "diverse4096-1-cold",
+      "input_matches": true,
+      "full_output_tokens_match": true
+    },
+    {
+      "label": "diverse4096-1-hot",
+      "input_matches": true,
+      "full_output_tokens_match": true
+    },
+    {
+      "label": "diverse4096-2-cold",
+      "input_matches": true,
+      "full_output_tokens_match": true
+    },
+    {
+      "label": "diverse4096-2-hot",
+      "input_matches": true,
+      "full_output_tokens_match": true
+    }
+  ],
+  "component_tests": 24,
+  "finite_state_components": 662,
+  "max_state_component_relative_l2": 0.0,
+  "sparse_selections_equal": 12,
+  "quality": {
+    "score": 15,
+    "total": 20,
+    "unchanged_full_output_tokens": true,
+    "new_regressions": 0
+  },
+  "selected_geometry": {
+    "protected": 9216,
+    "dynamic": 1024,
+    "prefill": 1024,
+    "total_expert_slots": 11264,
+    "kv_tokens": 8192,
+    "max_running_requests": 1,
+    "max_prefill_tokens": 4096,
+    "memory_ratio": 0.9
+  },
+  "resource": {
+    "peak_commit": 63402393600,
+    "min_commit_available": 6955466752,
+    "peak_torch_reserved": 23410507776,
+    "peak_torch_allocated": 20590468096
+  },
+  "limitations": [
+    "Single-request measured configuration only",
+    "Fixed protected expert pool; capacity changes require reload",
+    "Raw dev7 state v2 retained: test expected two tokens from a truncated chat header, which naturally produced EOS; v3 honors EOS and verifies actual16-token prefill",
+    "Prefill TTFT regression from dev4 remains open; decode is priority",
+    "Old-model, Speed backend/HTTP, packaged and MTP validation remain"
+  ],
+  "speed_acceptance": false,
+  "packaged_acceptance": false,
+  "next": "Freeze producer and Speed candidate version, verify application behavior, then evaluate MTP with state rollback and delivered throughput"
+}

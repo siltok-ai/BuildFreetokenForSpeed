@@ -1,0 +1,34 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0 -- C:\workspace\envs\speed-strata-q2-dev6\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\workspace\artifacts\flash-next-strata-q2-20261012\candidate-source-dev7-working\build-source
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collecting ... collected 24 items
+
+candidate-source-dev7-working\build-source\tests\moe\test_q2_residency.py::test_config_rejects_unsupported_contract_before_loading PASSED [  4%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_residency.py::test_owner_bytes_survive_graph_reset_prefill_and_rebuild[1-3] PASSED [  8%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_residency.py::test_owner_bytes_survive_graph_reset_prefill_and_rebuild[3-3] PASSED [ 12%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_residency.py::test_owner_bytes_survive_graph_reset_prefill_and_rebuild[8-3] PASSED [ 16%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_residency.py::test_owner_bytes_survive_graph_reset_prefill_and_rebuild[16-10] PASSED [ 20%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_grouped.py::test_grouped_q2_matches_independent_bf16_reference[1-1-False] PASSED [ 25%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_grouped.py::test_grouped_q2_matches_independent_bf16_reference[19-3-False] PASSED [ 29%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_grouped.py::test_grouped_q2_matches_independent_bf16_reference[129-3-False] PASSED [ 33%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_grouped.py::test_grouped_q2_matches_independent_bf16_reference[257-3-True] PASSED [ 37%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_routed_experts_match_integer_reference[1-False-16] PASSED [ 41%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_routed_experts_match_integer_reference[3-False-16] PASSED [ 45%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_routed_experts_match_integer_reference[8-False-16] PASSED [ 50%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_routed_experts_match_integer_reference[9-False-16] PASSED [ 54%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_routed_experts_match_integer_reference[3-True-16] PASSED [ 58%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_routed_experts_match_integer_reference[1-False-4096] PASSED [ 62%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_decode_skips_full_cache_grouping_and_replays_graph PASSED [ 66%]
+candidate-source-dev7-working\build-source\tests\moe\test_q2_grouped.py::test_q2_q8_zero_empty_and_invalid_precision PASSED [ 70%]
+candidate-source-dev7-working\build-source\tests\models\qwen4_exp\test_gguf_execution.py::GGUFExecutionConsistencyTests::test_bf16_fusion_bias_padding_and_strides PASSED [ 75%]
+candidate-source-dev7-working\build-source\tests\models\qwen4_exp\test_gguf_execution.py::GGUFExecutionConsistencyTests::test_compressed_projection_is_independent_of_batch_size PASSED [ 79%]
+candidate-source-dev7-working\build-source\tests\models\qwen4_exp\test_gguf_execution.py::GGUFExecutionConsistencyTests::test_experts_are_independent_of_prefill_and_tail_length PASSED [ 83%]
+candidate-source-dev7-working\build-source\tests\models\qwen4_exp\test_gguf_execution.py::GGUFExecutionConsistencyTests::test_fp32_attention_is_independent_of_batch_size PASSED [ 87%]
+candidate-source-dev7-working\build-source\tests\models\qwen4_exp\test_gguf_execution.py::GGUFExecutionConsistencyTests::test_native_mmvq_rejects_bad_binding_geometry PASSED [ 91%]
+candidate-source-dev7-working\build-source\tests\models\qwen4_exp\test_gguf_execution.py::GGUFExecutionConsistencyTests::test_native_q8_graph_and_layout PASSED [ 95%]
+candidate-source-dev7-working\build-source\tests\models\qwen4_exp\test_gguf_execution.py::GGUFExecutionConsistencyTests::test_qk_norm_is_independent_of_batch_size PASSED [100%]
+
+============================= 24 passed in 18.06s =============================

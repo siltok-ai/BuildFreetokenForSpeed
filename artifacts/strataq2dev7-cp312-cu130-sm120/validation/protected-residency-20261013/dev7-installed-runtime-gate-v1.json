@@ -1,0 +1,165 @@
+{
+  "passed": true,
+  "gates": {
+    "state": true,
+    "same_installed_version": true,
+    "complete_quality": true,
+    "frozen_inputs": true,
+    "previous_outputs": true,
+    "previous_quality": true,
+    "strata_quality": true,
+    "quality_exit": true,
+    "memory_headroom": true
+  },
+  "checks": [
+    {
+      "name": "multiply",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "chain",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "fraction",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "long_multiply",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "precedence",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "probability",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "python_sum",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "python_slice",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "python_list",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "set_sort",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "binary_count",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "json_sum",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "group_sum",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "indexing",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "ordering",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "deduction",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "boolean",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "multi_turn",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "long_lookup_1",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    },
+    {
+      "name": "long_lookup_2",
+      "input_identity": true,
+      "token_ids_equal": true,
+      "no_previous_regression": true,
+      "no_strata_only_regression": true
+    }
+  ],
+  "wheel_sha256": "32c54404cbd61a435d7fb76e7c3f2185d2c08a92959ebf1462a244f9e635ba42",
+  "quality_score": 15,
+  "quality_total": 20,
+  "previous_score": 15,
+  "strata_score": 15,
+  "state_gate_sha256": "774fd911b104119596d5feddbdeb69b7a28a9d13127f6c0cdb1bb55fe9ff8423",
+  "full_runtime_acceptance": false,
+  "speed_acceptance": false,
+  "scope": "Allows standalone installed-wheel performance measurements; no Speed/package/other-model acceptance"
+}

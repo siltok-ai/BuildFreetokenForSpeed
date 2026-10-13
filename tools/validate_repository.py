@@ -194,6 +194,12 @@ def main():
         from validate_protected_revision import validate as validate_protected_revision
         dev6_materials = ROOT/'artifacts/strataq2dev6-cp312-cu130-sm120'
         research_dev6 = validate_protected_revision(dev6_profile,dev6_materials if dev6_materials.exists() else None)
+    research_dev7 = None
+    dev7_profile = ROOT/'build/profiles/strataq2dev7.json'
+    if dev7_profile.exists():
+        from validate_sparse_residency_revision import validate as validate_sparse_revision
+        dev7_materials = ROOT/'artifacts/strataq2dev7-cp312-cu130-sm120'
+        research_dev7 = validate_sparse_revision(dev7_profile,dev7_materials if dev7_materials.exists() else None)
     print(json.dumps({"official_files": len(original_hashes), "changed_files": len(changed),
                       "patches": len(series["patches"]), "split_equals_historical": True,
                       "wheel_python_matches_prepared_source": True, "aot_count": len(specs),
@@ -201,7 +207,7 @@ def main():
                       "strata_research_dev2":research_dev2,
                       "strata_research_dev3":research_dev3, "strata_research_dev4":research_dev4,
                       "strata_research_dev5":research_dev5,
-                      "strata_research_dev6":research_dev6, "verified": True}))
+                      "strata_research_dev6":research_dev6, "strata_research_dev7":research_dev7, "verified": True}))
 
 
 if __name__ == "__main__":
