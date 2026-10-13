@@ -1,9 +1,0 @@
-{
-  "status": "passed_construction_only",
-  "layers": 48,
-  "expert_kind": "q2_0",
-  "router_dtype": "bfloat16",
-  "shared_expert_kind": "none",
-  "expert_geometry": "MoEConfig(num_experts=512, hidden=2560, intermediate=640, top_k=10, tp_rank=0, tp_size=1, scheme=QuantScheme(q2_0, WeightDesc(elem='q2_0', group=(1, 64), scale='f16'), roles=['weight']), activation='silu', alpha=1.0, beta=0.0, limit=None, interleaved=False, act_block=None, has_bias=False, apply_router_weight_on_input=False, strategy='offload', decode_target='gpu', dtype=torch.bfloat16)",
-  "layout": "{'gate_up': BankSpec(shape=(1280, 720), dtype=torch.uint8, resident=False), 'down': BankSpec(shape=(2560, 180), dtype=torch.uint8, resident=False)}"
-}

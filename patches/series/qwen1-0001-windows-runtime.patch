@@ -1,0 +1,28 @@
+diff --git a/python/freetoken/kernel/utils.py b/python/freetoken/kernel/utils.py
+index fe99a93..acd6b43 100644
+--- a/python/freetoken/kernel/utils.py
++++ b/python/freetoken/kernel/utils.py
+@@ -259,7 +259,8 @@ def _load_prebuilt(name: str) -> Module | None:
+             )
+         return None
+ 
+-    so_path = cache_dir / name / f"{name}.so"
++    suffix = ".dll" if os.name == "nt" else ".so"
++    so_path = cache_dir / name / f"{name}{suffix}"
+     if so_path.exists():
+         import tvm_ffi
+ 
+diff --git a/python/freetoken/models/loader.py b/python/freetoken/models/loader.py
+index 952d543..64201cf 100644
+--- a/python/freetoken/models/loader.py
++++ b/python/freetoken/models/loader.py
+@@ -73,6 +73,9 @@ def safetensors_weight_map(folder: str) -> dict[str, str]:
+ 
+ def drop_page_cache(path: str) -> None:
+     """drop a file's page cache: banks + full checkpoint cache don't both fit in host RAM (OOM)."""
++    if not hasattr(os, "posix_fadvise"):
++        # Windows 的串行 safetensors 映射可被系统回收；不伪装为已执行 POSIX cache eviction。
++        return
+     try:
+         fd = os.open(path, os.O_RDONLY)
+         try:

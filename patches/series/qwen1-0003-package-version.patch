@@ -1,0 +1,6 @@
+diff --git a/python/freetoken/version.py b/python/freetoken/version.py
+--- a/python/freetoken/version.py
++++ b/python/freetoken/version.py
+@@ -1 +1 @@
+-__version__ = "0.1.3"
++__version__ = "0.1.3+speed.qwen1"

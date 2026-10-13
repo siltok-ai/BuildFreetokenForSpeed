@@ -1,8 +1,0 @@
-{"label": "cold-70-0", "ttft_ms": 785.5066999909468, "decode_tps": 47.59798814158951, "output_tokens": 128}
-{"label": "cold-70-1", "ttft_ms": 901.4254999929108, "decode_tps": 47.62736588956908, "output_tokens": 128}
-{"label": "cold-70-2", "ttft_ms": 746.9218999904115, "decode_tps": 46.5761692918607, "output_tokens": 128}
-{"label": "cold-4096-0", "ttft_ms": 1105.4085999785457, "decode_tps": 40.5809410430725, "output_tokens": 32}
-{"label": "cold-4096-1", "ttft_ms": 1107.6156999915838, "decode_tps": 40.89170833523427, "output_tokens": 32}
-{"label": "cold-4096-2", "ttft_ms": 1263.3934000041336, "decode_tps": 41.05545360098523, "output_tokens": 32}
-no balance_serve
-flashinfer not found, use triton for linux

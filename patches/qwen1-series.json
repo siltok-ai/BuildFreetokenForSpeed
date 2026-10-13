@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "upstream_commit": "078132480ea4a0424f677a27eb22085624d331e6",
+  "patches": [
+    {
+      "id": "FTQWIN-001",
+      "path": "patches/series/qwen1-0001-windows-runtime.patch",
+      "sha256": "830c087e4e3176a90f2bab8d97282024c5aa2557ea3a11d8853804ad64c5e9e6",
+      "purpose": "Windows DLL 加载与串行 safetensors 无 POSIX fadvise 平台处理",
+      "files": [
+        "python/freetoken/kernel/utils.py",
+        "python/freetoken/models/loader.py"
+      ]
+    },
+    {
+      "id": "FTQWIN-002",
+      "path": "patches/series/qwen1-0002-windows-build.patch",
+      "sha256": "13e4ce1b79c3c060f1da6072ada60a2c0b90106e45d1df31e4e791b87e0c5012",
+      "purpose": "MSVC/CUDA 两个官方原生扩展与 Windows AOT 构建",
+      "files": [
+        "python/freetoken/kernel/csrc/jit/batch_memcpy.cuh",
+        "python/freetoken/kernel/csrc/jit/fast_index_copy.cuh",
+        "python/freetoken/kernel/csrc/jit/index.cu",
+        "python/freetoken/kernel/csrc/jit/store.cu",
+        "setup.py",
+        "tools/build_windows_extensions.py",
+        "tools/build_windows_kernel_cache.py",
+        "tools/windows-compat/README.md",
+        "tools/windows-compat/sys/cdefs.h"
+      ]
+    },
+    {
+      "id": "FTQPKG-001",
+      "path": "patches/series/qwen1-0003-package-version.patch",
+      "sha256": "dfa2255e7850bf4ee431e70035e724464703ebfa08cdbe831aab2a32134cdcf1",
+      "purpose": "独立定制版本；不覆盖历史材料",
+      "files": [
+        "python/freetoken/version.py"
+      ]
+    }
+  ]
+}

@@ -9,7 +9,7 @@ import subprocess
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_PROFILE = ROOT / "build/profiles/q2opt2.json"
+DEFAULT_PROFILE = ROOT / "build/profiles/qwen1.json"
 
 
 def sha256(path):

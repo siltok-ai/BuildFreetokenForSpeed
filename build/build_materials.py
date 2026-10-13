@@ -85,7 +85,7 @@ def main():
         if len(metadata) != 1 or BytesParser().parsebytes(archive.read(metadata[0]))["Version"] != inputs["custom_version"]:
             raise ValueError("wheel metadata differs from the custom version contract")
         native = sorted(name for name in archive.namelist() if name.endswith(".pyd"))
-        for module in ("_pinned_tensor", "_cpu_moe", "_row_store"):
+        for module in inputs["native_modules"]:
             if not any(Path(name).name.startswith(module + ".") for name in native):
                 raise ValueError(f"custom wheel lacks native module {module}")
     cache = out / "kernel-cache"
@@ -105,7 +105,7 @@ def main():
     manifest = {"schema_version": 1, "freetoken_version": inputs["custom_version"],
                 "torch_version": inputs["torch"], "torch_cuda": inputs["cuda"],
                 "python_minor": [3, 12], "cuda_capabilities": [[12, 0]], "spec_names": specs,
-                "artifacts": [{"path": path.relative_to(cache).as_posix(), "size": path.stat().st_size}
+                "artifacts": [{"path": path.relative_to(cache).as_posix(), "size": path.stat().st_size, "sha256": sha256(path)}
                               for path in dlls]}
     (cache / "speed-kernel-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     inventory = {str(path.relative_to(out)).replace("\\", "/"): {"bytes": path.stat().st_size,

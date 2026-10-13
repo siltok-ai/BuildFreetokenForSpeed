@@ -1,7 +1,7 @@
-# Speed 消费入口
+# Speed dev 接入
 
-这里保存机器可读的 [consumer-contract.json](consumer-contract.json) 与相对路径的 [manifest 示例](examples/)。完整解释见 [接入约定](../../docs/speed-integration.md)。
+consumer-contract.json 是唯一当前消费合同。Speed 必须使用同次材料 wheel 和完整 kernel-cache，绑定实际 SHA，并在正式打包时核对。
 
-Speed 自身的源码适配不在这里复制。最终适配提交为 [808003f0](https://github.com/siltok-ai/siltok-speed/tree/808003f0efc70e7f43226e5d1e8c32b3704405cb)，随包验收与材料身份见 [最终记录](../../artifacts/win1-cp312-cu130-sm120/validation/packaged-speed-20261009/record.json)。原探索基线和快照 SHA 仍保存在历史 [validation-summary](../../artifacts/win1-cp312-cu130-sm120/validation-summary.json) 中。
+Speed 文本 worker 关闭视觉/音频编码器，使用 moe_strategy，保持官方 0.1.3 quant_backend 与请求三元组；Windows MoE 指定 expert_load=serial。dense 的 MoE cache 为 0。
 
-已有 wheel 内含默认关闭的实验代码。普通模型与 INVALID 实验必须使用独立条目，不把实验参数放进全局 worker 环境。
+examples/historical-nvfp4-manifest.json 提供两模型的相对目录示例；运行时仍需完整本地权重。没有 Flash Next 或 INVALID 条目。

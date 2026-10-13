@@ -1,8 +1,8 @@
 {
   "format": 1,
-  "materials": "artifacts/win1-cp312-cu130-sm120",
-  "profile": "build/profiles/win1.json",
-  "version": "0.1.3+speed.win1",
+  "materials": "artifacts/qwen1-cp312-cu130-sm120",
+  "profile": "build/profiles/qwen1.json",
+  "version": "0.1.3+speed.qwen1",
   "upstream_commit": "078132480ea4a0424f677a27eb22085624d331e6",
   "python_minor": [
     3,
@@ -14,57 +14,28 @@
   "apache_tvm_ffi": "0.1.13.post3",
   "sm": "120",
   "wheel": {
-    "path": "wheels/freetoken-0.1.3+speed.win1-cp312-cp312-win_amd64.whl",
-    "sha256": "924bee8598cdd058104b8d3dd2cc4936860e092bd269616e0e832a7fbb87e5cf",
+    "path": "wheels/freetoken-0.1.3+speed.qwen1-cp312-cp312-win_amd64.whl",
+    "sha256": "62eea212afab9658c7cb2b5e5d01f8d0a61c1c5032b748da44acca4c1839f7f2",
     "native_modules": [
       "freetoken/kernel/_cpu_moe.cp312-win_amd64.pyd",
-      "freetoken/kernel/_pinned_tensor.cp312-win_amd64.pyd",
-      "freetoken/kernel/_row_store.cp312-win_amd64.pyd"
+      "freetoken/kernel/_pinned_tensor.cp312-win_amd64.pyd"
     ]
   },
   "kernel_cache": {
     "path": "kernel-cache",
-    "dll_count": 26,
+    "dll_count": 19,
     "manifest": "kernel-cache/speed-kernel-manifest.json",
-    "specs": "build/specs/speed-sm120.txt"
+    "manifest_sha256": "d548c4a26516103a52a0d47ecde29af5ddfec749af14c64648f899dee1437d8e",
+    "specs": "build/specs/qwen-sm120.txt"
   },
-  "speed_build_parameters": {
-    "FreetokenWheel": "<materials>/wheels/freetoken-0.1.3+speed.win1-cp312-cp312-win_amd64.whl",
-    "KernelCacheDir": "<materials>/kernel-cache"
-  },
-  "speed_runtime_config": {
-    "freetoken_kernel_cache_dir": "<materials>/kernel-cache",
-    "freetoken_runtime_dir": "optional installed runtime root containing freetoken and dist-info"
-  },
-  "normal_worker_must_clear_environment": [
-    "FREETOKEN_ALLOW_INVALID_MODEL",
-    "FREETOKEN_INVALID_EXPERT_KEEP_LAYERS"
+  "model_profiles": [
+    "qwen3.6-35b-a3b",
+    "qwen3.8-27b"
   ],
-  "research": {
-    "model_valid": false,
-    "explicit_extra": {
-      "allow_invalid_model": true,
-      "invalid_expert_keep_layers": 20
-    },
-    "architecture": "qwen4_exp",
-    "quantization": "NVFP4",
-    "ple_backend": "disk"
-  },
-  "validation_status": "validated_packaged_speed_runtime_nvfp4",
-  "packaged_speed_validated": true,
-  "speed_adapter_source_included": false,
-  "speed_source_identity": "artifacts/win1-cp312-cu130-sm120/validation/packaged-speed-20261009/record.json",
-  "packaged_speed_validation_scope": "staged runtime, embedded Python and cleaned PATH on original machine; no installer",
+  "quantization_validated": [
+    "nvfp4"
+  ],
+  "validation_status": "built_requires_runtime_validation",
   "installer_validated": false,
-  "clean_machine_validated": false,
-  "normal_full_flash_next_validated": false,
-  "historical_speed_source_identity": "artifacts/win1-cp312-cu130-sm120/validation-summary.json",
-  "speed_adapter": {
-    "repository": "https://github.com/siltok-ai/siltok-speed",
-    "branch": "feat/freetoken-win1-flash-next",
-    "commit": "808003f0efc70e7f43226e5d1e8c32b3704405cb",
-    "base_commit": "5fd331bc5257a6593d6bcb4707c5fa13cf69396b"
-  },
-  "accepted_materials_commit": "12bdf743bbf4725fc25468204313cb2f43733758",
-  "wheel_identity_policy": "Speed checks exact SHA, not only version. Rebuilt bytes require new evidence and Speed SHA update; source changes require a new custom revision."
+  "clean_machine_validated": false
 }

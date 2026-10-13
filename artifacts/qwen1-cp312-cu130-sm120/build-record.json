@@ -1,0 +1,240 @@
+{
+  "format": 1,
+  "status": "built_requires_runtime_validation",
+  "source_commit": "078132480ea4a0424f677a27eb22085624d331e6",
+  "custom_version": "0.1.3+speed.qwen1",
+  "wheel_filename": "freetoken-0.1.3+speed.qwen1-cp312-cp312-win_amd64.whl",
+  "torch": "2.11.0+cu130",
+  "cuda": "13.0",
+  "apache_tvm_ffi": "0.1.13.post3",
+  "sm": "120",
+  "upstream_lock": "upstream/lock.json",
+  "source_archive": "upstream/freetoken-0781324.zip",
+  "patch_series": "patches/qwen1-series.json",
+  "spec_file": "build/specs/qwen-sm120.txt",
+  "requirements_lock": "build/requirements.lock.txt",
+  "native_modules": [
+    "freetoken/kernel/_cpu_moe.cp312-win_amd64.pyd",
+    "freetoken/kernel/_pinned_tensor.cp312-win_amd64.pyd"
+  ],
+  "model_profiles": [
+    "qwen3.6-35b-a3b",
+    "qwen3.8-27b"
+  ],
+  "expert_load": "serial",
+  "input_sha256": {
+    "upstream/lock.json": "0cc6106265175308141d68e6e321897a79b4a4de77c77c90ef762610b482d643",
+    "upstream/freetoken-0781324.zip": "49a51eb5480c61571a69b44684f236cd86992b2b79062544f85bbcd263fd2443",
+    "patches/qwen1-series.json": "c7f6f4efe598c6697a0d535a11f90456c4125a7eea2b2c2cb3da7eaec6925364",
+    "build/specs/qwen-sm120.txt": "6cfb238119070e79d91e7372103641bcf945c6893e2ceae23d1a59c5770045f3",
+    "build/requirements.lock.txt": "29075247fd5c21e2e5b96f1ff313f3f773d1cca49556d56fcce61cca5aa05789",
+    "patches/series/qwen1-0001-windows-runtime.patch": "830c087e4e3176a90f2bab8d97282024c5aa2557ea3a11d8853804ad64c5e9e6",
+    "patches/series/qwen1-0002-windows-build.patch": "13e4ce1b79c3c060f1da6072ada60a2c0b90106e45d1df31e4e791b87e0c5012",
+    "patches/series/qwen1-0003-package-version.patch": "dfa2255e7850bf4ee431e70035e724464703ebfa08cdbe831aab2a32134cdcf1"
+  },
+  "python": "3.12.13 (main, Aug  7 2026, 02:26:41) [MSC v.1944 64 bit (AMD64)]",
+  "build_python": "C:\\workspace\\envs\\speed-qwen013-dev\\Scripts\\python.exe",
+  "dependencies": {
+    "annotated-doc": "0.0.5",
+    "annotated-types": "0.8.0",
+    "anyio": "4.15.1",
+    "apache-tvm-ffi": "0.1.13.post3",
+    "certifi": "2026.7.22",
+    "cffi": "2.1.1",
+    "charset-normalizer": "3.5.2",
+    "click": "8.5.0",
+    "colorama": "0.4.6",
+    "cryptography": "50.0.1",
+    "distro": "1.9.0",
+    "einops": "0.8.2",
+    "fastapi": "0.142.4",
+    "filelock": "4.0.12",
+    "flashlib": "0.3.0",
+    "fsspec": "2026.7.0",
+    "gguf": "0.19.0",
+    "h11": "0.16.0",
+    "hf-xet": "1.7.0",
+    "httpcore": "1.0.9",
+    "httpx": "0.28.1",
+    "huggingface-hub": "1.33.0",
+    "idna": "3.20",
+    "jinja2": "3.1.6",
+    "jiter": "0.17.0",
+    "llvmlite": "0.50.0",
+    "markdown-it-py": "4.2.0",
+    "markupsafe": "3.0.4",
+    "mdurl": "0.1.2",
+    "modelscope": "1.40.1",
+    "modelscope-hub": "0.4.5",
+    "mpmath": "1.3.0",
+    "msgpack": "1.2.3",
+    "networkx": "3.7",
+    "ninja": "1.13.2",
+    "numba": "0.68.0",
+    "numpy": "2.4.6",
+    "openai": "2.54.0",
+    "opentelemetry-api": "1.45.1",
+    "packaging": "26.3",
+    "partial-json-parser": "0.2.1.1.post7",
+    "pillow": "12.3.0",
+    "prompt-toolkit": "3.0.53",
+    "pycparser": "3.0",
+    "pydantic": "2.13.5",
+    "pydantic-core": "2.46.5",
+    "pygments": "2.21.0",
+    "pyyaml": "6.0.3",
+    "pyzmq": "27.2.0",
+    "regex": "2026.9.29",
+    "requests": "2.34.2",
+    "rich": "15.0.0",
+    "safetensors": "0.8.0",
+    "setuptools": "78.1.0",
+    "shellingham": "1.5.4",
+    "sniffio": "1.3.1",
+    "starlette": "1.7.0",
+    "sympy": "1.14.0",
+    "tokenizers": "0.23.2",
+    "torch": "2.11.0+cu130",
+    "torchvision": "0.26.0+cu130",
+    "tqdm": "4.70.1",
+    "transformers": "5.16.1",
+    "triton-windows": "3.6.0.post26",
+    "typer": "0.27.3",
+    "typing-extensions": "4.16.0",
+    "typing-inspection": "0.4.4",
+    "urllib3": "2.8.0",
+    "uvicorn": "0.54.0",
+    "wcwidth": "0.9.2",
+    "wheel": "0.48.0"
+  },
+  "cuda_compiler": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2025 NVIDIA Corporation\nBuilt on Wed_Jul_16_20:06:48_Pacific_Daylight_Time_2025\nCuda compilation tools, release 13.0, V13.0.48\nBuild cuda_13.0.r13.0/compiler.36260728_0\n",
+  "msvc_compiler": "\u7528\u6cd5: cl [ \u9009\u9879... ] \u6587\u4ef6\u540d... [ /link \u94fe\u63a5\u9009\u9879... ]\n\u7528\u4e8e x64 \u7684 Microsoft (R) C/C++ \u4f18\u5316\u7f16\u8bd1\u5668 19.44.35228 \u7248\n\u7248\u6743\u6240\u6709(C) Microsoft Corporation\u3002\u4fdd\u7559\u6240\u6709\u6743\u5229\u3002\n\n",
+  "producer_sha256": {
+    "build/build_materials.py": "6f273761f202a5ba6a5d2e9a4ff395315871ee2863767fbbd281e116c5183ad5",
+    "build/build-materials.ps1": "23f4e1cd865c38cd40369f8b324cae1aba4a9d97c5a6d8a7f6c7cd6eeeb02934",
+    "tools/prepare_source.py": "546c7bb932dab964824aeb782661f627d7ba6f494a03f569559d3d0aab364e5a",
+    "build/requirements.lock.txt": "29075247fd5c21e2e5b96f1ff313f3f773d1cca49556d56fcce61cca5aa05789"
+  },
+  "patches": [
+    {
+      "id": "FTQWIN-001",
+      "path": "patches/series/qwen1-0001-windows-runtime.patch",
+      "sha256": "830c087e4e3176a90f2bab8d97282024c5aa2557ea3a11d8853804ad64c5e9e6",
+      "purpose": "Windows DLL \u52a0\u8f7d\u4e0e\u4e32\u884c safetensors \u65e0 POSIX fadvise \u5e73\u53f0\u5904\u7406",
+      "files": [
+        "python/freetoken/kernel/utils.py",
+        "python/freetoken/models/loader.py"
+      ]
+    },
+    {
+      "id": "FTQWIN-002",
+      "path": "patches/series/qwen1-0002-windows-build.patch",
+      "sha256": "13e4ce1b79c3c060f1da6072ada60a2c0b90106e45d1df31e4e791b87e0c5012",
+      "purpose": "MSVC/CUDA \u4e24\u4e2a\u5b98\u65b9\u539f\u751f\u6269\u5c55\u4e0e Windows AOT \u6784\u5efa",
+      "files": [
+        "python/freetoken/kernel/csrc/jit/batch_memcpy.cuh",
+        "python/freetoken/kernel/csrc/jit/fast_index_copy.cuh",
+        "python/freetoken/kernel/csrc/jit/index.cu",
+        "python/freetoken/kernel/csrc/jit/store.cu",
+        "setup.py",
+        "tools/build_windows_extensions.py",
+        "tools/build_windows_kernel_cache.py",
+        "tools/windows-compat/README.md",
+        "tools/windows-compat/sys/cdefs.h"
+      ]
+    },
+    {
+      "id": "FTQPKG-001",
+      "path": "patches/series/qwen1-0003-package-version.patch",
+      "sha256": "dfa2255e7850bf4ee431e70035e724464703ebfa08cdbe831aab2a32134cdcf1",
+      "purpose": "\u72ec\u7acb\u5b9a\u5236\u7248\u672c\uff1b\u4e0d\u8986\u76d6\u5386\u53f2\u6750\u6599",
+      "files": [
+        "python/freetoken/version.py"
+      ]
+    }
+  ],
+  "artifacts": {
+    "wheels/freetoken-0.1.3+speed.qwen1-cp312-cp312-win_amd64.whl": {
+      "bytes": 1620340,
+      "sha256": "62eea212afab9658c7cb2b5e5d01f8d0a61c1c5032b748da44acca4c1839f7f2"
+    },
+    "kernel-cache/freetoken__store_1024_128_1_false/freetoken__store_1024_128_1_false.dll": {
+      "bytes": 318976,
+      "sha256": "8e180076a0e96a772b39e6a9b05efa2581454f691d6b629e7e42bfefa2b80e65"
+    },
+    "kernel-cache/freetoken__store_2048_128_1_false/freetoken__store_2048_128_1_false.dll": {
+      "bytes": 318976,
+      "sha256": "4a2e5f74244940dd2b81da67baf1863c289fdd390ad467d8cd726bbfd6388858"
+    },
+    "kernel-cache/freetoken__index_4096_4_128_1_false/freetoken__index_4096_4_128_1_false.dll": {
+      "bytes": 336896,
+      "sha256": "46be2ac75b2ce2858fd8c3c1abd80eee5df2125b3117930ea4787df6eab2a093"
+    },
+    "kernel-cache/freetoken__index_10240_4_128_1_false/freetoken__index_10240_4_128_1_false.dll": {
+      "bytes": 336896,
+      "sha256": "e10a586ac2c5a98b3f985319618ead94e264b66c5dbca0322b4007f073857670"
+    },
+    "kernel-cache/freetoken__fast_index_copy_update_flag/freetoken__fast_index_copy_update_flag.dll": {
+      "bytes": 312832,
+      "sha256": "b69c89258e1d3fb3ab7520f1dbd9c8f216f6add7c0ac5f58c8ed93ad84ff6631"
+    },
+    "kernel-cache/freetoken__fast_index_copy_128_8_128_1024_4_1/freetoken__fast_index_copy_128_8_128_1024_4_1.dll": {
+      "bytes": 340992,
+      "sha256": "73a076dea3c10274daf2764ba458f0da5c970b8a42ed6d42d099ea4c7fcf748b"
+    },
+    "kernel-cache/freetoken__fast_index_copy_256_8_256_1024_4_1/freetoken__fast_index_copy_256_8_256_1024_4_1.dll": {
+      "bytes": 340480,
+      "sha256": "4f46b3c040eddcb36645fe39076264427845268e942f032e6b361f8fe7d3119d"
+    },
+    "kernel-cache/freetoken__fast_index_copy_2048_16_2048_1024_4_1/freetoken__fast_index_copy_2048_16_2048_1024_4_1.dll": {
+      "bytes": 340992,
+      "sha256": "af83213d1eaf1f30fd14a6bb4d98fd822528f3dde6c9d73448fd3bd6e5fb8f48"
+    },
+    "kernel-cache/freetoken__fast_index_copy_4096_32_2048_1024_4_1/freetoken__fast_index_copy_4096_32_2048_1024_4_1.dll": {
+      "bytes": 340992,
+      "sha256": "b28d757f9d8aeb48bd384d5d1d4582f8f94a894f6176e061aebaf9c53cd3c04f"
+    },
+    "kernel-cache/freetoken__fast_index_copy_65536_32_2048_1024_4_1/freetoken__fast_index_copy_65536_32_2048_1024_4_1.dll": {
+      "bytes": 340992,
+      "sha256": "4d672ad2e443970f8fcfef85c110cb3fd3dda968f34f4b0e456ae9dde1f41063"
+    },
+    "kernel-cache/freetoken__fast_index_copy_131072_32_2048_1024_4_1/freetoken__fast_index_copy_131072_32_2048_1024_4_1.dll": {
+      "bytes": 340992,
+      "sha256": "70e2f19648c510203fdb2d226bf3e06246d453acead635e143f3b751e7230caf"
+    },
+    "kernel-cache/freetoken__fast_index_copy_524288_32_2048_1024_4_1/freetoken__fast_index_copy_524288_32_2048_1024_4_1.dll": {
+      "bytes": 340992,
+      "sha256": "c6cf936cc7d128fcefa6aa6054abf193e76d8d623160dd4cbaf26574b84994d5"
+    },
+    "kernel-cache/freetoken__fast_index_copy_1048576_32_2048_1024_4_1/freetoken__fast_index_copy_1048576_32_2048_1024_4_1.dll": {
+      "bytes": 340992,
+      "sha256": "4869be7a0af30db14e5a88528ea749a5467d3764133f6ac4a50948766cb6739f"
+    },
+    "kernel-cache/freetoken__fast_index_copy_2097152_32_2048_1024_4_1/freetoken__fast_index_copy_2097152_32_2048_1024_4_1.dll": {
+      "bytes": 340992,
+      "sha256": "ce43f9f8d3f4ea4eb08619f6492adef273d93352143890b0fa5aefbe7a72a001"
+    },
+    "kernel-cache/freetoken__fast_index_copy_4194304_32_2048_1024_4_1/freetoken__fast_index_copy_4194304_32_2048_1024_4_1.dll": {
+      "bytes": 340992,
+      "sha256": "fd4dd37e5a439370a452cf779b93bd0b05d9eb04362dbb10260af7b55b8b3d7d"
+    },
+    "kernel-cache/freetoken__fast_index_copy_multi_1024_8/freetoken__fast_index_copy_multi_1024_8.dll": {
+      "bytes": 322560,
+      "sha256": "515730f446fd27c56fe89302dcbbef6195c3182aba70e5d371dbd62872e5c22d"
+    },
+    "kernel-cache/freetoken__fast_index_copy_multi_1024_64/freetoken__fast_index_copy_multi_1024_64.dll": {
+      "bytes": 322560,
+      "sha256": "f2fff98db10aeb867561034a6b1ba9ed385b39149cb2ab4ffe1c1b49d050d36a"
+    },
+    "kernel-cache/freetoken__batch_memcpy/freetoken__batch_memcpy.dll": {
+      "bytes": 313856,
+      "sha256": "bff111122f5265e714de3ea2781df97b4c4653c3744c875fdf74969b402d4eaf"
+    },
+    "kernel-cache/freetoken__radix/freetoken__radix.dll": {
+      "bytes": 49664,
+      "sha256": "24444d7e79681fc8bae1d6db0b48cc90f4578a4416e91ac317b0b6df8f3b4837"
+    }
+  },
+  "wheel_sha256": "62eea212afab9658c7cb2b5e5d01f8d0a61c1c5032b748da44acca4c1839f7f2",
+  "aot_count": 19
+}
