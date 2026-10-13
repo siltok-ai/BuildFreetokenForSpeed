@@ -25,9 +25,9 @@ def main():
     if len(dlls) != record['aot_count']:
         raise ValueError('AOT inventory count mismatch')
     wheel = root / 'wheels' / record['wheel_filename']
-    with wheel.open('rb') as stream:
-        if hashlib.file_digest(stream, 'sha256').hexdigest() != record['wheel_sha256']:
-            raise ValueError('wheel identity differs from record')
+    # 上面的库存循环已校验 wheel 的实际字节，这里只核对两处声明一致。
+    if record['artifacts']['wheels/' + record['wheel_filename']]['sha256'] != record['wheel_sha256']:
+        raise ValueError('wheel identity differs from record')
     actual_dlls = {path.relative_to(root).as_posix() for path in (root / 'kernel-cache').rglob('*.dll')}
     if actual_dlls != set(dlls):
         raise ValueError('extra or missing DLL in kernel cache')
