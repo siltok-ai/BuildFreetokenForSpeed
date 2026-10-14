@@ -230,6 +230,10 @@ def main():
     if mtp_final_abort_record.exists():
         from validate_mtp_final_abort import validate as validate_final_abort
         mtp_final_abort = validate_final_abort(mtp_final_abort_record)
+    mtp_speed_consumer = None
+    if (ROOT/'integration/speed/consumer-contract-strataq2mtp2.json').exists():
+        from verify_mtp2_consumer import verify as verify_mtp_consumer
+        mtp_speed_consumer = verify_mtp_consumer()
     print(json.dumps({"official_files": len(original_hashes), "changed_files": len(changed),
                       "patches": len(series["patches"]), "split_equals_historical": True,
                       "wheel_python_matches_prepared_source": True, "aot_count": len(specs),
@@ -243,7 +247,7 @@ def main():
                       "mtp_scheduler_development_checkpoint":mtp_scheduler_checkpoint,
                       "mtp_lifecycle_development_checkpoint":mtp_lifecycle_checkpoint,
                       "mtp_installed_candidate":mtp_installed_candidate,
-                      "mtp_final_abort_candidate":mtp_final_abort, "verified": True}))
+                      "mtp_final_abort_candidate":mtp_final_abort, "mtp_speed_consumer_checkpoint":mtp_speed_consumer, "verified": True}))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,32 @@
+{
+  "format": 1,
+  "status": "passed",
+  "scope": "Final material replay and reviewed Speed consumer binding; single-host checkpoint, no full installer acceptance",
+  "speed_evidence_commit": "57dd25587bebc3cf0c86bfcd791aac84b5ced7fc",
+  "source_validation": "20 patches, 456 wheel Python files, 27 AOT and 3 native identities verified",
+  "unit_tests": "18 passed",
+  "initial_failure": "Git newline normalization of the cross-repository evidence index; fixed by Speed -text rule, second verification passed",
+  "consumer_sha256": "05baf40e69650f6a2573d552c7765bd12e1eed8e38c3978fd65f0fa34e33ede8",
+  "evidence": [
+    {
+      "path": "research/mtp/evidence/speed-consumer-20261014-v1/mtp2-final-consumer-review-v1.log.gz",
+      "sha256": "635519fb67bd15e0518765d6065dab3551434578967507f1cfaf429c8db7b007",
+      "raw_sha256": "a2a5cb02562f4eeab6a42db6f67fc515d2362724ea345936743a5922e8461960"
+    },
+    {
+      "path": "research/mtp/evidence/speed-consumer-20261014-v1/mtp2-final-consumer-review-v2.log.gz",
+      "sha256": "6d6c0e263519350e56d8851148db9ff0db90904e9c9ad42d0e1898a63e6f84e3",
+      "raw_sha256": "a7ec1758cc61a028661edfa2079fbf05c5d4ab7c08fc662f90566a4b0d38889c"
+    },
+    {
+      "path": "research/mtp/evidence/speed-consumer-20261014-v1/mtp2-final-repository-review-v1.log.gz",
+      "sha256": "1c78303ef7f9afaf7fcc30e57217c435af069499f77ce002fb2b973ea4f5b9b2",
+      "raw_sha256": "3787a950bdf8c9991e86df4071ae1a88f1912b3a10f5632667997b036a38c210"
+    },
+    {
+      "path": "research/mtp/evidence/speed-consumer-20261014-v1/mtp2-final-repository-unittests-v1.log.gz",
+      "sha256": "d893aad991e203f7a7453d6c9974ccf9a6c4e54af143ab645dce4175e1cb5168",
+      "raw_sha256": "5b33c8dd46edb2bb6f03a3b4d7cdeb30acbbd816cad7dc6cdf291944576ae013"
+    }
+  ]
+}

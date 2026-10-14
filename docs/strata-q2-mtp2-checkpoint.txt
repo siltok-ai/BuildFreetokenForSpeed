@@ -1,0 +1,35 @@
+MTP2 稳定分支检查点 / 2026-10-14
+
+Build: explore/flash-next-strata-q2-mtp
+Speed: explore/freetoken-flash-next-strata-q2-mtp
+FreeToken: 0.1.3+speed.strataq2mtp2; profile build/profiles/strataq2mtp2.json
+引擎材料提交: ef3540504ccc680e1a3b07149e6b79ca49444edd
+Speed运行代码: df914a02fd0ebce56f80dae90a16c403f0cb6204
+Speed验收/字节锁提交: 57dd25587bebc3cf0c86bfcd791aac84b5ced7fc
+Speed wheel: 0.1.2.dev0+strataq2mtp2.1
+
+消费合同 integration/speed/consumer-contract-strataq2mtp2.json 固定FT wheel、AOT、profile、Speed提交及原始证据SHA。mtp2-checkpoint-index.json是Speed验收索引的原始字节副本，原始104份证据在Speed对应提交research/strata-q2-mtp2-20261014。Speed为索引单独设置-text，避免Git行尾转换破坏跨仓库SHA；不全仓库规范化。
+
+默认关闭MTP。关闭默认永久9216/总槽11264；开启永久7168/总槽9216，动态1024和prefill1024。关闭也支持显式7168作为同容量对照。预测层独立artifact，来源固定Qwen BF16 revision；主模型保持完整Strata Q2，不混用RadixArk权重。greedy单请求最多3草稿，非greedy原采样；原无MTP分支/环境/wheel/权重均保留。
+
+本机Windows/cp312/Torch2.11-cu130/SM120已验收范围：
+- 20个补丁重放，456个wheel Python文件与重放源码相同；27 AOT/3 native身份及派生白名单核验。
+- 安装版本84组件通过、12子测试通过；真实prefix分叉/锚点/压力/重建等冻结引擎证据仍有效。
+- 最后窗口取消CPU故障前失败/修复通过，真实worker四次边界注入后同worker继续生成。
+- 最终Speed安装包thinking三题3/3；非thinking20题15/20，全部输出token IDs与已接受Q2基线相同。
+- 旧27B NVFP4与35B NVFP4真实安装包推理、重复输出、取消复用及退出通过，MTP实际关闭。
+- 安装backend四组实际512 token与冻结HTTP完整文本一致；EOS/stop string/非greedy、取消复用及主动结束本测试worker后的重启恢复通过。
+- 真实TCP HTTP开启/关闭各六组512 token，完整文本一致。开启短/4K中位106.54/109.58 tps、最低103.40/108.88；同容量关闭101.79/97.43中位。原最佳无MTP历史109.88/104.02保留，当前MTP短输入未超过原最佳。
+- 原生MTP四组512 token为111.92/110.00/113.01/113.21 tps；安装backend为111.82/108.50/112.80/112.75。原生冷/热prefix0与64/4032的实际值均记录。
+
+本机显式HTTP准入GPU21.75GiB/host27GiB、NVML、安全GPU64MiB/commit2GiB，全局默认未更改。MTP整机commit峰值66,521,567,232B，最低可用3,836,293,120B，GPU最低空闲1196.14MiB。4K首次HTTP TTFT开启11.22秒/关闭8.20秒，没有TTFT改善结论。
+
+边界：这是已验收的单机稳定分支检查点；不是完整安装器/干净机发布。扩展单测193通过、1 xfailed、6失败，六失败在原无MTP工作树同环境同样复现；定向117及manifest相关32通过，不宣称全量单测全绿。微小prefill形状数值差异留档，不宣称跨路径逐位一致。短trace记录实际MTP直接窗口miss/压缩搬运/PLE host等待；长测旧零phase计数无效。GPU WAIT嵌在kernel/event中，未独立量化；不能报告为零。
+
+复核：
+python tools/verify_mtp2_consumer.py --speed-checkout C:/workspace/worktrees/speed-flash-next-strata-q2-mtp
+python tools/validate_repository.py
+python -m unittest discover -s tests
+Speed侧：python tools/verify_mtp_checkpoint.py
+
+新功能和性能优化可基于这两个分支继续，另建不可变版本与重新验收。此次收敛不加入受限词表head或动态草稿长度，不合并main，不向官方FreeToken提交。

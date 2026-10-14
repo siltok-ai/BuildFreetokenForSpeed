@@ -1,3 +1,5 @@
+> 当前 MTP2 稳定分支检查点（2026-10-14）见 [交付说明](docs/strata-q2-mtp2-checkpoint.txt)及 [Speed 消费合同](integration/speed/consumer-contract-strataq2mtp2.json)。以下历史候选描述保留；最新已验收范围以该独立合同为准。
+
 # BuildFreetokenForSpeed
 
 正式维护仓库为公司 [siltok-ai/BuildFreetokenForSpeed](https://github.com/siltok-ai/BuildFreetokenForSpeed)。后续源码、制品合同、权重说明及证据只更新公司仓库；此前私人仓库保留历史，不再作为更新目标。

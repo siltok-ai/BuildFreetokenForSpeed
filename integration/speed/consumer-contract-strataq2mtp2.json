@@ -1,0 +1,129 @@
+{
+  "format": 1,
+  "status": "accepted_single_host_checkpoint",
+  "profile": "build/profiles/strataq2mtp2.json",
+  "profile_sha256": "7cb2188ea547979c311646bac3dc161c6e35cd263fd8f5ef33bf905bda9368e5",
+  "materials": "artifacts/strataq2mtp2-cp312-cu130-sm120",
+  "version": "0.1.3+speed.strataq2mtp2",
+  "producer_engine_commit": "ef3540504ccc680e1a3b07149e6b79ca49444edd",
+  "wheel": {
+    "path": "wheels/freetoken-0.1.3+speed.strataq2mtp2-cp312-cp312-win_amd64.whl",
+    "sha256": "20f4ea8983e9bb06c850c92322d07b78c7acfc1321b066f69c868de0f860ecd1"
+  },
+  "kernel_cache": {
+    "path": "kernel-cache",
+    "manifest": "kernel-cache/speed-kernel-manifest.json",
+    "manifest_sha256": "a8cbb7705072aff8f71b52b96fc8f5a6f86b18565ef081675b54c40364daf1c9",
+    "dll_count": 27
+  },
+  "platform": {
+    "os": "win_amd64",
+    "python_minor": [
+      3,
+      12
+    ],
+    "torch": "2.11.0+cu130",
+    "cuda": "13.0",
+    "sm": "120",
+    "apache_tvm_ffi": "0.1.13.post3"
+  },
+  "speed_adapter": {
+    "repository": "https://github.com/siltok-ai/silitok-speed",
+    "branch": "explore/freetoken-flash-next-strata-q2-mtp",
+    "source_commit": "df914a02fd0ebce56f80dae90a16c403f0cb6204",
+    "evidence_commit": "57dd25587bebc3cf0c86bfcd791aac84b5ced7fc",
+    "evidence": "research/strata-q2-mtp2-20261014/index.json",
+    "evidence_sha256": "404fe7e0b0cc71fe85044ecd1c10602da76a8d05434bb3f2d05a0964436dd5ca",
+    "snapshot": "integration/speed/mtp2-checkpoint-index.json",
+    "package": {
+      "status": "passed",
+      "wheel": "siltok_speed-0.1.2.dev0+strataq2mtp2.1-py3-none-any.whl",
+      "bytes": 7013847,
+      "sha256": "efc193552d93e5f2446a0d093e6e919e29cb1adade98330bd69c45efaa43031b",
+      "aot_dll_count": 27,
+      "source_commit": "df914a02fd0ebce56f80dae90a16c403f0cb6204"
+    }
+  },
+  "mtp": {
+    "default_enabled": false,
+    "manifest_artifact_role": "mtp",
+    "manifest_artifact_layout": "freetoken_mtp",
+    "runtime_manifest_sha256": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
+    "source_repository": "Qwen/Qwen3.8-Flash-Next",
+    "source_revision": "de4b8e4d43b917e7706784d8bb445c9af86a3540",
+    "max_draft_tokens": 3,
+    "greedy_only": true,
+    "context_tokens": 8192,
+    "transaction_slots": 4
+  },
+  "geometry": {
+    "off_default": {
+      "protected_experts": 9216,
+      "total_slots": 11264
+    },
+    "on": {
+      "protected_experts": 7168,
+      "total_slots": 9216
+    },
+    "off_matched": {
+      "protected_experts": 7168,
+      "total_slots": 9216
+    },
+    "dynamic_slots": 1024,
+    "prefill_slots": 1024,
+    "kv_tokens": 8192
+  },
+  "acceptance": {
+    "installed_backend": true,
+    "actual_http": true,
+    "long_actual_output_512": true,
+    "thinking_3_of_3": true,
+    "quality_unchanged_20_ids": true,
+    "old_27b_35b_default_off": true,
+    "eos_stop_nongreedy": true,
+    "cancellation_and_reuse": true,
+    "owned_worker_failure_restart": true,
+    "installed_components": "84 passed, 12 subtests passed",
+    "baseline_unit_failures": 6,
+    "full_installer_clean_machine": false
+  },
+  "performance": {
+    "on": {
+      "70-0": {
+        "median_tps": 106.54241527568108,
+        "minimum_tps": 103.40120560136333
+      },
+      "diverse-4096-0": {
+        "median_tps": 109.58206365929384,
+        "minimum_tps": 108.88210803598065
+      }
+    },
+    "off_matched": {
+      "70-0": {
+        "median_tps": 101.7943860176709,
+        "minimum_tps": 99.6743866007066
+      },
+      "diverse-4096-0": {
+        "median_tps": 97.4255127142099,
+        "minimum_tps": 92.52631124177168
+      }
+    },
+    "all_six_texts_equal": true,
+    "original_best_off_historical": {
+      "short_median_tps": 109.8818,
+      "context4096_median_tps": 104.0173,
+      "protected_experts": 9216,
+      "cache_slots": 11264
+    },
+    "comparison_note": "Original best historical OFF differs in expert capacity and background load; ON short does not beat that historical best."
+  },
+  "limitations": [
+    "Single-host checkpoint; complete installer and clean-machine acceptance remain open.",
+    "MTP greedy single request only; non-greedy uses native sampler.",
+    "First 4K HTTP TTFT ON11.22s/OFF8.20s; do not advertise TTFT improvement.",
+    "Six unrelated baseline unit failures reproduced in unchanged baseline; full broad unit suite is not green.",
+    "Native short cold/hot has a recorded small numerical divergence from existing prefill shapes; no blanket bitwise claim.",
+    "MTP reserved head and adaptive draft length deferred."
+  ],
+  "identity_policy": "Old artifacts remain immutable. New acceptance lives in a separate consumer record; build-record derivation status remains historical provenance, not rewritten. No main merge or official FreeToken contribution."
+}

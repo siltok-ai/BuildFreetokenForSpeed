@@ -111,3 +111,9 @@ Strata实现的逐项对照和缺口见 `STRATA-MAPPING.md`。本轮将8份固�
 接入Speed的取消边界review复现了一项实际所有权问题：`DecodeManager.filter_reqs`会先移除预算已用尽的请求，而最后一个MTP窗口仍在in-flight batch中等待CPU交付；此时原abort只查prefill/decode队列，漏掉这个请求，导致最后bundle仍交付且随后又回abort ack。CPU真实Req、DecodeManager和HybridRadix页/状态管理测试在旧代码上因req.aborted=False失败。补丁0019改为在两队列未找到时查仍持有有效table_idx的in-flight batch，延迟到copy_done后丢弃bundle、补齐已提交CPU历史并释放一次，最后只发送abort ack。84项组件与12个子测试通过，原故障及修复日志保存在 `evidence/final-abort-20261014-v1/index.json`；开发源码为 `ecd72e3071c470e3da268dd516df8d1fd81c3ded`。
 
 已冻结新的 `strataq2mtp2` profile和版本 `0.1.3+speed.strataq2mtp2`，补丁0020只改版本；保留全部mtp1资料和制品。新wheel SHA256 `20f4ea8983e9bb06c850c92322d07b78c7acfc1321b066f69c868de0f860ecd1`，27个AOT/3个native字节不变。源重放与故障前/后CPU测试不能代替真实GPU最后窗口取消或Speed服务验收，这些继续在独立安装mtp2环境验证。
+
+### MTP2 稳定检查点收敛（2026-10-14）
+
+默认关闭的Speed适配、实际安装版本、512-token原生/backend/HTTP、thinking、旧27B/35B、取消复用及测试worker故障后重启已经通过本机必要验收。最终Speed证据提交为 `57dd25587bebc3cf0c86bfcd791aac84b5ced7fc`；本仓库 `integration/speed/consumer-contract-strataq2mtp2.json` 单独绑定该证据、20补丁profile、FT2 wheel和27个AOT，保留原始build-record的派生来源状态。对应说明为 `docs/strata-q2-mtp2-checkpoint.txt`。
+
+长输出与短诊断严格分开；旧native统计钩子未覆盖MTP直接窗口，零phase计数被明确否定并由单独trace修正。当前本机HTTP MTP六组512-token均超过100 tps，同容量短/4K中位提升4.66%/12.48%，但短输入仍未超过原最佳无MTP历史配置。完整安装器、干净机及进一步优化不属于此次单机检查点通过的范围。
