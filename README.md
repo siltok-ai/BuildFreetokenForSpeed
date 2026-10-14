@@ -51,6 +51,8 @@ python -B tools/verify_mtp2_consumer.py
 
 上述离线检查不等价于GPU/整包验收。冻结本机结果：无MTP最佳历史HTTP短/4K中位109.88/104.02tps；MTP六次各512个实际交付token，中位106.54/109.58tps，同容量关闭101.79/97.43。20题非thinking15/20且输出IDs匹配已接受Q2基线，thinking三题3/3；旧27B/35B、取消复用和故障重启已通过安装版本验收。详细证据见 [消费合同](integration/speed/consumer-contract-strataq2mtp2.json)、[原始检查点](docs/strata-q2-mtp2-checkpoint.txt)。不是所有设备的100tps保证。
 
+新增[可搬迁交付验收](research/mtp/evidence/portable-delivery-20261014-v1/README.md)：固定元数据网络下载、完整两片校验、31份MTP重新转换、异路径刷新、Git导出29项测试与已安装Speed开/关各两次512-token推理均通过。`python -B tools/verify_flash_next_delivery.py`交叉核对封存原始记录。
+
 Speed新Cython整包、安装器/干净机，以及Speed自己的行尾/包清单复核问题仍需在Speed侧处理；本仓库不将这些未覆盖范围写成通过。第三方有版本锁但未提供完整离线wheelhouse。源码/格式/许可与维护规则见 [upstream](upstream/README.md)、[NOTICE](NOTICE)、[维护说明](docs/maintenance.md)。
 
 旧版本保持可回滚：`q2opt2` 为 HF主干+Q2专家混合模型；`strataq2dev7` 为无MTP全GGUF检查点；`strataq2mtp1` 为首次MTP候选。旧入口 `integration/speed/consumer-contract.json` 代表历史win1，不是当前选择。历史README保存在 [历史记录](docs/history/readme-before-current-20261014.txt)。

@@ -76,6 +76,8 @@ def validate_packaged_evidence(contract):
 def main():
     from verify_current_release import verify as verify_current
     current_release = verify_current()
+    from verify_flash_next_delivery import verify as verify_delivery
+    portable_delivery = verify_delivery()
     profile, series = load_profile(ROOT / "build/profiles/win1.json")
     lock = json.loads(repository_path(profile["upstream_lock"]).read_text(encoding="utf-8"))
     if lock["snapshot_modified"]:
@@ -249,7 +251,7 @@ def main():
                       "mtp_scheduler_development_checkpoint":mtp_scheduler_checkpoint,
                       "mtp_lifecycle_development_checkpoint":mtp_lifecycle_checkpoint,
                       "mtp_installed_candidate":mtp_installed_candidate,
-                      "mtp_final_abort_candidate":mtp_final_abort, "mtp_speed_consumer_checkpoint":mtp_speed_consumer, "current_release":current_release, "verified": True}))
+                      "mtp_final_abort_candidate":mtp_final_abort, "mtp_speed_consumer_checkpoint":mtp_speed_consumer, "current_release":current_release, "portable_delivery":portable_delivery, "verified": True}))
 
 
 if __name__ == "__main__":
