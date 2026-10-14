@@ -1,0 +1,363 @@
+{
+  "status": "development_basic_scheduler_lifecycle_verified",
+  "predecessor": "research/mtp/evidence/engine-scheduler-20261014-v1/index.json",
+  "predecessor_sha256": "40e16a93a45300024e76fbc70bf854704dc263374712c39543a2daf5d746ea26",
+  "source_base_commit": "5c193e2b52d7a0a4a9a97325772f90d641cf1d74",
+  "source_revision": "7b5e0b54f23e9542333b0d24bf0075c72ef1bef7",
+  "patch": "patches/series/strataq2mtp1-0017-bounded-windows.patch",
+  "patch_sha256": "3c002e328694added796099aa7f4b3b0b0dbdc2f876e51f2be5b2a0f2dc71575",
+  "baseline_sha256": {
+    "python/freetoken/models/qwen4_exp/mtp_runtime.py": "e6691b6a5edb8494da7c913e269b750106c36127aa0ae540753a8bb7392832c7",
+    "tests/models/qwen4_exp/test_mtp_runtime.py": null
+  },
+  "replayed_source_sha256": {
+    "python/freetoken/models/qwen4_exp/mtp_runtime.py": "e4f8f80780c80c384d0407de0605506068d4cafb1639817b6e89074fc61f302a",
+    "tests/models/qwen4_exp/test_mtp_runtime.py": "7a138b04a6c560a97c645debae280cbceaa5c5ddce5ee19dab2d5ae230df8925"
+  },
+  "replay_matches_tested_bytes": true,
+  "source_override": true,
+  "component_tests": "83 passed, 12 subtests passed",
+  "basic_scheduler_lifecycle_verified": true,
+  "full_engine_acceptance": false,
+  "speed_mtp_acceptance": false,
+  "profile_created": false,
+  "wheel_created": false,
+  "performance_acceptance": false,
+  "lifecycle_checks": [
+    {
+      "label": "cap-1",
+      "matched": true,
+      "outputs": 1,
+      "deliveries": 1,
+      "mtp_windows": 0
+    },
+    {
+      "label": "cap-2",
+      "matched": true,
+      "outputs": 2,
+      "deliveries": 2,
+      "mtp_windows": 1
+    },
+    {
+      "label": "cap-3",
+      "matched": true,
+      "outputs": 3,
+      "deliveries": 3,
+      "mtp_windows": 2
+    },
+    {
+      "label": "cap-4",
+      "matched": true,
+      "outputs": 4,
+      "deliveries": 4,
+      "mtp_windows": 2
+    },
+    {
+      "label": "cap-5",
+      "matched": true,
+      "outputs": 5,
+      "deliveries": 5,
+      "mtp_windows": 2
+    },
+    {
+      "label": "cap-17",
+      "matched": true,
+      "outputs": 17,
+      "deliveries": 17,
+      "mtp_windows": 5
+    },
+    {
+      "label": "stop-source",
+      "matched": true,
+      "outputs": 32,
+      "deliveries": 32,
+      "mtp_windows": 10
+    },
+    {
+      "label": "multi-token-stop",
+      "matched": true,
+      "outputs": 8,
+      "deliveries": 8,
+      "mtp_windows": 3
+    },
+    {
+      "label": "actual-eos",
+      "matched": true,
+      "outputs": 1,
+      "deliveries": 2,
+      "mtp_windows": 1
+    },
+    {
+      "label": "ignore-eos",
+      "matched": true,
+      "outputs": 17,
+      "deliveries": 17,
+      "mtp_windows": 7
+    },
+    {
+      "label": "non-greedy-fallback",
+      "matched": true,
+      "outputs": 32,
+      "deliveries": 32,
+      "mtp_windows": 0
+    },
+    {
+      "label": "prefix-hot-fork",
+      "matched": true
+    },
+    {
+      "label": "cancel-reuse",
+      "matched": true
+    },
+    {
+      "label": "after-valid-rebuild",
+      "matched": true,
+      "outputs": 32,
+      "deliveries": 32,
+      "mtp_windows": 10
+    },
+    {
+      "label": "chunked-prefill",
+      "matched": true,
+      "outputs": 32,
+      "deliveries": 32,
+      "mtp_windows": 11
+    },
+    {
+      "label": "rebuild-and-chunked-prefill",
+      "matched": true
+    },
+    {
+      "label": "prefix-pressure",
+      "matched": true,
+      "iterations": 8
+    },
+    {
+      "label": "shutdown",
+      "matched": true
+    }
+  ],
+  "evidence": [
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/run_lifecycle_components_v1.py.gz",
+      "sha256": "6a0f68166ec9aca4289838bd4836c43d8f616b68c88acd8e692ad2b955188d33",
+      "raw_sha256": "97eae22255e4afd3e358b85d93e15112f3549005a47fe391b22125be94aee19d"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/lifecycle-components-v1.json.gz",
+      "sha256": "2433c46f67ea94e37d7f2cbaf0d583a98d67e0e7d9ee9249084488582343282c",
+      "raw_sha256": "026f37de3478c15b2f2c7b3e29dba96de1c8be693896e2abb11c699e7ba015d1"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/lifecycle-components-v1.log.gz",
+      "sha256": "a27afaa272a7710e5799255f663eaca0863ec881e9de9a4b1150a338e152b220",
+      "raw_sha256": "86b0d9a175bedd182d54cf66ac1b3b2e76806de7e99a68173632bb32abd8dcee"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/probe_mtp_lifecycle_v1.py.gz",
+      "sha256": "93b606414c6451e4c28b96e51fbb358654377faca6f8f72b879375ec7b4488c1",
+      "raw_sha256": "a6ee059dce6ae3e9293830af3b524008c57b5f59095ee45a3f66404d3d733735"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/probe_mtp_lifecycle_v2.py.gz",
+      "sha256": "10d4453970d3f90068dbbb18205f9254837b596405fc5814f5fe4a5d49601853",
+      "raw_sha256": "d481252cf52250a1e9133eb10efebfc2927c6eed41cf6aedc46d4d4e5666cf27"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/probe_mtp_lifecycle_v3.py.gz",
+      "sha256": "a0d8f1ce727859d8597ccceda9b03d1e8eedda2df1c605c6b72e9f5f4877508a",
+      "raw_sha256": "4ad3f425049d70871961258a91ec25154aee92bc88f43a2d58be99f94b811dbd"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/probe_mtp_lifecycle_v4.py.gz",
+      "sha256": "110eff629c1076cc6dfdd6ebcd85299bade8833ca0e806cd0b0842ece21353e6",
+      "raw_sha256": "8f14831d3540d859a08809c274aec8ea7b11358ecb80e8dcb56be81814252472"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/probe_mtp_lifecycle_v5.py.gz",
+      "sha256": "0b025d3b9a30297855966491a0d9bbb8dab4a449e6e98d1df50185af94c598f0",
+      "raw_sha256": "6f82b8e352d306ba3886a21c1b347ab6afb5bac5f66505334f42cf6faf533c9a"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v1.json.gz",
+      "sha256": "ad91c98da0348806b666c8ca5d15b6b2b12eb4359318d8a11380d8b673cb0f86",
+      "raw_sha256": "1edf4806cceb1b9521b0539f23106fc2ca72cbb030241d6cf3baac8d6e626b2b"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v2.json.gz",
+      "sha256": "8879c50b708fb822236fb45666cbbcf488ecfe57393372a09a0cfc535edc9c26",
+      "raw_sha256": "231d7391a06d5f1791a54728f648df9e368256948f5281f9236eb412a2742b0d"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v3.json.gz",
+      "sha256": "21e93a1b73026907a361aff9d1f423a3ee3a655440a0fb91c9fb5f9a1aae6cc2",
+      "raw_sha256": "04a68b59ceece98f3fd4f855d19788cfcbb9c4e01121d2cef5c36acf3c74da2b"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v4.json.gz",
+      "sha256": "f78870d4514967a6b1daa1492147ca669800cdfc919aa2909124467e6fb5e5bf",
+      "raw_sha256": "37b6778b87173678cb03e39e097aafa1dfc7b507b9e14e5b361ec5dfaf6406d1"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v5.json.gz",
+      "sha256": "aa2d56ec84bb3d39d66eec4ad0871f9a2f94dbe6283fdbb73f004890f374caa0",
+      "raw_sha256": "ac49d5ac2b2a36f43178fa59cc1fd48656945f9388f47f0bc38df350ff266c5c"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v1-resource.json.gz",
+      "sha256": "4eab0fc03bf1d2a8ecd5f085a317d08cf07526ecd04ee33a71db9f5838d188df",
+      "raw_sha256": "c3bd6ff2e1e0d3ef4a00d577ef28051b232d1707e9c3542b8f01acb798f9686c"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v1-resource.log.gz",
+      "sha256": "a582a586dbe278c692cded0ae3a3d542f0c98986fd2a4178c1bdc5ef867e762b",
+      "raw_sha256": "d9967a1f095bc79ebf3e435a9600763bce90ef3ebc37c63d358f335cf964f0bc"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v1-resource.stdout.log.gz",
+      "sha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v1-resource.stderr.log.gz",
+      "sha256": "375a5301d33c8884ff2bc398e4ecc1fb85550ed4b7e492ff8038622d9053be3b",
+      "raw_sha256": "3320da5d04def877a29f60a3cf9a01144f8f9625bae105a86219384c1875f6d7"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v2-resource.json.gz",
+      "sha256": "b7ac124a867ae3125b71626edae2cdeaf90e7c3a4993dc7412d74fcf8f3c9b5e",
+      "raw_sha256": "33f75ad902a7795817680f9ac70dcef4eeb8765560d1fe9e5595612afa9a5bd7"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v2-resource.log.gz",
+      "sha256": "e2617edcc52542818d1ad5e0530ca4863a1724527cc3268653bbf9227cc940c0",
+      "raw_sha256": "b4c1085c669a945e93163a26a4b1382a578588aca7144681814bba665a21b470"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v2-resource.stdout.log.gz",
+      "sha256": "6bdebc0322458343d4746df600c79b78d4b432b53338d0f452e97dcafef09306",
+      "raw_sha256": "bbe2e4c3ae590f33ccd45a580d6acbf0ad59843d4f9de176278739d6fc03ba85"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v2-resource.stderr.log.gz",
+      "sha256": "eaacf2877576523f3864b3be83c7de19455813ed9dc09df9cc863290a5f8dc6d",
+      "raw_sha256": "a73962b2d0db6d279f5869fd654a4b051309642df660c3a5b35ec48d43b09bd8"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v3-resource.json.gz",
+      "sha256": "d08e487ec1404bcabc3ce463dec5b35cbac51b8b480c335d134e7caca7d84de0",
+      "raw_sha256": "ad3e0a8097cbe3bbc5f4b23ff636070b2fad3112b71610c0462d391030c2ba57"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v3-resource.log.gz",
+      "sha256": "f93c15682f7b01bb3fc06c02dc63755c59febef9f848906504b619b038f6b818",
+      "raw_sha256": "dddee94cc65b72491bb83ca7c5ce479992369efa9be55b086b753da36d78fc21"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v3-resource.stdout.log.gz",
+      "sha256": "65ea0352ef052826201613ed4de58b7c8ab38788dde8a379135257da4f8574a0",
+      "raw_sha256": "fe0c63a3ed444a73d286c73f62a95ce3a16146326c3ea2be16efce0a0286890b"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v3-resource.stderr.log.gz",
+      "sha256": "c76f567c3f843cd20293fc5ba1c724ccabec20925ead3b47e720852cc7c05f77",
+      "raw_sha256": "b00dc33b4a29750bc3091ed3f800b1396f7e4830f70bee4af2f96b6dc98b9c7a"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v4-resource.json.gz",
+      "sha256": "548e36ba59b69238514bdc235f1dca7efc0820a1d36d9bf7e6e0642a026a40ec",
+      "raw_sha256": "b6a22924dbf1d1759653582e3f84e7b0cc0a769a397338453d952cebea804d92"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v4-resource.log.gz",
+      "sha256": "36d49a725fb6583c3c24d3b473d551e95878783830b82c4e68f493a20f22b8e8",
+      "raw_sha256": "1c8f2de45f3c153f264bbde76ebbd32b7cce70bb146a6313c7caca322942e705"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v4-resource.stdout.log.gz",
+      "sha256": "be91aaaad55e05c086c9bf32bee2123717e1b2b79b1d7f38fbc347b293008803",
+      "raw_sha256": "91ad73c89e5b787c75a0ff85abac916b9c1b87cf82a0d1c30eca1d7f3f17c78f"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v4-resource.stderr.log.gz",
+      "sha256": "2c2aa462a26b949922f6b578d0fcd131e711339ab25a79b2876c08a8d089ba3f",
+      "raw_sha256": "9ee644c6842842edfd745eb56ac1f3791d87229080cabe2bd0bc05763d35212b"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v5-resource.json.gz",
+      "sha256": "bb3b16aad684b8a136ac869702aa3920f053e5f46dc6d188e34414a899a0c694",
+      "raw_sha256": "12ebc692623ef489958b8825253151336b4c8a41762127e51e0c2c63a797542d"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v5-resource.log.gz",
+      "sha256": "83e3a9f2e02f20ef16ade6b5c74a4e8a45f8f77b400885f56258661a1353591e",
+      "raw_sha256": "091dad86de084992b3fe3e9b95e21b80da42cb09ead069c486ed47b5105f8afe"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v5-resource.stdout.log.gz",
+      "sha256": "0b0e9059fa516cb4b09ef0a5b40208e65a3a56ddf5c9f2fb80041beeb2043463",
+      "raw_sha256": "3ba513c9272469a4e00e493b2e17351b3b148ddcb9ac362f3293a206c93deb23"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v5-resource.stderr.log.gz",
+      "sha256": "f6bbbe688ce4c7957b59f54121cb7bdfd281a721c2f05a746d59e645e022ca79",
+      "raw_sha256": "c04f41baa792d10ca7f73125da9e7c23d78107a341d86e7d59e93d15c75ed5b4"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v6-resource.json.gz",
+      "sha256": "b871a72409e9dc29ab108bb9ed163f559c6e5e88fe5fa33c64496d2a518cf5a8",
+      "raw_sha256": "349d2aa43ac0ce06530af8f60c7c619151f6933cc506b958c7f2f7d0b3e99474"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v6-resource.log.gz",
+      "sha256": "b1c1a44c0bf52082d725a0ed33567f8a435e653634b9f7766ef7cd9ecab78acc",
+      "raw_sha256": "11d3e3541f1934cf1e6254843047b2f038b10aa662b0c2705280bc2feea07a7a"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v6-resource.stdout.log.gz",
+      "sha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v6-resource.stderr.log.gz",
+      "sha256": "06eac1dfe15e4f1cb3d308492c8976a2eeec7a831d285483e9369817cf2b004f",
+      "raw_sha256": "91d62f489e19db140f39d5a226bb5e579189c61f8db2245aaa27a3839bd9cd95"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v7-resource.json.gz",
+      "sha256": "248648a44d68c6d963026a595136dc975f133906377bd7a1120f336a894611ad",
+      "raw_sha256": "c1089dd70c21bc39fc6498aeaa4e01ff95872cb40706bc5218038fd9ce0d3f73"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v7-resource.log.gz",
+      "sha256": "a4ae088f13012048a6c61a3a5b67af55a8cf5e57cf1f14e85ff7296a17d0c480",
+      "raw_sha256": "a2ca05a255938746d80cf540684ceeee780f008ab3182f60e807e7d7bda0fe7d"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v7-resource.stdout.log.gz",
+      "sha256": "a3f950bea49eae4623b876b2a929e4c6736c37f9eccc73d7f202a54e831263ad",
+      "raw_sha256": "88e2d76b5b08c2451f23c9748a621044c4e9af55599ba1e047ae0f0274e603ad"
+    },
+    {
+      "path": "research/mtp/evidence/engine-lifecycle-20261014-v1/mtp-lifecycle-v7-resource.stderr.log.gz",
+      "sha256": "b0032698f315131cd74011e11b3ec5f703898434f256b7f4fb74068b577b988e",
+      "raw_sha256": "2d1bbea30a94308bb15037a2dc5df1f871b2562f1011edd1e0856b4e1e69da64"
+    }
+  ],
+  "failure_notes": [
+    "v1 import guard, before model load",
+    "v2 tokenizer return_dict argument",
+    "v3 native sampling uses a separate _UGEN generator; torch.manual_seed alone does not reset it",
+    "v4 cancellation harness used the wrong ForwardOutput event field; v5 uses the existing tuple ABI",
+    "v5 cancellation harness assumed more than one committed row; corrected to cached_len=cpu_length-1+bundle length",
+    "v6 harness script creation command quoting failed; the supervisor rejected the missing script before model loading"
+  ],
+  "scope": "Length/EOS/ignore-EOS/multi-token stop/native sampling fallback/hot prefix/fork/in-flight cancel and reuse/idle rejection/rebuild/chunked prefill/eight repeated cleanup requests/shutdown; development source, not Speed",
+  "pending": [
+    "actual retained-prefix/state eviction pressure and page-boundary tool anchor",
+    "failure-path service gates",
+    "independent installed profile/wheel and performance",
+    "Speed on/off backend/HTTP, old-model and package validation"
+  ],
+  "stress_limit": "Artificial pressure prompts actually ended at EOS after 1/2 tokens; chunked finalization retained no useful full snapshot. This is cleanup coverage, not evidence of prefix/state eviction under pressure."
+}

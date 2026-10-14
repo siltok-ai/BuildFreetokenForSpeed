@@ -58,6 +58,23 @@ PYTHON_ONLY_CHANGES = {
     'python/freetoken/moe/q2_residency.py',
     'python/freetoken/moe/configs/q2_residency/strata_flash_next.json',
     'tests/moe/test_q2_residency.py',
+    # MTP 调度、状态与 Triton 草稿图；逐文件白名单，仍禁止原生源码与 AOT 输入变化。
+    'python/freetoken/attention/linear.py',
+    'python/freetoken/core.py',
+    'python/freetoken/kvcache/mtp_pool.py',
+    'python/freetoken/models/config.py',
+    'python/freetoken/models/qwen4_exp/mtp_draft_graph.py',
+    'python/freetoken/models/qwen4_exp/mtp_drafter.py',
+    'python/freetoken/models/qwen4_exp/mtp_runtime.py',
+    'python/freetoken/models/qwen4_exp/mtp_state.py',
+    'python/freetoken/scheduler/cache.py',
+    'python/freetoken/scheduler/scheduler.py',
+    'python/freetoken/scheduler/status.py',
+    'tests/kvcache/test_linear_state_pool_alloc.py',
+    'tests/kvcache/test_mtp_pool.py',
+    'tests/kvcache/test_qsa_pool.py',
+    'tests/models/qwen4_exp/test_mtp_runtime.py',
+    'tests/scheduler/test_hybrid_cache_manager.py',
 }
 
 

@@ -1,0 +1,130 @@
+{
+  "status": "installed_mtp_candidate_ownership_verified",
+  "profile": "build/profiles/strataq2mtp1.json",
+  "profile_sha256": "d0c41581486b2f3b37a236532af715d7d1e7e194d177bd2ca917664a1deae110",
+  "materials": "artifacts/strataq2mtp1-cp312-cu130-sm120",
+  "build_record_sha256": "f744284d6c87634a8089a371ec86cc0b5d05baa92f9860cdc987e2dd6fb983b9",
+  "version": "0.1.3+speed.strataq2mtp1",
+  "wheel_sha256": "cf9041c96ad263beb417331ba0f3adce3eeea932c7ca26fd6ba0b36cc0207518",
+  "installed_native_sha256": {
+    "freetoken/kernel/_cpu_moe.cp312-win_amd64.pyd": "09ab94699fe8b0d1e516fa9ae0d6d2e7ef21e6fa7cf9135a16ae65d75a900f0b",
+    "freetoken/kernel/_pinned_tensor.cp312-win_amd64.pyd": "8c7b95d5dc25c67d8b3463fae9decb1cc66853021cfda99b79a753a601ae2272",
+    "freetoken/kernel/_row_store.cp312-win_amd64.pyd": "decc65ca6869f70bc77da3355f4f80f16a876d3982daa46e19e59e582ad28f60"
+  },
+  "source_override": false,
+  "installed_ownership_verified": true,
+  "model_mtp_runtime_manifest_sha256": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
+  "predecessor": "research/mtp/evidence/engine-lifecycle-20261014-v1/index.json",
+  "predecessor_sha256": "c8b5423bfea655dc0a70cdb259d5677a50f6c26dc71588f7092319474c3b59e5",
+  "profile_created": true,
+  "wheel_created": true,
+  "speed_mtp_acceptance": false,
+  "performance_acceptance": false,
+  "full_engine_acceptance": false,
+  "evidence": [
+    {
+      "path": "research/mtp/evidence/installed-ownership-20261014-v1/probe_mtp1_installed_ownership_v1.py.gz",
+      "sha256": "ab2fbfe7d3c1023771a4b6d39da37ba727d799b0e57ae691b8edb4ea566932a8",
+      "raw_sha256": "df70ac4719d079a26c1c2cd977823e59f64c14d62113adb57ca0bda292ac3a56"
+    },
+    {
+      "path": "research/mtp/evidence/installed-ownership-20261014-v1/mtp1-installed-ownership-v1.json.gz",
+      "sha256": "6e2d6511ae6b1356f3d9f644240f009d0cf6ee8349842d410fb1e5aca9ee0c8d",
+      "raw_sha256": "e0a444f18765ada8ffc740d2db90e3ecdf99b36a3e5ca70b60b6fe08a0a05417"
+    },
+    {
+      "path": "research/mtp/evidence/installed-ownership-20261014-v1/mtp1-installed-ownership-v1-resource.json.gz",
+      "sha256": "6252272037367502a6cc330455bfa391ee48dfb8bbd4bbe19f5e3528bad77c4e",
+      "raw_sha256": "9845c2a9f5a148145f4f1ca04c6469c3db34244a481344afcdba2cf56d58a744"
+    },
+    {
+      "path": "research/mtp/evidence/installed-ownership-20261014-v1/mtp1-installed-ownership-v1-resource.log.gz",
+      "sha256": "5c66af1ee74ca0af4f1a4e20d3dfedf10037b10594fe3f6734854751b7ea3aab",
+      "raw_sha256": "5e36bc9b00a44008f746f29f5b9ec2fd7a532e01f6690b46d54e6ede257f25db"
+    },
+    {
+      "path": "research/mtp/evidence/installed-ownership-20261014-v1/mtp1-installed-ownership-v1-resource.stdout.log.gz",
+      "sha256": "1266b2233f9552a99032fbbe0ceed7dbbeef9fbfb232a864088d7bc3e89e438e",
+      "raw_sha256": "3539b9f31dc0368fab2176b1a23d2bd096749a46655b2289c5fbf195eefb9c49"
+    },
+    {
+      "path": "research/mtp/evidence/installed-ownership-20261014-v1/mtp1-installed-ownership-v1-resource.stderr.log.gz",
+      "sha256": "b662aa7e7beeba34ee02dad55ff685a6a339c64e458e0ff3e53a647cb9c1977c",
+      "raw_sha256": "c1e88d893dfa6aa2277c380ea5e9e66526c644de6ee81803573827972eb8a9bf"
+    },
+    {
+      "path": "research/mtp/evidence/installed-ownership-20261014-v1/freeze_mtp_profile_v1.py.gz",
+      "sha256": "31f59f4ee2df9c4f1933b12c3d62d27b1f8526d74bb3695bc640231675d2c97b",
+      "raw_sha256": "2ea305e19754caab14a94192ab00ea5ae66981f7ea51181ca7b61a3675c62ee6"
+    },
+    {
+      "path": "research/mtp/evidence/installed-ownership-20261014-v1/mtp1-derived-materials-v1.log.gz",
+      "sha256": "db5fd1de963c7c35792c5758380b19f083acaaa0c651a959bc45c396cfea3580",
+      "raw_sha256": "89afdd29fb29220ccae686e9fefc38e3927f289ac68a7aa89ae6108cdd5e8f92"
+    },
+    {
+      "path": "research/mtp/evidence/installed-ownership-20261014-v1/mtp1-environment-base-freeze-v1.txt.gz",
+      "sha256": "117fef70aa56c1f3abbfa06eb654eaf78605efa940de52a7d4524c654a25529d",
+      "raw_sha256": "c026fddadc4cb31efd4fadaecc8633e8d72800935c33ed487f5bc3ad67724599"
+    },
+    {
+      "path": "research/mtp/evidence/installed-ownership-20261014-v1/mtp1-environment-dependencies-v1.txt.gz",
+      "sha256": "15bdf8f6d2595c9cefa64143f8cc3c49b1f8ff66b9065b1cfa339124c6665a7a",
+      "raw_sha256": "965d2537105ccb195b923196179b0a8b401bb6248644178d426b7454dac39944"
+    },
+    {
+      "path": "research/mtp/evidence/installed-ownership-20261014-v1/mtp1-environment-dependencies-v2.txt.gz",
+      "sha256": "dff97d2f619a46a67cbe4c936f91eea0bd9a90ae88638321850296d3f445baf2",
+      "raw_sha256": "a3be8c5b99d179c7eb017bdd93bfca1288f212e5c6bd325250ae32e0a8899948"
+    },
+    {
+      "path": "research/mtp/evidence/installed-ownership-20261014-v1/mtp1-environment-install-v1.log.gz",
+      "sha256": "ea2adab4a681b91c1f2e7282fc86445a80ed064608bc0d674db512080aee930f",
+      "raw_sha256": "925c081a3826dadefe38ec8ae49ca71904307763630496856d8bc23541823eed"
+    },
+    {
+      "path": "research/mtp/evidence/installed-ownership-20261014-v1/mtp1-environment-install-v2.log.gz",
+      "sha256": "1965c5868294ab2f6998c63b435c9810471ff8ee9157710ca09928a38862d6b8",
+      "raw_sha256": "9bdd8c4cb617ca46d93965793a051ac9d0419d6fe852422fb9aa8d973c4fd958"
+    },
+    {
+      "path": "research/mtp/evidence/installed-ownership-20261014-v1/mtp1-environment-install-v3.log.gz",
+      "sha256": "c76ec0888e7742e68c0f6fc9cd7dcbdea1aaa7a75c78b48282de539fd3658b43",
+      "raw_sha256": "438a96b3fcb1ce13df023f06493df68ede623b43cc4707bbc695d9494f2a9648"
+    }
+  ],
+  "ownership_checks": [
+    {
+      "label": "page-boundary-anchor",
+      "token_id": 248045,
+      "prefix_tokens": 64,
+      "state_exact_equal": {
+        "conv": true,
+        "recurrent": true,
+        "ple_conv": true,
+        "ple_ngram_ctx": true,
+        "mtp_last_residual": true
+      },
+      "synthetic_anchor_token": true
+    },
+    {
+      "label": "anchor-fork-reuse",
+      "matched": true
+    },
+    {
+      "label": "real-retained-prefix-eviction",
+      "pool_pages": 16,
+      "page_size": 64,
+      "submitted_requests": 8,
+      "retained_prefix_before_pressure": 384,
+      "oldest_prefix_after_pressure": 0,
+      "each_request_delivered_tokens": 17,
+      "ignore_eos": true
+    }
+  ],
+  "pending": [
+    "installed length/cancel/quality and longer-output performance",
+    "failure-path and actual Speed worker/backend/HTTP on/off",
+    "old-model/package regressions"
+  ]
+}

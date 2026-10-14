@@ -93,3 +93,15 @@ Strata实现的逐项对照和缺口见 `STRATA-MAPPING.md`。本轮将8份固�
 ### 无MTP与MTP的分支和测量隔离
 
 无MTP Build分支 `explore/flash-next-strata-q2`、Speed分支 `explore/freetoken-flash-next-strata-q2` 及dev7制品保持不变。MTP改动分别留在 `explore/flash-next-strata-q2-mtp`、`explore/freetoken-flash-next-strata-q2-mtp`，以独立profile、版本、wheel/cache合同和默认关闭的配置接入，禁止覆盖原制品。正式实测保留原最佳无MTP、按MTP资源预算调整后的无MTP和相同预算开启MTP三条结果，并明确单独引擎/backend/HTTP口径。用户已授权完善并验证后推送远端；当前尚未推送，也没有合并main。
+
+### 基础生命周期、独立候选版本与提交收敛
+
+补丁0017（开发源码 `7b5e0b54f23e9542333b0d24bf0075c72ef1bef7`）为lookahead加上已拥有页与实际可回收页的容量约束，草稿窗口不会因额外页面需求破坏本来能运行的单token decode；逐轮诊断改为最多4096条的deque，避免长期worker持续积累Python记录。83项组件测试、12个子测试通过。41次全权重开发生成完成18项基础检查：1/2/3/4/5/17输出长度、真实EOS、ignore_eos、跨token stop、原采样回退、热prefix/分叉、窗口取消及复用、拒绝非法重建、成功重建、分块prefill与关闭。非greedy比较显式复位原Triton采样器自己的Generator，不能仅靠torch.manual_seed宣称seed一致；离线取消测试使用与Speed相同的递增uid。原始harness失败及更正理由全部保留。
+
+旧八条人工pressure提示实际在1/2个token后EOS，而且小chunk最后没有证明保留snapshot淘汰；它们仅作为重复回收覆盖，不冒充压力验收。独立安装的新wheel随后在16页KV池中运行八个420-token输入，每次实际交付17 token并保留384-token有效prefix，最后最旧prefix已被淘汰至0，页面/状态完整性检查通过。另以首个生成token作为合成工具锚点，在长度64边界冻结状态：native和MTP的全部GDN recurrent/conv、PLE conv/ngram与最后R逐张量完全相等，64-token prefix分叉续写的交付也相等。此处验证锚点的状态机制，不声称覆盖Speed实际工具调用业务。
+
+补丁0018只赋予独立版本 `0.1.3+speed.strataq2mtp1`，profile `build/profiles/strataq2mtp1.json`、18个有序补丁与制品目录 `artifacts/strataq2mtp1-cp312-cu130-sm120` 独立持有。wheel SHA256为 `cf9041c96ad263beb417331ba0f3adce3eeea932c7ca26fd6ba0b36cc0207518`；27个AOT及3个native模块按字节复用冻结dev7，仅在完整Python差异白名单、原生/AOT输入及工具链一致时允许。新环境 `C:/workspace/envs/speed-strata-q2-mtp1` 安装79项冻结依赖和新wheel，真实ownership测试不覆盖开发源码、不借用安装目录的旧Python文件。candidate材料状态仍为 `derived_requires_runtime_validation`，不继承dev7服务验收。
+
+基础生命周期证据见 `evidence/engine-lifecycle-20261014-v1/index.json`；独立安装及实际淘汰/锚点证据见 `evidence/installed-ownership-20261014-v1/index.json`。基础生命周期进程commit峰值61,407,039,488B、最低可用8,950,820,864B；独立安装ownership进程峰值62,102,511,616B、最低可用8,255,348,736B，NVML最低GPU可用3594.55MiB（短输入/16页测试，不代表4K峰值）。冻结源码重放、wheel来源/native身份及原始证据仍由仓库validator独立校验。
+
+按用户要求，稳定交付前只完成安装版本的长输出/quality/取消、失败路径以及Speed默认关闭开关、实际backend/HTTP、旧模型与随包回归。生产窗口异常必须使worker明确失败退出，丢弃未交付数据并释放上下文；当前不会在受损状态上悄悄继续，也不将未实现的库内异常恢复宣称为通过。受限draft head、动态k和更多细节优化留给稳定版本之后。两个对应分支在上述必要验收与完整review后再推送，main保持原状。

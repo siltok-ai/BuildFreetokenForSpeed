@@ -215,6 +215,16 @@ def main():
     if mtp_scheduler_record.exists():
         from validate_mtp_scheduler_checkpoint import validate as validate_mtp_scheduler
         mtp_scheduler_checkpoint = validate_mtp_scheduler(mtp_scheduler_record)
+    mtp_lifecycle_checkpoint = None
+    mtp_lifecycle_record = ROOT/'research/mtp/evidence/engine-lifecycle-20261014-v1/index.json'
+    if mtp_lifecycle_record.exists():
+        from validate_mtp_lifecycle_checkpoint import validate as validate_mtp_lifecycle
+        mtp_lifecycle_checkpoint = validate_mtp_lifecycle(mtp_lifecycle_record)
+    mtp_installed_candidate = None
+    mtp_installed_record = ROOT/'research/mtp/evidence/installed-ownership-20261014-v1/index.json'
+    if mtp_installed_record.exists():
+        from validate_mtp_installed_candidate import validate as validate_mtp_installed
+        mtp_installed_candidate = validate_mtp_installed(mtp_installed_record)
     print(json.dumps({"official_files": len(original_hashes), "changed_files": len(changed),
                       "patches": len(series["patches"]), "split_equals_historical": True,
                       "wheel_python_matches_prepared_source": True, "aot_count": len(specs),
@@ -225,7 +235,9 @@ def main():
                       "strata_research_dev6":research_dev6, "strata_research_dev7":research_dev7,
                       "mtp_engine_development_checkpoint":mtp_checkpoint,
                       "mtp_prefix_development_checkpoint":mtp_prefix_checkpoint,
-                      "mtp_scheduler_development_checkpoint":mtp_scheduler_checkpoint, "verified": True}))
+                      "mtp_scheduler_development_checkpoint":mtp_scheduler_checkpoint,
+                      "mtp_lifecycle_development_checkpoint":mtp_lifecycle_checkpoint,
+                      "mtp_installed_candidate":mtp_installed_candidate, "verified": True}))
 
 
 if __name__ == "__main__":
