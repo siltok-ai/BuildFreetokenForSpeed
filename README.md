@@ -2,6 +2,8 @@
 
 正式维护仓库为公司 [siltok-ai/BuildFreetokenForSpeed](https://github.com/siltok-ai/BuildFreetokenForSpeed)。后续源码、制品合同、权重说明及证据只更新公司仓库；此前私人仓库保留历史，不再作为更新目标。
 
+Flash Next的MTP候选保持在独立分支：见[完整接入设计](research/mtp/DESIGN.md)及[Strata实现对照](research/mtp/STRATA-MAPPING.md)。无MTP dev7制品保持冻结；MTP独立原型已测得约123 token/s，正式引擎的窗口、prefix/页回收、最后R及预算组件已通过65项测试和12个子测试。当前尚无正式MTP profile/wheel或Speed MTP服务验收，开发源码覆盖不代表原dev7制品，也不可用于发布。
+
 为 Silitok Speed 维护可追溯的 **FreeToken 官方源码 + 本地补丁 + Windows 构建素材**。本仓库既提供已验证的 wheel / DLL，也提供从冻结源码重新生成这些素材的入口。
 
 当前构建候选为 **`0.1.3+speed.q2opt2`**，官方来源 `078132480ea4a0424f677a27eb22085624d331e6`，CPython 3.12 / Windows x64 / Torch 2.11.0+cu130 / CUDA 13.0 / SM120。新构建默认使用 `build/profiles/q2opt2.json`；历史 win1 含 INVALID 专家别名实验，仅保留复现。

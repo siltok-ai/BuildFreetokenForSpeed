@@ -68,6 +68,16 @@ MTP草稿cell p使用主模型R_p与token p+1；其KV依赖后一token，不能�
 
 正式运行时仍需实现和验证这项辅助分页KV、最后R持有、专属四行事务槽预算、可复用窗口/草稿graph、EOS/stop裁剪、多token调度交付、取消、工具锚点和缓存重建。普通采样在正确拒绝采样完成前走原无MTP生成，但其有效prefix的辅助状态也必须维护一致。不会将当前诊断的整段KV预留或临时全局hooks直接作为服务实现。
 
+### 正式prefix状态与资源 checkpoint
+
+第二份源码提交 `66ae9a2`、补丁 `patches/series/strataq2mtp1-0015-owned-prefix-state.patch` 已落实上面的所有权接口：辅助KV随主位置p+1物理页持有，分配新页时清除valid标记，prefix恢复只读取0..P-2草稿cell。主模型在最终HC混合之前捕获FP32 R，并将最后R及每个track边界R写入声明的slot state，随正常COW/reset/rebuild处理。QSA pool统一管理辅助KV与其重建，不另设页面分配器。四个事务槽是池的额外保留槽，不会被请求分配、prefix淘汰或idle reclaim交还到普通free list。
+
+配置默认 `mtp_runtime_path=None`；关闭时不分配辅助KV、最后R捕获或额外事务槽。开启时新增成本进入模型slot声明、状态池上下限与KV cost/factory，实际量化模型配置检查得到9→13物理状态槽、最低5→9；状态池1,062,346,824→1,535,033,448字节；每64-token页成本1,671,168→1,933,376字节，QSA ring/scratch固定成本61,440→110,592字节。4096行R buffer为167,772,160字节，预先分配后才求解缓存预算。最终还须加入草稿权重/private KV/graph成本，不能用当前组件几何宣称总资源预算已验收。
+
+65项测试与12个subtest通过：真实HybridRadix prefix分叉、GDN live状态COW、辅助KV共享/分叉、旧物理页重用失效、QSA rebuild与逐张量成本、最后R的CPU/CUDA捕获/COW/reset、专属槽所有权，以及前一checkpoint的native窗口数值/graph测试。源码与重放逐文件SHA一致，记录在 `evidence/engine-prefix-state-20261014-v1/index.json`。目前只接入状态接口，generation driver、草稿prime/publish与多token调度尚未接入，完整模型生命周期/服务验收仍未完成。
+
+Strata实现的逐项对照和缺口见 `STRATA-MAPPING.md`。本轮将8份固定版本MTP/verifier/prefill/controller/采样核心参考保存为MIT来源锁，避免仅依赖量化工具来解释推理设计。普通greedy草稿dense注意力本来也是Strata选择；其32K/ring、受限head、异步事件和动态k需结合本机单GPUtrace选择适用实现。
+
 ### 无MTP与MTP的分支和测量隔离
 
 无MTP Build分支 `explore/flash-next-strata-q2`、Speed分支 `explore/freetoken-flash-next-strata-q2` 及dev7制品保持不变。MTP改动分别留在 `explore/flash-next-strata-q2-mtp`、`explore/freetoken-flash-next-strata-q2-mtp`，以独立profile、版本、wheel/cache合同和默认关闭的配置接入，禁止覆盖原制品。正式实测保留原最佳无MTP、按MTP资源预算调整后的无MTP和相同预算开启MTP三条结果，并明确单独引擎/backend/HTTP口径。用户已授权完善并验证后推送远端；当前尚未推送，也没有合并main。

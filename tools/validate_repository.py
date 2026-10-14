@@ -205,6 +205,11 @@ def main():
     if mtp_record.exists():
         from validate_mtp_engine_checkpoint import validate as validate_mtp_checkpoint
         mtp_checkpoint = validate_mtp_checkpoint(mtp_record)
+    mtp_prefix_checkpoint = None
+    mtp_prefix_record = ROOT/'research/mtp/evidence/engine-prefix-state-20261014-v1/index.json'
+    if mtp_prefix_record.exists():
+        from validate_mtp_prefix_checkpoint import validate as validate_mtp_prefix
+        mtp_prefix_checkpoint = validate_mtp_prefix(mtp_prefix_record)
     print(json.dumps({"official_files": len(original_hashes), "changed_files": len(changed),
                       "patches": len(series["patches"]), "split_equals_historical": True,
                       "wheel_python_matches_prepared_source": True, "aot_count": len(specs),
@@ -213,7 +218,8 @@ def main():
                       "strata_research_dev3":research_dev3, "strata_research_dev4":research_dev4,
                       "strata_research_dev5":research_dev5,
                       "strata_research_dev6":research_dev6, "strata_research_dev7":research_dev7,
-                      "mtp_engine_development_checkpoint":mtp_checkpoint, "verified": True}))
+                      "mtp_engine_development_checkpoint":mtp_checkpoint,
+                      "mtp_prefix_development_checkpoint":mtp_prefix_checkpoint, "verified": True}))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,56 @@
+{
+  "repository": "https://github.com/Niko1221/Strata",
+  "commit": "6674a0065fb96bacde33e3eb10f91a1df86f95f2",
+  "license": "MIT; existing references/LICENSE applies",
+  "scope": "Read-only algorithm and lifecycle references; not a substituted Strata runtime",
+  "files": [
+    {
+      "path": "research/mtp/references/engine/include/strata/core/mtp.hpp",
+      "source_path": "include/strata/core/mtp.hpp",
+      "sha256": "3a98110ad416b1b5c386b8b9fbb1973cc2fe34f68a127ee677d9ce961dc947e0",
+      "git_blob": "d2266e55c79c993f32543d17f35f71c6a8e9c8da"
+    },
+    {
+      "path": "research/mtp/references/engine/src/core/mtp.cpp",
+      "source_path": "src/core/mtp.cpp",
+      "sha256": "1df8882931b959688e60ef7d7e00a3d5387aa70063d9488f1278db76ed20dc57",
+      "git_blob": "e73ce24a09d7b931ac86720cbccb84f836f9fb64"
+    },
+    {
+      "path": "research/mtp/references/engine/include/strata/core/verify.hpp",
+      "source_path": "include/strata/core/verify.hpp",
+      "sha256": "81e7b9c5eb7686f1c16d3a89ffd1b497443401d12cbc7a685b0f378e35be70d2",
+      "git_blob": "deb25f0a83ea83e5353672b29c410faab3546499"
+    },
+    {
+      "path": "research/mtp/references/engine/include/strata/core/coupled_draft.hpp",
+      "source_path": "include/strata/core/coupled_draft.hpp",
+      "sha256": "0a79e0e114e3436af1d44548fab777bdea0f00641606a854910264bf3f98aa3d",
+      "git_blob": "0b5ada295c6c99328bb2817de489b320d7ff4560"
+    },
+    {
+      "path": "research/mtp/references/engine/include/strata/core/spec_prob.hpp",
+      "source_path": "include/strata/core/spec_prob.hpp",
+      "sha256": "29b4c20d0132403177043d27b15d7368c879184871f5689e5bf77bcc2d67274f",
+      "git_blob": "ab45e5552c6322d2a5fb35080f0350f96fbecbab"
+    },
+    {
+      "path": "research/mtp/references/engine/include/strata/spec/controller.hpp",
+      "source_path": "include/strata/spec/controller.hpp",
+      "sha256": "e1c8400792ec87882646c96b22d768e2f62a5cfebf4b415798ef177ea6e60cce",
+      "git_blob": "4864ce93acd70f51996998157166b278be097de0"
+    },
+    {
+      "path": "research/mtp/references/engine/src/spec/controller.cpp",
+      "source_path": "src/spec/controller.cpp",
+      "sha256": "9ea393b4d369ddce11315032695899a51deeb697e1a7745dc397724f4db7351f",
+      "git_blob": "be31270177f26a44ee3626831e831512d03c414c"
+    },
+    {
+      "path": "research/mtp/references/engine/include/strata/prefill/prefill.hpp",
+      "source_path": "include/strata/prefill/prefill.hpp",
+      "sha256": "d0bcef3a4aa2f1e33d3eeb680004f18b1920cbbb72dbff34868aeaff56167b21",
+      "git_blob": "03c4374d49a0cc0fd2f66ea5fa0e8de76ebaedcf"
+    }
+  ]
+}

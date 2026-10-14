@@ -1,0 +1,709 @@
+diff --git a/python/freetoken/engine/config.py b/python/freetoken/engine/config.py
+index fcae6b5..b782829 100644
+--- a/python/freetoken/engine/config.py
++++ b/python/freetoken/engine/config.py
+@@ -99,8 +99,17 @@ class EngineConfig:
+     num_token_override: int | None = None
+     # Runtime knobs of the multimodal path; the architecture side (vision_config, mrope) lives in ModelConfig.
+     mm: MultimodalConfig = field(default_factory=MultimodalConfig)
++    # Independent draft weights; absent keeps the native no-MTP path and budget.
++    mtp_runtime_path: str | None = None
++    mtp_max_context: int = 8192
+ 
+     def __post_init__(self):
++        if self.mtp_runtime_path is not None:
++            if (not self.mtp_runtime_path or self.max_running_req != 1 or self.tp_info.size != 1
++                    or self.use_dummy_weight or self.moe_strategy != 'offload' or self.moe_cpu_layers):
++                raise ValueError('MTP requires real weights, single-rank GPU offload and max_running_req=1')
++            if self.mtp_max_context < 64 or self.mtp_max_context % 64:
++                raise ValueError('MTP context capacity must be positive and page-aligned')
+         if self.moe_q2_resident_experts < 0:
+             raise ValueError('moe_q2_resident_experts must be nonnegative')
+         if self.moe_q2_resident_experts:
+@@ -157,6 +166,20 @@ class EngineConfig:
+         quant = checkpoint_quant_config(self.model_path, hf_config, spec)
+         set_quant_config(quant)
+         model_config = _load_attr(spec.module, spec.parse_config)(hf_config)
++        if self.mtp_runtime_path is not None:
++            from freetoken.models.config import SlotStateSpec
++            from freetoken.models.qwen4_exp.mtp_state import MTP_LAST_RESIDUAL
++            if (model_config.qwen4_args is None or getattr(quant, 'dialect', None) != 'gguf_strata'
++                    or self.active_encoders or model_config.hidden_size != 2560
++                    or model_config.qwen4_args.hc_count != 4):
++                raise ValueError('MTP currently requires text-only GGUF Strata Flash Next geometry')
++            capture_rows = getattr(self, 'max_extend_tokens', 4096)
++            if capture_rows <= 0:
++                raise ValueError('MTP capture row capacity must be positive')
++            model_config = replace(model_config,
++                slot_states=(*model_config.slot_states,
++                             SlotStateSpec(MTP_LAST_RESIDUAL, (10240,), dtype=torch.float32)),
++                mtp_runtime_path=self.mtp_runtime_path, mtp_capture_rows=capture_rows)
+         return replace(model_config, quant=quant)
+ 
+     @property
+diff --git a/python/freetoken/engine/engine.py b/python/freetoken/engine/engine.py
+index 04b8a10..4605437 100644
+--- a/python/freetoken/engine/engine.py
++++ b/python/freetoken/engine/engine.py
+@@ -440,6 +440,7 @@ class Engine:
+                 device=self.device,
+                 tp_size=config.tp_info.size,
+                 slot_states=config.model_config.slot_states,
++                reserved_slots=4 if config.mtp_runtime_path is not None else 0,
+             )
+             self.ctx.linear_state_pool = self.linear_state_pool
+         else:
+diff --git a/python/freetoken/kvcache/__init__.py b/python/freetoken/kvcache/__init__.py
+index e403e3b..de03a46 100644
+--- a/python/freetoken/kvcache/__init__.py
++++ b/python/freetoken/kvcache/__init__.py
+@@ -210,7 +210,8 @@ def create_kvcache_pool(
+         spec = kv_specs[0]
+         if num_req_slots is None:
+             raise ValueError("QSA pools need num_req_slots (max_running_req + 1)")
+-        gguf = getattr(model_config.quant, "dialect", None) == "gguf_strata"
++        gguf = getattr(getattr(model_config, 'quant', None), "dialect", None) == "gguf_strata"
++        mtp = getattr(model_config, 'mtp_runtime_path', None) is not None
+         return QSAKVCache(
+             num_kv_heads=spec.num_kv_heads,
+             num_layers=model_config.num_layers,
+@@ -226,6 +227,8 @@ def create_kvcache_pool(
+             layer_ids=spec.layer_ids,
+             mrope=model_config.model_is_mrope,
+             index_dtype=torch.float32 if gguf else dtype,
++            mtp=mtp,
++            ring_capacity=QSAKVCache.ring_capacity_for(spec.index_ratio, 3 if mtp else 0),
+         )
+ 
+     if len(kv_specs) == 1 and kv_specs[0].mla:
+diff --git a/python/freetoken/kvcache/linear_state_pool.py b/python/freetoken/kvcache/linear_state_pool.py
+index 7f4268d..09e30d6 100644
+--- a/python/freetoken/kvcache/linear_state_pool.py
++++ b/python/freetoken/kvcache/linear_state_pool.py
+@@ -53,10 +53,14 @@ class LinearStatePool:
+         tp_size: int | None = None,
+         slot_states: tuple[SlotStateSpec, ...] = (),
+         recurrent_dtype: torch.dtype | None = None,
++        reserved_slots: int = 0,
+     ) -> None:
+         if tp_size is None:
+             tp_size = get_tp_info().size
+ 
++        if reserved_slots < 0 or reserved_slots >= num_slots:
++            raise ValueError('Reserved linear-state slots must leave a padding slot')
++        self._reserved_count = reserved_slots
+         self._group = group
+         self._num_slots = num_slots
+         self._device = device
+@@ -94,7 +98,7 @@ class LinearStatePool:
+         # radix-tree-donated snapshots are all drawn from this single free-list, so memory
+         # flows between them by demand. Unused by the op harness (which assigns slots by hand).
+         self.padding_slot = 0
+-        self._free_slots: list[int] = list(range(1, num_slots))
++        self._free_slots: list[int] = list(range(1, num_slots - self._reserved_count))
+ 
+     def _alloc_slot_states(self, num_slots: int) -> dict[str, torch.Tensor]:
+         return {
+@@ -124,6 +128,10 @@ class LinearStatePool:
+     def num_free_slots(self) -> int:
+         return len(self._free_slots)
+ 
++    @property
++    def reserved_slot_ids(self) -> tuple[int, ...]:
++        return tuple(range(self._num_slots - self._reserved_count, self._num_slots))
++
+     def alloc(self, n: int = 1) -> list[int]:
+         """Pop ``n`` free slot ids (LIFO). Raises if the pool is exhausted."""
+         if n > len(self._free_slots):
+@@ -136,7 +144,7 @@ class LinearStatePool:
+         """Restore the free-list to all non-padding slots. Idle-only: the caller (e.g. a
+         CacheManager rebuild that discards the tree owning donated snapshots) must guarantee no
+         running request holds a slot, otherwise live state would be handed out twice."""
+-        self._free_slots = list(range(1, self._num_slots))
++        self._free_slots = list(range(1, self._num_slots - self._reserved_count))
+ 
+     def rebuild(self, num_slots: int) -> None:
+         """Reallocate the conv + recurrent state tensors for ``num_slots`` slots IN PLACE.
+@@ -147,6 +155,8 @@ class LinearStatePool:
+         live/snapshot state is dropped, so the caller must guarantee no running request
+         holds a slot and the radix tree owning donated snapshots is discarded too.
+         """
++        if num_slots <= self._reserved_count:
++            raise ValueError('Rebuilt linear-state pool cannot drop reserved ownership')
+         n_layers, _, local_conv_dim, km1 = self.conv_states.shape
+         _, _, local_v_heads, key_head_dim, value_head_dim = self.recurrent_states.shape
+         conv_dtype, rec_dtype = self.conv_states.dtype, self.recurrent_states.dtype
+@@ -167,7 +177,7 @@ class LinearStatePool:
+         )
+         self.slot_states = self._alloc_slot_states(num_slots)
+         self._num_slots = num_slots
+-        self._free_slots = list(range(1, num_slots))
++        self._free_slots = list(range(1, num_slots - self._reserved_count))
+ 
+     def free(self, slots) -> None:
+         """Return slot ids to the free-list. Accepts an int, list, or 1-D tensor."""
+@@ -175,7 +185,10 @@ class LinearStatePool:
+             slots = slots.flatten().tolist()
+         elif isinstance(slots, int):
+             slots = [slots]
+-        self._free_slots.extend(int(s) for s in slots)
++        slots = [int(s) for s in slots]
++        if any(s in self.reserved_slot_ids for s in slots):
++            raise ValueError('Reserved transaction slots cannot enter the request free list')
++        self._free_slots.extend(slots)
+ 
+     def clear_slots(self, slots) -> None:
+         """Zero conv + recurrent state at ``slots`` across all linear layers (fresh sequence)."""
+@@ -292,11 +305,12 @@ def _linear_pool_num_slots(config) -> int:
+     (1 live + 2 ping-pong + 1 committed snapshot locked through decode), plus a cross-request
+     snapshot cache and a padding sink; naive GDN keeps the old (max_running_req + 1)."""
+     mr = config.max_running_req
++    reserved = 4 if getattr(config, 'mtp_runtime_path', None) is not None else 0
+     if config.cache_type != "hybrid_radix":
+-        return mr + 1  # live + dummy/padding
++        return mr + 1 + reserved  # live + dummy/padding + transaction slots
+     ratio = config.linear_state_cache_ratio
+     n_cache = max(4, int(ratio * mr))
+-    return 4 * mr + n_cache + 1  # live + 2 ping-pong + locked committed snapshot + cache + padding
++    return 4 * mr + n_cache + 1 + reserved  # request/tree slots + padding + transaction slots
+ 
+ 
+ def _linear_pool_min_slots(config) -> int:
+@@ -306,6 +320,7 @@ def _linear_pool_min_slots(config) -> int:
+     padding. Below this, a full max_running_req batch can't get its slots and admission
+     deadlocks -- so a runtime rebuild rejects a smaller request."""
+     mr = config.max_running_req
++    reserved = 4 if getattr(config, 'mtp_runtime_path', None) is not None else 0
+     if config.cache_type != "hybrid_radix":
+-        return mr + 1
+-    return 4 * mr + 1
++        return mr + 1 + reserved
++    return 4 * mr + 1 + reserved
+diff --git a/python/freetoken/kvcache/mtp_pool.py b/python/freetoken/kvcache/mtp_pool.py
+new file mode 100644
+index 0000000..68ce4cc
+--- /dev/null
++++ b/python/freetoken/kvcache/mtp_pool.py
+@@ -0,0 +1,66 @@
++"""Draft-cell KV follows the main token on which that cell depends."""
++from __future__ import annotations
++
++import torch
++
++MTP_KV_HEADS = 2
++MTP_HEAD_DIM = 256
++MTP_KV_BYTES_PER_TOKEN = 2 * MTP_KV_HEADS * MTP_HEAD_DIM * 4 + 1
++
++
++class MtpKVState:
++    def __init__(self, num_tokens: int, device: torch.device) -> None:
++        self.device = torch.device(device)
++        self.rebuild(num_tokens)
++
++    def release(self) -> None:
++        self.keys = None
++        self.values = None
++        self.valid = None
++
++    def rebuild(self, num_tokens: int) -> None:
++        if num_tokens <= 0:
++            raise ValueError('MTP auxiliary KV needs positive token capacity')
++        self.release()
++        self.keys = torch.zeros((num_tokens, MTP_KV_HEADS, MTP_HEAD_DIM),
++                                dtype=torch.float32, device=self.device)
++        self.values = torch.zeros_like(self.keys)
++        self.valid = torch.zeros(num_tokens, dtype=torch.bool, device=self.device)
++
++    @property
++    def owned_bytes(self) -> int:
++        if self.keys is None:
++            return 0
++        return sum(t.numel() * t.element_size() for t in (self.keys, self.values, self.valid))
++
++    def invalidate(self, physical_slots: torch.Tensor) -> None:
++        self.valid.index_fill_(0, physical_slots.long(), False)
++
++    def publish(self, next_token_slots: torch.Tensor, keys: torch.Tensor, values: torch.Tensor) -> None:
++        # Cell p depends on token p+1: its owner is that next token's physical
++        # slot. Never publish recursive, unverified draft cells into shared pages.
++        shape = (next_token_slots.numel(), MTP_KV_HEADS, MTP_HEAD_DIM)
++        if keys.shape != shape or values.shape != shape or keys.dtype != torch.float32 or values.dtype != torch.float32:
++            raise ValueError('MTP auxiliary KV needs one FP32 key/value row per next-token slot')
++        indices = next_token_slots.long()
++        self.keys.index_copy_(0, indices, keys)
++        self.values.index_copy_(0, indices, values)
++        self.valid.index_fill_(0, indices, True)
++
++    def restore_prefix(self, main_prefix_slots: torch.Tensor, keys: torch.Tensor, values: torch.Tensor) -> int:
++        # A P-token prefix owns only cells 0..P-2. The branch-dependent cell
++        # P-1 must be recomputed with the new token using the restored last R.
++        owners = main_prefix_slots[1:].long()
++        count = owners.numel()
++        if keys.shape != values.shape or keys.ndim != 3 or keys.shape[1:] != (MTP_KV_HEADS, MTP_HEAD_DIM):
++            raise ValueError('MTP draft destination KV geometry differs')
++        if count > keys.shape[0]:
++            raise ValueError('MTP prefix exceeds private draft KV capacity')
++        if count:
++            # Once per request outside graph replay. Missing state is an error,
++            # rather than allowing recycled physical pages to seed a draft.
++            if not bool(self.valid.index_select(0, owners).all().item()):
++                raise RuntimeError('MTP prefix contains unpublished auxiliary cells')
++            keys[:count].copy_(self.keys.index_select(0, owners))
++            values[:count].copy_(self.values.index_select(0, owners))
++        return count
+diff --git a/python/freetoken/kvcache/qsa_pool.py b/python/freetoken/kvcache/qsa_pool.py
+index 5686dce..2a0ffb9 100644
+--- a/python/freetoken/kvcache/qsa_pool.py
++++ b/python/freetoken/kvcache/qsa_pool.py
+@@ -67,6 +67,7 @@ class QSAKVCache(MHAKVCache):
+         layer_ids: Sequence[int] | None = None,
+         mrope: bool = False,
+         index_dtype: torch.dtype | None = None,
++        mtp: bool = False,
+     ) -> None:
+         if index_ratio < 1 or page_size % index_ratio != 0:
+             # slot // index_ratio only names one group when a group never straddles a page.
+@@ -94,6 +95,8 @@ class QSAKVCache(MHAKVCache):
+         self._index_dtype = index_dtype or dtype
+         self._page_size = page_size
+         self._mrope = mrope
++        self._mtp = mtp
++        self._mtp_state = None
+         super().__init__(
+             num_kv_heads=num_kv_heads,
+             num_layers=num_layers,
+@@ -139,6 +142,12 @@ class QSAKVCache(MHAKVCache):
+             if self._mrope
+             else None
+         )
++        if self._mtp:
++            from .mtp_pool import MtpKVState
++            if self._mtp_state is None:
++                self._mtp_state = MtpKVState(num_pages * self._page_size, self._device)
++            else:
++                self._mtp_state.rebuild(num_pages * self._page_size)
+ 
+     def rebuild(self, num_pages: int) -> None:
+         # Free the index tiers BEFORE the K/V realloc (super().rebuild frees + syncs +
+@@ -149,11 +158,15 @@ class QSAKVCache(MHAKVCache):
+         self._cmp_k_buffer = None
+         self._pending_ring = None
+         self._rope_positions = None
++        if self._mtp_state is not None:
++            self._mtp_state.release()
+         super().rebuild(num_pages)
+         self._zero_kv_slabs()
+         try:
+             self._alloc_index_tiers(num_pages)
+         except Exception:
++            if self._mtp_state is not None:
++                self._mtp_state.release()
+             self._kv_buffer = None
+             self._k_buffer = None
+             self._v_buffer = None
+@@ -167,17 +180,21 @@ class QSAKVCache(MHAKVCache):
+         num_req_slots = config.max_running_req + 1
+         per_token = 0
+         fixed = 0
++        mtp = getattr(config.model_config, 'mtp_runtime_path', None) is not None
+         for spec in config.model_config.kv_cache_group_specs():
+             if spec.is_swa:
+                 continue
+             per_token += spec_kv_bytes_per_token(spec, config)
+             if spec.attn_type is AttnType.QSA:
+                 # One index-key row = all index layers at one position.
+-                index_bytes = 4 if getattr(config.model_config.quant, "dialect", None) == "gguf_strata" else _INDEX_DTYPE_BYTES
++                index_bytes = 4 if getattr(getattr(config.model_config, 'quant', None), "dialect", None) == "gguf_strata" else _INDEX_DTYPE_BYTES
+                 row = spec.index_head_dim * spec.num_index_layers * index_bytes
+-                fixed += num_req_slots * row * (cls.ring_capacity_for(spec.index_ratio) + 1)
++                fixed += num_req_slots * row * (cls.ring_capacity_for(spec.index_ratio, 3 if mtp else 0) + 1)
+                 if config.model_config.model_is_mrope:
+                     per_token += _ROPE_POS_BYTES
++        if mtp:
++            from .mtp_pool import MTP_KV_BYTES_PER_TOKEN
++            per_token += MTP_KV_BYTES_PER_TOKEN
+         return per_token * config.page_size, fixed, config.page_size, 0
+ 
+     def unit_bytes(self) -> tuple[int, int]:
+@@ -191,7 +208,12 @@ class QSAKVCache(MHAKVCache):
+             * self._index_head_dim
+             * self._index_dtype.itemsize
+         )
+-        return kv + slab // tokens + (_ROPE_POS_BYTES if self._mrope else 0), swa
++        mtp = self._mtp_state.owned_bytes // tokens if self._mtp_state is not None else 0
++        return kv + slab // tokens + (_ROPE_POS_BYTES if self._mrope else 0) + mtp, swa
++
++    @property
++    def mtp_state(self):
++        return self._mtp_state
+ 
+     def cmp_k_cache(self, slot: int) -> torch.Tensor:
+         """Compressed index keys of one sparse layer: ``[rows, index_head_dim]``."""
+diff --git a/python/freetoken/models/config.py b/python/freetoken/models/config.py
+index cf1267f..1330c7f 100644
+--- a/python/freetoken/models/config.py
++++ b/python/freetoken/models/config.py
+@@ -357,6 +357,8 @@ class ModelConfig:
+     # Extra per-request tensors riding the LinearStatePool slots (see SlotStateSpec);
+     # () for models without any. Requires a linear-attention group to ride on.
+     slot_states: Tuple[SlotStateSpec, ...] = ()
++    mtp_runtime_path: str | None = None
++    mtp_capture_rows: int = 0
+ 
+     @property
+     def is_moe(self) -> bool:
+diff --git a/python/freetoken/models/qwen4_exp/model.py b/python/freetoken/models/qwen4_exp/model.py
+index 1cdadb2..9aa9693 100644
+--- a/python/freetoken/models/qwen4_exp/model.py
++++ b/python/freetoken/models/qwen4_exp/model.py
+@@ -106,6 +106,8 @@ class Qwen4ExpModel(BaseOP):
+         self.hyper_connection_mixer = GatedResidual(config, use_combine=False, prefix=f"{prefix}.hyper_connection_mixer")
+         # plain tuple (not an OP child), so it never shows up in the state dict
+         self._ple = tuple(layer.ple for layer in self.layers.op_list if layer.ple is not None)
++        self._mtp_capture_rows = config.mtp_capture_rows
++        self._mtp_residual_capture = None
+ 
+     @property
+     def ple_layers(self) -> List[PLELayer]:
+@@ -128,6 +130,10 @@ class Qwen4ExpModel(BaseOP):
+             # single writer: the layers only read the context, so a second PLE layer's
+             # prefetch sees the un-rolled window
+             commit_ngram_context(meta, getattr(batch, "fla_metadata", None))
++        if self._mtp_residual_capture is not None:
++            from .mtp_state import capture_residual
++            capture_residual(hidden, batch, get_global_ctx().linear_state_pool,
++                             self._mtp_residual_capture)
+         return self.hyper_connection_mixer.mix(hidden)[0]
+ 
+ 
+@@ -148,6 +154,13 @@ class Qwen4ExpForCausalLM(BaseLLMModel):
+             declare_fp32_small_parameters(self)
+         super().__init__()
+ 
++    def prepare_for_runtime(self) -> None:
++        if self.model._mtp_capture_rows:
++            # Allocate before cache sizing and graph capture, never during replay.
++            self.model._mtp_residual_capture = torch.empty(
++                self.model._mtp_capture_rows, self._config.hidden_size * self.model.hc_count,
++                device=self.model.embed_tokens.packed_0.device, dtype=torch.float32)
++
+     def load_host_tables(self, engine_config) -> int:
+         """Attach the PLE n-gram table (pinned checkpoint bank, or zeros for dummy weights); returns the pinned host bytes the engine reserves from its pin budget."""
+         ple_layers = self.model.ple_layers
+diff --git a/python/freetoken/models/qwen4_exp/mtp_state.py b/python/freetoken/models/qwen4_exp/mtp_state.py
+new file mode 100644
+index 0000000..8e9f275
+--- /dev/null
++++ b/python/freetoken/models/qwen4_exp/mtp_state.py
+@@ -0,0 +1,21 @@
++"""Capture the target residual before its final HC mix, with normal slot ownership."""
++from __future__ import annotations
++
++import torch
++
++MTP_LAST_RESIDUAL = 'mtp_last_residual'
++
++
++def capture_residual(residual, batch, pool, buffer):
++    if residual.dtype != torch.float32 or residual.ndim != 2 or len(residual) > len(buffer):
++        raise ValueError('MTP target residual exceeds its declared FP32 capture buffer')
++    fla = batch.fla_metadata
++    if fla is None:
++        raise ValueError('MTP residual capture requires prepared FLA metadata')
++    buffer[:len(residual)].copy_(residual)
++    states = pool.slot_state(MTP_LAST_RESIDUAL)
++    ends = fla.cu_seqlens[1:].long() - 1
++    states.index_copy_(0, fla.cache_indices.long(), residual.index_select(0, ends))
++    if fla.track_dst is not None:
++        rows = fla.track_boundary_row.long() - 1
++        states.index_copy_(0, fla.track_dst, residual.index_select(0, rows))
+diff --git a/python/freetoken/scheduler/cache.py b/python/freetoken/scheduler/cache.py
+index ef8cb3e..79f8c5d 100644
+--- a/python/freetoken/scheduler/cache.py
++++ b/python/freetoken/scheduler/cache.py
+@@ -31,7 +31,7 @@ _SWA_RETAIN_GAP = 16
+ 
+ class CacheManager:
+     def __init__(self, num_pages: int, page_size: int, page_table: torch.Tensor, type: str,
+-                 linear_state_pool=None, swa_pool=None, sliding_window_size=None):
++                 linear_state_pool=None, swa_pool=None, sliding_window_size=None, mtp_state=None):
+         # The `_free_slots` follows a page-aligned manner. For example, if page_size = 2,
+         # the `_free_slots` may look like [0, 2, 4, 6, ...], and each slot represents a page.
+         device = page_table.device
+@@ -41,6 +41,7 @@ class CacheManager:
+         # the HybridSWAKVCache global-paged mode) through a SWARadixCache; non-hybrid models keep
+         # the plain naive/radix path.
+         self.linear_state_pool = linear_state_pool
++        self.mtp_state = mtp_state
+         self.swa_pool = swa_pool
+         self.sliding_window_size = sliding_window_size
+         self.is_hybrid = type == "hybrid_radix"
+@@ -625,6 +626,8 @@ class CacheManager:
+             assert len(self.free_slots) >= needed_pages, "Eviction did not free enough space."
+         allocated = self.free_slots[:needed_pages]
+         self.free_slots = self.free_slots[needed_pages:]
++        if self.mtp_state is not None:
++            self.mtp_state.invalidate(self._page_to_token(allocated))
+         return allocated
+ 
+     def _free(self, indices: torch.Tensor) -> None:
+diff --git a/python/freetoken/scheduler/scheduler.py b/python/freetoken/scheduler/scheduler.py
+index d057d3b..60cf91a 100644
+--- a/python/freetoken/scheduler/scheduler.py
++++ b/python/freetoken/scheduler/scheduler.py
+@@ -84,6 +84,7 @@ class Scheduler(SchedulerIOMixin):
+         self.cache_manager = CacheManager(
+             self.engine.num_pages, config.page_size, self.engine.page_table, config.cache_type,
+             linear_state_pool=self.engine.linear_state_pool,
++            mtp_state=getattr(self.engine.kv_cache, 'mtp_state', None),
+             swa_pool=self.engine.kv_cache,
+             sliding_window_size=next(
+                 (g.sliding_window for g in config.model_config.kv_cache_group_specs() if g.is_swa),
+diff --git a/tests/kvcache/test_linear_state_pool_alloc.py b/tests/kvcache/test_linear_state_pool_alloc.py
+index e9fe405..e5d014a 100644
+--- a/tests/kvcache/test_linear_state_pool_alloc.py
++++ b/tests/kvcache/test_linear_state_pool_alloc.py
+@@ -52,6 +52,23 @@ def test_alloc_exhaustion_raises():
+         pool.alloc(1)
+ 
+ 
++def test_mtp_transaction_slots_are_extra_and_remain_reserved_after_idle_rebuild():
++    from freetoken.kvcache.linear_state_pool import _linear_pool_min_slots, _linear_pool_num_slots
++    base = SimpleNamespace(max_running_req=1, cache_type='hybrid_radix', linear_state_cache_ratio=1.)
++    original = _linear_pool_num_slots(base)
++    base.mtp_runtime_path = 'independent-test-runtime'
++    assert _linear_pool_num_slots(base) == original + 4
++    assert _linear_pool_min_slots(base) == 9
++    pool = LinearStatePool(_group(), original + 4, torch.float32, torch.device('cpu'),
++                           tp_size=1, reserved_slots=4)
++    assert pool.num_free_slots == original - 1
++    pool.reclaim_all_slots()
++    assert pool.num_free_slots == original - 1
++    pool.rebuild(original + 5)
++    assert pool.num_free_slots == original
++    assert set(pool.alloc(original)).isdisjoint(pool.reserved_slot_ids)
++
++
+ def test_clear_slots_zeros_all_layers():
+     pool = _pool(num_slots=6)
+     s = pool.alloc(1)[0]
+@@ -165,7 +182,7 @@ def test_slot_state_in_the_byte_account():
+     assert with_state - gdn_only == 32 * 9 * 2
+     assert _pool(slot_states=_SPECS).bytes_per_slot() == with_state
+ 
+-    mc = SimpleNamespace(slot_states=_SPECS)
++    mc = SimpleNamespace(slot_states=_SPECS, quant=None)
+     mc.linear_attention_group = lambda: group
+     config = SimpleNamespace(
+         model_config=mc, dtype=torch.bfloat16, tp_info=SimpleNamespace(size=1),
+diff --git a/tests/kvcache/test_mtp_pool.py b/tests/kvcache/test_mtp_pool.py
+new file mode 100644
+index 0000000..62170f6
+--- /dev/null
++++ b/tests/kvcache/test_mtp_pool.py
+@@ -0,0 +1,131 @@
++"""Real page/cache ownership: shared draft cells, fork boundaries and recycled pages."""
++from types import SimpleNamespace
++
++import pytest
++import torch
++
++from freetoken.core import Req, SamplingParams
++from freetoken.kvcache.linear_state_pool import LinearStatePool
++from freetoken.kvcache.mtp_pool import MtpKVState, MTP_KV_BYTES_PER_TOKEN
++from freetoken.models.config import LinearGatedDeltaGroupConfig, SlotStateSpec
++from freetoken.models.qwen4_exp.mtp_state import MTP_LAST_RESIDUAL, capture_residual
++from freetoken.scheduler.cache import CacheManager
++
++
++def _pool():
++    group = LinearGatedDeltaGroupConfig('linear', (0,), 2, 4, 16, 16, 4, 'silu')
++    return LinearStatePool(group, 16, torch.float32, torch.device('cpu'), tp_size=1,
++        slot_states=(SlotStateSpec(MTP_LAST_RESIDUAL, (10240,), dtype=torch.float32),), reserved_slots=4)
++
++
++def test_real_prefix_forks_keep_shared_cells_and_isolate_lookahead():
++    aux = MtpKVState(64, torch.device('cpu'))
++    pool = _pool()
++    pt = torch.full((4, 128), -1, dtype=torch.int32)
++    manager = CacheManager(16, 4, pt, 'hybrid_radix', linear_state_pool=pool, mtp_state=aux)
++    ids = [11, 12, 13, 14]
++
++    def admit(tail, table_idx):
++        tokens = torch.tensor([*ids, tail], dtype=torch.int32)
++        pending = SimpleNamespace(input_ids=tokens, input_len=5)
++        match = manager.match_req(pending)
++        req = Req(tokens, table_idx, match.cuda_handle.cached_len, 4, table_idx,
++                  SamplingParams(), match.cuda_handle)
++        req.linear_slot_idx = pool.alloc(1)[0]
++        req.mamba_ping_pong = tuple(pool.alloc(2))
++        manager.lock(req.cache_handle)
++        if req.cached_len:
++            pt[table_idx, :req.cached_len].copy_(req.cache_handle.get_matched_indices())
++            pool.copy_from(match.mamba_value, req.linear_slot_idx)
++        manager.allocate_paged([req])
++        return req
++
++    cold = admit(15, 0)
++    shared_keys = torch.arange(3 * 512, dtype=torch.float32).reshape(3, 2, 256)
++    aux.publish(pt[0, 1:4], shared_keys, -shared_keys)
++    pool.slot_state(MTP_LAST_RESIDUAL)[cold.linear_slot_idx].fill_(3.5)
++    cold.cached_len = 4
++    manager.cache_req(cold, finished=True)
++
++    left, right = admit(25, 1), admit(35, 2)
++    private_k, private_v = torch.zeros(8, 2, 256), torch.zeros(8, 2, 256)
++    assert aux.restore_prefix(pt[1, :4], private_k, private_v) == 3
++    torch.testing.assert_close(private_k[:3], shared_keys, rtol=0, atol=0)
++    assert private_k[3].count_nonzero() == 0  # branch-dependent cell is not restored
++    torch.testing.assert_close(pool.slot_state(MTP_LAST_RESIDUAL)[left.linear_slot_idx],
++                               torch.full((10240,), 3.5), rtol=0, atol=0)
++    assert torch.equal(pt[1, :4], pt[2, :4])
++    assert pt[1, 4] != pt[2, 4]
++    aux.publish(pt[1, 4:5], torch.full((1, 2, 256), 25.), torch.full((1, 2, 256), -25.))
++    aux.publish(pt[2, 4:5], torch.full((1, 2, 256), 35.), torch.full((1, 2, 256), -35.))
++    aux.restore_prefix(pt[1, :5], private_k, private_v)
++    assert private_k[3, 0, 0] == 25
++    aux.restore_prefix(pt[2, :5], private_k, private_v)
++    assert private_k[3, 0, 0] == 35
++    left.cached_len = right.cached_len = 5
++    manager.cache_req(left, finished=True)
++    manager.cache_req(right, finished=True)
++    manager.check_integrity()
++
++    # Re-admission reuses a physical page. Old auxiliary bytes may remain there,
++    # but the allocator invalidates them before they can be restored as a prefix.
++    manager.free_slots = manager.free_slots.sort().values
++    again = admit(45, 1)
++    with pytest.raises(RuntimeError, match='unpublished'):
++        aux.restore_prefix(pt[1, :5], private_k, private_v)
++    aux.restore_prefix(pt[1, :4], private_k, private_v)
++    again.cached_len = 5
++    manager.cache_req(again, finished=True)
++    manager.check_integrity()
++
++
++@pytest.mark.parametrize('device', ['cpu', 'cuda'])
++def test_auxiliary_rebuild_and_exact_owned_bytes(device):
++    if device == 'cuda' and not torch.cuda.is_available():
++        pytest.skip('requires CUDA')
++    state = MtpKVState(64, torch.device(device))
++    assert state.owned_bytes == 64 * MTP_KV_BYTES_PER_TOKEN
++    slots = torch.tensor([3, 12], device=device)
++    keys = torch.randn(2, 2, 256, device=device)
++    state.publish(slots, keys, -keys)
++    private_k, private_v = torch.zeros(8, 2, 256, device=device), torch.zeros(8, 2, 256, device=device)
++    assert state.restore_prefix(torch.cat([slots[:1], slots]), private_k, private_v) == 2
++    torch.testing.assert_close(private_k[:2], keys, rtol=0, atol=0)
++    state.rebuild(128)
++    assert state.owned_bytes == 128 * MTP_KV_BYTES_PER_TOKEN
++    with pytest.raises(RuntimeError, match='unpublished'):
++        state.restore_prefix(torch.cat([slots[:1], slots]), private_k, private_v)
++
++
++@pytest.mark.parametrize('device', ['cpu', 'cuda'])
++def test_last_residual_tracks_every_row_and_follows_cow_rebuild(device):
++    if device == 'cuda' and not torch.cuda.is_available():
++        pytest.skip('requires CUDA')
++    from freetoken.attention.linear import FLAMetadata
++    group = LinearGatedDeltaGroupConfig('linear', (0,), 2, 4, 16, 16, 4, 'silu')
++    pool = LinearStatePool(group, 10, torch.float32, torch.device(device), tp_size=1,
++        slot_states=(SlotStateSpec(MTP_LAST_RESIDUAL, (10240,), dtype=torch.float32),), reserved_slots=4)
++    ids = torch.tensor([1], device=device, dtype=torch.int32)
++    dst = torch.tensor(pool.reserved_slot_ids, device=device)
++    boundaries = torch.arange(1, 5, device=device)
++    fla = FLAMetadata(torch.tensor([0, 4], device=device), ids,
++                      track_dst=dst, track_boundary_row=boundaries, is_verify=True)
++    batch = SimpleNamespace(fla_metadata=fla)
++    residual = torch.randn(4, 10256, device=device)[:, :10240]
++    assert not residual.is_contiguous()
++    buffer = torch.empty(8, 10240, device=device)
++    capture_residual(residual, batch, pool, buffer)
++    state = pool.slot_state(MTP_LAST_RESIDUAL)
++    torch.testing.assert_close(buffer[:4], residual, rtol=0, atol=0)
++    torch.testing.assert_close(state[1], residual[-1], rtol=0, atol=0)
++    torch.testing.assert_close(state[dst], residual, rtol=0, atol=0)
++    pool.copy_from(pool.reserved_slot_ids[1], 2)
++    torch.testing.assert_close(state[2], residual[1], rtol=0, atol=0)
++    pool.rebuild(13)
++    assert pool.slot_state(MTP_LAST_RESIDUAL).count_nonzero() == 0
++    assert pool.num_free_slots == 8
++    assert set(pool.alloc(8)).isdisjoint(pool.reserved_slot_ids)
++    pool.reclaim_all_slots()
++    assert pool.num_free_slots == 8
++    with pytest.raises(ValueError, match='Reserved'):
++        pool.free(pool.reserved_slot_ids[0])
+diff --git a/tests/kvcache/test_qsa_pool.py b/tests/kvcache/test_qsa_pool.py
+index dea722f..e19f54a 100644
+--- a/tests/kvcache/test_qsa_pool.py
++++ b/tests/kvcache/test_qsa_pool.py
+@@ -37,7 +37,7 @@ def _tp(monkeypatch):
+     )
+ 
+ 
+-def _pool(num_pages=4, page_size=64, index_ratio=4, num_req_slots=4, ring_capacity=None):
++def _pool(num_pages=4, page_size=64, index_ratio=4, num_req_slots=4, ring_capacity=None, mtp=False):
+     return QSAKVCache(
+         num_kv_heads=2,
+         num_layers=8,
+@@ -52,6 +52,7 @@ def _pool(num_pages=4, page_size=64, index_ratio=4, num_req_slots=4, ring_capaci
+         num_req_slots=num_req_slots,
+         ring_capacity=ring_capacity,
+         layer_ids=(1, 3, 5, 7),
++        mtp=mtp,
+     )
+ 
+ 
+@@ -71,7 +72,7 @@ def _spec(*, index_ratio=4, attn_type=AttnType.QSA, num_kv_heads=2, head_dim=64,
+ 
+ 
+ def _config(spec, *, page_size=64, max_running_req=3):
+-    mc = SimpleNamespace(num_layers=8, has_swa_attention=False, has_linear_attention=True, model_is_mrope=False)
++    mc = SimpleNamespace(num_layers=8, has_swa_attention=False, has_linear_attention=True, model_is_mrope=False, quant=None)
+     mc.kv_cache_group_specs = lambda: (spec,)
+     return SimpleNamespace(
+         model_config=mc,
+@@ -217,3 +218,30 @@ def test_resolve_pool_class_and_factory():
+ 
+     with pytest.raises(ValueError, match="num_req_slots"):
+         create_kvcache_pool(mc, num_pages=4, page_size=64, dtype=torch.bfloat16, device=DEV)
++
++
++def test_mtp_auxiliary_and_wider_ring_match_factory_cost_and_rebuild():
++    from freetoken.kvcache import create_kvcache_pool
++    from freetoken.kvcache.mtp_pool import MTP_KV_BYTES_PER_TOKEN
++    spec = _spec()
++    config = _config(spec)
++    old_cost, old_fixed, _, _ = QSAKVCache.kv_cost(config)
++    config.model_config.mtp_runtime_path = 'independent-test-runtime'
++    pool = create_kvcache_pool(config.model_config, 4, 64, config.dtype, DEV, num_req_slots=4)
++    cost, fixed, _, _ = QSAKVCache.kv_cost(config)
++    assert cost == old_cost + 64 * MTP_KV_BYTES_PER_TOKEN
++    assert pool.unit_bytes()[0] * 64 == cost
++    assert pool.ring_capacity == QSAKVCache.ring_capacity_for(4, 3)
++    buffers = [pool._kv_buffer, pool._cmp_k_buffer, pool._pending_ring]
++    actual = sum(t.numel() * t.element_size() for t in buffers) + pool.mtp_state.owned_bytes
++    assert actual == cost * 4 + fixed
++    assert fixed > old_fixed
++    state = pool.mtp_state
++    pool.rebuild(8)
++    assert pool.mtp_state is state
++    assert state.owned_bytes == 8 * 64 * MTP_KV_BYTES_PER_TOKEN
++    assert state.valid.count_nonzero() == 0
++
++
++def test_no_mtp_allocates_no_auxiliary():
++    assert _pool().mtp_state is None
+diff --git a/tests/scheduler/test_hybrid_cache_manager.py b/tests/scheduler/test_hybrid_cache_manager.py
+index 7e1d51f..9c36ca1 100644
+--- a/tests/scheduler/test_hybrid_cache_manager.py
++++ b/tests/scheduler/test_hybrid_cache_manager.py
+@@ -242,7 +242,4 @@ def test_mtp_finish_keeps_shared_prefix_and_returns_only_owned_future_pages():
+ 
+ 
+ if __name__ == "__main__":
+-    for name, fn in list(globals().items()):
+-        if name.startswith("test_") and callable(fn):
+-            fn()
+-            print(f"{name}: PASS")
++    raise SystemExit(pytest.main([__file__, '-q']))
