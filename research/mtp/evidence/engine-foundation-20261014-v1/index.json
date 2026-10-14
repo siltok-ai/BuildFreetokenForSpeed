@@ -1,0 +1,80 @@
+{
+  "status": "development_checkpoint_component_tests_passed",
+  "base_profile": "build/profiles/strataq2dev7.json",
+  "base_profile_sha256": "a4f5e10fc246c60debf702523746f49b482c6c0ea2c211ee230ce8c8e0f45ff8",
+  "patch": "patches/series/strataq2mtp1-0014-verification-foundation.patch",
+  "patch_sha256": "b63655632fa9938d820896f7e484e0ad7aad8e92036436594881f7f58e95e01b",
+  "source_base_commit": "07e72132792617013ad613f119628d3d0da7ebfd",
+  "source_revision": "b4b3985cba119690d31ac89632c561813faf8d9f",
+  "baseline_sha256": {
+    "python/freetoken/attention/linear.py": "693bab4c8b822e75ae460ff473cb9522e15f17e3304af4e043ee11249e9e35cd",
+    "python/freetoken/attention/qsa_sparse.py": "bb1b22fccad78954b833444e42e8fc3f02ee21c8aecbf9fe843808e1317a4416",
+    "python/freetoken/core.py": "d2f48bb275014cbfe544b233a5f90ac7ae2f27f31461d93aca538c9a246d36e6",
+    "python/freetoken/models/qwen4_exp/gdn.py": "668fe7c19a1f8bcda442dfbef08e868d2cbd39fbf06d2b46416807a7a1ac0ef3",
+    "python/freetoken/models/qwen4_exp/ple.py": "5d81d4926d69a8d00feed6a4d378322c66302678ba0550e509aabd5affdd9122",
+    "python/freetoken/scheduler/cache.py": "b012da0f73d66f5995daece7620cc59f6b31241d91e073fab89c3c353d268880",
+    "tests/models/qwen4_exp/test_gguf_gdn.py": "8d5c6d3dfa5dac8bff69d383e1225ea2e9b87d35d202f9db8bcf8cf386c42090",
+    "tests/models/qwen4_exp/test_gguf_ple.py": "379d0c7a2614f487efc6a2e220f23bd6c913344d9c8e9104caa6cbb61513de83",
+    "tests/scheduler/test_hybrid_cache_manager.py": "331b9d3a31d50e31627e4f954d638fecea189a889a4c07e69a0068f33f80b108"
+  },
+  "replayed_source_sha256": {
+    "python/freetoken/attention/linear.py": "d99c402aea1b2a6e86818d4ed0372313effeaa7224d933484efa9d6921a2c918",
+    "python/freetoken/attention/qsa_sparse.py": "1bbe996ccb901fc511fde370aebdc188cd59b22cf2fe1d7927b89836ef08988a",
+    "python/freetoken/core.py": "bf8dc78006a2de8ab67f271fee80b5767909149b645bd7f97b01a4798be00363",
+    "python/freetoken/models/qwen4_exp/gdn.py": "b5daea613cabf423cfaa3cde1cdcaf70b74f37eced488f6df543f3d4ad15ddcd",
+    "python/freetoken/models/qwen4_exp/ple.py": "30647d38f682475fddb3799e67a06b1138da667b1c4194b6dae95ff24d93021f",
+    "python/freetoken/scheduler/cache.py": "e15e28671cdce522fa39ad7b70a9fb3c0a18e7e00e476b31ccfcd5c79607794d",
+    "tests/models/qwen4_exp/test_gguf_gdn.py": "9fc159b04bb555f9ebda93ad0469b2deaded2da8267167629e7c0dfd58dd3f58",
+    "tests/models/qwen4_exp/test_gguf_ple.py": "3746b1a252d4eab44add0eaa9944535fd846d1f6c758c0ce0f06f739a33b9bf9",
+    "tests/scheduler/test_hybrid_cache_manager.py": "c5951337faf9ed1af1c3813e510ec283f1a69205e9f6966274c0e48f353d23a1"
+  },
+  "replay_matches_tested_bytes": true,
+  "component_tests": "34 passed, 12 subtests passed; includes native CUDA state equality and graph live-slot retargeting",
+  "full_engine_acceptance": false,
+  "profile_created": false,
+  "wheel_created": false,
+  "speed_mtp_acceptance": false,
+  "source_version": "0.1.3+speed.strataq2dev7 with explicitly declared development source override",
+  "evidence": [
+    {
+      "path": "research/mtp/evidence/engine-foundation-20261014-v1/preparation-record.json.gz",
+      "sha256": "c9570c27061049a28d9e0c70cea796df57ff92e31c172d2b1d4305903cc43597",
+      "raw_sha256": "fed92cec9e2304582bd984bcc75ab3c89cd8b798383ab54c33185199af93c14d"
+    },
+    {
+      "path": "research/mtp/evidence/engine-foundation-20261014-v1/run_foundation_tests_v1.py.gz",
+      "sha256": "27573ee606de7d954ffe0e0c967d11121c1b53274c8cf0feb42a2899baf7da15",
+      "raw_sha256": "01d39e88b7ca966dbe97d5d1311a830a394d18380b7c60af8da3e85b5ac23a35"
+    },
+    {
+      "path": "research/mtp/evidence/engine-foundation-20261014-v1/foundation-tests-v1.json.gz",
+      "sha256": "ebc9bbf066bc9e04cda8b52168ef7808f896b54ca3361e1c9b6432bd8865ebe8",
+      "raw_sha256": "5fd69368ec539390892019063c2de3107c6884525ab040b6c3b39bd65285f332"
+    },
+    {
+      "path": "research/mtp/evidence/engine-foundation-20261014-v1/foundation-tests-v1.log.gz",
+      "sha256": "849e7e12d3ddddba0cc9440332be096d924f114d3ff25dbdb981caff7f1c73fb",
+      "raw_sha256": "7f9fd85fc644dbad323f370ea18b0ed1efbab7f3dcc58e8e171e2ed7749aedec"
+    },
+    {
+      "path": "research/mtp/evidence/engine-foundation-20261014-v1/foundation-tests-v2.json.gz",
+      "sha256": "e944979cc6ff6d9f48414a82f49d422c27a04a86fdeaba5284e23e9b8beefec8",
+      "raw_sha256": "41c854bca16b083ae71bc3864016bb26f32b660df0d34c08acd6a5a05d16a737"
+    },
+    {
+      "path": "research/mtp/evidence/engine-foundation-20261014-v1/foundation-tests-v2.log.gz",
+      "sha256": "ff71e90367c9662fa75fde0ef5c46ded1c9fff77a6c08355e2e8c340200bbf7f",
+      "raw_sha256": "8d039851d6fbdbf307ee1e57c958d2a8e969564cca85a168d4c07f3a9c6c502e"
+    },
+    {
+      "path": "research/mtp/evidence/engine-foundation-20261014-v1/foundation-tests-v3.json.gz",
+      "sha256": "ddc6da1be662b554e67b1f0d70d082b30fb9204c9ae8d97b7d3c3a753eee3fc4",
+      "raw_sha256": "1cb42e2b1c2784eddf0336292e4876e0bb36fad6ea1644ed501c6fbae9f79e2b"
+    },
+    {
+      "path": "research/mtp/evidence/engine-foundation-20261014-v1/foundation-tests-v3.log.gz",
+      "sha256": "f5112d773e800674861d8ae0dd878c6e655dfc7fe2e18f3fb6787214a6831ab6",
+      "raw_sha256": "4d03412bee5fdb72b50ce54d2c21b04069a67319809c3f75e5ffa6b4c2b8aa77"
+    }
+  ]
+}

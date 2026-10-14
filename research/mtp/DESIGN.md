@@ -51,3 +51,23 @@ v4用已知single-request窗口长度调用原有varlen conv静态参数，绕�
 隔离审计后，8064永久专家、10112总槽的实际512-token原型测到短上下文123.12/123.00/114.86 token/s（中位123.00），首组4K上下文120.71。全部输出ID及恢复后的原生成均匹配对应无MTP冷基线。三草稿链中位约1.84ms，有效行追齐/提交约0.22–0.28ms；这些速度是同步提交后在独立循环中的实际token吞吐，**不是Speed worker或HTTP MTP性能**。prompt prime、每次新建graph及其预热单列，不包含在decode计时内。
 
 当前仍没有正式MTP profile、版本wheel、worker多token交付或Speed MTP开关。尚须实现可复用的动态请求/slot窗口图、专属事务池及资源准入；验证EOS/长度/stop、取消、prefix复用/分叉/压力、缓存重建、thinking和非greedy回退；随后绑定独立发布材料并测真实Speed/TCP。现有原型的强制事务归还和独占页预留只适用于诊断，不能直接作为生产调度器。短上下文/4K同容量对照和更多4K重复测量继续单独保存；不能只用一次最快值声明完整MTP验收。
+
+## 正式引擎开发 checkpoint：2026-10-14
+
+正式开发源码独立位于 `C:/workspace/artifacts/flash-next-strata-q2-20261012/mtp-engine-development-v1/build-source`，本地分支 `develop/strata-q2-mtp-engine`。它由冻结dev7 profile重放，原始checkpoint为 `07e7213`，验证窗口与KV所有权改动为 `b4b3985`。新改动已经导出至 `patches/series/strataq2mtp1-0014-verification-foundation.patch`；对应来源、测试、失败记录和逐文件重放SHA位于 `evidence/engine-foundation-20261014-v1/index.json`。这只是开发checkpoint，尚无新发布profile/wheel，测试显式声明源码覆盖和dev7 native来源，不能继续用dev7版本字符串宣称它是原正式制品。
+
+第一份正式差异新增独立 `verify` batch/FLA/PLE标识，因果窗口仅允许单个已有状态的请求、1–4行。GDN复用原decode卷积，GGUF递推按每行写入track槽；conv、PLE卷积与ngram快照都包含进入窗口之前的历史，解决短窗口不能只从当前输入取历史的问题。QSA ring快照读取GPU元数据中的实际请求槽，不再捕获诊断请求的固定CPU table_idx。原 `ForwardOutput` 三字段ABI保持不变；新batch上的可选token bundle尚未接入调度器。
+
+KV的 `mtp_reserved_len` 是物理页面的排他所有权边界，不是可读语义长度。普通准备流程也记录实际申请边界，避免原流程已经申请pending token所在页之后，窗口再申请一次并覆盖页表。重复预留不会重复计费；仅 `cached_len` 之前的有效token可进入prefix tree；结束/取消沿整个已申请边界释放拒绝尾部。对齐结束时保留有效prefix并独立释放未来页，不对齐结束时释放全部未捐赠页。16组跨页/接受长度组合及共享prefix测试均通过页面总数、唯一性和树命中检查。
+
+组件结果为34项测试与12个subtest通过，包含GDN/PLE在CUDA上的全部窗口行状态及输出与native decode完全一致、验证graph切换live slot仍一致、原混合prefix捐赠和缓存rebuild。CPU PLE向量化SiLU有约1.2e-7尾数差异，CPU输出断言使用2e-7容差；所有状态及CUDA输出仍要求精确相等。失败v1/v2和修正后v3日志完整保留。组件结果不能代替真实全模型、取消或服务吞吐验收。
+
+### Prefix与草稿KV的所有权约定
+
+MTP草稿cell p使用主模型R_p与token p+1；其KV依赖后一token，不能直接随位置p的共享prefix页发布，否则不同续写会互相覆盖。正式设计将cell p的KV放在**主模型位置p+1的物理token槽**。长度P的共享prefix仅携带cell 0..P-2；分叉处的cell P-1由所恢复的最后R和新token P在该请求新页中重算。保留最后主R作为声明的FP32 slot state，它随GDN/PLE一起COW、快照和重建。草稿递归产生的未验证R/KV不发布到共享页；只发布由真实target R追齐后的有效cell。这样可以复用prefix，同时避免将依赖未提交token的状态发布给后续请求。
+
+正式运行时仍需实现和验证这项辅助分页KV、最后R持有、专属四行事务槽预算、可复用窗口/草稿graph、EOS/stop裁剪、多token调度交付、取消、工具锚点和缓存重建。普通采样在正确拒绝采样完成前走原无MTP生成，但其有效prefix的辅助状态也必须维护一致。不会将当前诊断的整段KV预留或临时全局hooks直接作为服务实现。
+
+### 无MTP与MTP的分支和测量隔离
+
+无MTP Build分支 `explore/flash-next-strata-q2`、Speed分支 `explore/freetoken-flash-next-strata-q2` 及dev7制品保持不变。MTP改动分别留在 `explore/flash-next-strata-q2-mtp`、`explore/freetoken-flash-next-strata-q2-mtp`，以独立profile、版本、wheel/cache合同和默认关闭的配置接入，禁止覆盖原制品。正式实测保留原最佳无MTP、按MTP资源预算调整后的无MTP和相同预算开启MTP三条结果，并明确单独引擎/backend/HTTP口径。用户已授权完善并验证后推送远端；当前尚未推送，也没有合并main。

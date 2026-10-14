@@ -1,0 +1,540 @@
+diff --git a/python/freetoken/attention/linear.py b/python/freetoken/attention/linear.py
+index f3717e5..554382c 100644
+--- a/python/freetoken/attention/linear.py
++++ b/python/freetoken/attention/linear.py
+@@ -42,6 +42,7 @@ class FLAMetadata:
+     track_h_row: torch.Tensor | None = None      # [nt] int64 row into h (boh_i + aligned//CHUNK)
+     track_conv_src: torch.Tensor | None = None   # [nt, kernel-1] int64 conv-input token positions
+     track_boundary_row: torch.Tensor | None = None  # [nt] int64 forward-local row of the track boundary; states with their own left context (qwen4_exp PLE) derive their windows from it
++    is_verify: bool = False
+ 
+ 
+ def build_fla_metadata(batch: "Batch", device: torch.device) -> FLAMetadata:
+@@ -78,7 +79,13 @@ def build_fla_metadata(batch: "Batch", device: torch.device) -> FLAMetadata:
+     fresh = [gdn_slot(r) for r in reqs if r.cached_len == 0]
+     fresh_host = torch.tensor(fresh, dtype=torch.int64, **pin) if fresh else None
+ 
+-    track = _build_track_metadata(reqs, cu_host, device, pin)
++    is_verify = getattr(batch, "is_verify", False)
++    if is_verify:
++        if len(reqs) != 1 or not 1 <= lens[0] <= 4 or reqs[0].cached_len <= 0:
++            raise ValueError("MTP verification requires one continuing request and 1-4 rows")
++        track = {}
++    else:
++        track = _build_track_metadata(reqs, cu_host, device, pin)
+ 
+     return FLAMetadata(
+         cu_seqlens=cu_host.to(device, non_blocking=True),
+@@ -87,6 +94,7 @@ def build_fla_metadata(batch: "Batch", device: torch.device) -> FLAMetadata:
+         fresh_state_indices=(
+             fresh_host.to(device, non_blocking=True) if fresh_host is not None else None
+         ),
++        is_verify=is_verify,
+         **track,
+     )
+ 
+diff --git a/python/freetoken/attention/qsa_sparse.py b/python/freetoken/attention/qsa_sparse.py
+index c25016d..bff9b47 100644
+--- a/python/freetoken/attention/qsa_sparse.py
++++ b/python/freetoken/attention/qsa_sparse.py
+@@ -297,7 +297,19 @@ class QSASparseAttnBackend(BaseAttnBackend):
+             # cached plan would bake the warmup's addresses into the graph.
+             self._plan_index_writes(md, batch)
+ 
++        snapshots = getattr(batch, "mtp_ring_snapshots", None)
++        old_ring = None
++        if getattr(batch, "is_verify", False) and snapshots is not None:
++            if md.ring_slots.numel() != 1 or not 1 <= index.k.shape[0] <= 4:
++                raise ValueError("MTP QSA verification requires one request and 1-4 rows")
++            old_ring = self.kvcache.pending_ring(slot).index_select(0, md.ring_slots.long())[0]
+         self._update_index_cache(index, md, slot)
++        if old_ring is not None:
++            rows = index.k.shape[0]
++            snapshots[:rows, slot].copy_(old_ring.unsqueeze(0).expand(rows, -1, -1))
++            for row in range(rows):
++                slots = md.positions[:row + 1].long() % old_ring.shape[0]
++                snapshots[row, slot].index_copy_(0, slots, index.k[:row + 1])
+         indices = self._select(index, md, slot)
+         return qsa_sparse_paged_attention(
+             q,
+diff --git a/python/freetoken/core.py b/python/freetoken/core.py
+index 45a763c..98a1817 100644
+--- a/python/freetoken/core.py
++++ b/python/freetoken/core.py
+@@ -66,6 +66,9 @@ class Req:
+     # handler must not free resources under an in-flight forward; it sets this flag and
+     # _process_last_data frees the request when the batch drains (after copy_done.synchronize).
+     aborted: bool = False
++    # Exclusive page-aligned ownership bound, including speculative lookahead.
++    # It must not advance cached_len or become visible to the prefix cache.
++    mtp_reserved_len: int = 0
+ 
+     def __post_init__(self) -> None:
+         assert self.input_ids.is_cpu
+@@ -115,7 +118,7 @@ class Req:
+ @dataclass
+ class Batch:
+     reqs: List[Req]
+-    phase: Literal["prefill", "decode"]
++    phase: Literal["prefill", "decode", "verify"]
+     # these fields should be set by scheduler
+     input_ids: torch.Tensor = field(init=False)
+     positions: torch.Tensor = field(init=False)
+@@ -157,6 +160,8 @@ class Batch:
+     # _prepare_batch succeeds. Continuation chunks leave this empty, so accounting is
+     # exactly-once.
+     prompt_admissions: List[Tuple[int, int, int]] = field(default_factory=list, init=False)
++    mtp_token_ids: torch.Tensor | None = field(default=None, init=False)
++    mtp_ring_snapshots: torch.Tensor | None = field(default=None, init=False)
+ 
+     @property
+     def is_prefill(self) -> bool:
+@@ -166,6 +171,10 @@ class Batch:
+     def is_decode(self) -> bool:
+         return self.phase == "decode"
+ 
++    @property
++    def is_verify(self) -> bool:
++        return self.phase == "verify"
++
+     def get_attn_positions(self) -> torch.Tensor:
+         return self.mrope_positions if self.mrope_positions is not None else self.positions
+ 
+diff --git a/python/freetoken/models/qwen4_exp/gdn.py b/python/freetoken/models/qwen4_exp/gdn.py
+index 1ca5708..55fa2ce 100644
+--- a/python/freetoken/models/qwen4_exp/gdn.py
++++ b/python/freetoken/models/qwen4_exp/gdn.py
+@@ -152,6 +152,8 @@ class Qwen4ExpGatedDeltaNet(BaseOP):
+         z = z.reshape(total, self.num_v_heads, self.head_v_dim)
+         li = pool.local_index(self.layer_id)
+ 
++        if getattr(fla, "is_verify", False) and not self._gguf:
++            raise ValueError("MTP verification currently requires the GGUF GDN path")
+         if self._gguf:
+             core_out = self._gguf_core(conv_in, a, b, pool, li, fla, batch.is_decode)
+         elif batch.is_decode:
+@@ -207,8 +209,21 @@ class Qwen4ExpGatedDeltaNet(BaseOP):
+         from freetoken.kernel.triton.gguf_gdn import gguf_gdn_forward
+         if pool.conv_states.dtype != torch.float32:
+             raise ValueError("GGUF GDN convolution state must be FP32")
++        is_verify = getattr(fla, "is_verify", False)
++        old_conv = None
++        if is_verify:
++            if is_decode or fla.cache_indices.numel() != 1 or not 1 <= len(conv_in) <= 4:
++                raise ValueError("MTP GDN verification requires one request and 1-4 rows")
++            if fla.track_dst is not None:
++                old_conv = pool.conv_states[li].index_select(
++                    0, fla.cache_indices.long())[0].transpose(0, 1)
+         if is_decode:
+             mixed = self._conv_decode(conv_in, fla.cache_indices, pool)
++        elif is_verify:
++            # Preserve native decode arithmetic; varlen prefill uses another
++            # activation implementation and may change quantized downstream picks.
++            mixed = torch.cat([self._conv_decode(conv_in[row:row + 1], fla.cache_indices, pool)
++                               for row in range(len(conv_in))], dim=0)
+         else:
+             mixed = self._conv_prefill(conv_in, pool, fla.cu_seqlens,
+                                        fla.cache_indices, fla.has_initial_state)
+@@ -221,7 +236,13 @@ class Qwen4ExpGatedDeltaNet(BaseOP):
+             v.reshape(-1, self.num_v_heads, self.head_v_dim),
+             a, b, self.A_log, self.dt_bias, pool.recurrent_states[li], fla, is_decode=is_decode)
+         if not is_decode and fla.track_dst is not None:
+-            conv_window = conv_in[fla.track_conv_src].transpose(-1, -2).contiguous()
++            if is_verify:
++                history = torch.cat([old_conv, conv_in], dim=0)
++                indices = fla.track_boundary_row[:, None] + torch.arange(
++                    old_conv.shape[0], device=conv_in.device)[None, :]
++                conv_window = history[indices].transpose(-1, -2).contiguous()
++            else:
++                conv_window = conv_in[fla.track_conv_src].transpose(-1, -2).contiguous()
+             pool.conv_states[li].index_copy_(0, fla.track_dst, conv_window)
+         return result
+ 
+diff --git a/python/freetoken/models/qwen4_exp/ple.py b/python/freetoken/models/qwen4_exp/ple.py
+index 9f6a56e..de57f28 100644
+--- a/python/freetoken/models/qwen4_exp/ple.py
++++ b/python/freetoken/models/qwen4_exp/ple.py
+@@ -294,6 +294,7 @@ class PLEMetadata:
+     state_slots: torch.Tensor
+     fresh_slots: torch.Tensor | None
+     is_decode: bool
++    is_verify: bool = False
+ 
+ 
+ def _state_slot(req) -> int:
+@@ -372,6 +373,7 @@ def build_ple_metadata(
+         state_slots=slots,
+         fresh_slots=fresh,
+         is_decode=batch.is_decode,
++        is_verify=getattr(batch, "is_verify", False),
+     )
+ 
+ 
+@@ -400,7 +402,11 @@ def commit_ngram_context(meta: PLEMetadata, fla, context_pool: torch.Tensor | No
+         nxt = torch.where(cand >= cu[:-1].unsqueeze(1), ids[cand.clamp_min(0)], old)
+     context_pool.index_copy_(0, meta.state_slots, nxt.to(context_pool.dtype))
+     if fla is not None and fla.track_boundary_row is not None:
+-        win = ids[fla.track_boundary_row.unsqueeze(1) - ctx_len + steps]
++        if getattr(fla, "is_verify", False):
++            history = torch.cat([meta.ngram_context[0], ids])
++            win = history[fla.track_boundary_row.unsqueeze(1) + steps]
++        else:
++            win = ids[fla.track_boundary_row.unsqueeze(1) - ctx_len + steps]
+         context_pool.index_copy_(0, fla.track_dst, win.to(context_pool.dtype))
+ 
+ 
+@@ -628,10 +634,16 @@ class PLELayer(BaseOP):
+         """Copy the conv history at the GDN track boundary into the same donatable slot, so a radix
+         prefix hit restores PLE and GDN state together. Track slots never alias the live slots this
+         forward advances, so the two writes are order-independent."""
+-        src = fla.track_boundary_row.unsqueeze(1) + torch.arange(
+-            -self.state_len, 0, device=x.device
+-        )
+-        window = x[src].transpose(-1, -2).contiguous()
++        if getattr(fla, "is_verify", False):
++            old = states.index_select(0, fla.cache_indices.long())[0].transpose(0, 1)
++            history = torch.cat([old, x], dim=0)
++            src = fla.track_boundary_row.unsqueeze(1) + torch.arange(self.state_len, device=x.device)
++            window = history[src].transpose(-1, -2).contiguous()
++        else:
++            src = fla.track_boundary_row.unsqueeze(1) + torch.arange(
++                -self.state_len, 0, device=x.device
++            )
++            window = x[src].transpose(-1, -2).contiguous()
+         states.index_copy_(0, fla.track_dst, window.to(states.dtype))
+ 
+     def _conv_state_slab(self, R: torch.Tensor) -> torch.Tensor:
+@@ -656,8 +668,25 @@ class PLELayer(BaseOP):
+         """silu of the dilated depthwise conv over [state | x], and roll the per-request state."""
+         if meta.is_decode:
+             return self._decode_conv(x, meta, states)
++        if meta.is_verify:
++            return self._verify_conv(x, meta, states)
+         return self._prefill_conv(x, meta, states)
+ 
++    def _verify_conv(
++        self, x: torch.Tensor, meta: PLEMetadata, states: torch.Tensor
++    ) -> torch.Tensor:
++        if len(meta.seq_lens) != 1 or not 1 <= len(x) <= 4:
++            raise ValueError("MTP PLE verification requires one request and 1-4 rows")
++        old = self._read_state(meta, states, x.dtype)[0]
++        history = torch.cat([old.transpose(0, 1), x], dim=0)
++        indices = torch.arange(len(x), device=x.device)[:, None] + torch.arange(
++            0, self.state_len + 1, self.dilation, device=x.device)[None, :]
++        window = history[indices].transpose(-1, -2).contiguous().float()
++        out = (window * self.conv1d.weight.squeeze(1).float()).sum(-1)
++        states.index_copy_(0, meta.state_slots,
++                          history[-self.state_len:].transpose(0, 1)[None].contiguous().to(states.dtype))
++        return F.silu(out.to(x.dtype))
++
+     def _decode_conv(
+         self, x: torch.Tensor, meta: PLEMetadata, states: torch.Tensor
+     ) -> torch.Tensor:
+diff --git a/python/freetoken/scheduler/cache.py b/python/freetoken/scheduler/cache.py
+index 772297e..ef8cb3e 100644
+--- a/python/freetoken/scheduler/cache.py
++++ b/python/freetoken/scheduler/cache.py
+@@ -262,12 +262,22 @@ class CacheManager:
+         if self.swa_pool is not None and len(indices) > 0:
+             self.swa_pool.free_swa(indices)
+ 
+-    def allocate_paged(self, reqs: List[Req]) -> None:
++    def allocate_paged(self, reqs: List[Req], *, reserve_tokens: int = 0) -> None:
++        if reserve_tokens < 0:
++            raise ValueError("reserve_tokens must be non-negative")
++        if reserve_tokens and (not self.is_hybrid or self.swa_paged):
++            raise ValueError("MTP page reservation requires the hybrid GDN cache")
+         needed_pages = 0
+         allocation_info: List[Tuple[int, int, int]] = []
++        reservations: List[Tuple[Req, int]] = []
+         for req in reqs:
+-            first_page = div_ceil(req.cached_len, self.page_size)
+-            last_page = div_ceil(req.device_len, self.page_size)
++            first_page = div_ceil(max(req.cached_len, req.mtp_reserved_len), self.page_size)
++            end = (min(req.device_len + reserve_tokens, req.max_device_len)
++                   if reserve_tokens else req.device_len)
++            last_page = div_ceil(end, self.page_size)
++            # Native preparation may already own the pending token's page. Record
++            # it too, so reserving a window after preparation never replaces it.
++            reservations.append((req, max(req.mtp_reserved_len, last_page * self.page_size)))
+             if last_page > first_page:
+                 needed_pages += last_page - first_page
+                 allocation_info.append((req.table_idx, first_page, last_page))
+@@ -282,6 +292,8 @@ class CacheManager:
+                     self.ensure_swa_slots(len(allocated))
+                 self.swa_pool.alloc_swa(allocated)
+             _write_page_table(self.page_table, allocated, allocation_info, self.page_size)
++        for req, end in reservations:
++            req.mtp_reserved_len = end
+ 
+     def cache_req(self, req: Req, *, finished: bool) -> None:
+         if self.is_swa:
+@@ -339,7 +351,8 @@ class CacheManager:
+ 
+         pool = self.linear_state_pool
+         old_handle = req.cache_handle
+-        page_indices = self.page_table[req.table_idx, : req.cached_len]
++        page_indices = (self._padded_tail(req, 0) if finished else
++                        self.page_table[req.table_idx, : req.cached_len])
+ 
+         if finished:
+             # A pending freeze (the tool-call anchor, or a prefill ×64 track the request
+@@ -377,11 +390,13 @@ class CacheManager:
+                     req.input_ids[:insert_len], page_indices[:insert_len], req.linear_slot_idx)
+                 self.unlock(old_handle)
+                 self._free(page_indices[free_upto : max(free_upto, prefix_len)])
++                self._free(self._padded_tail(req, req.cached_len))
+                 keep_live = not mamba_exist           # tree now owns linear_slot_idx
+             else:
+                 self.unlock(old_handle)
+                 self._free(page_indices[free_upto :])
+             self._free_req_slots(req, keep_live=keep_live)
++            req.mtp_reserved_len = 0
+             return
+ 
+         # Prefill chunk commit: donate the frozen snapshot at the tracked ×64 boundary.
+@@ -493,12 +508,14 @@ class CacheManager:
+             self.lock(req.cache_handle)
+ 
+     def _padded_tail(self, req: Req, start: int) -> torch.Tensor:
+-        """The request's OWN slice [start, page_ceil(cached_len)) of the page table. A finish
++        """The request's OWN slice through its allocated page bound. A finish
+         frees through the page-CEIL bound, not cached_len: allocate_paged allocates (and, when
+         swa_paged, charges swa for) whole pages, so the padding [cached_len, page_ceil) belongs
+         to the finishing request. ``start`` is page-aligned (a match/insert boundary), so the
+-        full-pool page bases derived via ``[::page_size]`` are identical to the unpadded slice."""
+-        end = div_ceil(req.cached_len, self.page_size) * self.page_size
++        full-pool page bases derived via ``[::page_size]`` are identical to the unpadded slice.
++        Speculative pages beyond cached_len are owned but never inserted into the tree."""
++        end = max(div_ceil(req.cached_len, self.page_size) * self.page_size,
++                  req.mtp_reserved_len)
+         return self.page_table[req.table_idx, start:end]
+ 
+     def _free_req_slots(self, req: Req, keep_live: bool = False) -> None:
+diff --git a/tests/models/qwen4_exp/test_gguf_gdn.py b/tests/models/qwen4_exp/test_gguf_gdn.py
+index 90e590f..7e59dc1 100644
+--- a/tests/models/qwen4_exp/test_gguf_gdn.py
++++ b/tests/models/qwen4_exp/test_gguf_gdn.py
+@@ -7,6 +7,72 @@ import torch.nn.functional as F
+ 
+ @unittest.skipUnless(torch.cuda.is_available(), "requires CUDA")
+ class GGUFStateTests(unittest.TestCase):
++    def test_verify_conv_and_recurrence_snapshots_equal_native_decode(self):
++        from freetoken.attention.linear import FLAMetadata
++        from freetoken.kvcache.linear_state_pool import LinearStatePool
++        from freetoken.models.config import LinearGatedDeltaGroupConfig
++        from freetoken.models.qwen4_exp.gdn import Qwen4ExpGatedDeltaNet
++        group = LinearGatedDeltaGroupConfig(
++            name='linear', layer_ids=(0,), num_key_heads=2, num_value_heads=6,
++            key_head_dim=128, value_head_dim=128, conv_kernel_dim=4, output_gate='sigmoid')
++        pool = LinearStatePool(group, 8, torch.float32, torch.device('cuda'), tp_size=1)
++        op = object.__new__(Qwen4ExpGatedDeltaNet)
++        op.layer_id = 0
++        op.num_k_heads, op.num_v_heads = 2, 6
++        op.head_k_dim, op.head_v_dim = 128, 128
++        op.key_dim, op.value_dim = 256, 768
++        op.conv1d = SimpleNamespace(weight=torch.randn(1280, 1, 4, device='cuda'))
++        op.A_log = -torch.rand(6, device='cuda')
++        op.dt_bias = torch.randn(6, device='cuda')
++        for count in (1, 2, 3, 4):
++            with self.subTest(count=count):
++                pool.conv_states.normal_()
++                pool.recurrent_states.normal_(0, .01)
++                initial_conv = pool.conv_states.clone()
++                initial_rec = pool.recurrent_states.clone()
++                conv = torch.randn(count, 1280, device='cuda')
++                a, b = torch.randn(count, 6, device='cuda'), torch.randn(count, 6, device='cuda')
++                slots = torch.tensor([1], dtype=torch.int32, device='cuda')
++                fla = FLAMetadata(torch.tensor([0, count], dtype=torch.int32, device='cuda'), slots,
++                    track_dst=torch.arange(2, count + 2, device='cuda'),
++                    track_boundary_row=torch.arange(1, count + 1, device='cuda'), is_verify=True)
++                output = op._gguf_core(conv, a, b, pool, 0, fla, False)
++                verify_conv, verify_rec = pool.conv_states.clone(), pool.recurrent_states.clone()
++                pool.conv_states.copy_(initial_conv)
++                pool.recurrent_states.copy_(initial_rec)
++                one = FLAMetadata(torch.tensor([0, 1], dtype=torch.int32, device='cuda'), slots)
++                expected = []
++                for row in range(count):
++                    expected.append(op._gguf_core(conv[row:row+1], a[row:row+1], b[row:row+1], pool, 0, one, True))
++                    torch.testing.assert_close(verify_conv[0, row + 2], pool.conv_states[0, 1], rtol=0, atol=0)
++                    torch.testing.assert_close(verify_rec[0, row + 2], pool.recurrent_states[0, 1], rtol=0, atol=0)
++                torch.testing.assert_close(output, torch.cat(expected), rtol=0, atol=0)
++                if count == 4:
++                    # A reusable graph must honor the live request's staged slot,
++                    # rather than baking the capture request's slot into snapshots.
++                    graph = torch.cuda.CUDAGraph()
++                    stream = torch.cuda.Stream()
++                    stream.wait_stream(torch.cuda.current_stream())
++                    with torch.cuda.stream(stream):
++                        op._gguf_core(conv, a, b, pool, 0, fla, False)
++                        with torch.cuda.graph(graph, stream=stream):
++                            captured = op._gguf_core(conv, a, b, pool, 0, fla, False)
++                    torch.cuda.current_stream().wait_stream(stream)
++                    pool.conv_states.copy_(initial_conv)
++                    pool.recurrent_states.copy_(initial_rec)
++                    slots.fill_(6)
++                    graph.replay()
++                    verify_conv, verify_rec = pool.conv_states.clone(), pool.recurrent_states.clone()
++                    pool.conv_states.copy_(initial_conv)
++                    pool.recurrent_states.copy_(initial_rec)
++                    expected = []
++                    for row in range(count):
++                        expected.append(op._gguf_core(conv[row:row+1], a[row:row+1], b[row:row+1], pool, 0, one, True))
++                        torch.testing.assert_close(verify_conv[0, row + 2], pool.conv_states[0, 6], rtol=0, atol=0)
++                        torch.testing.assert_close(verify_rec[0, row + 2], pool.recurrent_states[0, 6], rtol=0, atol=0)
++                    torch.testing.assert_close(captured, torch.cat(expected), rtol=0, atol=0)
++                    graph.reset()
++
+     def test_channels_first_view_varlen_snapshot_and_resume(self):
+         from freetoken.kernel.triton.gguf_gdn import gguf_gdn_forward
+         torch.manual_seed(17)
+diff --git a/tests/models/qwen4_exp/test_gguf_ple.py b/tests/models/qwen4_exp/test_gguf_ple.py
+index 17a9ce4..e80496e 100644
+--- a/tests/models/qwen4_exp/test_gguf_ple.py
++++ b/tests/models/qwen4_exp/test_gguf_ple.py
+@@ -43,4 +43,49 @@ class GGUFPLEReductionTests(unittest.TestCase):
+         zeros=torch.zeros_like(key)
+         torch.testing.assert_close(gguf_ple_gate(zeros,query,4),torch.full_like(gate,.5),rtol=0,atol=0)
+ 
++class VerifyPLEStateTests(unittest.TestCase):
++    def test_window_and_every_snapshot_equal_native_decode(self):
++        from freetoken.attention.linear import FLAMetadata
++        from freetoken.models.qwen4_exp.ple import PLELayer, PLEMetadata, commit_ngram_context
++        devices = ['cpu', 'cuda'] if torch.cuda.is_available() else ['cpu']
++        for device in devices:
++            for count in (1, 2, 3, 4):
++                with self.subTest(device=device, count=count):
++                    torch.manual_seed(205)
++                    layer = object.__new__(PLELayer)
++                    layer.state_len = 9
++                    layer.dilation = 3
++                    layer.conv1d = SimpleNamespace(weight=torch.randn(16, 1, 4, device=device))
++                    states = torch.randn(7, 16, 9, device=device)
++                    reference = states.clone()
++                    context_pool = torch.arange(35, device=device).reshape(7, 5).clone()
++                    context_ref = context_pool.clone()
++                    x = torch.randn(count, 16, device=device)
++                    ids = torch.arange(100, 100 + count, device=device)
++                    slots = torch.tensor([1], device=device)
++                    boundaries = torch.arange(1, count + 1, device=device)
++                    dst = torch.arange(2, count + 2, device=device)
++                    fla = FLAMetadata(torch.tensor([0, count], device=device), slots,
++                                      track_dst=dst, track_boundary_row=boundaries, is_verify=True)
++                    meta = PLEMetadata(ids, fla.cu_seqlens, (count,), context_pool[1:2].clone(),
++                                       slots, None, False, True)
++                    layer._write_track_snapshot(states, x, fla)
++                    output = layer._short_conv(x, meta, states)
++                    commit_ngram_context(meta, fla, context_pool)
++                    expected = []
++                    for row in range(count):
++                        one = PLEMetadata(ids[row:row+1], torch.tensor([0, 1], device=device),
++                                          (1,), context_ref[1:2].clone(), slots, None, True)
++                        expected.append(layer._short_conv(x[row:row+1], one, reference))
++                        commit_ngram_context(one, None, context_ref)
++                        torch.testing.assert_close(states[row + 2], reference[1], rtol=0, atol=0)
++                        torch.testing.assert_close(context_pool[row + 2], context_ref[1], rtol=0, atol=0)
++                    # CPU SiLU changes vectorization with the row count. CUDA,
++                    # the supported inference path, must match native decode exactly.
++                    tolerance = 0 if device == 'cuda' else 2e-7
++                    torch.testing.assert_close(output, torch.cat(expected), rtol=tolerance, atol=tolerance)
++                    torch.testing.assert_close(states[1], reference[1], rtol=0, atol=0)
++                    torch.testing.assert_close(context_pool[1], context_ref[1], rtol=0, atol=0)
++
++
+ if __name__=='__main__':unittest.main()
+diff --git a/tests/scheduler/test_hybrid_cache_manager.py b/tests/scheduler/test_hybrid_cache_manager.py
+index 098f276..7e1d51f 100644
+--- a/tests/scheduler/test_hybrid_cache_manager.py
++++ b/tests/scheduler/test_hybrid_cache_manager.py
+@@ -6,6 +6,7 @@ from __future__ import annotations
+ from types import SimpleNamespace
+ 
+ import torch
++import pytest
+ 
+ from freetoken.core import Req, SamplingParams
+ from freetoken.kvcache.linear_state_pool import LinearStatePool
+@@ -163,6 +164,83 @@ def test_pool_sizing_covers_4mr_floor():
+         assert _linear_pool_num_slots(c) >= 4 * mr + 1, (mr, _linear_pool_num_slots(c))
+ 
+ 
++@pytest.mark.parametrize("page_size,position", [(4, 3), (4, 4), (64, 63), (64, 64)])
++@pytest.mark.parametrize("committed_rows", [1, 2, 3, 4])
++def test_mtp_reservation_is_owned_once_and_rejected_tail_is_freed(page_size, position, committed_rows):
++    pool = _pool()
++    pt = torch.full((4, 1024), -1, dtype=torch.int32)
++    cm = CacheManager(16, page_size, pt, "hybrid_radix", linear_state_pool=pool)
++    ids = torch.arange(position + 1, dtype=torch.int32)
++    match = cm.match_req(_pend(ids.tolist()))
++    req = Req(ids, 1, 0, 16, 1, SamplingParams(), match.cuda_handle)
++    req.linear_slot_idx = pool.alloc(1)[0]
++    req.mamba_ping_pong = tuple(pool.alloc(2))
++    cm.lock(req.cache_handle)
++    cm.allocate_paged([req])
++    req.cached_len = position
++    original = pt[1, :position + 1].clone()
++    cm.allocate_paged([req], reserve_tokens=3)
++    reserved = pt[1, :req.mtp_reserved_len].clone()
++    free_count = cm.free_slots.numel()
++    assert torch.equal(original, reserved[:original.numel()])
++    assert req.cached_len == position
++    assert req.mtp_reserved_len >= position + 4
++    cm.allocate_paged([req], reserve_tokens=3)
++    assert cm.free_slots.numel() == free_count
++    assert torch.equal(pt[1, :reserved.numel()], reserved)
++
++    # A rejected suffix survives as owned lookahead for the next round; neither
++    # a second reservation nor the native one-token preparation may allocate it twice.
++    req.cached_len += committed_rows
++    req.device_len += committed_rows
++    req.append_host(torch.arange(100, 100 + committed_rows, dtype=torch.int32))
++    cm.allocate_paged([req])
++    # After all four rows commit, the next pending input can need a new page;
++    # only that new page may be charged, never any of the reserved pages again.
++    next_pages = max(0, (req.device_len + page_size - 1) // page_size - reserved.numel() // page_size)
++    assert cm.free_slots.numel() == free_count - next_pages
++    assert torch.equal(pt[1, :reserved.numel()], reserved)
++    cm.cache_req(req, finished=True)
++    cm.check_integrity()
++    assert cm.free_slots.unique().numel() == cm.free_slots.numel()
++    assert req.mtp_reserved_len == 0
++    retained = req.cached_len if req.cached_len % page_size == 0 else 0
++    assert cm.free_slots.numel() == cm.num_pages - retained // page_size
++    hit = cm.match_req(_pend([*req.input_ids[:req.cached_len].tolist(), 999]))
++    assert hit.cuda_handle.cached_len == retained
++    assert hit.cuda_handle.cached_len <= req.cached_len
++
++
++def test_mtp_finish_keeps_shared_prefix_and_returns_only_owned_future_pages():
++    pool = _pool()
++    pt = torch.full((4, 128), -1, dtype=torch.int32)
++    cm = CacheManager(16, 4, pt, "hybrid_radix", linear_state_pool=pool)
++
++    def admit(ids, cached=0, handle=None):
++        if handle is None:
++            handle = cm.match_req(_pend(ids)).cuda_handle
++        req = Req(torch.tensor(ids, dtype=torch.int32), 1, cached, 12, 1, SamplingParams(), handle)
++        req.linear_slot_idx = pool.alloc(1)[0]
++        req.mamba_ping_pong = tuple(pool.alloc(2))
++        cm.lock(handle)
++        if cached:
++            pt[1, :cached].copy_(handle.get_matched_indices())
++        cm.allocate_paged([req], reserve_tokens=3)
++        return req
++
++    first = admit([1, 2, 3, 4, 5])
++    first.cached_len = 4
++    cm.cache_req(first, finished=True)
++    canonical = pt[1, :4].clone()
++    hit = cm.match_req(_pend([1, 2, 3, 4, 9]))
++    second = admit([1, 2, 3, 4, 9], 4, hit.cuda_handle)
++    second.cached_len = 5  # first rejected window row committed; no aligned new snapshot
++    cm.cache_req(second, finished=True)
++    cm.check_integrity()
++    assert torch.equal(cm.match_req(_pend([1, 2, 3, 4, 8])).cuda_handle.get_matched_indices(), canonical)
++    assert set(canonical[::4].tolist()).isdisjoint(cm.free_slots.tolist())
++
++
+ if __name__ == "__main__":
+     for name, fn in list(globals().items()):
+         if name.startswith("test_") and callable(fn):

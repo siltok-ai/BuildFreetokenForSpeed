@@ -200,6 +200,11 @@ def main():
         from validate_sparse_residency_revision import validate as validate_sparse_revision
         dev7_materials = ROOT/'artifacts/strataq2dev7-cp312-cu130-sm120'
         research_dev7 = validate_sparse_revision(dev7_profile,dev7_materials if dev7_materials.exists() else None)
+    mtp_checkpoint = None
+    mtp_record = ROOT/'research/mtp/evidence/engine-foundation-20261014-v1/index.json'
+    if mtp_record.exists():
+        from validate_mtp_engine_checkpoint import validate as validate_mtp_checkpoint
+        mtp_checkpoint = validate_mtp_checkpoint(mtp_record)
     print(json.dumps({"official_files": len(original_hashes), "changed_files": len(changed),
                       "patches": len(series["patches"]), "split_equals_historical": True,
                       "wheel_python_matches_prepared_source": True, "aot_count": len(specs),
@@ -207,7 +212,8 @@ def main():
                       "strata_research_dev2":research_dev2,
                       "strata_research_dev3":research_dev3, "strata_research_dev4":research_dev4,
                       "strata_research_dev5":research_dev5,
-                      "strata_research_dev6":research_dev6, "strata_research_dev7":research_dev7, "verified": True}))
+                      "strata_research_dev6":research_dev6, "strata_research_dev7":research_dev7,
+                      "mtp_engine_development_checkpoint":mtp_checkpoint, "verified": True}))
 
 
 if __name__ == "__main__":
