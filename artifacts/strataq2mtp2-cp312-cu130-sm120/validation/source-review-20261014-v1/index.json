@@ -1,0 +1,47 @@
+{
+  "status": "source_final_abort_and_materials_verified",
+  "version": "0.1.3+speed.strataq2mtp2",
+  "repository_validator_passed": true,
+  "materials_tool_tests": 18,
+  "component_tests": "84 passed, 12 subtests passed",
+  "full_engine_acceptance": false,
+  "speed_mtp_acceptance": false,
+  "performance_acceptance": false,
+  "evidence": [
+    {
+      "path": "artifacts/strataq2mtp2-cp312-cu130-sm120/validation/source-review-20261014-v1/freeze_mtp2_final_abort_v1.py.gz",
+      "sha256": "aa4eaaf3bdadbfc782febcb08ba1411b5cb232e2c88f2cba0bc22ad01181b556",
+      "raw_sha256": "6c94a6aaec1b4fc450d2aba2429075d7ab12efb294d02457c523397a7fc18a3c"
+    },
+    {
+      "path": "artifacts/strataq2mtp2-cp312-cu130-sm120/validation/source-review-20261014-v1/mtp2-derived-materials-v1.log.gz",
+      "sha256": "83dcc1936906ff77486713916eb6f4035a61d3a408d9a3d1c8d13d977cf4ce30",
+      "raw_sha256": "f97635426388be60692d1522922c4009e1cf7ac5e5ecad2ac97d46840f30070a"
+    },
+    {
+      "path": "artifacts/strataq2mtp2-cp312-cu130-sm120/validation/source-review-20261014-v1/mtp2-build-validator-v1.log.gz",
+      "sha256": "9e505031395060b6bbf9705e4b0279f2b972e7fb3b578d9373442356279f4273",
+      "raw_sha256": "24cbc40e8f6a2056a45741c4170acc1ea71a1d13b35a8f45b90096fd3ef49918"
+    },
+    {
+      "path": "artifacts/strataq2mtp2-cp312-cu130-sm120/validation/source-review-20261014-v1/mtp2-build-unittests-v1.log.gz",
+      "sha256": "7eaf79040d05d03881264b42836610c3aeb4fe9f35eefca50b59e21a19faf0a2",
+      "raw_sha256": "e28b6a50659a5700e798e7e48ff5df6c06fbe25c4bb0bea2d528493a1864e1dc"
+    },
+    {
+      "path": "artifacts/strataq2mtp2-cp312-cu130-sm120/validation/source-review-20261014-v1/mtp2-environment-base-freeze-v1.txt.gz",
+      "sha256": "e888ed65f6bb95f10890e76e84686ba967562d80f1d83742b4db25b837b63f1d",
+      "raw_sha256": "f2bc9ef8dd93624ea830fbd13ec3885f5078bdc7bcf8aa5a40bec0813f696697"
+    },
+    {
+      "path": "artifacts/strataq2mtp2-cp312-cu130-sm120/validation/source-review-20261014-v1/mtp2-environment-dependencies-v1.txt.gz",
+      "sha256": "dff97d2f619a46a67cbe4c936f91eea0bd9a90ae88638321850296d3f445baf2",
+      "raw_sha256": "a3be8c5b99d179c7eb017bdd93bfca1288f212e5c6bd325250ae32e0a8899948"
+    },
+    {
+      "path": "artifacts/strataq2mtp2-cp312-cu130-sm120/validation/source-review-20261014-v1/mtp2-environment-install-v1.log.gz",
+      "sha256": "fe288eb5fbb16056f5a50aea6a4ca47845b1e18d223e5330c6be716fe0cf7190",
+      "raw_sha256": "461594ed109033569b7cbf5fb843ebbbe4620d194629d8fc3bf24e741e51116f"
+    }
+  ]
+}

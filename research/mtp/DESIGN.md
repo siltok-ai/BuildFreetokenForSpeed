@@ -105,3 +105,9 @@ Strata实现的逐项对照和缺口见 `STRATA-MAPPING.md`。本轮将8份固�
 基础生命周期证据见 `evidence/engine-lifecycle-20261014-v1/index.json`；独立安装及实际淘汰/锚点证据见 `evidence/installed-ownership-20261014-v1/index.json`。基础生命周期进程commit峰值61,407,039,488B、最低可用8,950,820,864B；独立安装ownership进程峰值62,102,511,616B、最低可用8,255,348,736B，NVML最低GPU可用3594.55MiB（短输入/16页测试，不代表4K峰值）。冻结源码重放、wheel来源/native身份及原始证据仍由仓库validator独立校验。
 
 按用户要求，稳定交付前只完成安装版本的长输出/quality/取消、失败路径以及Speed默认关闭开关、实际backend/HTTP、旧模型与随包回归。生产窗口异常必须使worker明确失败退出，丢弃未交付数据并释放上下文；当前不会在受损状态上悄悄继续，也不将未实现的库内异常恢复宣称为通过。受限draft head、动态k和更多细节优化留给稳定版本之后。两个对应分支在上述必要验收与完整review后再推送，main保持原状。
+
+### 最后窗口取消的必需修订
+
+接入Speed的取消边界review复现了一项实际所有权问题：`DecodeManager.filter_reqs`会先移除预算已用尽的请求，而最后一个MTP窗口仍在in-flight batch中等待CPU交付；此时原abort只查prefill/decode队列，漏掉这个请求，导致最后bundle仍交付且随后又回abort ack。CPU真实Req、DecodeManager和HybridRadix页/状态管理测试在旧代码上因req.aborted=False失败。补丁0019改为在两队列未找到时查仍持有有效table_idx的in-flight batch，延迟到copy_done后丢弃bundle、补齐已提交CPU历史并释放一次，最后只发送abort ack。84项组件与12个子测试通过，原故障及修复日志保存在 `evidence/final-abort-20261014-v1/index.json`；开发源码为 `ecd72e3071c470e3da268dd516df8d1fd81c3ded`。
+
+已冻结新的 `strataq2mtp2` profile和版本 `0.1.3+speed.strataq2mtp2`，补丁0020只改版本；保留全部mtp1资料和制品。新wheel SHA256 `20f4ea8983e9bb06c850c92322d07b78c7acfc1321b066f69c868de0f860ecd1`，27个AOT/3个native字节不变。源重放与故障前/后CPU测试不能代替真实GPU最后窗口取消或Speed服务验收，这些继续在独立安装mtp2环境验证。

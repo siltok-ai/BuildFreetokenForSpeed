@@ -4,6 +4,8 @@
 
 Flash Next的MTP候选保持在独立分支：见[完整接入设计](research/mtp/DESIGN.md)及[Strata实现对照](research/mtp/STRATA-MAPPING.md)。无MTP dev7制品保持冻结；正式MTP调度四组512-token匹配对应native基线，83项组件测试与12个子测试、41次基础生命周期生成通过。独立候选profile/version为 `strataq2mtp1` / `0.1.3+speed.strataq2mtp1`，新wheel已生成；尚未完成Speed服务、稳定性能和发布验收，不能继承dev7验收，也不能将开发源码覆盖作为正式制品。
 
+当前后续候选为 `strataq2mtp2` / `0.1.3+speed.strataq2mtp2`：修复review中复现的最后in-flight窗口取消，84项组件与12个子测试通过。mtp1材料保留；新版本仍需安装后的真实取消、Speed及性能/回归验收，不属于已完成的稳定发布。
+
 为 Silitok Speed 维护可追溯的 **FreeToken 官方源码 + 本地补丁 + Windows 构建素材**。本仓库既提供已验证的 wheel / DLL，也提供从冻结源码重新生成这些素材的入口。
 
 当前构建候选为 **`0.1.3+speed.q2opt2`**，官方来源 `078132480ea4a0424f677a27eb22085624d331e6`，CPython 3.12 / Windows x64 / Torch 2.11.0+cu130 / CUDA 13.0 / SM120。新构建默认使用 `build/profiles/q2opt2.json`；历史 win1 含 INVALID 专家别名实验，仅保留复现。

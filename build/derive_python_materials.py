@@ -75,6 +75,7 @@ PYTHON_ONLY_CHANGES = {
     'tests/kvcache/test_qsa_pool.py',
     'tests/models/qwen4_exp/test_mtp_runtime.py',
     'tests/scheduler/test_hybrid_cache_manager.py',
+    'tests/scheduler/test_abort_inflight_prefill.py',
 }
 
 
