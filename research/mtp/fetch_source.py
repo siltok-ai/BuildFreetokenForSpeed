@@ -7,7 +7,6 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REVISION = 'de4b8e4d43b917e7706784d8bb445c9af86a3540'
-OUT = Path('C:/workspace/models/Qwen/Qwen3.8-Flash-Next') / REVISION / 'mtp-source-bf16'
 STRATA_COMMIT = '6674a0065fb96bacde33e3eb10f91a1df86f95f2'
 
 
@@ -15,7 +14,9 @@ def main():
     """限定新权重目录、来源与完整张量集合；下载后独立核验每个文件。"""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=['inventory', 'fetch', 'verify'])
+    parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
+    OUT = args.output.resolve()
     origins = json.loads((HERE / 'references/origins.json').read_text(encoding='utf-8'))
     assert origins['commit'] == STRATA_COMMIT
     code = HERE / 'references/mtp_fetch.py'

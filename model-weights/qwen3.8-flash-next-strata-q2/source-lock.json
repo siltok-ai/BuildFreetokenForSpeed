@@ -1,0 +1,69 @@
+{
+  "format": 1,
+  "model": "qwen3.8-flash-next.strata-q2",
+  "scope": "Complete GGUF text weights; HF metadata/tokenizer only; no HF trunk or visual weights",
+  "gguf": {
+    "repo": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "revision": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+    "files": [
+      {
+        "name": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "bytes": 37623740192,
+        "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+      },
+      {
+        "name": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "bytes": 28800138432,
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+      }
+    ]
+  },
+  "metadata": {
+    "repo": "RadixArk/Qwen3.8-Flash-Next-NVFP4",
+    "revision": "7b719225242aacd3dbd3f9407468c2ee9a9d2594",
+    "files": [
+      {
+        "name": "config.json",
+        "bytes": 4983,
+        "sha256": "e765305daba0951974308f4d32c075b52a6a45974730d273f2216718a994d624"
+      },
+      {
+        "name": "generation_config.json",
+        "bytes": 202,
+        "sha256": "e70c136c1b78ddc1fb0905bac8e733a4dc448d4f852a5dd75143fffc70be550e"
+      },
+      {
+        "name": "tokenizer_config.json",
+        "bytes": 17928,
+        "sha256": "b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27"
+      },
+      {
+        "name": "tokenizer.json",
+        "bytes": 12809320,
+        "sha256": "0997f410c57a1f4e53b09e4be8f4a172d90edd9564368fb0847030937229b9f3"
+      },
+      {
+        "name": "chat_template.jinja",
+        "bytes": 8952,
+        "sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041"
+      }
+    ],
+    "scope": "Only model config, tokenizer and chat template; never HF weight shards"
+  },
+  "expert_geometry": {
+    "layers": 48,
+    "experts_per_layer": 512,
+    "hidden": 2560,
+    "intermediate": 640,
+    "expert_bytes": 33973862400
+  },
+  "mtp": {
+    "repository": "Qwen/Qwen3.8-Flash-Next",
+    "revision": "de4b8e4d43b917e7706784d8bb445c9af86a3540",
+    "tensor_count": 31,
+    "source_bytes": 5214301696,
+    "runtime_bytes": 823887872,
+    "manifest": "mtp-runtime.json",
+    "manifest_sha256": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d"
+  }
+}

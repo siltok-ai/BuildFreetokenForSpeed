@@ -7,9 +7,10 @@ import os
 from pathlib import Path
 import subprocess
 import zipfile
+from current_release import load_current
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_PROFILE = ROOT / "build/profiles/q2opt2.json"
+DEFAULT_PROFILE = ROOT / load_current()['profile']
 
 
 def sha256(path):

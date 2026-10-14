@@ -2,7 +2,7 @@
 
 目标是持续获得官方模型与性能更新，同时保留 Speed 的小范围平台适配和优化；每次升级都有明确来源、可读差异、可生成制品、旧模型回归和回滚能力。本仓库作为 Speed 之外的定制供应层，避免把修改散落在某台机器的 site-packages 或无法重建的 wheel 中。
 
-当前默认 profile 为 `q2opt2`，有序目录为 `patches/q2opt2-series.json`，已经排除专家别名实验。六组补丁的必要性、来源身份修复、可移除条件和实际验证见 [Q2 材料审查](q2-material-review.md)。下文 win1 迁移和 normal/research 规划保留历史背景；当前 validator 同时保留 win1 等价证明，并分别核对 q2opt1 / q2opt2 的实际 profile 与原生来源。
+当前默认 profile 由 `integration/speed/current-release.json` 选择，为 `strataq2mtp2`，有序目录为 `patches/strataq2mtp2-series.json`；MTP 默认关闭。全 GGUF/MTP 准备、迁移和 Speed 配套入口见 [当前交付流程](flash-next-current-delivery.md)。以下 q2opt2/win1 内容保留历史上下文。六组补丁的必要性、来源身份修复、可移除条件和实际验证见 [Q2 材料审查](q2-material-review.md)。下文 win1 迁移和 normal/research 规划保留历史背景；当前 validator 同时保留 win1 等价证明，并分别核对 q2opt1 / q2opt2 的实际 profile 与原生来源。
 
 ## 三个边界
 

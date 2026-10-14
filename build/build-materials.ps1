@@ -3,11 +3,15 @@ param(
     [Parameter(Mandatory)][string]$BuildPython,
     [Parameter(Mandatory)][string]$CudaHome,
     [Parameter(Mandatory)][string]$OutDir,
-    [string]$Profile = (Join-Path $PSScriptRoot 'profiles/q2opt2.json'),
+    [string]$Profile = '',
     [int]$Jobs = 2,
     [switch]$PreflightOnly
 )
 $ErrorActionPreference = 'Stop'
+if (-not $Profile) {
+    $Current = Get-Content -LiteralPath (Join-Path $PSScriptRoot '../integration/speed/current-release.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+    $Profile = Join-Path $PSScriptRoot ('../' + $Current.profile)
+}
 # 按目标机器探测 VS；不写死本机 workspace、venv 或 CUDA 路径。
 $VsWhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
 $VsRoot = & $VsWhere -latest -products '*' -version '[17.0,18.0)' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath | Select-Object -First 1

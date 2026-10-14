@@ -7,10 +7,13 @@ import hashlib
 import json
 from pathlib import Path
 import time
+import sys
 
 import numpy as np
 
 HERE=Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parents[1]/'tools'))
+from flash_next_mtp import finalize_runtime, canonical_manifest
 Q8_NAMES={'fc_embedding.weight','fc_hidden.weight','self_attn.q_proj.weight',
     'self_attn.k_proj.weight','self_attn.v_proj.weight','self_attn.o_proj.weight',
     'self_attn.indexer.index_qk_proj.weight','mlp.shared_expert.gate_proj.weight',
@@ -57,12 +60,15 @@ def main():
     parser.add_argument('--source',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
     args=parser.parse_args()
+    _, frozen = canonical_manifest()
     verified=json.loads((args.source/'complete-source-verification.json').read_text(encoding='utf-8'))
     lock=json.loads((args.source/'source-lock.json').read_text(encoding='utf-8'))
     if not verified['passed'] or verified['complete_tensor_count']!=31 or len(verified['tensors'])!=31:
         raise ValueError('Incomplete MTP source verification')
     if lock['revision']!='de4b8e4d43b917e7706784d8bb445c9af86a3540':
         raise ValueError('MTP revision differs from the validated Strata recipe')
+    if lock != frozen['source'] or {r['name'] for r in verified['tensors']} != set(lock['tensor_sha256']):
+        raise ValueError('MTP source differs from the complete frozen tensor set')
     for row in verified['tensors']:
         path=args.source/'tensors'/(row['name']+'.bin')
         if path.stat().st_size!=row['bytes'] or sha(path)!=lock['tensor_sha256'][row['name']]:
@@ -77,7 +83,7 @@ def main():
         norm_semantics='Raw FP32 zero-centered Gemma weight; runtime applies (1+w) once.',
         draft_only=True, engine_integrated=False)
     def save():
-        (args.output/'runtime.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
+        (args.output/'conversion-progress.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
     save()
     for row in verified['tensors']:
         name=short_name(row['name'])
@@ -125,6 +131,7 @@ def main():
         total_bytes=sum(t['bytes'] for t in report['tensors']),
         conversion_seconds=time.perf_counter()-started)
     save()
+    finalize_runtime(args.output, report)
     print(json.dumps({k:v for k,v in report.items() if k not in {'source','tensors'}},ensure_ascii=False))
 
 
