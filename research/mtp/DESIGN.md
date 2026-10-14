@@ -78,6 +78,18 @@ MTP草稿cell p使用主模型R_p与token p+1；其KV依赖后一token，不能�
 
 Strata实现的逐项对照和缺口见 `STRATA-MAPPING.md`。本轮将8份固定版本MTP/verifier/prefill/controller/采样核心参考保存为MIT来源锁，避免仅依赖量化工具来解释推理设计。普通greedy草稿dense注意力本来也是Strata选择；其32K/ring、受限head、异步事件和动态k需结合本机单GPUtrace选择适用实现。
 
+### 正式greedy调度 checkpoint
+
+第三份源码提交 `5c193e2`、补丁 `patches/series/strataq2mtp1-0016-greedy-scheduler.patch` 将已验证草稿层/链graph迁入正式模块，明确提供FP32草稿attention的num_stages=1接口，主模型默认配置不变。草稿权重及R buffer在缓存预算求解前加载；target 1–4行、draft/catchup 1–3行graph由引擎持有，实际请求更新GPU位置/长度/页表/live slot，正常请求之间不重新捕获图。prefix、普通prefill和非greedy原生生成维护辅助KV。私有drafter归属以Req对象身份识别，避免离线LLM.generate重复uid/table_idx时误用另一请求的上下文。
+
+调度器在开启MTP时先drain已验证bundle，再准备下一窗口。每轮只按有效输出长度推进cached/device/CPU history/GPU token pool；原ForwardOutput三字段保持不变，bundle通过可选batch字段交给原EOS/stop/length/DetokenizeMsg流程。取消时完整已提交CPU历史在页/槽回收前补齐，未发出的bundle不转成客户端输出。工具锚点冻结正确行状态；idle rebuild先释放图、重建后再捕获。对应逻辑已接入但取消、工具锚点及重建仍待真实生命周期验收，不根据代码存在宣称通过。
+
+首次正式全权重路径测试三组64-token：冷70、64-token prefix命中、另一条70提示全部匹配对应冻结native基线，结束后CacheManager.check_integrity通过。随后四组512-token（冷短、热短、另一冷短、4K冷）输出ID全部逐项匹配相应无MTP基线，包括热/冷基线自身的历史差异；窗口提交统计连续，计入初始prefill输出后恰好512。80项组件测试与12个subtest通过，重放源码SHA匹配真实全权重测试，记录在 `evidence/engine-scheduler-20261014-v1/index.json`。
+
+测试为7168永久+1024动态+1024prefill（9216总槽），不是最佳无MTP11264槽。含轻量CPU分项计时的四组decode为113.21/109.96/112.59/111.74 token/s；TTFT为0.60/0.41/0.53/8.26秒。首个64-token热测TTFT10.96秒在后续同源码进程中未复现；CPU诊断中的prefix恢复仅约0.57ms、热残余prime约1.02ms，不能将首次长延迟归因于prefix恢复。4K的prime约411ms，其余首次prefill/编译开销仍需trace和复测。没有声称这些诊断数字是稳定性能或Speed/HTTP MTP速度。
+
+512进程整机commit峰值64,563,339,264B、最低可用5,794,521,088B；NVML 147次采样最低GPU可用861.58MiB。7168几何考虑额外四个事务槽、辅助KV和现有后台上下文，未通过的7680/8064配置不直接作为服务默认。当前仍需EOS/stop/取消/压力/重建/非greedy实际验证、独立无观察器长测及trace、正式profile/wheel/AOT合同、Speed worker/backend/HTTP、旧模型和随包验证。新checkpoint的wired=true只说明正式调度已调用MTP，lifecycle/performance/service/release验收全部保持false。
+
 ### 无MTP与MTP的分支和测量隔离
 
 无MTP Build分支 `explore/flash-next-strata-q2`、Speed分支 `explore/freetoken-flash-next-strata-q2` 及dev7制品保持不变。MTP改动分别留在 `explore/flash-next-strata-q2-mtp`、`explore/freetoken-flash-next-strata-q2-mtp`，以独立profile、版本、wheel/cache合同和默认关闭的配置接入，禁止覆盖原制品。正式实测保留原最佳无MTP、按MTP资源预算调整后的无MTP和相同预算开启MTP三条结果，并明确单独引擎/backend/HTTP口径。用户已授权完善并验证后推送远端；当前尚未推送，也没有合并main。

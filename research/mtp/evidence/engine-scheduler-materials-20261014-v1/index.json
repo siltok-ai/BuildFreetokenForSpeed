@@ -1,0 +1,27 @@
+{
+  "status": "passed",
+  "scope": "Offline material/source/evidence checks; not lifecycle/Speed/packaging acceptance",
+  "validator": {
+    "source_replay_verified": true,
+    "component_evidence_verified": true,
+    "actual_512_token_runs_verified": 4,
+    "frozen_native_output_ids_equal": true,
+    "mtp_generation_driver_wired": true,
+    "lifecycle_acceptance": false,
+    "performance_acceptance": false,
+    "speed_mtp_acceptance": false
+  },
+  "unittests": 18,
+  "files": [
+    {
+      "path": "research/mtp/evidence/engine-scheduler-materials-20261014-v1/scheduler-build-validator-v1.log.gz",
+      "sha256": "32cab0623151c3521359d197449c7352f33dfa8ec0206dd096e99045b59ca378",
+      "raw_sha256": "ea0042c63092a2a24ebd6917862fb4290db81b1ffbd8efe0a377b3885997272a"
+    },
+    {
+      "path": "research/mtp/evidence/engine-scheduler-materials-20261014-v1/scheduler-build-unittests-v1.log.gz",
+      "sha256": "c8fed45da2f9b2a343b0c5096f7d0050799987f96f29b84227ef94f751f60bd3",
+      "raw_sha256": "4424ffdf70776310041b4c962e88d65bc4ec80cb99bf77e9207645e26361a266"
+    }
+  ]
+}

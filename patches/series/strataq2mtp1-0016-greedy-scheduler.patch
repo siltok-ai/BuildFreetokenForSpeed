@@ -1,0 +1,778 @@
+diff --git a/python/freetoken/core.py b/python/freetoken/core.py
+index 98a1817..263b73a 100644
+--- a/python/freetoken/core.py
++++ b/python/freetoken/core.py
+@@ -161,6 +161,7 @@ class Batch:
+     # exactly-once.
+     prompt_admissions: List[Tuple[int, int, int]] = field(default_factory=list, init=False)
+     mtp_token_ids: torch.Tensor | None = field(default=None, init=False)
++    mtp_delivered_count: int | None = field(default=None, init=False)
+     mtp_ring_snapshots: torch.Tensor | None = field(default=None, init=False)
+ 
+     @property
+diff --git a/python/freetoken/engine/engine.py b/python/freetoken/engine/engine.py
+index 4605437..299a8b9 100644
+--- a/python/freetoken/engine/engine.py
++++ b/python/freetoken/engine/engine.py
+@@ -343,6 +343,7 @@ class Engine:
+         torch.cuda.set_stream(self.stream)
+         self.dtype = config.dtype
+         self.config = config  # retained for runtime cache rebuild (rebuild_runtime_cache)
++        self.mtp_runtime = None
+         # KV pool family fixed at construction from the model config: its classmethods own the
+         # page-token geometry and cost arithmetic the engine needs BEFORE the pool exists
+         # (num_pages sizing, --moe-cache-auto); the instance owns rebuild/validation after.
+@@ -361,6 +362,8 @@ class Engine:
+         with torch.device("meta"), torch_dtype(config.dtype):
+             self.model = create_model(config.model_config)
+         self._load_weights(config)
++        if config.mtp_runtime_path is not None:
++            self.model.prepare_mtp_runtime(config.mtp_runtime_path, config.mtp_max_context)
+         if config.active_encoders:
+             from freetoken.models.blocks import SupportsMultimodal
+ 
+@@ -502,6 +505,9 @@ class Engine:
+         if config.attention_backend.split(",")[0] == "triton":
+             # Prefill runs on the first comma part; warm its autotune cache.
+             self._warmup_prefill()
++        if config.mtp_runtime_path is not None:
++            from freetoken.models.qwen4_exp.mtp_runtime import MtpRuntime
++            self.mtp_runtime = MtpRuntime(self, self.model._mtp_drafter)
+ 
+     def _init_communication(self, config: EngineConfig) -> torch.distributed.ProcessGroup:
+         if config.tp_info.size == 1 or config.use_pynccl:
+@@ -1014,6 +1020,8 @@ class Engine:
+         self.rebuild_teardown_started = True
+         # 1. Tear down CUDA graphs + backend capture scratch (free-before-alloc).
+         self.attn_backend.reset_capture()
++        if self.mtp_runtime is not None:
++            self.mtp_runtime.close_graphs()
+         self.graph_runner.destroy_cuda_graphs()
+         # 2. Resize caches in place (each frees its old GPU tensors before allocating).
+         # Pin the new window first (validated above) so any KV-pool rebuild below sizes the window
+@@ -1060,10 +1068,14 @@ class Engine:
+             mrope=config.model_config.model_is_mrope,
+         )
+ 
++        if self.mtp_runtime is not None:
++            self.mtp_runtime.prepare_graphs()
++
+     def forward_batch(self, batch: Batch, args: BatchSamplingArgs) -> ForwardOutput:
+         assert torch.cuda.current_stream() == self.stream
+         if batch.mm_gather_plan:
+             self._run_mm_encoder(batch)
++        native_state = self.mtp_runtime.before_native(batch) if self.mtp_runtime is not None else None
+         use_graph = self.graph_runner.can_use_cuda_graph(batch)
+         with self.ctx.forward_batch(batch), self.model.forward_host_ctx(batch, use_graph):
+             logits = self.graph_runner.replay(batch) if use_graph else self.model.forward()
+@@ -1071,6 +1083,8 @@ class Engine:
+             # One pinned read: surfaces a fired flag-handshake watchdog (dead coordinator
+             # -> stale expert outputs) as a loud error instead of silent corruption.
+             self.cpu_moe_executor.raise_if_unhealthy()
++        if native_state is not None:
++            self.mtp_runtime.after_native(batch, native_state)
+ 
+         for req in batch.reqs:
+             req.complete_one()
+@@ -1144,6 +1158,8 @@ class Engine:
+         )
+ 
+     def shutdown(self) -> None:
++        if self.mtp_runtime is not None:
++            self.mtp_runtime.close_graphs()
+         self.graph_runner.destroy_cuda_graphs()
+         torch.distributed.destroy_process_group()
+         destroy_distributed()
+diff --git a/python/freetoken/kernel/triton/qsa/attend.py b/python/freetoken/kernel/triton/qsa/attend.py
+index c5404c6..65d0186 100644
+--- a/python/freetoken/kernel/triton/qsa/attend.py
++++ b/python/freetoken/kernel/triton/qsa/attend.py
+@@ -239,6 +239,7 @@ def qsa_sparse_paged_attention(
+     block_table: torch.Tensor,
+     token_to_req: torch.Tensor,
+     out: torch.Tensor | None = None,
++    *, num_stages: int = 2,
+ ) -> torch.Tensor:
+     """Run sparse GQA directly over paged BF16 K/V caches."""
+ 
+@@ -347,7 +348,7 @@ def qsa_sparse_paged_attention(
+         BLOCK_M=block_m,
+         BLOCK_N=block_n,
+         num_warps=partial_warps,
+-        num_stages=2,
++        num_stages=num_stages,
+     )
+     if num_splits == 1:
+         return out
+diff --git a/python/freetoken/models/qwen4_exp/model.py b/python/freetoken/models/qwen4_exp/model.py
+index 9aa9693..7add0cd 100644
+--- a/python/freetoken/models/qwen4_exp/model.py
++++ b/python/freetoken/models/qwen4_exp/model.py
+@@ -153,9 +153,16 @@ class Qwen4ExpForCausalLM(BaseLLMModel):
+             from .gguf_weight import declare_fp32_small_parameters
+             declare_fp32_small_parameters(self)
+         super().__init__()
++        self._mtp_drafter = None
++
++    def prepare_mtp_runtime(self, path: str, max_context: int) -> None:
++        from pathlib import Path
++        from .mtp_drafter import MtpDrafter
++        self.prepare_for_runtime()
++        self._mtp_drafter = MtpDrafter(Path(path), self, max_context=max_context)
+ 
+     def prepare_for_runtime(self) -> None:
+-        if self.model._mtp_capture_rows:
++        if self.model._mtp_capture_rows and self.model._mtp_residual_capture is None:
+             # Allocate before cache sizing and graph capture, never during replay.
+             self.model._mtp_residual_capture = torch.empty(
+                 self.model._mtp_capture_rows, self._config.hidden_size * self.model.hc_count,
+diff --git a/python/freetoken/models/qwen4_exp/mtp_draft_graph.py b/python/freetoken/models/qwen4_exp/mtp_draft_graph.py
+new file mode 100644
+index 0000000..671f5c9
+--- /dev/null
++++ b/python/freetoken/models/qwen4_exp/mtp_draft_graph.py
+@@ -0,0 +1,98 @@
++"""Owned greedy draft-chain graphs with GPU positions and FreeToken paged attention."""
++from __future__ import annotations
++import torch
++from freetoken.kernel.triton.qsa import qsa_sparse_paged_attention
++
++class DraftGraphs:
++
++    def __init__(self, draft, stream, *, attention_width):
++        """Own compressed draft weights/KV; borrow target embedding, head and RoPE."""
++        if not 0 < attention_width <= draft.max_context or draft.max_context % 64:
++            raise ValueError('Draft graph requires a bounded page-aligned context')
++        self.draft = draft
++        self.stream = stream
++        device = draft.device
++        self.cell = torch.zeros(1, device=device, dtype=torch.int32)
++        self.r = torch.zeros((1, 10240), device=device, dtype=torch.float32)
++        self.token = torch.zeros(1, device=device, dtype=torch.int32)
++        self.candidates = torch.empty(3, device=device, dtype=torch.int32)
++        self.columns = torch.arange(attention_width, device=device, dtype=torch.int32)[None, :]
++        self.table = torch.arange(draft.max_context // 64, device=device, dtype=torch.int32)[None, :]
++        self.mapping = torch.zeros(1, device=device, dtype=torch.int32)
++        self.keys = draft.keys.view(-1, 64, 2, 256)
++        self.values = draft.values.view(-1, 64, 2, 256)
++        self.catchup_r = torch.zeros((3, 10240), device=device, dtype=torch.float32)
++        self.catchup_tokens = torch.zeros(3, device=device, dtype=torch.int32)
++        self.catchup_start = torch.zeros(1, device=device, dtype=torch.int32)
++        self.chains = {}
++        self.catchup = {}
++        self.attention_width = attention_width
++        key_before = draft.keys[:3].clone()
++        value_before = draft.values[:3].clone()
++        try:
++            for count in range(1, 4):
++
++                def chain():
++                    for row in range(count):
++                        token, residual = draft.step(self.r, self.token, 0, positions=self.cell, attend=self.attend)
++                        self.r.copy_(residual)
++                        self.token.copy_(token)
++                        self.candidates[row].copy_(token[0])
++                        self.cell.add_(1)
++                self.cell.zero_()
++                chain()
++                self.cell.zero_()
++                torch.cuda.synchronize()
++                graph = torch.cuda.CUDAGraph()
++                with torch.cuda.graph(graph, stream=stream):
++                    chain()
++                self.chains[count] = graph
++
++                def catchup():
++                    r = draft.initial_residual(self.catchup_r[:count], self.catchup_tokens[:count])
++                    x, _ = draft.mix('attn_hyper_connection', r)
++                    positions = self.catchup_start + torch.arange(count, device=device, dtype=torch.int32)
++                    draft.key_value(x, positions)
++                catchup()
++                torch.cuda.synchronize()
++                graph = torch.cuda.CUDAGraph()
++                with torch.cuda.graph(graph, stream=stream):
++                    catchup()
++                self.catchup[count] = graph
++        finally:
++            draft.keys[:3].copy_(key_before)
++            draft.values[:3].copy_(value_before)
++            torch.cuda.synchronize()
++
++    def attend(self, q, positions):
++        """Mask future/private speculative cells on device before paged FP32 attention."""
++        indices = torch.where(self.columns <= positions[0], self.columns, -1).to(torch.int32)
++        return qsa_sparse_paged_attention(q.reshape(1, 24, 256), self.keys, self.values, indices, self.table, self.mapping, num_stages=1).reshape(1, 24, 1, 256)
++
++    def chain(self, residual, token, cell, count):
++        """Launch one draft chain and read its candidates once on the host."""
++        if count not in self.chains or cell < 0 or cell + count > self.attention_width:
++            raise ValueError('Draft chain is outside the captured attention capacity')
++        self.r.copy_(residual)
++        self.token.fill_(int(token))
++        self.cell.fill_(cell)
++        self.chains[count].replay()
++        return self.candidates[:count].cpu().tolist()
++
++    def prime(self, residuals, tokens, start):
++        """Build only K/V from verified target residuals and next tokens."""
++        count = len(tokens)
++        if count not in self.catchup or start + count > self.attention_width:
++            raise ValueError('Draft catch-up is outside the captured capacity')
++        self.catchup_r[:count].copy_(residuals)
++        self.catchup_tokens[:count].copy_(tokens)
++        self.catchup_start.fill_(start)
++        self.catchup[count].replay()
++
++    def close(self):
++        """Destroy owned graphs after their users drain; borrowed target weights stay owned by the model."""
++        torch.cuda.synchronize()
++        for graph in [*self.chains.values(), *self.catchup.values()]:
++            graph.reset()
++        self.chains.clear()
++        self.catchup.clear()
+diff --git a/python/freetoken/models/qwen4_exp/mtp_drafter.py b/python/freetoken/models/qwen4_exp/mtp_drafter.py
+new file mode 100644
+index 0000000..7f3be97
+--- /dev/null
++++ b/python/freetoken/models/qwen4_exp/mtp_drafter.py
+@@ -0,0 +1,123 @@
++"""FreeToken-kernel MTP calibration prototype; greedy single request, dense draft attention."""
++from __future__ import annotations
++import hashlib
++import json
++from pathlib import Path
++import torch
++import torch.nn.functional as F
++from freetoken.kernel.gguf_quant import compressed_linear, gguf_gemma_rmsnorm
++from freetoken.kernel.gguf_native import bf16_gemv
++from freetoken.kernel.triton.hc import grouped_gemma_rmsnorm, hc_silu, hc_gate_mix, hc_combine
++from freetoken.moe.fused_q2_q8 import fused_experts_q2_q8
++
++class MtpDrafter:
++
++    def __init__(self, runtime: Path, main_model, *, max_context=8192):
++        """Own compressed draft weights/KV; borrow target embedding, head and RoPE."""
++        manifest = json.loads((runtime / 'runtime.json').read_text(encoding='utf-8'))
++        if manifest['status'] != 'packed_unvalidated_runtime' or len(manifest['tensors']) != 31:
++            raise ValueError('MTP runtime conversion is incomplete')
++        self.device = main_model.model.embed_tokens.packed_0.device
++        self.embedding = main_model.model.embed_tokens
++        self.head = main_model.lm_head
++        self.rope = next((layer.self_attn.rotary for layer in main_model.model.layers.op_list if not layer._is_linear))
++        self.renormalize = main_model._config.norm_topk_prob
++        self.weights = {}
++        self.metadata = {}
++        for row in manifest['tensors']:
++            path = runtime / row['path']
++            with path.open('rb') as f:
++                if hashlib.file_digest(f, 'sha256').hexdigest() != row['sha256']:
++                    raise ValueError('MTP runtime bytes changed: ' + row['name'])
++            raw = bytearray(path.read_bytes())
++            dtype = torch.float32 if row['type_id'] == 0 else torch.uint8
++            weight = torch.frombuffer(raw, dtype=dtype).to(self.device)
++            if row['type_id'] == 0:
++                weight = weight.reshape(row['shape'])
++            elif row['name'] == 'mlp.experts.gate_up_proj':
++                weight = weight.reshape(512, 1280, 720)
++            elif row['name'] == 'mlp.experts.down_proj':
++                weight = weight.reshape(512, 2560, 180)
++            self.weights[row['name']] = weight
++            self.metadata[row['name']] = row
++            del raw
++        self.max_context = max_context
++        self.keys = torch.zeros((max_context, 2, 256), device=self.device, dtype=torch.float32)
++        self.values = torch.zeros_like(self.keys)
++        self.owned_bytes = sum((t.numel() * t.element_size() for t in self.weights.values())) + 2 * self.keys.numel() * self.keys.element_size()
++
++    def linear(self, name, x):
++        row = self.metadata[name]
++        return compressed_linear(self.weights[name], x, row['shape'][0], row['type_id'])
++
++    def initial_residual(self, residual, tokens):
++        """Normalize all four streams before shared per-stream fc_hidden projection."""
++        h = gguf_gemma_rmsnorm(residual, self.weights['pre_fc_norm_hidden.weight'])
++        hidden = self.linear('fc_hidden.weight', h.reshape(-1, 2560)).reshape(-1, 10240)
++        embedding = self.embedding.forward(tokens)
++        embedding = gguf_gemma_rmsnorm(embedding, self.weights['pre_fc_norm_embedding.weight'])
++        embedding = self.linear('fc_embedding.weight', embedding).repeat(1, 4)
++        return hidden + embedding
++
++    def mix(self, prefix, residual, *, inject=True):
++        """Use the validated FP32 HC path with merged BF16 down/inject projection."""
++        rn = grouped_gemma_rmsnorm(residual, self.weights[prefix + '.hc_norm.weight'], 1e-06, 4)
++        if inject:
++            down = bf16_gemv(self.weights[prefix + '.input_mix_weight_down.weight'], rn, 324, packed1=self.weights[prefix + '.block_inject_weight.weight'], first_rows=320)
++            lowrank, raw_inject = (down[:, :320], down[:, 320:324])
++        else:
++            lowrank = self.linear(prefix + '.input_mix_weight_down.weight', rn)
++            raw_inject = None
++        gates = self.linear(prefix + '.input_mix_weight_up.weight', hc_silu(lowrank, 4))
++        return (hc_gate_mix(rn, gates, 4), raw_inject)
++
++    def key_value(self, x, positions):
++        k = self.linear('self_attn.k_proj.weight', x).reshape(-1, 256)
++        k = gguf_gemma_rmsnorm(k, self.weights['self_attn.k_norm.weight']).reshape(-1, 512)
++        _, k = self.rope.forward(positions, torch.zeros_like(k), k)
++        v = self.linear('self_attn.v_proj.weight', x)
++        self.keys.index_copy_(0, positions.long(), k.reshape(-1, 2, 256))
++        self.values.index_copy_(0, positions.long(), v.reshape(-1, 2, 256))
++
++    def prime(self, residuals, next_tokens, *, start=0):
++        """Build only K/V from verified target residuals and next tokens."""
++        if start + len(next_tokens) > self.max_context:
++            raise ValueError('MTP draft context capacity exceeded')
++        for offset in range(0, len(next_tokens), 8):
++            tokens = next_tokens[offset:offset + 8]
++            r = self.initial_residual(residuals[offset:offset + 8], tokens)
++            x, _ = self.mix('attn_hyper_connection', r)
++            positions = torch.arange(start + offset, start + offset + len(tokens), device=self.device, dtype=torch.int32)
++            self.key_value(x, positions)
++
++    def step(self, residual, token, cell, *, positions=None, attend=None):
++        """Cell p pairs R_p with token p+1 and predicts p+2; recursive KV remains private."""
++        if not 0 <= cell < self.max_context:
++            raise ValueError('MTP draft cell is outside its own KV capacity')
++        if positions is None:
++            positions = torch.tensor([cell], device=self.device, dtype=torch.int32)
++        r = self.initial_residual(residual, token.reshape(1))
++        x, inject = self.mix('attn_hyper_connection', r)
++        self.key_value(x, positions)
++        qgate = self.linear('self_attn.q_proj.weight', x).reshape(1, 24, 512)
++        q = qgate[:, :, :256].contiguous().reshape(-1, 256)
++        q = gguf_gemma_rmsnorm(q, self.weights['self_attn.q_norm.weight']).reshape(1, 6144)
++        q, _ = self.rope.forward(positions, q, torch.zeros((1, 512), device=self.device, dtype=torch.float32))
++        if attend is None:
++            attended = F.scaled_dot_product_attention(q.reshape(1, 24, 1, 256), self.keys[:cell + 1].permute(1, 0, 2).unsqueeze(0), self.values[:cell + 1].permute(1, 0, 2).unsqueeze(0), enable_gqa=True)
++        else:
++            attended = attend(q, positions)
++        attended = attended.reshape(1, 6144) * qgate[:, :, 256:].reshape(1, 6144).sigmoid()
++        r = hc_combine(r, self.linear('self_attn.o_proj.weight', attended), inject, 4)
++        x, inject = self.mix('mlp_hyper_connection', r)
++        router = self.linear('mlp.gate.weight', x)
++        scores, ids = router.topk(10, dim=-1)
++        weights = scores.softmax(-1) if self.renormalize else router.softmax(-1).gather(-1, ids)
++        routed = fused_experts_q2_q8(x, self.weights['mlp.experts.gate_up_proj'], self.weights['mlp.experts.down_proj'], weights.contiguous(), ids.to(torch.int32).contiguous())
++        shared = F.silu(self.linear('mlp.shared_expert.gate_proj.weight', x)) * self.linear('mlp.shared_expert.up_proj.weight', x)
++        shared = self.linear('mlp.shared_expert.down_proj.weight', shared)
++        gate = self.linear('mlp.shared_expert_gate.weight', x).sigmoid()
++        r = hc_combine(r, routed + gate * shared, inject, 4)
++        mixed, _ = self.mix('hyper_connection_mixer', r, inject=False)
++        logits = self.head.quant_method.apply(self.head, mixed)
++        return (logits.argmax(-1).to(torch.int32), r)
+diff --git a/python/freetoken/models/qwen4_exp/mtp_runtime.py b/python/freetoken/models/qwen4_exp/mtp_runtime.py
+new file mode 100644
+index 0000000..01f587f
+--- /dev/null
++++ b/python/freetoken/models/qwen4_exp/mtp_runtime.py
+@@ -0,0 +1,215 @@
++"""One-request greedy MTP windows with owned transactions and native scheduler delivery."""
++from __future__ import annotations
++
++import copy
++from typing import NamedTuple
++
++import torch
++
++from freetoken.attention.linear import build_fla_metadata
++from freetoken.core import Batch
++from .mtp_draft_graph import DraftGraphs
++from .mtp_state import MTP_LAST_RESIDUAL
++
++
++class DeliveryLimit(NamedTuple):
++    count: int
++    finished: bool
++
++
++def verified_prefix(candidates, picks, eos_ids, ignore_eos):
++    accepted = 0
++    for draft, target in zip(candidates, picks):
++        if draft != target or (not ignore_eos and draft in eos_ids):
++            break
++        accepted += 1
++    return [*candidates[:accepted], picks[accepted]]
++
++
++class MtpRuntime:
++    def __init__(self, engine, drafter):
++        self.engine = engine
++        self.draft = drafter
++        self.ple = engine.model._ple_table
++        self.graphs = {}
++        self.draft_graphs = None
++        self.active_owner = None
++        self.rounds = []
++        self.prepare_graphs()
++
++    @property
++    def pool(self):
++        return self.engine.linear_state_pool
++
++    @property
++    def aux(self):
++        return self.engine.kv_cache.mtp_state
++
++    @property
++    def raw(self):
++        return self.engine.model.model._mtp_residual_capture
++
++    def eligible(self, batch):
++        if not batch.is_decode or len(batch.reqs) != 1:
++            return False
++        req = batch.reqs[0]
++        return (req.sampling_params.is_greedy and not req.mm_items and req.extend_len == 1
++                and 0 < req.cached_len < self.draft.max_context and req.remain_len > 0)
++
++    def prepare_graphs(self):
++        if len(self.pool.reserved_slot_ids) != 4:
++            raise ValueError('MTP needs four exclusively reserved transaction slots')
++        self.dst = torch.tensor(self.pool.reserved_slot_ids, device=self.engine.device, dtype=torch.int64)
++        self.rings = torch.empty((4, *self.engine.kv_cache._pending_ring.shape[1:]),
++                                 device=self.engine.device, dtype=self.engine.kv_cache._pending_ring.dtype)
++        for count in (1, 2, 3, 4):
++            req = copy.copy(self.engine.dummy_req)
++            req.cached_len, req.device_len = 1, 1 + count
++            req.input_ids = torch.zeros(1 + count, dtype=torch.int32, device='cpu')
++            req.mamba_ping_pong = None
++            batch = Batch([req], 'verify')
++            batch.padded_reqs = [req]
++            batch.input_ids = torch.zeros(count, device=self.engine.device, dtype=torch.int32)
++            batch.positions = torch.arange(1, count + 1, device=self.engine.device, dtype=torch.int32)
++            dummy_base = self.engine.num_pages * self.engine.config.page_size
++            batch.out_loc = dummy_base + batch.positions
++            batch.linear_table_idx = torch.tensor([0], device=self.engine.device, dtype=torch.int32)
++            batch.fla_metadata = build_fla_metadata(batch, self.engine.device)
++            fla = batch.fla_metadata
++            fla.track_dst = self.dst[:count]
++            fla.track_boundary_row = torch.arange(1, count + 1, device=self.engine.device)
++            batch.mtp_ring_snapshots = self.rings
++            self.engine.attn_backend.prepare_metadata(batch)
++            for _ in range(2):
++                with self.engine.ctx.forward_batch(batch), self.engine.model.forward_host_ctx(batch, False):
++                    hidden = self.engine.model.model.forward(batch.input_ids, batch)
++                    self.engine.model.lm_head.quant_method.apply(self.engine.model.lm_head, hidden)
++            torch.cuda.synchronize(self.engine.device)
++            graph = torch.cuda.CUDAGraph()
++            with torch.cuda.graph(graph, stream=self.engine.stream):
++                with self.engine.ctx.forward_batch(batch):
++                    hidden = self.engine.model.model.forward(batch.input_ids, batch)
++                    logits = self.engine.model.lm_head.quant_method.apply(self.engine.model.lm_head, hidden)
++                    picks = logits.argmax(-1).to(torch.int32)
++            self.graphs[count] = (batch, graph, picks)
++        self.draft_graphs = DraftGraphs(self.draft, self.engine.stream, attention_width=self.draft.max_context)
++        self.pool.clear_slots([self.pool.padding_slot, *self.pool.reserved_slot_ids])
++        self.engine.kv_cache._pending_ring[self.engine.dummy_req.table_idx].zero_()
++        self.active_owner = None
++
++    def close_graphs(self):
++        torch.cuda.synchronize(self.engine.device)
++        for _, graph, _ in self.graphs.values():
++            graph.reset()
++        self.graphs.clear()
++        if self.draft_graphs is not None:
++            self.draft_graphs.close()
++            self.draft_graphs = None
++        self.active_owner = None
++
++    def _ensure_owner(self, req):
++        if self.active_owner is not req:
++            if req.cached_len <= self.draft.max_context:
++                self.aux.restore_prefix(self.engine.page_table[req.table_idx, :req.cached_len],
++                                        self.draft.keys, self.draft.values)
++            self.active_owner = req
++
++    def before_native(self, batch):
++        req = batch.reqs[0]
++        self._ensure_owner(req)
++        previous = None
++        if 0 < req.cached_len <= self.draft.max_context:
++            previous = self.pool.slot_state(MTP_LAST_RESIDUAL)[req.linear_slot_idx:req.linear_slot_idx + 1].clone()
++        return req.cached_len, previous
++
++    def after_native(self, batch, native_state):
++        base, previous = native_state
++        req = batch.reqs[0]
++        if previous is not None:
++            self.draft.prime(previous, batch.input_ids[:1], start=base - 1)
++            self.aux.publish(batch.out_loc[:1], self.draft.keys[base-1:base], self.draft.values[base-1:base])
++        count = min(len(batch.input_ids) - 1, self.draft.max_context - base)
++        if count > 0:
++            self.draft.prime(self.raw[:count], batch.input_ids[1:count + 1], start=base)
++            self.aux.publish(batch.out_loc[1:count + 1], self.draft.keys[base:base + count],
++                             self.draft.values[base:base + count])
++
++    def _replay(self, req, inputs, position):
++        batch, graph, picks = self.graphs[len(inputs)]
++        batch.input_ids.copy_(torch.tensor(inputs, device=self.engine.device, dtype=torch.int32))
++        batch.positions.copy_(torch.arange(position, position + len(inputs), device=self.engine.device, dtype=torch.int32))
++        batch.out_loc.copy_(self.engine.page_table[req.table_idx, batch.positions.long()])
++        batch.fla_metadata.cache_indices.fill_(req.linear_slot_idx)
++        batch.linear_table_idx.fill_(req.linear_slot_idx)
++        md = batch.attn_metadata
++        md.ring_slots.fill_(req.table_idx)
++        md.seq_lens.fill_(position + len(inputs))
++        md.kv_len_cpu.fill_(position + len(inputs))
++        md.block_table.copy_(self.engine.attn_backend._block_table(md.ring_slots.long()))
++        context = self.ple._ple_context(req.input_ids, position)
++        self.ple.fill([torch.tensor([*context, *inputs], dtype=torch.int64)], graph=True)
++        graph.replay()
++        self.ple._graph_consumed.record(self.engine.stream)
++        return picks
++
++    def _freeze_anchor(self, req, position, committed, delivered, limit, anchor_id):
++        if anchor_id is None or req.mamba_last_track_seqlen is not None:
++            return
++        anchor = req.toolcall_anchor_len
++        if anchor is None:
++            for i, token in enumerate(delivered):
++                if token == anchor_id and not (i == len(delivered) - 1 and limit.finished):
++                    anchor = position + i + 2
++                    req.toolcall_anchor_len = anchor
++                    break
++        if (anchor is not None and position < anchor <= position + committed
++                and anchor % self.engine.config.page_size == 0):
++            row = anchor - position - 1
++            dst = req.mamba_ping_pong[req.mamba_next_track_idx]
++            self.pool.copy_from(self.pool.reserved_slot_ids[row], dst)
++            req.mamba_last_track_seqlen = anchor
++            req.mamba_next_track_idx = 1 - req.mamba_next_track_idx
++
++    def forward(self, batch, manager, token_pool, eos_ids, clip, anchor_id):
++        from freetoken.engine.engine import ForwardOutput
++        req = batch.reqs[0]
++        self._ensure_owner(req)
++        position = req.cached_len
++        depth = min(3, req.remain_len - 1, self.draft.max_context - position)
++        manager.allocate_paged([req], reserve_tokens=depth)
++        pending = int(batch.input_ids[0].item())
++        residual = self.pool.slot_state(MTP_LAST_RESIDUAL)[req.linear_slot_idx:req.linear_slot_idx + 1]
++        if depth:
++            candidates = self.draft_graphs.chain(residual, pending, position - 1, depth)
++        else:
++            candidates = []
++            self.draft_graphs.prime(residual, batch.input_ids[:1], position - 1)
++        self.aux.publish(self.engine.page_table[req.table_idx, position:position + 1],
++                         self.draft.keys[position-1:position], self.draft.values[position-1:position])
++        inputs = [pending, *candidates]
++        picks = self._replay(req, inputs, position).cpu().tolist()
++        delivered = verified_prefix(candidates, picks, eos_ids, req.sampling_params.ignore_eos)
++        limit = clip(req, delivered)
++        delivered = delivered[:limit.count]
++        committed = len(delivered)
++        if committed < len(inputs):
++            self.pool.copy_from(self.pool.reserved_slot_ids[committed - 1], req.linear_slot_idx)
++            self.engine.kv_cache._pending_ring[req.table_idx].copy_(self.rings[committed - 1])
++        self._freeze_anchor(req, position, committed, delivered, limit, anchor_id)
++        accepted = committed - 1
++        tokens = torch.tensor(delivered, device=self.engine.device, dtype=torch.int32)
++        if accepted:
++            self.draft_graphs.prime(self.raw[:accepted], tokens[:accepted], position)
++            self.aux.publish(self.engine.page_table[req.table_idx, position+1:position+committed],
++                             self.draft.keys[position:position+accepted], self.draft.values[position:position+accepted])
++        old_device = req.device_len
++        req.cached_len = position + committed
++        req.device_len = old_device + committed
++        token_pool[req.table_idx, old_device:req.device_len].copy_(tokens)
++        bundle = tokens.to('cpu', non_blocking=True)
++        event = torch.cuda.Event()
++        event.record(self.engine.stream)
++        batch.mtp_token_ids = bundle
++        self.rounds.append(dict(uid=req.uid, position=position, draft_count=depth,
++                               accepted_drafts=accepted, committed_rows=committed))
++        return ForwardOutput(tokens[-1:], bundle[-1:], event)
+diff --git a/python/freetoken/scheduler/scheduler.py b/python/freetoken/scheduler/scheduler.py
+index 60cf91a..387bb9a 100644
+--- a/python/freetoken/scheduler/scheduler.py
++++ b/python/freetoken/scheduler/scheduler.py
+@@ -225,6 +225,15 @@ class Scheduler(SchedulerIOMixin):
+         for msg in self.receive_msg(blocking=blocking):
+             self._process_one_msg(msg)
+ 
++        if self.engine.mtp_runtime is not None and last_data is not None:
++            # A variable-size verified bundle must reach CPU history before the
++            # next window is prepared; native no-MTP keeps its overlap schedule.
++            self.stream.wait_stream(self.engine.stream)
++            self._process_last_data(last_data)
++            self._flush_abort_acks()
++            last_data = None
++            self._last_data = None
++
+         # Execute a queued cache rebuild once the scheduler is fully idle (the safe point):
+         # no last batch to process, no pending prefill, no running decode. finished_reqs is
+         # NOT a gate — those requests are already freed (no live GPU/page resources).
+@@ -334,6 +343,8 @@ class Scheduler(SchedulerIOMixin):
+                     # Aborted while this final-chunk prefill / decode step was in flight: free
+                     # here (the forward is drained) and finish the request. No DetokenizeMsg --
+                     # the abort ack flushed after this method stays the uid's terminal reply.
++                    if batch.mtp_token_ids is not None:
++                        req.append_host(batch.mtp_token_ids)
+                     self.decode_manager.remove_req(req)
+                     self._free_req_resources(req)
+                     new_finished_reqs.add(req)
+@@ -345,61 +356,66 @@ class Scheduler(SchedulerIOMixin):
+                     # are freed below/already; shipping this token would append past the
+                     # client's terminal reply.
+                     continue
+-                next_token = next_tokens_cpu[i]
+-                req.append_host(next_token.unsqueeze(0))
+-                next_token = int(next_token.item())
+-                # EOS / stop-string -> "stop", output budget exhausted -> "length";
+-                # EOS and stop strings win over length.
+-                # Overlap can advance device_len one token ahead of this host reply.
+-                hit_length = req.input_ids.numel() >= req.max_device_len
+-                hit_eos = (
+-                    not req.sampling_params.ignore_eos and next_token in self.eos_token_ids
+-                )
+-                matched_stop = (
+-                    self._match_stop_str(req)
+-                    if not hit_eos and req.sampling_params.stop_strs
+-                    else None
+-                )
+-                finished = hit_length or hit_eos or matched_stop is not None
+-                finish_reason = (
+-                    ("stop" if (hit_eos or matched_stop is not None) else "length")
+-                    if finished
+-                    else None
+-                )
+-                if (
+-                    next_token == self.toolcall_anchor_id
+-                    and req.toolcall_anchor_len is None
+-                    and not finished
+-                ):
+-                    req.toolcall_anchor_len = req.input_ids.numel()
+-                reply.append(
+-                    DetokenizeMsg(
+-                        uid=req.uid,
+-                        next_token=next_token,
+-                        finished=finished,
+-                        finish_reason=finish_reason,
+-                        matched_stop=matched_stop,
+-                        stop_strs=req.sampling_params.stop_strs or None,
++                output_tokens = (batch.mtp_token_ids if batch.mtp_token_ids is not None
++                                 else next_tokens_cpu[i:i + 1])
++                for next_token in output_tokens:
++                    req.append_host(next_token.unsqueeze(0))
++                    next_token = int(next_token.item())
++                    # EOS / stop-string -> "stop", output budget exhausted -> "length";
++                    # EOS and stop strings win over length.
++                    # Overlap can advance device_len one token ahead of this host reply.
++                    hit_length = req.input_ids.numel() >= req.max_device_len
++                    hit_eos = (
++                        not req.sampling_params.ignore_eos and next_token in self.eos_token_ids
++                    )
++                    matched_stop = (
++                        self._match_stop_str(req)
++                        if not hit_eos and req.sampling_params.stop_strs
++                        else None
++                    )
++                    finished = hit_length or hit_eos or matched_stop is not None
++                    finish_reason = (
++                        ("stop" if (hit_eos or matched_stop is not None) else "length")
++                        if finished
++                        else None
++                    )
++                    if (
++                        next_token == self.toolcall_anchor_id
++                        and req.toolcall_anchor_len is None
++                        and not finished
++                    ):
++                        req.toolcall_anchor_len = req.input_ids.numel()
++                    reply.append(
++                        DetokenizeMsg(
++                            uid=req.uid,
++                            next_token=next_token,
++                            finished=finished,
++                            finish_reason=finish_reason,
++                            matched_stop=matched_stop,
++                            stop_strs=req.sampling_params.stop_strs or None,
++                        )
+                     )
+-                )
+ 
+-                # NOTE: overlap scheduling may make the request freed twice, skip second free
+-                if finished and req not in self.finished_reqs:
+-                    self.decode_manager.remove_req(req)
+-                    self._free_req_resources(req)
+-                    new_finished_reqs.add(req)
+-                elif batch.is_prefill and req.table_idx != -1:
+-                    # for prefill, non-chunk req, cache the prefix.
+-                    # Polymorphic: the DSV4 naive manager keeps the request's slots (no-op);
+-                    # the generic manager inserts the prefix into its radix/naive cache.
+-                    # table_idx == -1 is defense-in-depth: aborts mark in-flight requests
+-                    # instead of freeing them (handled above), so a freed request should
+-                    # never reach this commit -- but if a future path frees one early, skip
+-                    # rather than re-read the freed page-table row (and on hybrid, deref the
+-                    # None'd GDN ping-pong slots).
+-                    self.cache_manager.cache_req(req, finished=False)
++                    # NOTE: overlap scheduling may make the request freed twice, skip second free
++                    if finished and req not in self.finished_reqs:
++                        self.decode_manager.remove_req(req)
++                        self._free_req_resources(req)
++                        new_finished_reqs.add(req)
++                        break
++                    elif batch.is_prefill and req.table_idx != -1:
++                        # for prefill, non-chunk req, cache the prefix.
++                        # Polymorphic: the DSV4 naive manager keeps the request's slots (no-op);
++                        # the generic manager inserts the prefix into its radix/naive cache.
++                        # table_idx == -1 is defense-in-depth: aborts mark in-flight requests
++                        # instead of freeing them (handled above), so a freed request should
++                        # never reach this commit -- but if a future path frees one early, skip
++                        # rather than re-read the freed page-table row (and on hybrid, deref the
++                        # None'd GDN ping-pong slots).
++                        self.cache_manager.cache_req(req, finished=False)
+ 
+         self.finished_reqs = new_finished_reqs
++        if batch.mtp_token_ids is not None:
++            batch.mtp_delivered_count = len(reply)
+         # Stamp each reply with the post-batch KV page occupancy so the frontend (shell
+         # status bar) can show live KV usage without a separate query.
+         used, total = self._kv_usage_pages()
+@@ -901,11 +917,34 @@ class Scheduler(SchedulerIOMixin):
+         batch.input_ids = self.token_pool[input_mapping]
+         if self.toolcall_anchor_id is not None and not batch.is_prefill:
+             self.cache_manager.snapshot_toolcall_anchor(batch.reqs)
++        runtime = self.engine.mtp_runtime
++        if runtime is not None and runtime.eligible(batch):
++            output = runtime.forward(batch, self.cache_manager, self.token_pool,
++                                     self.eos_token_ids, self._mtp_delivery_limit, self.toolcall_anchor_id)
++            self.decode_manager.filter_reqs(batch.reqs)
++            return output
+         forward_output = self.engine.forward_batch(batch, sample_args)
+         self.token_pool[output_mapping] = forward_output.next_tokens_gpu
+         self.decode_manager.filter_reqs(forward_input.batch.reqs)
+         return forward_output
+ 
++    def _mtp_delivery_limit(self, req, tokens):
++        from freetoken.models.qwen4_exp.mtp_runtime import DeliveryLimit
++        history = req.input_ids.tolist()
++        prompt_len = req.max_device_len - req.output_len
++        for i, token in enumerate(tokens):
++            history.append(token)
++            hit_eos = not req.sampling_params.ignore_eos and token in self.eos_token_ids
++            hit_length = len(history) >= req.max_device_len
++            hit_stop = False
++            if not hit_eos and req.sampling_params.stop_strs:
++                max_chars = max(len(s) for s in req.sampling_params.stop_strs)
++                tail = self.tokenizer.decode(history[max(prompt_len, len(history) - max_chars - 1):])
++                hit_stop = any(s in tail for s in req.sampling_params.stop_strs)
++            if hit_eos or hit_length or hit_stop:
++                return DeliveryLimit(i + 1, True)
++        return DeliveryLimit(len(tokens), False)
++
+ 
+ def _make_mrope_positions(batch: Batch, device: torch.device) -> torch.Tensor:
+     """[3, N] rope rows: an image request's prompt tokens use their precomputed columns, everything else is sequence index + per-request delta."""
+diff --git a/python/freetoken/scheduler/status.py b/python/freetoken/scheduler/status.py
+index ca706c5..96c7a37 100644
+--- a/python/freetoken/scheduler/status.py
++++ b/python/freetoken/scheduler/status.py
+@@ -103,7 +103,8 @@ class SchedulerStatusReporter:
+         swa_tokens: tuple[int, int] | None = None,
+     ) -> None:
+         self._decode_forward_count += 1
+-        self._decode_generated_tokens += len(batch.reqs)
++        delivered = getattr(batch, 'mtp_delivered_count', None)
++        self._decode_generated_tokens += delivered if delivered is not None else len(batch.reqs)
+         if self._decode_forward_count % self.decode_log_interval != 0:
+             return
+ 

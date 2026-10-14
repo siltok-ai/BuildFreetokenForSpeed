@@ -210,6 +210,11 @@ def main():
     if mtp_prefix_record.exists():
         from validate_mtp_prefix_checkpoint import validate as validate_mtp_prefix
         mtp_prefix_checkpoint = validate_mtp_prefix(mtp_prefix_record)
+    mtp_scheduler_checkpoint = None
+    mtp_scheduler_record = ROOT/'research/mtp/evidence/engine-scheduler-20261014-v1/index.json'
+    if mtp_scheduler_record.exists():
+        from validate_mtp_scheduler_checkpoint import validate as validate_mtp_scheduler
+        mtp_scheduler_checkpoint = validate_mtp_scheduler(mtp_scheduler_record)
     print(json.dumps({"official_files": len(original_hashes), "changed_files": len(changed),
                       "patches": len(series["patches"]), "split_equals_historical": True,
                       "wheel_python_matches_prepared_source": True, "aot_count": len(specs),
@@ -219,7 +224,8 @@ def main():
                       "strata_research_dev5":research_dev5,
                       "strata_research_dev6":research_dev6, "strata_research_dev7":research_dev7,
                       "mtp_engine_development_checkpoint":mtp_checkpoint,
-                      "mtp_prefix_development_checkpoint":mtp_prefix_checkpoint, "verified": True}))
+                      "mtp_prefix_development_checkpoint":mtp_prefix_checkpoint,
+                      "mtp_scheduler_development_checkpoint":mtp_scheduler_checkpoint, "verified": True}))
 
 
 if __name__ == "__main__":
