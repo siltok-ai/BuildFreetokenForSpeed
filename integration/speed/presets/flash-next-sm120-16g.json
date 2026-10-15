@@ -1,0 +1,31 @@
+{
+  "format": 1,
+  "name": "sm120-16g-measured",
+  "scope": "Explicit RTX 5070 Ti 16GiB / 64GB RAM single-worker recipe. Requires the paired Speed adapter supporting explicit smaller expert pools and budgets. Tight VRAM configuration: NVML admission remains enabled; other GPU workloads can prevent admission. Consult the current consumer contract for actual native, HTTP and installer acceptance scope.",
+  "startup_timeout_seconds": 600,
+  "resource": {
+    "gpu_probe": "nvml",
+    "vram_safety_gb": 0.25,
+    "commit_safety_gb": 4
+  },
+  "modes": {
+    "off": {
+      "resident": 3584,
+      "total_slots": 5632,
+      "vram_estimate_gib": 14.875,
+      "host_commit_estimate_gib": 33
+    },
+    "on": {
+      "resident": 2304,
+      "total_slots": 4352,
+      "vram_estimate_gib": 14.875,
+      "host_commit_estimate_gib": 34
+    },
+    "off-matched": {
+      "resident": 2304,
+      "total_slots": 4352,
+      "vram_estimate_gib": 14.875,
+      "host_commit_estimate_gib": 34
+    }
+  }
+}

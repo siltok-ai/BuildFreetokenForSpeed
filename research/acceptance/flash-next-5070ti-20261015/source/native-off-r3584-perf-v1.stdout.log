@@ -1,0 +1,79 @@
+[1m[2026-10-15|13:31:04|core|rank=0][0m [32mINFO    [0m Enabled expandable_segments (override via PYTORCH_ALLOC_CONF)
+[1m[2026-10-15|13:31:04|core|rank=0][0m [33mWARNING [0m Page size is overridden to 64 for the qsa_sparse backend
+[1m[2026-10-15|13:31:04|core|rank=0][0m [32mINFO    [0m Resolved config: moe_strategy='offload', attention_backend='qsa_sparse', cache_type='hybrid_radix', page_size=64
+[1m[2026-10-15|13:31:04|core|rank=0][0m [32mINFO    [0m Free memory before loading model: 14.67 GiB
+[1m[2026-10-15|13:31:08|core|rank=0][0m [32mINFO    [0m PLE disk backend: ReadFile pool x16, NO_BUFFERING, wait-sync
+[1m[2026-10-15|13:31:08|core|rank=0][0m [32mINFO    [0m MoE experts: q2_0 via triton
+[1m[2026-10-15|13:31:11|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 0: 467 compact host rows
+[1m[2026-10-15|13:31:11|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 1: 450 compact host rows
+[1m[2026-10-15|13:31:12|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 2: 451 compact host rows
+[1m[2026-10-15|13:31:13|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 3: 443 compact host rows
+[1m[2026-10-15|13:31:13|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 4: 444 compact host rows
+[1m[2026-10-15|13:31:14|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 5: 435 compact host rows
+[1m[2026-10-15|13:31:14|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 6: 438 compact host rows
+[1m[2026-10-15|13:31:15|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 7: 448 compact host rows
+[1m[2026-10-15|13:31:15|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 8: 439 compact host rows
+[1m[2026-10-15|13:31:16|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 9: 437 compact host rows
+[1m[2026-10-15|13:31:16|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 10: 448 compact host rows
+[1m[2026-10-15|13:31:17|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 11: 441 compact host rows
+[1m[2026-10-15|13:31:18|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 12: 432 compact host rows
+[1m[2026-10-15|13:31:18|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 13: 439 compact host rows
+[1m[2026-10-15|13:31:19|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 14: 442 compact host rows
+[1m[2026-10-15|13:31:19|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 15: 436 compact host rows
+[1m[2026-10-15|13:31:20|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 16: 435 compact host rows
+[1m[2026-10-15|13:31:20|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 17: 431 compact host rows
+[1m[2026-10-15|13:31:21|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 18: 445 compact host rows
+[1m[2026-10-15|13:31:22|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 19: 429 compact host rows
+[1m[2026-10-15|13:31:22|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 20: 431 compact host rows
+[1m[2026-10-15|13:31:23|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 21: 431 compact host rows
+[1m[2026-10-15|13:31:23|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 22: 444 compact host rows
+[1m[2026-10-15|13:31:24|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 23: 435 compact host rows
+[1m[2026-10-15|13:31:24|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 24: 438 compact host rows
+[1m[2026-10-15|13:31:25|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 25: 433 compact host rows
+[1m[2026-10-15|13:31:25|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 26: 435 compact host rows
+[1m[2026-10-15|13:31:26|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 27: 444 compact host rows
+[1m[2026-10-15|13:31:27|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 28: 453 compact host rows
+[1m[2026-10-15|13:31:27|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 29: 430 compact host rows
+[1m[2026-10-15|13:31:28|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 30: 449 compact host rows
+[1m[2026-10-15|13:31:28|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 31: 437 compact host rows
+[1m[2026-10-15|13:31:29|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 32: 439 compact host rows
+[1m[2026-10-15|13:31:29|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 33: 429 compact host rows
+[1m[2026-10-15|13:31:30|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 34: 436 compact host rows
+[1m[2026-10-15|13:31:31|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 35: 429 compact host rows
+[1m[2026-10-15|13:31:31|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 36: 434 compact host rows
+[1m[2026-10-15|13:31:32|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 37: 416 compact host rows
+[1m[2026-10-15|13:31:32|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 38: 434 compact host rows
+[1m[2026-10-15|13:31:33|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 39: 434 compact host rows
+[1m[2026-10-15|13:31:33|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 40: 438 compact host rows
+[1m[2026-10-15|13:31:34|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 41: 425 compact host rows
+[1m[2026-10-15|13:31:35|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 42: 419 compact host rows
+[1m[2026-10-15|13:31:35|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 43: 438 compact host rows
+[1m[2026-10-15|13:31:36|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 44: 435 compact host rows
+[1m[2026-10-15|13:31:36|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 45: 431 compact host rows
+[1m[2026-10-15|13:31:37|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 46: 439 compact host rows
+[1m[2026-10-15|13:31:37|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 47: 426 compact host rows
+[1m[2026-10-15|13:31:37|core|rank=0][0m [32mINFO    [0m Multimodal disabled: --text-model-only
+[1m[2026-10-15|13:31:37|core|rank=0][0m [32mINFO    [0m Allocating 8192 tokens for KV cache, K + V = 0.20 GiB
+[1m[2026-10-15|13:31:38|core|rank=0][0m [32mINFO    [0m qsa_sparse block top-k: triton qsa_block_topk
+[1m[2026-10-15|13:31:38|core|rank=0][0m [32mINFO    [0m Free memory after initialization: 2.58 GiB
+[1m[2026-10-15|13:31:38|core|rank=0][0m [32mINFO    [0m Start capturing CUDA graphs with sizes: [1]
+[1m[2026-10-15|13:31:38|core|rank=0][0m [32mINFO    [0m Free GPU memory before capturing CUDA graphs: 2.58 GiB
+[1m[2026-10-15|13:31:39|core|rank=0][0m [32mINFO    [0m Free GPU memory after capturing CUDA graphs: 2.57 GiB
+[1m[2026-10-15|13:31:40|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 26, #cached-token: 0, token usage: 0.01, #mamba-slot: 3/8, mamba usage: 0.38, #running-req: 1, #queue-req: 0, input throughput (token/s): 35.42
+{"name": "warmup", "input_tokens": 26, "output_tokens": 3, "elapsed_seconds": 0.7989837999994052, "terminal": {"token": 248046, "finished": true, "finish_reason": "stop"}, "torch_allocated": 12805650432, "torch_reserved": 12960399360, "arrivals": 3, "temperature": 0, "ttft_ms": 726.631700003054, "decode_tps": 53.112244760795775, "quality_pass": true}
+[1m[2026-10-15|13:31:41|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 70, #cached-token: 0, token usage: 0.02, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 82.81
+{"name": "70-0-0", "input_tokens": 70, "output_tokens": 512, "elapsed_seconds": 7.774752299999818, "terminal": {"token": 408, "finished": true, "finish_reason": "length"}, "torch_allocated": 12805651456, "torch_reserved": 12983468032, "arrivals": 512, "temperature": 0, "ttft_ms": 771.8206999998074, "decode_tps": 72.97212464835279}
+[1m[2026-10-15|13:31:48|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 6, #cached-token: 64, token usage: 0.02, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 0.83
+[1m[2026-10-15|13:31:54|core|rank=0][0m [32mINFO    [0m Decode batch, #running-req: 1, #token: 576, token usage: 0.07, #mamba-slot: 4/8, mamba usage: 0.50, gen throughput (token/s): 64.78, #queue-req: 0
+{"name": "70-0-1", "input_tokens": 70, "output_tokens": 512, "elapsed_seconds": 7.207625800001551, "terminal": {"token": 318, "finished": true, "finish_reason": "length"}, "torch_allocated": 12805651456, "torch_reserved": 12983468032, "arrivals": 512, "temperature": 0, "ttft_ms": 224.30380000150762, "decode_tps": 73.17709903355004}
+[1m[2026-10-15|13:31:55|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 6, #cached-token: 64, token usage: 0.02, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 0.85
+{"name": "70-0-2", "input_tokens": 70, "output_tokens": 512, "elapsed_seconds": 7.085422599993763, "terminal": {"token": 318, "finished": true, "finish_reason": "length"}, "torch_allocated": 12805651456, "torch_reserved": 12983468032, "arrivals": 512, "temperature": 0, "ttft_ms": 86.97899999970105, "decode_tps": 73.0188993774207}
+[1m[2026-10-15|13:32:14|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 4096, #cached-token: 0, token usage: 0.51, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 218.37
+[1m[2026-10-15|13:32:20|core|rank=0][0m [32mINFO    [0m Decode batch, #running-req: 1, #token: 4608, token usage: 0.56, #mamba-slot: 4/8, mamba usage: 0.50, gen throughput (token/s): 38.73, #queue-req: 0
+{"name": "diverse-4096-0-0", "input_tokens": 4096, "output_tokens": 512, "elapsed_seconds": 19.089958900003694, "terminal": {"token": 159034, "finished": true, "finish_reason": "length"}, "torch_allocated": 12805683712, "torch_reserved": 15625879552, "arrivals": 512, "temperature": 0, "ttft_ms": 11757.116599997971, "decode_tps": 69.6887461934416}
+[1m[2026-10-15|13:32:22|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 64, #cached-token: 4032, token usage: 0.51, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 7.90
+{"name": "diverse-4096-0-1", "input_tokens": 4096, "output_tokens": 512, "elapsed_seconds": 8.108774400003313, "terminal": {"token": 159034, "finished": true, "finish_reason": "length"}, "torch_allocated": 12805683712, "torch_reserved": 15625879552, "arrivals": 512, "temperature": 0, "ttft_ms": 762.9146999970544, "decode_tps": 69.56528557742865}
+[1m[2026-10-15|13:32:30|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 64, #cached-token: 4032, token usage: 0.51, #mamba-slot: 4/8, mamba usage: 0.50, #running-req: 1, #queue-req: 0, input throughput (token/s): 7.91
+[1m[2026-10-15|13:32:36|core|rank=0][0m [32mINFO    [0m Decode batch, #running-req: 1, #token: 4544, token usage: 0.55, #mamba-slot: 4/8, mamba usage: 0.50, gen throughput (token/s): 62.78, #queue-req: 0
+{"name": "diverse-4096-0-2", "input_tokens": 4096, "output_tokens": 512, "elapsed_seconds": 8.152469000000565, "terminal": {"token": 159034, "finished": true, "finish_reason": "length"}, "torch_allocated": 12805683712, "torch_reserved": 15625879552, "arrivals": 512, "temperature": 0, "ttft_ms": 739.9430000004941, "decode_tps": 68.93958918240614}
+{"status": "passed", "output": "C:\\workspace\\runs\\siltok-speed\\flash-accept-20261015\\native-off-r3584-perf-v1.json"}

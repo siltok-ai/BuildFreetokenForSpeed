@@ -1,0 +1,4 @@
+{"name": "warmup", "elapsed_s": 0.879171900000074, "ttft_ms": 821.5827000021818, "output_tokens": 3, "decode_tps": 49.04978307668186, "events": 3, "quality_pass": true}
+{"name": "context4096", "elapsed_s": 12.350583400002506, "ttft_ms": 11833.669100000407, "output_tokens": 32, "decode_tps": 59.97288064975387, "events": 32}
+{"name": "after_cancel", "elapsed_s": 0.7218742999975802, "ttft_ms": 666.2241999947582, "output_tokens": 3, "decode_tps": 51.485617490657084, "events": 3, "quality_pass": true}
+{"status": "passed", "output": "C:\\workspace\\runs\\siltok-speed\\flash-accept-20261015\\backend-off-r1024-smoke-v1.json", "worker_pids_gone": true}

@@ -1,0 +1,30 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\siltok-speed\\flash-accept\\Scripts\\python.exe",
+    "-u",
+    "-B",
+    "C:\\workspace\\runs\\siltok-speed\\flash-accept-20261015\\cli-delivery-probe.py",
+    "--source",
+    "C:\\workspace\\wt\\siltok-speed\\flash-accept",
+    "--deployment",
+    "C:\\workspace\\cfg\\siltok-speed\\flash-accept\\delivery-off-matched-v1",
+    "--output",
+    "C:\\workspace\\runs\\siltok-speed\\flash-accept-20261015\\cli-off-matched-delivery-v2.json"
+  ],
+  "cwd": "C:\\workspace\\wt\\siltok-speed\\flash-accept",
+  "started": 1792044523.908109,
+  "samples": 111,
+  "min_commit_available": 12771274752,
+  "min_ram_available": 24669999104,
+  "min_gpu_free": 4955844608,
+  "max_commit_used": 57547636736,
+  "max_gpu_used": 12139089920,
+  "max_tree_rss": 33654190080,
+  "max_tree_private": 47122911232,
+  "stop_reason": null,
+  "pid": 6404,
+  "returncode": 0,
+  "elapsed_s": 56.13999999999942,
+  "remaining_before_cleanup": [],
+  "remaining_descendants": []
+}

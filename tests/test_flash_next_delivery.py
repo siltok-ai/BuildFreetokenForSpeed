@@ -15,7 +15,7 @@ sys.path.insert(0, str(ROOT/'tools'))
 from current_release import load_current
 from flash_next_weights import layout, plan, prepare, verify_checkpoint, verify_file, write, read, download
 from flash_next_mtp import canonical_manifest, finalize_runtime
-from flash_next_speed_config import configuration
+from flash_next_speed_config import configuration, link_checkpoints
 
 
 def fixture(root):
@@ -153,6 +153,44 @@ class DeliveryBoundaries(unittest.TestCase):
         self.assertIn('mtp',a['artifacts']);self.assertNotIn('mtp',b['artifacts'])
         self.assertEqual(config['resource']['gpu_probe'],'nvml')
         self.assertFalse(b['engine']['extra']['mtp_enabled'])
+
+    def test_16g_cli_selects_fitting_pools_and_preserves_dry_run_roots(self):
+        """真实CLI选择16GiB方案，不能继续误用24GiB预算或创建空模型目录。"""
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)/'weights'
+            deployment=Path(directory)/'deployment'
+            for preset in ('sm120-16g-measured','sm120-16g-roomy-measured'):
+                results={}
+                for mode in ('off','on','off-matched'):
+                    result=subprocess.run([sys.executable,'-B',str(ROOT/'tools/flash_next_speed_config.py'),
+                        '--root',str(root),'--deployment-root',str(deployment),'--preset',preset,
+                        '--mode',mode,'--dry-run'],check=True,capture_output=True,text=True)
+                    value=json.loads(result.stdout)
+                    model=value['manifest']['models'][0]
+                    extra=model['engine']['extra'];resource=value['config']['resource']
+                    self.assertLess(extra['vram_estimate_bytes']/2**30+resource['vram_safety_gb'],15.2)
+                    self.assertLess(extra['vram_estimate_bytes']/2**30+extra['host_commit_estimate_bytes']/2**30+resource['commit_safety_gb'],54)
+                    self.assertGreaterEqual(extra['vram_estimate_bytes'],extra['moe_cache_size']*1_382_400)
+                    self.assertGreaterEqual(extra['host_commit_estimate_bytes'],(24576-extra['moe_q2_resident_experts'])*1_382_400)
+                    results[mode]=model
+                on=results['on'];off=results['off-matched']
+                self.assertEqual(on['engine']['extra']['moe_cache_size'],off['engine']['extra']['moe_cache_size'])
+                self.assertIn('mtp',on['artifacts']);self.assertNotIn('mtp',off['artifacts'])
+                self.assertFalse(root.exists());self.assertFalse(deployment.exists())
+
+    def test_shared_checkpoint_entry_reads_original_bytes_and_refuses_replacement(self):
+        """实际目录共享必须读取源文件，并拒绝覆盖已有入口。"""
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            source=root/'source';source.mkdir()
+            (source/'weight.bin').write_bytes(b'original-weight-bytes')
+            link=root/'checkpoint-link'
+            link_checkpoints(source,link)
+            self.assertTrue(os.path.samefile(source/'weight.bin',link/'weight.bin'))
+            self.assertEqual((link/'weight.bin').read_bytes(),(source/'weight.bin').read_bytes())
+            with self.assertRaises(OSError):
+                link_checkpoints(source,link)
+            self.assertEqual((source/'weight.bin').read_bytes(),b'original-weight-bytes')
 
 
 if __name__=='__main__':

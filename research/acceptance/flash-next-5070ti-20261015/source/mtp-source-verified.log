@@ -1,0 +1,2 @@
+{"passed": true, "revision": "de4b8e4d43b917e7706784d8bb445c9af86a3540", "complete_tensor_count": 31, "total_bytes": 5214301696}
+{"status": "source_verified", "source": "C:\\workspace\\models\\siltok-speed\\flash-next\\sources\\Qwen\\Qwen3.8-Flash-Next\\de4b8e4d43b917e7706784d8bb445c9af86a3540\\mtp-source-bf16"}

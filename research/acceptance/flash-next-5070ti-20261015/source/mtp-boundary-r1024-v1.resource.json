@@ -1,0 +1,24 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\siltok-speed\\flash-accept\\Scripts\\python.exe",
+    "-u",
+    "-B",
+    "C:\\workspace\\runs\\siltok-speed\\flash-accept-20261015\\mtp-boundary-probe.py"
+  ],
+  "cwd": "C:\\workspace\\wt\\siltok-speed\\flash-accept",
+  "started": 1792041868.2415192,
+  "samples": 101,
+  "min_commit_available": 12431511552,
+  "min_ram_available": 23141036032,
+  "min_gpu_free": 5049131008,
+  "max_commit_used": 57887399936,
+  "max_gpu_used": 12045803520,
+  "max_tree_rss": 34857521152,
+  "max_tree_private": 47414689792,
+  "stop_reason": null,
+  "pid": 8080,
+  "returncode": 0,
+  "elapsed_s": 51.09399999999732,
+  "remaining_before_cleanup": [],
+  "remaining_descendants": []
+}

@@ -37,7 +37,7 @@ python -B tools/flash_next_mtp.py verify --root D:\models\flash-next
 
 完整 GGUF 两片、tokenizer与元数据、MTP源文件和派生数据按发布者/revision/用途分目录。GGUF是文本全权重路径，HF仅提供固定配置与tokenizer；不加载RadixArk HF主干。权重大文件不进Git。搬迁后执行 `flash_next_weights.py refresh` 重新完整验真并生成目标机器的绝对回执；可搬迁来源描述保留相对路径。FT2引擎本身要求绝对运行路径，不用修改旧引擎绕过校验。
 
-[当前交付流程](docs/flash-next-current-delivery.md)包含安装wheel、明确选择新cache、配置开关、同预算性能对照、目录搬迁和失败处理。性能preset需要显式选择，适用于已测SM120/24GiB单机条件，不替换全局安全策略。
+[当前交付流程](docs/flash-next-current-delivery.md)包含安装wheel、明确选择新cache、配置开关、同预算性能对照、目录搬迁和失败处理。性能preset需要显式选择：原SM120/24GiB方案保持原样，另有5070 Ti/16GiB的已测容量与余量档，不替换全局安全策略。[5070 Ti交接实测](docs/flash-next-5070ti-acceptance.md)记录源码HTTP短/4K约71.76/68.94tps及MTP对照，明确区分尚待完成的整包验收。
 
 ## 构建和验证
 
@@ -47,6 +47,7 @@ python -B tools/flash_next_mtp.py verify --root D:\models\flash-next
 python -B tools/validate_repository.py
 python -B -m unittest discover -s tests -v
 python -B tools/verify_mtp2_consumer.py
+python -B tools/verify_flash_next_5070ti.py
 ```
 
 上述离线检查不等价于GPU/整包验收。冻结本机结果：无MTP最佳历史HTTP短/4K中位109.88/104.02tps；MTP六次各512个实际交付token，中位106.54/109.58tps，同容量关闭101.79/97.43。20题非thinking15/20且输出IDs匹配已接受Q2基线，thinking三题3/3；旧27B/35B、取消复用和故障重启已通过安装版本验收。详细证据见 [消费合同](integration/speed/consumer-contract-strataq2mtp2.json)、[原始检查点](docs/strata-q2-mtp2-checkpoint.txt)。不是所有设备的100tps保证。
