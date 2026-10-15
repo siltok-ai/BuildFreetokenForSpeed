@@ -2,18 +2,18 @@
   "format": 1,
   "profile": "build/profiles/strataq2mtp2.json",
   "materials": "artifacts/strataq2mtp2-cp312-cu130-sm120",
-  "consumer_contract": "integration/speed/consumer-contract-strataq2mtp2.json",
+  "consumer_contract": "integration/speed/consumer-contract-5070ti-explore.json",
   "weight_source_lock": "model-weights/qwen3.8-flash-next-strata-q2/source-lock.json",
   "mtp_manifest": "model-weights/qwen3.8-flash-next-strata-q2/mtp-runtime.json",
   "input_sha256": {
     "build/profiles/strataq2mtp2.json": "7cb2188ea547979c311646bac3dc161c6e35cd263fd8f5ef33bf905bda9368e5",
-    "integration/speed/consumer-contract-strataq2mtp2.json": "05baf40e69650f6a2573d552c7765bd12e1eed8e38c3978fd65f0fa34e33ede8",
     "model-weights/qwen3.8-flash-next-strata-q2/source-lock.json": "a9c445bbeb1103938656137ce94dd31a69d3b835bfd4bf555e1e6c0a56d5ab49",
     "model-weights/qwen3.8-flash-next-strata-q2/mtp-runtime.json": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
-    "integration/speed/presets/flash-next-sm120-24g.json": "6f464b9ca7dfb1dafc85749c56dbaa18ee19b410d57d8db1f2be32ca5f959268"
+    "integration/speed/consumer-contract-5070ti-explore.json": "123b527ae156efad8d304ee1200b423d31c1613254d60f9207ea78ca0bd4b5ac",
+    "integration/speed/presets/flash-next-sm120-16g.json": "18f73b5920c7e80d90987fd14db350c868540b88f2781c9f65fb5a2813f6d79c"
   },
   "version": "0.1.3+speed.strataq2mtp2",
   "mtp_default_enabled": false,
-  "scope": "Current Speed Flash Next Strata Q2 material supply. Single-host runtime acceptance; installer/clean-machine acceptance remains open.",
-  "speed_preset": "integration/speed/presets/flash-next-sm120-24g.json"
+  "scope": "5070 Ti actual full installer accepted with explicitly retained unresolved long-output issue; clean-OS acceptance remains open. Historical 24GiB contracts and old dev supply branch are preserved.",
+  "speed_preset": "integration/speed/presets/flash-next-sm120-16g.json"
 }

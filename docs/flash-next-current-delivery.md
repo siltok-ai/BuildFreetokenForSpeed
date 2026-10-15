@@ -1,6 +1,6 @@
 # 当前 Flash Next 全 GGUF / MTP 材料交付
 
-当前选择在 `integration/speed/current-release.json`。FreeToken引擎为 `0.1.3+speed.strataq2mtp2`，与Speed分支 `explore/freetoken-flash-next-strata-q2-mtp` 配套。此次仅完善供应工具，保持引擎wheel/AOT、量化数学、31份MTP数据及Speed批准的manifest SHA不变。
+当前选择在 `integration/speed/current-release.json`。FreeToken引擎为 `0.1.3+speed.strataq2mtp2`，与Speed分支 `explore/freetoken-flash-next-strata-q2-mtp` 配套。5070 Ti适配留在Speed，保持引擎wheel/AOT、量化数学、31份MTP数据及Speed批准的manifest SHA不变。当前合同绑定运行提交e0524007和交付提交3e251687；完整安装/卸载已验证，带已知长输出问题接受，详情见[本机验收](flash-next-5070ti-acceptance.md)。旧24GiB合同及旧dev材料分支保持原样。
 
 ## 环境和制品
 

@@ -1,0 +1,7 @@
+{
+  "resource": {
+    "gpu_probe": "nvml",
+    "vram_safety_gb": 0.25,
+    "commit_safety_gb": 4
+  }
+}

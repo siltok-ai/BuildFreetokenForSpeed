@@ -20,8 +20,13 @@ def verify():
             or mtp['total_bytes']!=823887872):
         raise ValueError('Current producer/Speed consumer identities disagree')
     subprocess.run([sys.executable,'-B',str(ROOT/'tools/verify_materials.py'),str(ROOT/current['materials'])],check=True)
+    installed=None
+    if consumer.get('kind')=='flash_next_5070ti_installed_consumer':
+        from verify_flash_next_5070ti_consumer import verify as verify_installed
+        installed=verify_installed(ROOT/current['consumer_contract'])
     return dict(status='verified',version=current['version'],profile=current['profile'],
-                consumer_contract=current['consumer_contract'],mtp_default_enabled=False)
+                consumer_contract=current['consumer_contract'],mtp_default_enabled=False,
+                installed_5070ti=installed)
 
 
 if __name__=='__main__':

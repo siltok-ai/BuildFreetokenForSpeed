@@ -10,7 +10,7 @@
 | profile / 有序补丁 | `build/profiles/strataq2mtp2.json` / `patches/strataq2mtp2-series.json`（20组） |
 | 成对制品 | `artifacts/strataq2mtp2-cp312-cu130-sm120/`：wheel内3个native模块，27个AOT DLL |
 | 运行合同 | Windows x64 / Python 3.12 / Torch 2.11.0+cu130 / CUDA13 / TVM FFI 0.1.13.post3 / SM120 |
-| Speed 对应分支 | `explore/freetoken-flash-next-strata-q2-mtp`，当前运行代码 `df914a02`、验收提交 `57dd2558` |
+| Speed 对应分支 | `explore/freetoken-flash-next-strata-q2-mtp`，5070 Ti运行代码 `e0524007`、交付提交 `3e251687` |
 | MTP | **默认关闭**；开启时独立预测层、专属事务/KV/graph预算；greedy最多3草稿，非greedy原采样 |
 
 本次供应层完善保留 FT2、wheel/AOT 和 Speed 既有 SHA 合同，不更改推理计算。历史版本、补丁和验收资料保持不可变。
@@ -37,7 +37,7 @@ python -B tools/flash_next_mtp.py verify --root D:\models\flash-next
 
 完整 GGUF 两片、tokenizer与元数据、MTP源文件和派生数据按发布者/revision/用途分目录。GGUF是文本全权重路径，HF仅提供固定配置与tokenizer；不加载RadixArk HF主干。权重大文件不进Git。搬迁后执行 `flash_next_weights.py refresh` 重新完整验真并生成目标机器的绝对回执；可搬迁来源描述保留相对路径。FT2引擎本身要求绝对运行路径，不用修改旧引擎绕过校验。
 
-[当前交付流程](docs/flash-next-current-delivery.md)包含安装wheel、明确选择新cache、配置开关、同预算性能对照、目录搬迁和失败处理。性能preset需要显式选择：原SM120/24GiB方案保持原样，另有5070 Ti/16GiB的已测容量与余量档，不替换全局安全策略。[5070 Ti交接实测](docs/flash-next-5070ti-acceptance.md)记录源码HTTP短/4K约71.76/68.94tps及MTP对照，明确区分尚待完成的整包验收。
+[当前交付流程](docs/flash-next-current-delivery.md)包含安装wheel、明确选择新cache、配置开关、同预算性能对照、目录搬迁和失败处理。性能preset需要显式选择：原SM120/24GiB方案保持原样，另有5070 Ti/16GiB的已测容量与余量档，不替换全局安全策略。[5070 Ti交接实测](docs/flash-next-5070ti-acceptance.md)记录源码HTTP短/4K约71.76/68.94tps及MTP对照，包含真实安装/卸载验收及未解决长输出风险。
 
 ## 构建和验证
 
@@ -54,6 +54,6 @@ python -B tools/verify_flash_next_5070ti.py
 
 新增[可搬迁交付验收](research/mtp/evidence/portable-delivery-20261014-v1/README.md)：固定元数据网络下载、完整两片校验、31份MTP重新转换、异路径刷新、Git导出29项测试与已安装Speed开/关各两次512-token推理均通过。`python -B tools/verify_flash_next_delivery.py`交叉核对封存原始记录。
 
-Speed新Cython整包、安装器/干净机，以及Speed自己的行尾/包清单复核问题仍需在Speed侧处理；本仓库不将这些未覆盖范围写成通过。第三方有版本锁但未提供完整离线wheelhouse。源码/格式/许可与维护规则见 [upstream](upstream/README.md)、[NOTICE](NOTICE)、[维护说明](docs/maintenance.md)。
+5070 Ti新Cython整包已真实安装验收并清理，按用户决定带已知长输出风险接受，详见当前消费合同；干净操作系统及独立整合分支尚未验收。第三方有版本锁但未提供完整离线wheelhouse。源码/格式/许可与维护规则见 [upstream](upstream/README.md)、[NOTICE](NOTICE)、[维护说明](docs/maintenance.md)。
 
 旧版本保持可回滚：`q2opt2` 为 HF主干+Q2专家混合模型；`strataq2dev7` 为无MTP全GGUF检查点；`strataq2mtp1` 为首次MTP候选。旧入口 `integration/speed/consumer-contract.json` 代表历史win1，不是当前选择。历史README保存在 [历史记录](docs/history/readme-before-current-20261014.txt)。

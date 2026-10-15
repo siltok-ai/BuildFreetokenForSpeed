@@ -1,0 +1,214 @@
+{
+  "apply": true,
+  "install_path": "C:\\workspace\\build\\siltok-speed\\i03",
+  "bundle_cache_hash": "3515e287a507a8555ac3ea5192562c59a9780a5118fd7f7e35fe027fdc0c6ab2",
+  "service_before": {
+    "state": "Stopped",
+    "path": "\"C:\\workspace\\build\\siltok-speed\\i03\\SiltokSpeed.exe\""
+  },
+  "processes_before": null,
+  "data_before": [
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\config",
+      "CreationTime": "2026-10-15T14:29:36.4507878+08:00",
+      "LastWriteTime": "2026-10-15T14:31:54.4279315+08:00",
+      "Length": null
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\logs",
+      "CreationTime": "2026-10-15T14:29:36.4507878+08:00",
+      "LastWriteTime": "2026-10-15T14:35:53.5041104+08:00",
+      "Length": null
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\results",
+      "CreationTime": "2026-10-15T14:29:36.4507878+08:00",
+      "LastWriteTime": "2026-10-15T14:35:49.7630408+08:00",
+      "Length": null
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\runtime",
+      "CreationTime": "2026-10-15T14:29:36.4507878+08:00",
+      "LastWriteTime": "2026-10-15T14:34:06.029438+08:00",
+      "Length": null
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\config\\managed-base.yaml",
+      "CreationTime": "2026-10-15T14:31:04.0577629+08:00",
+      "LastWriteTime": "2026-10-15T14:31:04.0577629+08:00",
+      "Length": 1070
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\config\\operator.override.yaml",
+      "CreationTime": "2026-10-15T14:31:54.4279315+08:00",
+      "LastWriteTime": "2026-10-15T14:34:04.2683295+08:00",
+      "Length": 108
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\logs\\bootstrap.log",
+      "CreationTime": "2026-10-15T14:31:09.0016798+08:00",
+      "LastWriteTime": "2026-10-15T14:35:53.5051109+08:00",
+      "Length": 897
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\logs\\crash.log",
+      "CreationTime": "2026-10-15T14:31:09.0016798+08:00",
+      "LastWriteTime": "2026-10-15T14:31:09.0016798+08:00",
+      "Length": 0
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\logs\\events.jsonl",
+      "CreationTime": "2026-10-15T14:31:09.0166832+08:00",
+      "LastWriteTime": "2026-10-15T14:35:49.7650406+08:00",
+      "Length": 3435
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\logs\\run_state.json",
+      "CreationTime": "2026-10-15T14:35:53.4981092+08:00",
+      "LastWriteTime": "2026-10-15T14:35:53.4981092+08:00",
+      "Length": 329
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\logs\\siltok.log",
+      "CreationTime": "2026-10-15T14:31:09.0166832+08:00",
+      "LastWriteTime": "2026-10-15T14:35:53.4961086+08:00",
+      "Length": 5406
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\logs\\SiltokSpeed.wrapper.log",
+      "CreationTime": "2026-10-15T14:31:04.8038569+08:00",
+      "LastWriteTime": "2026-10-15T14:35:54.1496287+08:00",
+      "Length": 8341
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\logs\\stdout.log",
+      "CreationTime": "2026-10-15T14:31:09.0166832+08:00",
+      "LastWriteTime": "2026-10-15T14:35:53.3670786+08:00",
+      "Length": 1348
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\results\\6bf4ff11-b8c2-4528-8044-bebb5737c597",
+      "CreationTime": "2026-10-15T14:35:48.0552362+08:00",
+      "LastWriteTime": "2026-10-15T14:35:48.0562364+08:00",
+      "Length": null
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\results\\8dab1b44-6e8c-4780-8691-55b9eee98a14",
+      "CreationTime": "2026-10-15T14:35:49.7620399+08:00",
+      "LastWriteTime": "2026-10-15T14:35:49.7630408+08:00",
+      "Length": null
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\results\\6bf4ff11-b8c2-4528-8044-bebb5737c597\\content.json",
+      "CreationTime": "2026-10-15T14:35:48.0562364+08:00",
+      "LastWriteTime": "2026-10-15T14:35:48.0562364+08:00",
+      "Length": 346
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\results\\6bf4ff11-b8c2-4528-8044-bebb5737c597\\metadata.json",
+      "CreationTime": "2026-10-15T14:35:48.0562364+08:00",
+      "LastWriteTime": "2026-10-15T14:35:48.0562364+08:00",
+      "Length": 424
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\results\\8dab1b44-6e8c-4780-8691-55b9eee98a14\\content.json",
+      "CreationTime": "2026-10-15T14:35:49.7620399+08:00",
+      "LastWriteTime": "2026-10-15T14:35:49.7620399+08:00",
+      "Length": 346
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\results\\8dab1b44-6e8c-4780-8691-55b9eee98a14\\metadata.json",
+      "CreationTime": "2026-10-15T14:35:49.7630408+08:00",
+      "LastWriteTime": "2026-10-15T14:35:49.7630408+08:00",
+      "Length": 423
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\runtime\\task-inputs",
+      "CreationTime": "2026-10-15T14:29:36.4507878+08:00",
+      "LastWriteTime": "2026-10-15T14:29:36.4507878+08:00",
+      "Length": null
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\runtime\\task-ledger",
+      "CreationTime": "2026-10-15T14:29:36.4507878+08:00",
+      "LastWriteTime": "2026-10-15T14:35:53.4961086+08:00",
+      "Length": null
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\runtime\\task-ledger-quarantine",
+      "CreationTime": "2026-10-15T14:29:36.4517879+08:00",
+      "LastWriteTime": "2026-10-15T14:29:36.4517879+08:00",
+      "Length": null
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\runtime\\config.yaml",
+      "CreationTime": "2026-10-15T14:34:05.7043359+08:00",
+      "LastWriteTime": "2026-10-15T14:34:05.7053363+08:00",
+      "Length": 1038
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\runtime\\release-runtime-metadata.json",
+      "CreationTime": "2026-10-15T14:31:09.0156827+08:00",
+      "LastWriteTime": "2026-10-15T14:34:06.029438+08:00",
+      "Length": 1242
+    },
+    {
+      "FullName": "C:\\ProgramData\\Siltok\\Speed\\runtime\\task-ledger\\tasks.db",
+      "CreationTime": "2026-10-15T14:31:11.6398154+08:00",
+      "LastWriteTime": "2026-10-15T14:35:53.4941081+08:00",
+      "Length": 24576
+    }
+  ],
+  "shortcuts": [],
+  "cache_paths": [
+    "C:\\Users\\UserPC\\AppData\\Local\\Temp\\siltok-speed-assets\\3515e287a507a8555ac3ea5192562c59a9780a5118fd7f7e35fe027fdc0c6ab2",
+    "C:\\Windows\\Temp\\siltok-speed-assets\\3515e287a507a8555ac3ea5192562c59a9780a5118fd7f7e35fe027fdc0c6ab2"
+  ],
+  "uninstall_temp_dirs": [],
+  "installed_test_trees": [
+    "C:\\workspace\\cache\\triton\\installed-i03",
+    "C:\\workspace\\cache\\ext\\installed-i03",
+    "C:\\workspace\\runs\\siltok-speed\\flash-accept-20261015\\install-i03\\tmp"
+  ],
+  "registry_paths": [
+    "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\SiltokSpeed",
+    "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\EventLog\\Application\\SiltokSpeed",
+    "HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{A3F1C2E4-7B6D-4E9A-8C12-9D4E5F6A7B80}}_is1",
+    "HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{A3F1C2E4-7B6D-4E9A-8C12-9D4E5F6A7B80}_is1",
+    "HKLM:\\Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{A3F1C2E4-7B6D-4E9A-8C12-9D4E5F6A7B80}}_is1",
+    "HKLM:\\Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{A3F1C2E4-7B6D-4E9A-8C12-9D4E5F6A7B80}_is1"
+  ],
+  "protected_workspace_paths": [
+    "C:\\workspace\\codebase\\siltok-speed",
+    "C:\\workspace\\models\\siltok-speed",
+    "C:\\workspace\\envs\\siltok-speed",
+    "C:\\workspace\\tools"
+  ],
+  "plan": [
+    "Uninstall the explicitly owned test instance using its own Inno uninstaller",
+    "Stop only remaining processes whose executable path is inside that exact test install",
+    "Copy ProgramData evidence into the workspace, then delete only proven test-owned data",
+    "Remove this exact application EventLog source, service/AppID leftovers and owned shortcuts",
+    "Remove only this bundle hash from user/SYSTEM temp caches and logged Inno uninstall temp directories",
+    "Verify application/service/registrations/cache absence and preserve source/models/venvs/tools"
+  ],
+  "uninstaller_exit": 0,
+  "after_checks": {
+    "install_directory_absent": true,
+    "programdata_absent": true,
+    "service_absent": true,
+    "owned_processes_absent": true,
+    "service_registry_absent": true,
+    "event_source_absent": true,
+    "uninstall_keys_absent": true,
+    "bundle_caches_absent": true,
+    "installed_test_trees_absent": true,
+    "logged_uninstaller_temps_absent": true,
+    "owned_shortcuts_absent": true,
+    "source_preserved": true,
+    "models_preserved": true,
+    "venvs_preserved": true,
+    "tools_preserved": true
+  },
+  "ok": true
+}

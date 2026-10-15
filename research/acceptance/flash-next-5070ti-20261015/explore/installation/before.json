@@ -1,0 +1,12 @@
+{
+  "format": 1,
+  "observed_utc": "2026-10-15T06:29:05.3292992Z",
+  "phase": "before",
+  "install_path": "C:\\workspace\\build\\siltok-speed\\i03",
+  "data_path": "C:\\ProgramData\\Siltok\\Speed",
+  "service": null,
+  "install_present": false,
+  "data_present": false,
+  "event_source_present": false,
+  "uninstall_keys": []
+}
