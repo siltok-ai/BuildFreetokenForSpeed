@@ -1,0 +1,101 @@
+{
+  "format": 1,
+  "profile": "build/profiles/strataq2mtp2.json",
+  "profile_sha256": "7cb2188ea547979c311646bac3dc161c6e35cd263fd8f5ef33bf905bda9368e5",
+  "materials": "artifacts/strataq2mtp2-cp312-cu130-sm120",
+  "version": "0.1.3+speed.strataq2mtp2",
+  "producer_engine_commit": "ef3540504ccc680e1a3b07149e6b79ca49444edd",
+  "wheel": {
+    "path": "wheels/freetoken-0.1.3+speed.strataq2mtp2-cp312-cp312-win_amd64.whl",
+    "sha256": "20f4ea8983e9bb06c850c92322d07b78c7acfc1321b066f69c868de0f860ecd1"
+  },
+  "kernel_cache": {
+    "path": "kernel-cache",
+    "manifest": "kernel-cache/speed-kernel-manifest.json",
+    "manifest_sha256": "a8cbb7705072aff8f71b52b96fc8f5a6f86b18565ef081675b54c40364daf1c9",
+    "dll_count": 27
+  },
+  "platform": {
+    "os": "win_amd64",
+    "python_minor": [
+      3,
+      12
+    ],
+    "torch": "2.11.0+cu130",
+    "cuda": "13.0",
+    "sm": "120",
+    "apache_tvm_ffi": "0.1.13.post3"
+  },
+  "mtp": {
+    "default_enabled": false,
+    "manifest_artifact_role": "mtp",
+    "manifest_artifact_layout": "freetoken_mtp",
+    "runtime_manifest_sha256": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
+    "source_repository": "Qwen/Qwen3.8-Flash-Next",
+    "source_revision": "de4b8e4d43b917e7706784d8bb445c9af86a3540",
+    "max_draft_tokens": 3,
+    "greedy_only": true,
+    "context_tokens": 8192,
+    "transaction_slots": 4
+  },
+  "kind": "flash_next_5070ti_installed_consumer",
+  "speed_adapter": {
+    "repository": "https://github.com/siltok-ai/siltok-speed",
+    "branch": "integrate/flash-next-strata-q2-mtp-5070ti",
+    "source_commit": "f13ffb99d05ea0add75d5da341bca29fc6c787c1",
+    "evidence_commit": "f13ffb99d05ea0add75d5da341bca29fc6c787c1",
+    "package": {
+      "version": "0.1.2.dev0+strataq2mtp2.3.2026101516",
+      "bundle_sha256": "455d325b1abc3ea0541e5388186469c3cc5fd09c38afdc8c029a424b4211c372",
+      "installer": {
+        "filename": "SiltokSpeed-Setup-0.1.2.dev0+strataq2mtp2.3.2026101516.exe",
+        "bytes": 2280361534,
+        "sha256": "1f33c29fe121fc96ff01fb723aa38d791552c207eaff4c4ed9401d146685cf42",
+        "version": "0.1.2.dev0+strataq2mtp2.3.2026101516",
+        "source_commit": "f13ffb99d05ea0add75d5da341bca29fc6c787c1",
+        "bundle_sha256": "455d325b1abc3ea0541e5388186469c3cc5fd09c38afdc8c029a424b4211c372",
+        "ordinary_wheel": {
+          "filename": "siltok_speed-0.1.2.dev0+strataq2mtp2.3-py3-none-any.whl",
+          "bytes": 7635048,
+          "sha256": "f9cfde5790abafd471ca7408715e8c313986a7695a26c11cffd51e1fb64424bc"
+        }
+      }
+    }
+  },
+  "acceptance": {
+    "status": "accepted_with_known_issue",
+    "full_installer": true,
+    "clean_os": false,
+    "full_installer_clean_machine": false,
+    "old_35b": true,
+    "h3": true,
+    "old_27b_16g": false,
+    "integration": true
+  },
+  "evidence": {
+    "index": "research/acceptance/flash-next-5070ti-20261015/integration/index.json",
+    "sha256": "87bf75b2c1a22531f3132eec4e23df7c8aac68f0e630fef8196a604bfe5fc095"
+  },
+  "known_issues": [
+    {
+      "id": "intermittent-long-output-token0",
+      "state": "unresolved",
+      "delivery_exception_authorized_by_user": true,
+      "failed_worker_token_ids_captured": false,
+      "first_failure_report": "known-first-failure",
+      "source_recheck_report": "known-source-recheck",
+      "installed_recheck_report": "known-installed-recheck",
+      "numeric_stress_report": "known-numeric-stress",
+      "unobserved_stress_report": "known-unobserved-stress",
+      "numeric_sample_reports": [
+        "known-sampling-10904",
+        "known-sampling-3928"
+      ],
+      "additional_prompt_variants": {
+        "tested": 12,
+        "passed": 11
+      },
+      "additional_variant_native_report": "known-native-variant"
+    }
+  ]
+}

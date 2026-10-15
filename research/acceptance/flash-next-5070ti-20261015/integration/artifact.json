@@ -1,0 +1,13 @@
+{
+  "filename": "SiltokSpeed-Setup-0.1.2.dev0+strataq2mtp2.3.2026101516.exe",
+  "bytes": 2280361534,
+  "sha256": "1f33c29fe121fc96ff01fb723aa38d791552c207eaff4c4ed9401d146685cf42",
+  "version": "0.1.2.dev0+strataq2mtp2.3.2026101516",
+  "source_commit": "f13ffb99d05ea0add75d5da341bca29fc6c787c1",
+  "bundle_sha256": "455d325b1abc3ea0541e5388186469c3cc5fd09c38afdc8c029a424b4211c372",
+  "ordinary_wheel": {
+    "filename": "siltok_speed-0.1.2.dev0+strataq2mtp2.3-py3-none-any.whl",
+    "bytes": 7635048,
+    "sha256": "f9cfde5790abafd471ca7408715e8c313986a7695a26c11cffd51e1fb64424bc"
+  }
+}

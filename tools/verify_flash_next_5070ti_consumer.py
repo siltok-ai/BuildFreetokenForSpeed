@@ -80,6 +80,13 @@ def verify(contract_path=None, speed_root=None):
     require(artifact==package['installer'] and artifact['version']==package['version']
             and artifact['source_commit']==commit and artifact['bundle_sha256']==package['bundle_sha256'],
             'Installer artifact identity differs from installed product')
+    integration_provenance=None
+    if contract['acceptance']['integration']:
+        integration_provenance=evidence_read(contained(directory,'integration/integration-provenance.json'))
+        require(integration_provenance['source_commit']==commit and
+                integration_provenance['ahead_behind'].split()==['0','1'] and
+                integration_provenance['actual_rebase'] is True,
+                'Integration is not the recorded single-commit rebased source')
     wheel=contained(materials,contract['wheel']['path'])
     require(hashlib.sha256(wheel.read_bytes()).hexdigest()==contract['wheel']['sha256'],'Wrong FreeToken wheel')
     with zipfile.ZipFile(wheel) as archive:
@@ -145,6 +152,15 @@ def verify(contract_path=None, speed_root=None):
     service=role('normal-service');cleanup=role('cleanup')
     require(service['status']=='passed' and service['test_bypass'] is False
             and service['health']['commit']==commit and not service['health']['dirty'],'Real service identity failed')
+    if contract['acceptance']['integration']:
+        # 整合版保留dev原生设备许可证；无证书的正常服务必须拒绝推理。
+        require(service['health']['status']=='unlicensed' and service['chat_denied']['status_code']==503
+                and service['chat_denied']['body']['error']['code']=='engine_unlicensed',
+                'Integrated normal service no longer enforces the dev license boundary')
+    else:
+        require(service['arithmetic']['choices'][0]['message']['content'].strip()=='527'
+                and service['sse']['text'].strip()=='527' and service['sse']['done_events']==1,
+                'Exploration normal-service inference was not retained')
     require(cleanup['ok'] and all(cleanup['after_checks'].values()),'Owned installation cleanup incomplete')
     known_issues=contract.get('known_issues',[])
     require(len(known_issues)==1,'Recorded unresolved delivery issue must remain explicit')
@@ -202,6 +218,9 @@ def verify(contract_path=None, speed_root=None):
         require(not subprocess.check_output(git+['status','--porcelain']),'Speed checkout is dirty')
         require(not subprocess.check_output(git+['diff',commit,'HEAD','--','silitok_speed','packaging/windows/build.ps1']),
                 'Speed runtime/build differs from validated source')
+        if integration_provenance is not None:
+            parent=subprocess.check_output(git+['rev-parse',commit+'^'],text=True).strip()
+            require(parent==integration_provenance['dev_base'],'Integrated commit is not directly based on accepted dev')
     return dict(verified=True,scope='archived_actual_installed_5070ti_acceptance',speed_commit=commit,
                 actual_http_512_token_runs=18,matched_mtp_outputs=6,full_installer=True,clean_os=False,
                 unresolved_known_issues=[issue['id'] for issue in known_issues])

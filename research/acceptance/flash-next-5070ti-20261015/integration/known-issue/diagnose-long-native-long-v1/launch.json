@@ -1,0 +1,51 @@
+{
+  "mode": "installed",
+  "command": [
+    "C:\\workspace\\envs\\siltok-speed\\flash-accept\\Scripts\\python.exe",
+    "-u",
+    "-B",
+    "C:\\workspace\\runs\\siltok-speed\\flash-accept-20261015\\diagnose-long-native-long-v1\\probes\\supervise.py",
+    "--prefix",
+    "C:\\workspace\\runs\\siltok-speed\\flash-accept-20261015\\diagnose-long-native-long-v1\\run",
+    "--cwd",
+    "C:\\workspace\\build\\siltok-speed\\i03",
+    "--timeout",
+    "180",
+    "--",
+    "C:\\workspace\\build\\siltok-speed\\i03\\python\\python.exe",
+    "-I",
+    "-X",
+    "utf8",
+    "-u",
+    "-B",
+    "C:\\workspace\\runs\\siltok-speed\\flash-accept-20261015\\diagnose-long-native-long-v1\\probes\\native-long-probe.py",
+    "--output",
+    "C:\\workspace\\runs\\siltok-speed\\flash-accept-20261015\\diagnose-long-native-long-v1\\report.json",
+    "--baseline",
+    "C:\\workspace\\runs\\siltok-speed\\flash-accept-20261015\\http-off-r3584-smoke-v1.json"
+  ],
+  "ple_sync": null,
+  "poison_empty": false,
+  "poison_bytes": false,
+  "diagnostic_scripts": {
+    "diagnose-http-long.py": "12ca71f63c8206aba650fc26039c36d1bc37dcef2baf9999d9a6d5e3754b956c",
+    "run-http-long-stress.py": "e88628318401a1e49747df8a4c600ad0a35b2aece3142cebf17ad9ce63aca7ce",
+    "run-http-smoke-v2.py": "1f722560c856c6576e06050f6387c17d3cc519014a4e699389fad2bad5604d43",
+    "numeric-launch.py": "7c2f8b838056dc679e3263270a330e9375eb1a8be83fe269e6dbaf16aa2efed5",
+    "worker-numeric-hook.py": "31f55226e77b24c3a7c96e3d52d7b6e6eca51fd8108d0b756d673b6b0271e8c1",
+    "worker-poison-hook.py": "40426be8138f953b5b1cda4396266cba27ed54fcc4fbaf5508a6889dac0b1425",
+    "run-installed-probe.py": "a9bc30dc39faf11bdac38cd8aa6a3937a21437f9b3aa4c20d42ad9a1ed44e147",
+    "supervise.py": "acf6a68d3f40c4c642de941f0fa4f93269c0ca45783b0a6ef959ece86a917ad2",
+    "graph-wait-probe.py": "e7cb1a01f717bba414f95eb878b4ee1990697a869e1934cd6bf4163ffba37a98",
+    "native-long-probe.py": "27086956d81aee6c0109ba2dd725bdeba330a26451ae33794eab2b7cda86f5e0"
+  },
+  "environment": {
+    "PATH": "C:\\workspace\\build\\siltok-speed\\i03\\python\\Scripts;C:\\Windows\\System32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\Program Files\\NVIDIA Corporation\\NVSMI",
+    "TEMP": "C:\\workspace\\runs\\siltok-speed\\flash-accept-20261015\\install-i03\\tmp",
+    "SILITOK_CONFIG": "C:\\workspace\\runs\\siltok-speed\\flash-accept-20261015\\install-i03\\probe-config",
+    "SILITOK_FREETOKEN_KERNEL_CACHE_DIR": "C:\\workspace\\build\\siltok-speed\\i03\\runtime\\kernel-cache",
+    "FREETOKEN_KERNEL_CACHE_DIR": "C:\\workspace\\build\\siltok-speed\\i03\\runtime\\kernel-cache",
+    "TRITON_CACHE_DIR": "C:\\workspace\\cache\\triton\\installed-i03",
+    "TORCH_EXTENSIONS_DIR": "C:\\workspace\\cache\\ext\\installed-i03"
+  }
+}

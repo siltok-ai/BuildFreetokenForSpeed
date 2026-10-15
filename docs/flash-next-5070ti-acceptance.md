@@ -1,6 +1,6 @@
 # Flash Next Strata Q2：RTX 5070 Ti 交接实测
 
-2026-10-15，本机交接验收记录。完整 Q2 GGUF、原生 FreeToken、Speed backend 和真实 TCP HTTP/SSE 已运行；新的 Cython 整包已构建、真实安装并完成回归及卸载清理，按用户明确决定带已知问题接受；独立 rebase 整合版仍待重新验收。
+2026-10-15，本机交接验收记录。完整 Q2 GGUF、原生 FreeToken、Speed backend 和真实 TCP HTTP/SSE 已运行；新的 Cython 整包已构建、真实安装并完成回归及卸载清理，按用户明确决定带已知问题接受；独立 rebase 整合版亦已重新构建、安装回归和清场，保留相同已知风险。
 
 ## 环境与配置
 
@@ -63,3 +63,25 @@ FreeToken 为冻结的 `0.1.3+speed.strataq2mtp2`，使用原 wheel 和配套 27
 本页当前不证明长期压力运行、并发模型、完整8192边界、更长上下文、27B dense在16GiB的运行资格、全新操作系统或完全离线安装。整包和整合分支通过后，应分别追加其提交、安装器SHA、实测结果与清理事实，保留本轮源码数据。
 
 探索消费合同：[consumer-contract-5070ti-explore.json](../integration/speed/consumer-contract-5070ti-explore.json)。实际安装封存149文件见[explore](../research/acceptance/flash-next-5070ti-20261015/explore/README.md)。`python -B tools/verify_current_release.py`会复算安装身份、性能、质量和清理；Speed用`python -B tools/verify_flash_next_checkpoint.py --build-root <Build仓库>`检查当前代码与合同。旧`verify_mtp_checkpoint.py`保留历史哈希，仅用于历史提交，不篡改为新验收。署名：boqi。
+
+## 基于最新dev的整合版实际安装验收
+
+独立分支`integrate/flash-next-strata-q2-mtp-5070ti`运行提交`f13ffb99d05ea0add75d5da341bca29fc6c787c1`，直接父提交为dev `fc7dd6a79017d789304645d784825ce8e517b98d`，已实际rebase并整理成相对dev的单个功能提交。探索`3e251687`历史保持原样，当前dev与旧Build材料分支未修改。配套材料供应为Build `1d9ccc023797c2b6aec2917949705145ac669a24`，FT2引擎字节未改。
+
+正式f02版本`0.1.2.dev0+strataq2mtp2.3.2026101516`，安装器2,280,361,534字节、SHA256 `1f33c29fe121fc96ff01fb723aa38d791552c207eaff4c4ed9401d146685cf42`，实际安装到i04。相同HTTP协议已完成18次实际512输出，六组同容量开/关文本、reasoning、usage及结束原因一致。
+
+| 模式 | 短输入decode中位tps | 4K输入decode中位tps |
+| --- | ---: | ---: |
+| 关闭MTP，永久3584 | 71.69 | 68.84 |
+| 开启MTP，永久2304 | 60.05 | 62.55 |
+| 关闭MTP，永久2304 | 66.46 | 63.75 |
+
+整合保留dev设备许可证能力，正常SCM服务无证书时健康状态为unlicensed，推理返回既定`503 / engine_unlicensed`；独立模型验收进程使用仓库外测试替身，产品许可证/API校验文件与dev字节一致。首次外部探针错误预期401/403，修正为dev明确的503契约后通过，未改产品。
+
+相关CPU回归273 passed，真实MTP权重配置投影未跳过。Discovery18项未授权夹具失败在未改dev上同样复现，保留记录。冲突决策见Speed的`docs/flash-next-integration-conflict-review.md`。最终10项安装队列全部完成：Flash Next两档backend、三档HTTP512性能、两档HTTP功能、35B backend/HTTP和H3。正常卸载及15项清理通过；按用户决定带原已知问题接受，不宣称长期压力或干净OS通过。
+
+最终整合合同：[consumer-contract-5070ti-integration.json](../integration/speed/consumer-contract-5070ti-integration.json)；封存含原始输出、资源/来源审计、视频及rebase/单提交事实：[integration](../research/acceptance/flash-next-5070ti-20261015/integration/README.md)。Speed的`verify_flash_next_checkpoint.py`与Build的`verify_current_release.py`配套核对。当前dev许可证/API校验文件保持原样，模型开发验收仅用独立进程内临时绕过。署名boqi。
+
+整合安装版H3：124帧、832×480、24fps及32kHz双声道AAC，全部可解码；首中末帧已查看，运动/音频数值检查通过。MP4 SHA256 `3ea5b1bfc67e1779e5fd139a64f5269671d62d0ae77eb0099e25433553bbddec`。
+
+整合安装版H3视频与本机此前dev、相同输入/种子的验收产物SHA256完全一致；探索版的不同SOL默认路径另留原记录，不覆盖历史数据。

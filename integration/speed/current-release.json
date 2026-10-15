@@ -2,18 +2,18 @@
   "format": 1,
   "profile": "build/profiles/strataq2mtp2.json",
   "materials": "artifacts/strataq2mtp2-cp312-cu130-sm120",
-  "consumer_contract": "integration/speed/consumer-contract-5070ti-explore.json",
+  "consumer_contract": "integration/speed/consumer-contract-5070ti-integration.json",
   "weight_source_lock": "model-weights/qwen3.8-flash-next-strata-q2/source-lock.json",
   "mtp_manifest": "model-weights/qwen3.8-flash-next-strata-q2/mtp-runtime.json",
   "input_sha256": {
     "build/profiles/strataq2mtp2.json": "7cb2188ea547979c311646bac3dc161c6e35cd263fd8f5ef33bf905bda9368e5",
     "model-weights/qwen3.8-flash-next-strata-q2/source-lock.json": "a9c445bbeb1103938656137ce94dd31a69d3b835bfd4bf555e1e6c0a56d5ab49",
     "model-weights/qwen3.8-flash-next-strata-q2/mtp-runtime.json": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
-    "integration/speed/consumer-contract-5070ti-explore.json": "123b527ae156efad8d304ee1200b423d31c1613254d60f9207ea78ca0bd4b5ac",
-    "integration/speed/presets/flash-next-sm120-16g.json": "18f73b5920c7e80d90987fd14db350c868540b88f2781c9f65fb5a2813f6d79c"
+    "integration/speed/presets/flash-next-sm120-16g.json": "18f73b5920c7e80d90987fd14db350c868540b88f2781c9f65fb5a2813f6d79c",
+    "integration/speed/consumer-contract-5070ti-integration.json": "9dd3374713fa180cf527ea0b76c17fd96a0be493db522f1d9bd98d2aed8fa1c1"
   },
   "version": "0.1.3+speed.strataq2mtp2",
   "mtp_default_enabled": false,
-  "scope": "5070 Ti actual full installer accepted with explicitly retained unresolved long-output issue; clean-OS acceptance remains open. Historical 24GiB contracts and old dev supply branch are preserved.",
+  "scope": "5070 Ti actual full installer acceptance for the single-commit integration on dev; accepted with retained unresolved long-output issue. Dev license enforcement preserved; clean-OS acceptance remains open.",
   "speed_preset": "integration/speed/presets/flash-next-sm120-16g.json"
 }

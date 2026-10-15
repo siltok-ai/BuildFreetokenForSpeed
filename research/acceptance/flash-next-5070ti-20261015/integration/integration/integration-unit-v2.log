@@ -1,0 +1,22 @@
+........................................................................ [ 26%]
+........................................................................ [ 52%]
+........................................................................ [ 79%]
+.........................................................                [100%]
+============================== warnings summary ===============================
+..\..\..\envs\siltok-speed\flash-accept\Lib\site-packages\fastapi\testclient.py:1
+  C:\workspace\envs\siltok-speed\flash-accept\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+..\..\..\envs\siltok-speed\flash-accept\Lib\site-packages\starlette\testclient.py:53
+  C:\workspace\envs\siltok-speed\flash-accept\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/unit/test_freetoken_mtp.py::test_real_mtp_source_projects_native_config_and_budget
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+tests/unit/test_freetoken_mtp.py::test_real_mtp_source_projects_native_config_and_budget
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+273 passed, 4 warnings in 34.86s
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

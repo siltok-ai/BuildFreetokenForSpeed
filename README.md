@@ -10,7 +10,7 @@
 | profile / 有序补丁 | `build/profiles/strataq2mtp2.json` / `patches/strataq2mtp2-series.json`（20组） |
 | 成对制品 | `artifacts/strataq2mtp2-cp312-cu130-sm120/`：wheel内3个native模块，27个AOT DLL |
 | 运行合同 | Windows x64 / Python 3.12 / Torch 2.11.0+cu130 / CUDA13 / TVM FFI 0.1.13.post3 / SM120 |
-| Speed 对应分支 | `explore/freetoken-flash-next-strata-q2-mtp`，5070 Ti运行代码 `e0524007`、交付提交 `3e251687` |
+| Speed 对应分支 | `integrate/flash-next-strata-q2-mtp-5070ti`，运行/交付 `f13ffb99`，直接基于 dev `fc7dd6a7`；探索 `3e251687` 保留 |
 | MTP | **默认关闭**；开启时独立预测层、专属事务/KV/graph预算；greedy最多3草稿，非greedy原采样 |
 
 本次供应层完善保留 FT2、wheel/AOT 和 Speed 既有 SHA 合同，不更改推理计算。历史版本、补丁和验收资料保持不可变。
@@ -50,10 +50,10 @@ python -B tools/verify_mtp2_consumer.py
 python -B tools/verify_flash_next_5070ti.py
 ```
 
-上述离线检查不等价于GPU/整包验收。冻结本机结果：无MTP最佳历史HTTP短/4K中位109.88/104.02tps；MTP六次各512个实际交付token，中位106.54/109.58tps，同容量关闭101.79/97.43。20题非thinking15/20且输出IDs匹配已接受Q2基线，thinking三题3/3；旧27B/35B、取消复用和故障重启已通过安装版本验收。详细证据见 [消费合同](integration/speed/consumer-contract-strataq2mtp2.json)、[原始检查点](docs/strata-q2-mtp2-checkpoint.txt)。不是所有设备的100tps保证。
+上述离线检查不等价于GPU/整包验收。历史5090 D v2结果：无MTP最佳历史HTTP短/4K中位109.88/104.02tps；MTP六次各512个实际交付token，中位106.54/109.58tps，同容量关闭101.79/97.43。20题非thinking15/20且输出IDs匹配已接受Q2基线，thinking三题3/3；旧27B/35B、取消复用和故障重启已通过安装版本验收。详细证据见 [消费合同](integration/speed/consumer-contract-strataq2mtp2.json)、[原始检查点](docs/strata-q2-mtp2-checkpoint.txt)。不是所有设备的100tps保证。
 
 新增[可搬迁交付验收](research/mtp/evidence/portable-delivery-20261014-v1/README.md)：固定元数据网络下载、完整两片校验、31份MTP重新转换、异路径刷新、Git导出29项测试与已安装Speed开/关各两次512-token推理均通过。`python -B tools/verify_flash_next_delivery.py`交叉核对封存原始记录。
 
-5070 Ti新Cython整包已真实安装验收并清理，按用户决定带已知长输出风险接受，详见当前消费合同；干净操作系统及独立整合分支尚未验收。第三方有版本锁但未提供完整离线wheelhouse。源码/格式/许可与维护规则见 [upstream](upstream/README.md)、[NOTICE](NOTICE)、[维护说明](docs/maintenance.md)。
+5070 Ti新Cython整包已真实安装验收并清理，按用户决定带已知长输出风险接受，详见当前消费合同；独立整合分支亦已完整构建、实际安装回归并清理；干净操作系统尚未验收。第三方有版本锁但未提供完整离线wheelhouse。源码/格式/许可与维护规则见 [upstream](upstream/README.md)、[NOTICE](NOTICE)、[维护说明](docs/maintenance.md)。
 
 旧版本保持可回滚：`q2opt2` 为 HF主干+Q2专家混合模型；`strataq2dev7` 为无MTP全GGUF检查点；`strataq2mtp1` 为首次MTP候选。旧入口 `integration/speed/consumer-contract.json` 代表历史win1，不是当前选择。历史README保存在 [历史记录](docs/history/readme-before-current-20261014.txt)。

@@ -1,0 +1,5 @@
+{
+  "stage": "failed: CalledProcessError(1, ['C:\\\\Program Files\\\\PowerShell\\\\7\\\\pwsh.exe', '-NoProfile', '-File', 'C:\\\\workspace\\\\runs\\\\siltok-speed\\\\flash-accept-20261015\\\\install-integration-i04.ps1'])",
+  "source_commit": "f13ffb99d05ea0add75d5da341bca29fc6c787c1",
+  "updated_utc": 1792052555.6751378
+}
