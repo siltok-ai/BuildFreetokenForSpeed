@@ -1,0 +1,8 @@
+{
+  "status": "prepared",
+  "runtime": "C:\\workspace\\envs\\siltok-speed\\flash-perf-rel8",
+  "speed_wheel": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\speed8-ordinary-wheel-v1\\siltok_speed-0.1.2.dev0+strataq2perf8-py3-none-any.whl",
+  "speed_wheel_sha256": "1c40d1a84d77e0c51ed50d7cc823220dc5310e78005a5ecaf5693ce45c336b45",
+  "source_commit": "480c1ae26b170b8b2c7e1359a828dcfb88271844",
+  "source_dirty": false
+}

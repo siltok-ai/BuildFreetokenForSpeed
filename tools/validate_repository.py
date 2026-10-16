@@ -293,6 +293,18 @@ def main():
         from validate_performance8_revision import validate as validate_performance8
         performance_revision8 = validate_performance8(ROOT/'build/profiles/strataq2perf8.json',
             ROOT/'artifacts/strataq2perf8-cp312-cu130-sm120')
+    performance_consumer8 = None
+    if (ROOT/'integration/speed/consumer-contract-strataq2perf8.json').exists():
+        from verify_performance8_consumer import verify as verify_performance8_consumer
+        performance_consumer8 = verify_performance8_consumer()
+    performance_delivery8 = None
+    if (ROOT/'integration/speed/consumer-contract-strataq2perf8-compiled.json').exists():
+        from verify_performance8_delivery import verify as verify_performance8_delivery
+        performance_delivery8 = verify_performance8_delivery()
+    performance_installed8 = None
+    if (ROOT/'integration/speed/consumer-contract-strataq2perf8-installed.json').exists():
+        from verify_performance8_installed import verify as verify_performance8_installed
+        performance_installed8 = verify_performance8_installed()
     print(json.dumps({"official_files": len(original_hashes), "changed_files": len(changed),
                       "patches": len(series["patches"]), "split_equals_historical": True,
                       "wheel_python_matches_prepared_source": True, "aot_count": len(specs),
@@ -307,6 +319,9 @@ def main():
                       "performance_consumer6":performance_consumer6,
                       "performance_revision7":performance_revision7,
                       "performance_revision8":performance_revision8,
+                      "performance_consumer8":performance_consumer8,
+                      "performance_delivery8":performance_delivery8,
+                      "performance_installed8":performance_installed8,
                       "strata_research_dev2":research_dev2,
                       "strata_research_dev3":research_dev3, "strata_research_dev4":research_dev4,
                       "strata_research_dev5":research_dev5,

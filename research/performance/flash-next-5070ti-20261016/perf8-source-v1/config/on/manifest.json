@@ -1,0 +1,55 @@
+{
+  "schema": "silitok.models/1",
+  "models": [
+    {
+      "id": "flash-next-strata-q2-on",
+      "name": "Flash Next Strata Q2 on",
+      "type": "language",
+      "family": "qwen3.8",
+      "features": [
+        "chat"
+      ],
+      "engine": {
+        "pipeline": "chat",
+        "backend": "Qwen36Backend",
+        "offload": false,
+        "extra": {
+          "attention_backend": "qsa_sparse",
+          "ple_backend": "disk",
+          "cache_type": "radix",
+          "memory_ratio": 0.9,
+          "kv_cache_tokens": 8192,
+          "cuda_graph_max_bs": 1,
+          "max_prefill_length": 1024,
+          "moe_q2_resident_experts": 4992,
+          "moe_q2_dynamic_slots": 1024,
+          "moe_cache_size": 7040,
+          "mtp_enabled": true,
+          "vram_estimate_bytes": 16106127360,
+          "host_commit_estimate_bytes": 33285996544,
+          "linear_state_cache_slots": 1,
+          "moe_q2_adapt_every": 32,
+          "moe_q2_adapt_decay": 0.7,
+          "gguf_embedding_host": true,
+          "ple_row_cache_rows": 1048576,
+          "moe_q2_prefill_workspace": true,
+          "fixed_q2_rebuild_reserve_mib": 0,
+          "mtp_compact_state": true,
+          "mtp_draft_policy": "paired_cjk",
+          "startup_timeout_seconds": 600,
+          "request_deadline_seconds": 1800
+        }
+      },
+      "artifacts": {
+        "weights": {
+          "path": "checkpoints/flash-next-strata-q2",
+          "layout": "hf_model"
+        },
+        "mtp": {
+          "path": "checkpoints/flash-next-mtp",
+          "layout": "freetoken_mtp"
+        }
+      }
+    }
+  ]
+}

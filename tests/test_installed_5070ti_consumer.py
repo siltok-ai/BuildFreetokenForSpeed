@@ -7,16 +7,15 @@ import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
-from current_release import ROOT, load_current
+from current_release import ROOT
 from verify_flash_next_5070ti_consumer import verify
 
 
 class InstalledConsumerTests(unittest.TestCase):
     def test_rejects_changed_contract_bindings(self):
         """真正执行冻结报告核对，拒绝身份、封存摘要和已知风险被改写。"""
-        contract = json.loads((ROOT / load_current()['consumer_contract']).read_text(encoding='utf-8'))
-        if contract.get('kind') != 'flash_next_5070ti_installed_consumer':
-            self.skipTest('Historical release has no installed 5070 Ti contract')
+        # 历史实装证据必须继续受防篡改回归保护，不随默认版本切换而跳过。
+        contract = json.loads((ROOT / 'integration/speed/consumer-contract-5070ti-integration.json').read_text(encoding='utf-8'))
         changes = (
             ('index digest', lambda item: item['evidence'].update(sha256='0' * 64)),
             ('source identity', lambda item: item['speed_adapter'].update(source_commit='0' * 40)),

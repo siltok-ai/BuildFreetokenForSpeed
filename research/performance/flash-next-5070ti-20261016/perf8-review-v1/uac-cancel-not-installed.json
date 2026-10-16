@@ -1,0 +1,5 @@
+{
+  "status": "failed",
+  "observed_utc": "2026-10-16T21:03:24.0432068Z",
+  "error": "由于以下错误，无法运行此命令: An error occurred trying to start process 'C:\\Program Files\\PowerShell\\7\\pwsh.exe' with working directory 'C:\\Users\\UserPC'. 操作已被用户取消。"
+}

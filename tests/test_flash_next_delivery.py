@@ -43,7 +43,7 @@ class DeliveryBoundaries(unittest.TestCase):
     def test_default_points_to_current_speed_and_old_profile_is_explicitly_available(self):
         from prepare_source import DEFAULT_PROFILE, load_profile
         current = load_current()
-        self.assertEqual(DEFAULT_PROFILE, ROOT/'build/profiles/strataq2mtp2.json')
+        self.assertEqual(DEFAULT_PROFILE, ROOT/current['profile'])
         self.assertEqual(load_profile(DEFAULT_PROFILE)[0]['custom_version'], current['version'])
         self.assertEqual(load_profile(ROOT/'build/profiles/q2opt2.json')[0]['custom_version'], '0.1.3+speed.q2opt2')
 

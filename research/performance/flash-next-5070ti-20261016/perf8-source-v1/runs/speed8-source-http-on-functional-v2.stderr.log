@@ -1,0 +1,53 @@
+C:\workspace\envs\siltok-speed\flash-perf-cand8\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+INFO silitok_speed.engine.scheduler: Scheduler started (thread=SilitokScheduler)
+INFO httpx: HTTP Request: GET http://127.0.0.1:64371/v1/models "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task c9c62478-65ad-4237-a9b6-83314f598128 started (pipeline=chat)
+INFO silitok_speed.engine.resource: admission model=qwen3.8-flash-next.q2_0_strata-freetoken fits=True reject=False vram_need=16.11GB commit_need=49.39GB ram_need=33.29GB vram_free=16.40GB commit_avail=57.00GB ram_avail=56.78GB reasons= warnings=
+INFO silitok_speed.engine.models: Loading backend FreeTokenQwen36Backend for model qwen3.8-flash-next.q2_0_strata-freetoken (estimated VRAM: 16.11 GB, commit: 16.11 GB)
+INFO silitok_speed.engine.models: Backend FreeTokenQwen36Backend loaded for qwen3.8-flash-next.q2_0_strata-freetoken (current VRAM: 15.34 GB)
+INFO silitok_speed.engine.scheduler: Task c9c62478-65ad-4237-a9b6-83314f598128 completed
+INFO httpx: HTTP Request: POST http://127.0.0.1:64371/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task c0f09a30-2041-4967-86bd-09f1c081ab7f started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task c0f09a30-2041-4967-86bd-09f1c081ab7f completed
+INFO httpx: HTTP Request: POST http://127.0.0.1:64371/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task 0d3b2cc6-3ddf-4a1e-853e-f01d19a2c7e5 started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task 0d3b2cc6-3ddf-4a1e-853e-f01d19a2c7e5 completed
+INFO httpx: HTTP Request: POST http://127.0.0.1:64371/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task b963b52b-df32-477e-b405-f4c373914d4a started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task b963b52b-df32-477e-b405-f4c373914d4a completed
+INFO httpx: HTTP Request: POST http://127.0.0.1:64371/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task 493380a9-2da6-4092-8eda-2017ea34077d started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task 493380a9-2da6-4092-8eda-2017ea34077d completed
+INFO httpx: HTTP Request: POST http://127.0.0.1:64371/v1/chat/completions "HTTP/1.1 200 OK"
+INFO httpx: HTTP Request: POST http://127.0.0.1:64371/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task 7e5c055a-4717-4b99-8dde-0eca6127c91a started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task 7e5c055a-4717-4b99-8dde-0eca6127c91a completed
+INFO httpx: HTTP Request: POST http://127.0.0.1:64371/v1/chat/completions "HTTP/1.1 400 Bad Request"
+INFO httpx: HTTP Request: GET http://127.0.0.1:64371/v1/status "HTTP/1.1 200 OK"
+INFO httpx: HTTP Request: GET http://127.0.0.1:64371/v1/models "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task 84d93b3d-4ec6-4de9-acd6-265539aa578d started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task 84d93b3d-4ec6-4de9-acd6-265539aa578d completed
+INFO httpx: HTTP Request: POST http://127.0.0.1:64371/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task a5f560f7-b1be-4461-add8-67f23fa12ec0 started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task a5f560f7-b1be-4461-add8-67f23fa12ec0 completed
+INFO httpx: HTTP Request: POST http://127.0.0.1:64371/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task 625675a4-8aa3-4b8e-aec9-9aad49227108 started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task 625675a4-8aa3-4b8e-aec9-9aad49227108 completed
+INFO httpx: HTTP Request: POST http://127.0.0.1:64371/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task a7a12a03-ec3a-412e-b3eb-3d56d6a5f79f started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task a7a12a03-ec3a-412e-b3eb-3d56d6a5f79f completed
+INFO httpx: HTTP Request: POST http://127.0.0.1:64371/v1/chat/completions "HTTP/1.1 200 OK"
+INFO httpx: HTTP Request: POST http://127.0.0.1:64371/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task fb4d5a65-c6df-410c-8f07-5caa8bd1c7ef started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task fb4d5a65-c6df-410c-8f07-5caa8bd1c7ef completed
+INFO silitok_speed.engine.scheduler: Task 318a7580-976a-4056-99a2-290336014ba5 started (pipeline=chat)
+INFO silitok_speed.engine.scheduler: Task 318a7580-976a-4056-99a2-290336014ba5 completed
+INFO httpx: HTTP Request: POST http://127.0.0.1:64371/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Task a9fc8b10-492a-4733-b1ee-f91b2f9afde8 started (pipeline=chat)
+INFO silitok_speed.engine.resource: admission model=qwen3.8-flash-next.q2_0_strata-freetoken fits=True reject=False vram_need=16.11GB commit_need=49.39GB ram_need=33.29GB vram_free=16.40GB commit_avail=56.99GB ram_avail=56.77GB reasons= warnings=
+INFO silitok_speed.engine.models: Loading backend FreeTokenQwen36Backend for model qwen3.8-flash-next.q2_0_strata-freetoken (estimated VRAM: 16.11 GB, commit: 16.11 GB)
+INFO silitok_speed.engine.models: Backend FreeTokenQwen36Backend loaded for qwen3.8-flash-next.q2_0_strata-freetoken (current VRAM: 15.34 GB)
+INFO silitok_speed.engine.scheduler: Task a9fc8b10-492a-4733-b1ee-f91b2f9afde8 completed
+INFO httpx: HTTP Request: POST http://127.0.0.1:64371/v1/chat/completions "HTTP/1.1 200 OK"
+INFO silitok_speed.engine.scheduler: Scheduler stopped cleanly

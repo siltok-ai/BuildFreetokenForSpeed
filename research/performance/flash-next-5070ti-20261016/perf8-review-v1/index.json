@@ -1,0 +1,41 @@
+{
+  "scope": "source_and_protected_payload_review",
+  "files": {
+    "build-perf8-preinstalled-tools-v2.log": {
+      "bytes": 12109,
+      "sha256": "ccc79a9d086c3de807740c33a9b9bf19e942ac246310c255d954a9c2a4eb1353"
+    },
+    "build-perf8-preinstalled-validator-v1.log": {
+      "bytes": 19464,
+      "sha256": "0c3fb24d2f9023c512a9556be36e1ceb462db35ec509cd768db9235b15d3567d"
+    },
+    "current-release-at-review.json": {
+      "bytes": 1618,
+      "sha256": "b5b74228deb5dc92fbdd76001751eb6808f6da1ff781164ab5efe0da3451d9cd"
+    },
+    "historical-test-skip-before-fix.log": {
+      "bytes": 12181,
+      "sha256": "f0266016fb8440b3a53ea64b2ce01b1e06e045fea8edbc142da91ebf038385a0"
+    },
+    "perf8-code-review-v1.json": {
+      "bytes": 1587,
+      "sha256": "dba43b5272ab511284e0e5765a12dc7d6f656bbf4923bed92b94bd47882fe540"
+    },
+    "perf8-preinstalled-cpu-ready-v1.json": {
+      "bytes": 145,
+      "sha256": "b30fe4f550326a148dee084a22a97bd9cbc593855a9055231469fb7b3813ed74"
+    },
+    "scope.json": {
+      "bytes": 316,
+      "sha256": "9fe9069dfaaa08ef0d828a74f609f67af2afe2d7e4efab2bec61afe62bc6b0bb"
+    },
+    "uac-cancel-not-installed.json": {
+      "bytes": 297,
+      "sha256": "84b54eea49b04c76e7970f2246a9aced52b9a8c5cf6a3f3fb36011f10ecf874d"
+    },
+    "uac-launch-not-installed.json": {
+      "bytes": 414,
+      "sha256": "0bfb2406604344d57e07d81553431e18db65f1936d3e910deb5ebf5dc6c8b8b8"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "reviewed_utc": "2026-10-16T21:11:49.790716+00:00",
+  "speed_commit": "480c1ae26b170b8b2c7e1359a828dcfb88271844",
+  "materials_commit": "5beafbb70ac09cc42681d6264d2caf990b95e906",
+  "source_and_compiled_contracts_match": true,
+  "speed_worktree_clean": true,
+  "windows_installer_code_unchanged_from_f13ffb99": true,
+  "original_full_gsq_q2_preserved": true,
+  "mtp_default_off": true,
+  "explicit_paired_policy": true,
+  "code_review": [
+    "Indexed Q5 reads original packed rows; 64 actual full/subset logit comparisons exact.",
+    "Paired policy counts complete draft/verify/commit cycles, excludes stale exploitation from relative choice, resets per request.",
+    "Exact new int64 map ownership 850392B is accounted; full policy retains old bytes.",
+    "Workspace poison guard precedes draft bookkeeping; real failure-before/component-pass-after preserved.",
+    "All per-role source/compiled identity, resource minima, cancellation/reload and clean child exits verified.",
+    "Frozen archives/profiles/materials remain byte-identical; public build manifest only, no bundle encryption key archived.",
+    "Historical installed tamper regression now targets its frozen contract explicitly."
+  ],
+  "pending": [
+    "Final actual installation: UAC returned operation-cancelled before helper started; VNC readiness requested.",
+    "Two authorized GitHub pushes after checkpoint/review completion."
+  ],
+  "known_issues": [
+    "intermittent-long-output-token0: unresolved"
+  ],
+  "runtime_scope": "compiled_staged_payload_not_installer",
+  "actual_install_validated": false
+}

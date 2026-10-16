@@ -1,0 +1,13 @@
+C:\workspace\envs\siltok-speed\flash-perf-cand8\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+Traceback (most recent call last):
+  File "C:\workspace\runs\siltok-speed\flash-perf-20261016\consumer-tools\backend8-probe.py", line 146, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "C:\workspace\runs\siltok-speed\flash-perf-20261016\consumer-tools\backend8-probe.py", line 99, in main
+    backend.load(spec,BackendConfig(device='cuda:0',offload=False,extra=extra))
+  File "C:\workspace\wt\siltok-speed\flash-perf\silitok_speed\backends\freetoken_qwen36.py", line 483, in load
+    self._start_worker(cancel_event=cancel_event)
+  File "C:\workspace\wt\siltok-speed\flash-perf\silitok_speed\backends\freetoken_qwen36.py", line 826, in _start_worker
+    raise ModelCorruptError(f'FreeToken worker MTP ownership differs from the release contract: {differences}')
+silitok_speed.backends.base.ModelCorruptError: FreeToken worker MTP ownership differs from the release contract: {'draft_owned_bytes': (857442304, 858292696)}

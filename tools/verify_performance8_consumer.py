@@ -86,12 +86,20 @@ def verify(contract_path=DEFAULT,speed_root=None):
         resource=read(contained(directory,resource_relative))
         require(resource['returncode']==0 and resource['stop_reason'] is None and not resource['remaining_descendants'],
                 'Resource or cleanup failure: '+role)
+        require(resource['min_gpu_free']>=256*2**20 and resource['min_ram_available']>=2*2**30
+                and resource['min_commit_available']>=2**30,'Measured resource floor breached: '+role)
         return read(path)
 
     measured={}
     for mode,resident in [('off',5760),('on',4992)]:
         backend=report('backend-'+mode+'-quality')
-        quality(backend,read(native_root/f'runtime/perf8-wheel-quality-{mode}-v1.json'))
+        native=read(native_root/f'runtime/perf8-wheel-quality-{mode}-v1.json')
+        if mode=='on':
+            checks=native['indexed_head_checks']
+            require(len(checks['exact_full_subset'])==64 and all(checks['exact_full_subset'])
+                    and checks['rows']==106299 and checks['packed_copy_bytes']==0,
+                    'Actual indexed/full-head equality evidence incomplete')
+        quality(backend,native)
         identity=backend['identity']
         require(identity['freetoken_version']==contract['version'] and
                 identity['freetoken_installed_code']['files']==code and identity['aot_dlls']['files']==aot,

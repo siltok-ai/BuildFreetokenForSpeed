@@ -6,14 +6,16 @@
 
 | 项目 | 当前选择 |
 | --- | --- |
-| FreeToken | `0.1.3+speed.strataq2mtp2` |
-| profile / 有序补丁 | `build/profiles/strataq2mtp2.json` / `patches/strataq2mtp2-series.json`（20组） |
-| 成对制品 | `artifacts/strataq2mtp2-cp312-cu130-sm120/`：wheel内3个native模块，27个AOT DLL |
+| FreeToken | `0.1.3+speed.strataq2perf8` |
+| profile / 有序补丁 | `build/profiles/strataq2perf8.json` / `patches/strataq2perf8-series.json`（48组） |
+| 成对制品 | `artifacts/strataq2perf8-cp312-cu130-sm120/`：wheel内3个native模块，27个AOT DLL |
 | 运行合同 | Windows x64 / Python 3.12 / Torch 2.11.0+cu130 / CUDA13 / TVM FFI 0.1.13.post3 / SM120 |
-| Speed 对应分支 | `integrate/flash-next-strata-q2-mtp-5070ti`，运行/交付 `f13ffb99`，直接基于 dev `fc7dd6a7`；探索 `3e251687` 保留 |
-| MTP | **默认关闭**；开启时独立预测层、专属事务/KV/graph预算；greedy最多3草稿，非greedy原采样 |
+| Speed 对应分支 | `integrate/flash-next-strata-q2-mtp-5070ti`，验收提交 `480c1ae26b170b8b2c7e1359a828dcfb88271844` |
+| MTP | **默认关闭**；显式 `paired_cjk` 在完整词表3草稿与CJK词表2草稿之间按整轮收益选择；原 `full` 保留，非greedy原采样 |
 
-本次供应层完善保留 FT2、wheel/AOT 和 Speed 既有 SHA 合同，不更改推理计算。历史版本、补丁和验收资料保持不可变。
+本轮5070 Ti优化已完成普通wheel、Speed源码及实际编译保护载荷的质量、资源、生命周期和HTTP验收。当前合同明确区分暂存载荷与真实安装，不以旧安装记录替代本轮证明；旧质量集15/20、thinking3/3，无新增失败，保留间歇长输出已知问题。当前测量、复现命令和范围见 [perf8交付记录](docs/flash-next-5070ti-perf8.txt)。历史版本、补丁与验收资料保持不可变。
+
+以下保留早期候选演进记录，当前选择以上方唯一指针为准。
 
 5070 Ti 性能分支另有显式候选 `strataq2perf2`，包含缓存借用、搬运重叠与交错投影；默认当前指针保持上述已验收版本。实测范围、原生重建边界和待完成验收见 [性能候选记录](docs/flash-next-5070ti-performance.txt)。
 后续独立候选 `strataq2perf3` 增加紧凑MTP事务、快照容量配置、在线热点所有者交换和宽tile，原生材料字节沿用perf2；已测范围与尚未完成的Speed验收见 [第三轮记录](docs/flash-next-5070ti-perf3.txt)。
