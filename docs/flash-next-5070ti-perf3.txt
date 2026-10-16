@@ -7,7 +7,7 @@ FreeToken 0.1.3+speed.strataq2perf3；wheel SHA256：
 材料：artifacts/strataq2perf3-cp312-cu130-sm120。
 从perf2追加4组补丁；3个native模块和全部27个AOT输入/字节保持不变，沿用perf2的r2规格。
 这次没有重新编译原生模块。两份新增模块是Python/Triton，在运行时按真实几何编译。
-默认current-release指针和历史制品不变；Speed仍在继续对接，此记录不代表perf3产品HTTP或安装器已经验收。
+默认current-release指针和历史制品不变；Speed源码HTTP已通过本节后述范围，尚无perf3编译安装验收。
 
 实现及边界
 mtp_compact_state显式启用紧凑事务：verify保持live递推矩阵只读，记录每候选行的k/delta/decay；
@@ -48,7 +48,7 @@ GPU最小余量约637/683MiB（开启/关闭），commit和RAM监督通过，唯
 Strata同Q2参考为7774→7016（约9.8%）；框架、生成文本、次数不同，仅用于归因。
 prefill分块改变须同时核对TTFT和完整请求时长；尚不把decode改进等同于所有请求端到端都更快。
 
-正式普通wheel阶段检查点（未通过Speed HTTP或安装器）
+正式普通wheel阶段检查点（当时尚未通过Speed HTTP或安装器）
 同上述组合配置，每项三次实际512输出，统计首末交付间隔；同模式连续请求保留热点学习与前缀缓存。
 关闭MTP：英92.8373、中92.8502、代码85.4254、短91.2923、4K84.4320 token/s。
 开启MTP：英92.9575、中95.6110、代码102.7214、短95.2593、4K96.9217。
@@ -60,6 +60,17 @@ prefill分块改变须同时核对TTFT和完整请求时长；尚不把decode改
 证据：research/performance/flash-next-5070ti-20261016/perf3-native/index.json（65份原始报告/日志/工具与SHA）。
 其中包含旧预算拒绝、实际空闲量仍不足、释放未使用缓存后通过的失败前/修复后记录。
 用户要求阶段收益及时本地提交；整体就绪后更新/推送Build main及Speed原整合分支，当前尚未推送。
+
+Speed源码消费阶段
+79项相关单元检查、公开测试入口21项通过；开/关正式worker质量均15/20、thinking3/3、无新增失败，
+全部23题完整IDs与对应原生普通wheel一致。取消后复用和进程树退出通过。
+真实TCP HTTP开/关均通过同步、SSE、四题质量、stop、非greedy、连接取消、原worker复用、完整卸载重载。
+每模式短/4K各三次真实512交付：off90.6600/85.5336、on93.1634/96.8506 token/s，MTP约+2.76%/+13.23%。
+两组资源监督正常退出，无残留。GPU最小余量约681/639MiB，commit余量约10.53/9.24GiB。
+明确取舍：首轮4K TTFT off9.81/on10.18秒，总耗时15.88/15.53秒；上一阶段perf2总耗时14.79/14.80秒。
+比初始FT2同类19.49秒仍快，但并非所有请求都胜过perf2。后续继续比较2048分块等方案，旧配方保留。
+新配置工具需显式--preset sm120-16g-perf3-candidate --profile build/profiles/strataq2perf3.json，
+支持新的快照/分块/热点参数；现有FT2/24G/16G配方不改写。工具测试现为40项通过。
 
 重建与离线复核
 python -B build/derive_python_materials.py --profile build/profiles/strataq2perf3.json --base-profile build/profiles/strataq2perf2.json --base-materials artifacts/strataq2perf2-cp312-cu130-sm120 --output <全新目录>

@@ -192,6 +192,25 @@ class DeliveryBoundaries(unittest.TestCase):
                 link_checkpoints(source,link)
             self.assertEqual((source/'weight.bin').read_bytes(),b'original-weight-bytes')
 
+    def test_perf3_candidate_cli_rejects_wrong_material_and_projects_measured_geometry(self):
+        """候选不能误用默认FT2材料；真实CLI明确传递已测配置且不创建模型目录。"""
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)/'missing-weights'
+            command=[sys.executable,'-B',str(ROOT/'tools/flash_next_speed_config.py'),
+                '--root',str(root),'--preset','sm120-16g-perf3-candidate','--dry-run']
+            rejected=subprocess.run(command+['--profile','build/profiles/strataq2perf2.json'],capture_output=True,text=True)
+            self.assertNotEqual(rejected.returncode,0)
+            for mode,resident in [('off',5120),('on',4352)]:
+                result=subprocess.run(command+['--profile','build/profiles/strataq2perf3.json','--mode',mode],
+                                      check=True,capture_output=True,text=True)
+                value=json.loads(result.stdout)
+                self.assertEqual(value['freetoken_version'],'0.1.3+speed.strataq2perf3')
+                extra=value['manifest']['models'][0]['engine']['extra']
+                self.assertEqual((extra['moe_q2_resident_experts'],extra['moe_cache_size']),(resident,resident+2048))
+                self.assertEqual((extra['max_prefill_length'],extra['linear_state_cache_slots'],extra['moe_q2_adapt_every']),(1024,1,32))
+                self.assertEqual(extra.get('mtp_compact_state',False),mode=='on')
+            self.assertFalse(root.exists())
+
 
 if __name__=='__main__':
     unittest.main()

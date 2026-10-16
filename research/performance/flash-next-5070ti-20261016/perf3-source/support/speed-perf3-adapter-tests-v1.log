@@ -1,0 +1,184 @@
+......F.FFFF.......................                                      [100%]
+================================== FAILURES ===================================
+______ test_discovery_projects_mtp_artifact_to_the_private_worker_config ______
+
+tmp_path = WindowsPath('C:/Users/UserPC/AppData/Local/Temp/pytest-of-UserPC/pytest-16/test_discovery_projects_mtp_ar0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000014FB0E16A50>
+
+    def test_discovery_projects_mtp_artifact_to_the_private_worker_config(tmp_path,monkeypatch):
+        from silitok_speed.discovery import _register_chat
+        from silitok_speed.manifest_types import ArtifactDescriptor
+        _checkpoint(tmp_path,monkeypatch)
+        registered=[]
+        class Registration:
+            def register_model(self,spec,backend,cfg):
+                registered.append((spec,backend,cfg))
+        artifacts={'weights':ArtifactDescriptor(path='.',layout=Layout.HF_MODEL),
+                   'mtp':ArtifactDescriptor(path='prediction',layout=Layout.FREETOKEN_MTP)}
+        _register_chat(Registration(),'next-mtp',artifacts,{'backend':'Qwen36Backend','extra':{'mtp_enabled':True}},
+                       None,False,str(tmp_path))
+        assert len(registered)==1
+        spec,backend,cfg=registered[0]
+>       assert cfg.extra['mtp_runtime_path']==str((tmp_path/'prediction').resolve())
+E       AssertionError: assert 'C:\\Users\\U...0\\prediction' == 'C:\\Users\\U...0\\prediction'
+E         
+E         Skipping 35 identical leading characters in diff, use -v to show
+E         Skipping 44 identical trailing characters in diff, use -v to show
+E         - pytest-of-userpc\pytest-1
+E         ?           ^   ^^
+E         + pytest-of-UserPC\pytest-1
+E         ?           ^   ^^
+
+tests\unit\test_freetoken_mtp.py:79: AssertionError
+__ test_tuned_mtp_contract_matches_real_native_state_budget[False-None-4096] __
+
+compact = False, cache_slots = None, prefill = 4096
+
+    @pytest.mark.parametrize('compact,cache_slots,prefill',
+                             [(False,None,4096),(False,1,1024),(True,1,1024),(True,0,4096)])
+    @pytest.mark.skipif(not os.getenv('SILITOK_MAIN_GGUF_TEST_DIR') or not os.getenv('SILITOK_MTP_RUNTIME_TEST_DIR'),
+                        reason='Requires the frozen local GGUF and MTP metadata')
+    def test_tuned_mtp_contract_matches_real_native_state_budget(compact,cache_slots,prefill):
+        """真实元数据贯穿backend、IPC、引擎配置，核对不同物理布局的启动回执。"""
+        import torch
+        from freetoken.distributed import DistributedInfo
+        from freetoken.scheduler.config import SchedulerConfig
+        from freetoken.kvcache.linear_state_pool import _linear_pool_num_slots, state_pool_bytes
+        from silitok_speed.qwen36.freetoken_mtp import expected_mtp_ready
+        checkpoint=contract.inspect_freetoken_checkpoint(Path(os.environ['SILITOK_MAIN_GGUF_TEST_DIR']))
+        extra=dict(mtp_enabled=True,mtp_runtime_path=os.environ['SILITOK_MTP_RUNTIME_TEST_DIR'],
+            mtp_compact_state=compact,linear_state_cache_slots=cache_slots,moe_q2_adapt_every=32,
+            max_prefill_length=prefill,moe_q2_resident_experts=4352,moe_cache_size=6400,
+            vram_estimate_bytes=15*2**30,host_commit_estimate_bytes=31*2**30)
+        initialized=torch.cuda.is_initialized()
+        options=_runtime_options(checkpoint,BackendConfig(extra=extra))
+        payload=worker._worker_options({'options':_worker_option_payload(options)})
+        native=SchedulerConfig(model_path=str(checkpoint.root),tp_info=DistributedInfo(0,1),
+                               offline_mode=True,**worker._llm_kwargs(payload))
+        receipt=expected_mtp_ready(options.mtp_manifest_sha256,compact_state=compact,
+            state_cache_slots=cache_slots,max_prefill_length=prefill)
+>       assert receipt['linear_state_bytes']==state_pool_bytes(native)
+E       AssertionError: assert 1535033448 == 708476976
+E        +  where 708476976 = <function state_pool_bytes at 0x0000014FE1268400>(SchedulerConfig(model_path='C:\\workspace\\models\\siltok-speed\\flash-next\\checkpoints\\flash-next-strata-q2', tp_in...cache_type='radix', offline_mode=True, decode_log_interval=1000, special_token_ckpt=False, _unique_suffix='.pid=16288'))
+
+tests\unit\test_freetoken_mtp.py:145: AssertionError
+___ test_tuned_mtp_contract_matches_real_native_state_budget[False-1-1024] ____
+
+compact = False, cache_slots = 1, prefill = 1024
+
+    @pytest.mark.parametrize('compact,cache_slots,prefill',
+                             [(False,None,4096),(False,1,1024),(True,1,1024),(True,0,4096)])
+    @pytest.mark.skipif(not os.getenv('SILITOK_MAIN_GGUF_TEST_DIR') or not os.getenv('SILITOK_MTP_RUNTIME_TEST_DIR'),
+                        reason='Requires the frozen local GGUF and MTP metadata')
+    def test_tuned_mtp_contract_matches_real_native_state_budget(compact,cache_slots,prefill):
+        """真实元数据贯穿backend、IPC、引擎配置，核对不同物理布局的启动回执。"""
+        import torch
+        from freetoken.distributed import DistributedInfo
+        from freetoken.scheduler.config import SchedulerConfig
+        from freetoken.kvcache.linear_state_pool import _linear_pool_num_slots, state_pool_bytes
+        from silitok_speed.qwen36.freetoken_mtp import expected_mtp_ready
+        checkpoint=contract.inspect_freetoken_checkpoint(Path(os.environ['SILITOK_MAIN_GGUF_TEST_DIR']))
+        extra=dict(mtp_enabled=True,mtp_runtime_path=os.environ['SILITOK_MTP_RUNTIME_TEST_DIR'],
+            mtp_compact_state=compact,linear_state_cache_slots=cache_slots,moe_q2_adapt_every=32,
+            max_prefill_length=prefill,moe_q2_resident_experts=4352,moe_cache_size=6400,
+            vram_estimate_bytes=15*2**30,host_commit_estimate_bytes=31*2**30)
+        initialized=torch.cuda.is_initialized()
+        options=_runtime_options(checkpoint,BackendConfig(extra=extra))
+        payload=worker._worker_options({'options':_worker_option_payload(options)})
+        native=SchedulerConfig(model_path=str(checkpoint.root),tp_info=DistributedInfo(0,1),
+                               offline_mode=True,**worker._llm_kwargs(payload))
+        receipt=expected_mtp_ready(options.mtp_manifest_sha256,compact_state=compact,
+            state_cache_slots=cache_slots,max_prefill_length=prefill)
+>       assert receipt['linear_state_bytes']==state_pool_bytes(native)
+E       AssertionError: assert 1180794960 == 708476976
+E        +  where 708476976 = <function state_pool_bytes at 0x0000014FE1268400>(SchedulerConfig(model_path='C:\\workspace\\models\\siltok-speed\\flash-next\\checkpoints\\flash-next-strata-q2', tp_in...cache_type='radix', offline_mode=True, decode_log_interval=1000, special_token_ckpt=False, _unique_suffix='.pid=16288'))
+
+tests\unit\test_freetoken_mtp.py:145: AssertionError
+____ test_tuned_mtp_contract_matches_real_native_state_budget[True-1-1024] ____
+
+compact = True, cache_slots = 1, prefill = 1024
+
+    @pytest.mark.parametrize('compact,cache_slots,prefill',
+                             [(False,None,4096),(False,1,1024),(True,1,1024),(True,0,4096)])
+    @pytest.mark.skipif(not os.getenv('SILITOK_MAIN_GGUF_TEST_DIR') or not os.getenv('SILITOK_MTP_RUNTIME_TEST_DIR'),
+                        reason='Requires the frozen local GGUF and MTP metadata')
+    def test_tuned_mtp_contract_matches_real_native_state_budget(compact,cache_slots,prefill):
+        """真实元数据贯穿backend、IPC、引擎配置，核对不同物理布局的启动回执。"""
+        import torch
+        from freetoken.distributed import DistributedInfo
+        from freetoken.scheduler.config import SchedulerConfig
+        from freetoken.kvcache.linear_state_pool import _linear_pool_num_slots, state_pool_bytes
+        from silitok_speed.qwen36.freetoken_mtp import expected_mtp_ready
+        checkpoint=contract.inspect_freetoken_checkpoint(Path(os.environ['SILITOK_MAIN_GGUF_TEST_DIR']))
+        extra=dict(mtp_enabled=True,mtp_runtime_path=os.environ['SILITOK_MTP_RUNTIME_TEST_DIR'],
+            mtp_compact_state=compact,linear_state_cache_slots=cache_slots,moe_q2_adapt_every=32,
+            max_prefill_length=prefill,moe_q2_resident_experts=4352,moe_cache_size=6400,
+            vram_estimate_bytes=15*2**30,host_commit_estimate_bytes=31*2**30)
+        initialized=torch.cuda.is_initialized()
+        options=_runtime_options(checkpoint,BackendConfig(extra=extra))
+        payload=worker._worker_options({'options':_worker_option_payload(options)})
+        native=SchedulerConfig(model_path=str(checkpoint.root),tp_info=DistributedInfo(0,1),
+                               offline_mode=True,**worker._llm_kwargs(payload))
+        receipt=expected_mtp_ready(options.mtp_manifest_sha256,compact_state=compact,
+            state_cache_slots=cache_slots,max_prefill_length=prefill)
+>       assert receipt['linear_state_bytes']==state_pool_bytes(native)
+E       AssertionError: assert 734915952 == 262597968
+E        +  where 262597968 = <function state_pool_bytes at 0x0000014FE1268400>(SchedulerConfig(model_path='C:\\workspace\\models\\siltok-speed\\flash-next\\checkpoints\\flash-next-strata-q2', tp_in...cache_type='radix', offline_mode=True, decode_log_interval=1000, special_token_ckpt=False, _unique_suffix='.pid=16288'))
+
+tests\unit\test_freetoken_mtp.py:145: AssertionError
+____ test_tuned_mtp_contract_matches_real_native_state_budget[True-0-4096] ____
+
+compact = True, cache_slots = 0, prefill = 4096
+
+    @pytest.mark.parametrize('compact,cache_slots,prefill',
+                             [(False,None,4096),(False,1,1024),(True,1,1024),(True,0,4096)])
+    @pytest.mark.skipif(not os.getenv('SILITOK_MAIN_GGUF_TEST_DIR') or not os.getenv('SILITOK_MTP_RUNTIME_TEST_DIR'),
+                        reason='Requires the frozen local GGUF and MTP metadata')
+    def test_tuned_mtp_contract_matches_real_native_state_budget(compact,cache_slots,prefill):
+        """真实元数据贯穿backend、IPC、引擎配置，核对不同物理布局的启动回执。"""
+        import torch
+        from freetoken.distributed import DistributedInfo
+        from freetoken.scheduler.config import SchedulerConfig
+        from freetoken.kvcache.linear_state_pool import _linear_pool_num_slots, state_pool_bytes
+        from silitok_speed.qwen36.freetoken_mtp import expected_mtp_ready
+        checkpoint=contract.inspect_freetoken_checkpoint(Path(os.environ['SILITOK_MAIN_GGUF_TEST_DIR']))
+        extra=dict(mtp_enabled=True,mtp_runtime_path=os.environ['SILITOK_MTP_RUNTIME_TEST_DIR'],
+            mtp_compact_state=compact,linear_state_cache_slots=cache_slots,moe_q2_adapt_every=32,
+            max_prefill_length=prefill,moe_q2_resident_experts=4352,moe_cache_size=6400,
+            vram_estimate_bytes=15*2**30,host_commit_estimate_bytes=31*2**30)
+        initialized=torch.cuda.is_initialized()
+        options=_runtime_options(checkpoint,BackendConfig(extra=extra))
+        payload=worker._worker_options({'options':_worker_option_payload(options)})
+        native=SchedulerConfig(model_path=str(checkpoint.root),tp_info=DistributedInfo(0,1),
+                               offline_mode=True,**worker._llm_kwargs(payload))
+        receipt=expected_mtp_ready(options.mtp_manifest_sha256,compact_state=compact,
+            state_cache_slots=cache_slots,max_prefill_length=prefill)
+>       assert receipt['linear_state_bytes']==state_pool_bytes(native)
+E       AssertionError: assert 616836456 == 262597968
+E        +  where 262597968 = <function state_pool_bytes at 0x0000014FE1268400>(SchedulerConfig(model_path='C:\\workspace\\models\\siltok-speed\\flash-next\\checkpoints\\flash-next-strata-q2', tp_in...cache_type='radix', offline_mode=True, decode_log_interval=1000, special_token_ckpt=False, _unique_suffix='.pid=16288'))
+
+tests\unit\test_freetoken_mtp.py:145: AssertionError
+============================== warnings summary ===============================
+..\..\..\envs\siltok-speed\flash-perf-cand3\Lib\site-packages\fastapi\testclient.py:1
+  C:\workspace\envs\siltok-speed\flash-perf-cand3\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+..\..\..\envs\siltok-speed\flash-perf-cand3\Lib\site-packages\starlette\testclient.py:53
+  C:\workspace\envs\siltok-speed\flash-perf-cand3\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/unit/test_freetoken_mtp.py::test_real_mtp_source_projects_native_config_and_budget
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+tests/unit/test_freetoken_mtp.py::test_real_mtp_source_projects_native_config_and_budget
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/unit/test_freetoken_mtp.py::test_discovery_projects_mtp_artifact_to_the_private_worker_config
+FAILED tests/unit/test_freetoken_mtp.py::test_tuned_mtp_contract_matches_real_native_state_budget[False-None-4096]
+FAILED tests/unit/test_freetoken_mtp.py::test_tuned_mtp_contract_matches_real_native_state_budget[False-1-1024]
+FAILED tests/unit/test_freetoken_mtp.py::test_tuned_mtp_contract_matches_real_native_state_budget[True-1-1024]
+FAILED tests/unit/test_freetoken_mtp.py::test_tuned_mtp_contract_matches_real_native_state_budget[True-0-4096]
+5 failed, 30 passed, 4 warnings in 12.07s
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

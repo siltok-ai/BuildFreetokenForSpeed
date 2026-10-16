@@ -7,11 +7,13 @@ import os
 from flash_next_weights import ROOT, LOCK, layout, read, verify_checkpoint, write
 from flash_next_mtp import verify_runtime
 from current_release import load_current
+from prepare_source import load_profile, sha256
 
 PRESETS = {
     'sm120-24g-measured': 'integration/speed/presets/flash-next-sm120-24g.json',
     'sm120-16g-measured': 'integration/speed/presets/flash-next-sm120-16g.json',
     'sm120-16g-roomy-measured': 'integration/speed/presets/flash-next-sm120-16g-roomy.json',
+    'sm120-16g-perf3-candidate': 'integration/speed/presets/flash-next-sm120-16g-perf3.json',
 }
 
 
@@ -24,6 +26,9 @@ def configuration(mode, preset):
         moe_cache_size=selected['total_slots'], mtp_enabled=mode == 'on',
         vram_estimate_bytes=int(selected['vram_estimate_gib']*2**30),
         host_commit_estimate_bytes=int(selected['host_commit_estimate_gib']*2**30))
+    extra.update(preset.get('runtime_extra', {}))
+    if mode == 'on' and preset.get('compact_mtp', False):
+        extra['mtp_compact_state'] = True
     if 'startup_timeout_seconds' in preset:
         extra.update(startup_timeout_seconds=preset['startup_timeout_seconds'], request_deadline_seconds=1800)
     artifacts = dict(weights=dict(path='checkpoints/flash-next-strata-q2', layout='hf_model'))
@@ -55,14 +60,31 @@ def main():
     parser.add_argument('--deployment-root', type=Path,
                         help='New configuration root sharing checkpoints from --root; defaults to --root')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--profile', type=Path,
+                        help='Explicit candidate profile inside build/profiles; default uses current release')
     args = parser.parse_args()
     current = load_current()
     preset = read(ROOT/PRESETS[args.preset])
+    if args.profile is not None:
+        profile_path = (ROOT/args.profile).resolve(strict=True)
+        if profile_path.parent != (ROOT/'build/profiles').resolve():
+            raise ValueError('Candidate profile must be inside build/profiles')
+        profile, _ = load_profile(profile_path)
+        materials = 'artifacts/'+profile_path.stem+'-cp312-cu130-sm120'
+        record = read(ROOT/materials/'build-record.json')
+        if (record['custom_version'] != profile['custom_version']
+                or sha256(ROOT/materials/'wheels'/profile['wheel_filename']) != record['wheel_sha256']):
+            raise ValueError('Candidate wheel differs from its frozen profile/materials')
+        current = dict(version=profile['custom_version'], materials=materials,
+                       profile=profile_path.relative_to(ROOT).as_posix())
+    if preset.get('required_version', current['version']) != current['version']:
+        raise ValueError('This preset requires its explicit candidate --profile')
     manifest, resource = configuration(args.mode, preset)
     paths = layout(args.root, read(LOCK))
     deployment = (args.deployment_root or paths['root']).resolve()
     if args.dry_run:
-        print(json.dumps(dict(manifest=manifest, config=resource, scope=preset['scope']),ensure_ascii=False))
+        print(json.dumps(dict(manifest=manifest, config=resource, scope=preset['scope'],
+                             freetoken_version=current['version']),ensure_ascii=False))
         return
     targets = [deployment/'manifest.json', deployment/'speed-config/config.yaml', deployment/'speed-inputs.json']
     if any(p.exists() for p in targets):

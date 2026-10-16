@@ -1,0 +1,186 @@
+........FFFF............................................................ [ 91%]
+.......                                                                  [100%]
+================================== FAILURES ===================================
+__ test_tuned_mtp_contract_matches_real_native_state_budget[False-None-4096] __
+
+compact = False, cache_slots = None, prefill = 4096
+
+    @pytest.mark.parametrize('compact,cache_slots,prefill',
+                             [(False,None,4096),(False,1,1024),(True,1,1024),(True,0,4096)])
+    @pytest.mark.skipif(not os.getenv('SILITOK_MAIN_GGUF_TEST_DIR') or not os.getenv('SILITOK_MTP_RUNTIME_TEST_DIR'),
+                        reason='Requires the frozen local GGUF and MTP metadata')
+    def test_tuned_mtp_contract_matches_real_native_state_budget(compact,cache_slots,prefill):
+        """真实元数据贯穿backend、IPC、引擎配置，核对不同物理布局的启动回执。"""
+        import torch
+        from freetoken.distributed import DistributedInfo
+        from freetoken.scheduler.config import SchedulerConfig
+        from freetoken.kvcache.linear_state_pool import _linear_pool_num_slots, state_pool_bytes
+        from freetoken.engine.engine import _resolve_cache_type
+        from silitok_speed.qwen36.freetoken_mtp import expected_mtp_ready
+        checkpoint=contract.inspect_freetoken_checkpoint(Path(os.environ['SILITOK_MAIN_GGUF_TEST_DIR']))
+        extra=dict(mtp_enabled=True,mtp_runtime_path=os.environ['SILITOK_MTP_RUNTIME_TEST_DIR'],
+            mtp_compact_state=compact,linear_state_cache_slots=cache_slots,moe_q2_adapt_every=32,
+            max_prefill_length=prefill,moe_q2_resident_experts=4352,moe_cache_size=6400,
+            vram_estimate_bytes=15*2**30,host_commit_estimate_bytes=31*2**30)
+        initialized=torch.cuda.is_initialized()
+        options=_runtime_options(checkpoint,BackendConfig(extra=extra))
+        payload=worker._worker_options({'options':_worker_option_payload(options)})
+        native=SchedulerConfig(model_path=str(checkpoint.root),tp_info=DistributedInfo(0,1),
+                               offline_mode=True,**worker._llm_kwargs(payload))
+        # Engine在分配前把含GDN的radix映射为hybrid_radix；这里只执行同一纯配置转换。
+>       native.cache_type=_resolve_cache_type(native.model_config.has_linear_attention,native.cache_type)
+        ^^^^^^^^^^^^^^^^^
+
+tests\unit\test_freetoken_mtp.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = SchedulerConfig(model_path='C:\\workspace\\models\\siltok-speed\\flash-next\\checkpoints\\flash-next-strata-q2', tp_in...cache_type='radix', offline_mode=True, decode_log_interval=1000, special_token_ckpt=False, _unique_suffix='.pid=11244')
+name = 'cache_type', value = 'hybrid_radix'
+
+>   ???
+E   dataclasses.FrozenInstanceError: cannot assign to field 'cache_type'
+
+<string>:4: FrozenInstanceError
+___ test_tuned_mtp_contract_matches_real_native_state_budget[False-1-1024] ____
+
+compact = False, cache_slots = 1, prefill = 1024
+
+    @pytest.mark.parametrize('compact,cache_slots,prefill',
+                             [(False,None,4096),(False,1,1024),(True,1,1024),(True,0,4096)])
+    @pytest.mark.skipif(not os.getenv('SILITOK_MAIN_GGUF_TEST_DIR') or not os.getenv('SILITOK_MTP_RUNTIME_TEST_DIR'),
+                        reason='Requires the frozen local GGUF and MTP metadata')
+    def test_tuned_mtp_contract_matches_real_native_state_budget(compact,cache_slots,prefill):
+        """真实元数据贯穿backend、IPC、引擎配置，核对不同物理布局的启动回执。"""
+        import torch
+        from freetoken.distributed import DistributedInfo
+        from freetoken.scheduler.config import SchedulerConfig
+        from freetoken.kvcache.linear_state_pool import _linear_pool_num_slots, state_pool_bytes
+        from freetoken.engine.engine import _resolve_cache_type
+        from silitok_speed.qwen36.freetoken_mtp import expected_mtp_ready
+        checkpoint=contract.inspect_freetoken_checkpoint(Path(os.environ['SILITOK_MAIN_GGUF_TEST_DIR']))
+        extra=dict(mtp_enabled=True,mtp_runtime_path=os.environ['SILITOK_MTP_RUNTIME_TEST_DIR'],
+            mtp_compact_state=compact,linear_state_cache_slots=cache_slots,moe_q2_adapt_every=32,
+            max_prefill_length=prefill,moe_q2_resident_experts=4352,moe_cache_size=6400,
+            vram_estimate_bytes=15*2**30,host_commit_estimate_bytes=31*2**30)
+        initialized=torch.cuda.is_initialized()
+        options=_runtime_options(checkpoint,BackendConfig(extra=extra))
+        payload=worker._worker_options({'options':_worker_option_payload(options)})
+        native=SchedulerConfig(model_path=str(checkpoint.root),tp_info=DistributedInfo(0,1),
+                               offline_mode=True,**worker._llm_kwargs(payload))
+        # Engine在分配前把含GDN的radix映射为hybrid_radix；这里只执行同一纯配置转换。
+>       native.cache_type=_resolve_cache_type(native.model_config.has_linear_attention,native.cache_type)
+        ^^^^^^^^^^^^^^^^^
+
+tests\unit\test_freetoken_mtp.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = SchedulerConfig(model_path='C:\\workspace\\models\\siltok-speed\\flash-next\\checkpoints\\flash-next-strata-q2', tp_in...cache_type='radix', offline_mode=True, decode_log_interval=1000, special_token_ckpt=False, _unique_suffix='.pid=11244')
+name = 'cache_type', value = 'hybrid_radix'
+
+>   ???
+E   dataclasses.FrozenInstanceError: cannot assign to field 'cache_type'
+
+<string>:4: FrozenInstanceError
+____ test_tuned_mtp_contract_matches_real_native_state_budget[True-1-1024] ____
+
+compact = True, cache_slots = 1, prefill = 1024
+
+    @pytest.mark.parametrize('compact,cache_slots,prefill',
+                             [(False,None,4096),(False,1,1024),(True,1,1024),(True,0,4096)])
+    @pytest.mark.skipif(not os.getenv('SILITOK_MAIN_GGUF_TEST_DIR') or not os.getenv('SILITOK_MTP_RUNTIME_TEST_DIR'),
+                        reason='Requires the frozen local GGUF and MTP metadata')
+    def test_tuned_mtp_contract_matches_real_native_state_budget(compact,cache_slots,prefill):
+        """真实元数据贯穿backend、IPC、引擎配置，核对不同物理布局的启动回执。"""
+        import torch
+        from freetoken.distributed import DistributedInfo
+        from freetoken.scheduler.config import SchedulerConfig
+        from freetoken.kvcache.linear_state_pool import _linear_pool_num_slots, state_pool_bytes
+        from freetoken.engine.engine import _resolve_cache_type
+        from silitok_speed.qwen36.freetoken_mtp import expected_mtp_ready
+        checkpoint=contract.inspect_freetoken_checkpoint(Path(os.environ['SILITOK_MAIN_GGUF_TEST_DIR']))
+        extra=dict(mtp_enabled=True,mtp_runtime_path=os.environ['SILITOK_MTP_RUNTIME_TEST_DIR'],
+            mtp_compact_state=compact,linear_state_cache_slots=cache_slots,moe_q2_adapt_every=32,
+            max_prefill_length=prefill,moe_q2_resident_experts=4352,moe_cache_size=6400,
+            vram_estimate_bytes=15*2**30,host_commit_estimate_bytes=31*2**30)
+        initialized=torch.cuda.is_initialized()
+        options=_runtime_options(checkpoint,BackendConfig(extra=extra))
+        payload=worker._worker_options({'options':_worker_option_payload(options)})
+        native=SchedulerConfig(model_path=str(checkpoint.root),tp_info=DistributedInfo(0,1),
+                               offline_mode=True,**worker._llm_kwargs(payload))
+        # Engine在分配前把含GDN的radix映射为hybrid_radix；这里只执行同一纯配置转换。
+>       native.cache_type=_resolve_cache_type(native.model_config.has_linear_attention,native.cache_type)
+        ^^^^^^^^^^^^^^^^^
+
+tests\unit\test_freetoken_mtp.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = SchedulerConfig(model_path='C:\\workspace\\models\\siltok-speed\\flash-next\\checkpoints\\flash-next-strata-q2', tp_in...cache_type='radix', offline_mode=True, decode_log_interval=1000, special_token_ckpt=False, _unique_suffix='.pid=11244')
+name = 'cache_type', value = 'hybrid_radix'
+
+>   ???
+E   dataclasses.FrozenInstanceError: cannot assign to field 'cache_type'
+
+<string>:4: FrozenInstanceError
+____ test_tuned_mtp_contract_matches_real_native_state_budget[True-0-4096] ____
+
+compact = True, cache_slots = 0, prefill = 4096
+
+    @pytest.mark.parametrize('compact,cache_slots,prefill',
+                             [(False,None,4096),(False,1,1024),(True,1,1024),(True,0,4096)])
+    @pytest.mark.skipif(not os.getenv('SILITOK_MAIN_GGUF_TEST_DIR') or not os.getenv('SILITOK_MTP_RUNTIME_TEST_DIR'),
+                        reason='Requires the frozen local GGUF and MTP metadata')
+    def test_tuned_mtp_contract_matches_real_native_state_budget(compact,cache_slots,prefill):
+        """真实元数据贯穿backend、IPC、引擎配置，核对不同物理布局的启动回执。"""
+        import torch
+        from freetoken.distributed import DistributedInfo
+        from freetoken.scheduler.config import SchedulerConfig
+        from freetoken.kvcache.linear_state_pool import _linear_pool_num_slots, state_pool_bytes
+        from freetoken.engine.engine import _resolve_cache_type
+        from silitok_speed.qwen36.freetoken_mtp import expected_mtp_ready
+        checkpoint=contract.inspect_freetoken_checkpoint(Path(os.environ['SILITOK_MAIN_GGUF_TEST_DIR']))
+        extra=dict(mtp_enabled=True,mtp_runtime_path=os.environ['SILITOK_MTP_RUNTIME_TEST_DIR'],
+            mtp_compact_state=compact,linear_state_cache_slots=cache_slots,moe_q2_adapt_every=32,
+            max_prefill_length=prefill,moe_q2_resident_experts=4352,moe_cache_size=6400,
+            vram_estimate_bytes=15*2**30,host_commit_estimate_bytes=31*2**30)
+        initialized=torch.cuda.is_initialized()
+        options=_runtime_options(checkpoint,BackendConfig(extra=extra))
+        payload=worker._worker_options({'options':_worker_option_payload(options)})
+        native=SchedulerConfig(model_path=str(checkpoint.root),tp_info=DistributedInfo(0,1),
+                               offline_mode=True,**worker._llm_kwargs(payload))
+        # Engine在分配前把含GDN的radix映射为hybrid_radix；这里只执行同一纯配置转换。
+>       native.cache_type=_resolve_cache_type(native.model_config.has_linear_attention,native.cache_type)
+        ^^^^^^^^^^^^^^^^^
+
+tests\unit\test_freetoken_mtp.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = SchedulerConfig(model_path='C:\\workspace\\models\\siltok-speed\\flash-next\\checkpoints\\flash-next-strata-q2', tp_in...cache_type='radix', offline_mode=True, decode_log_interval=1000, special_token_ckpt=False, _unique_suffix='.pid=11244')
+name = 'cache_type', value = 'hybrid_radix'
+
+>   ???
+E   dataclasses.FrozenInstanceError: cannot assign to field 'cache_type'
+
+<string>:4: FrozenInstanceError
+============================== warnings summary ===============================
+..\..\..\envs\siltok-speed\flash-perf-cand3\Lib\site-packages\fastapi\testclient.py:1
+  C:\workspace\envs\siltok-speed\flash-perf-cand3\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+..\..\..\envs\siltok-speed\flash-perf-cand3\Lib\site-packages\starlette\testclient.py:53
+  C:\workspace\envs\siltok-speed\flash-perf-cand3\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/unit/test_freetoken_mtp.py::test_real_mtp_source_projects_native_config_and_budget
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+tests/unit/test_freetoken_mtp.py::test_real_mtp_source_projects_native_config_and_budget
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/unit/test_freetoken_mtp.py::test_tuned_mtp_contract_matches_real_native_state_budget[False-None-4096]
+FAILED tests/unit/test_freetoken_mtp.py::test_tuned_mtp_contract_matches_real_native_state_budget[False-1-1024]
+FAILED tests/unit/test_freetoken_mtp.py::test_tuned_mtp_contract_matches_real_native_state_budget[True-1-1024]
+FAILED tests/unit/test_freetoken_mtp.py::test_tuned_mtp_contract_matches_real_native_state_budget[True-0-4096]
+4 failed, 75 passed, 4 warnings in 21.02s
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

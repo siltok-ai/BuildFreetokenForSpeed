@@ -1,0 +1,154 @@
+{
+  "status": "passed",
+  "transport": "tcp",
+  "original_worker_pids": [
+    11952,
+    17352
+  ],
+  "replacement_worker_pids": [
+    2096,
+    17512
+  ],
+  "disconnect_after_content_chunks": 1,
+  "same_worker_after_cancel": true,
+  "original_exited_before_reload": true,
+  "replacement_exited": true,
+  "before": {
+    "id": "chatcmpl-1792139508050",
+    "object": "chat.completion",
+    "created": 1792139508,
+    "model": "qwen3.8-flash-next.q2_0-freetoken",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "reasoning_content": null,
+          "content": "527"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 24,
+      "completion_tokens": 3,
+      "total_tokens": 27
+    }
+  },
+  "after_cancel": {
+    "id": "chatcmpl-1792139518834",
+    "object": "chat.completion",
+    "created": 1792139518,
+    "model": "qwen3.8-flash-next.q2_0-freetoken",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "reasoning_content": null,
+          "content": "527"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 24,
+      "completion_tokens": 3,
+      "total_tokens": 27
+    }
+  },
+  "after_reload": {
+    "id": "chatcmpl-1792139574203",
+    "object": "chat.completion",
+    "created": 1792139574,
+    "model": "qwen3.8-flash-next.q2_0-freetoken",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "reasoning_content": null,
+          "content": "527"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 24,
+      "completion_tokens": 3,
+      "total_tokens": 27
+    }
+  },
+  "stop_string": {
+    "id": "chatcmpl-1792139509014",
+    "object": "chat.completion",
+    "created": 1792139509,
+    "model": "qwen3.8-flash-next.q2_0-freetoken",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "reasoning_content": null,
+          "content": "5"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 24,
+      "completion_tokens": 2,
+      "total_tokens": 26
+    }
+  },
+  "after_stop": {
+    "id": "chatcmpl-1792139509805",
+    "object": "chat.completion",
+    "created": 1792139509,
+    "model": "qwen3.8-flash-next.q2_0-freetoken",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "reasoning_content": null,
+          "content": "527"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 24,
+      "completion_tokens": 3,
+      "total_tokens": 27
+    }
+  },
+  "non_greedy": {
+    "id": "chatcmpl-1792139510806",
+    "object": "chat.completion",
+    "created": 1792139510,
+    "model": "qwen3.8-flash-next.q2_0-freetoken",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "reasoning_content": null,
+          "content": "527"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 24,
+      "completion_tokens": 3,
+      "total_tokens": 27
+    }
+  }
+}
