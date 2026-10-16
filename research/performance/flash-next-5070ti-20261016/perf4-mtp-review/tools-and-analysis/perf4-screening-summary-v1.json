@@ -1,0 +1,949 @@
+{
+  "scope": "external_process_prototypes_on_frozen_perf3; not a release; numerical trajectories can differ",
+  "performance": {
+    "cap2_full_head": {
+      "report": "mtp-cap2-fivekeys-v1.json",
+      "results": {
+        "english": {
+          "median_tps": 102.40811376846811,
+          "individual_tps": [
+            96.48749272843095,
+            102.40811376846811,
+            103.71936632785098
+          ],
+          "input_tokens": [
+            62,
+            62,
+            62
+          ],
+          "mtp": [
+            {
+              "windows": 221,
+              "drafted": 440,
+              "accepted": 290,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 221,
+              "drafted": 440,
+              "accepted": 290,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 221,
+              "drafted": 440,
+              "accepted": 290,
+              "committed": 511,
+              "lookup_windows": 0
+            }
+          ]
+        },
+        "chinese": {
+          "median_tps": 94.18464034312798,
+          "individual_tps": [
+            94.44189139186305,
+            93.71603710609956,
+            94.18464034312798
+          ],
+          "input_tokens": [
+            66,
+            66,
+            66
+          ],
+          "mtp": [
+            {
+              "windows": 236,
+              "drafted": 472,
+              "accepted": 275,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 243,
+              "drafted": 485,
+              "accepted": 268,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 243,
+              "drafted": 485,
+              "accepted": 268,
+              "committed": 511,
+              "lookup_windows": 0
+            }
+          ]
+        },
+        "code": {
+          "median_tps": 102.19982012873159,
+          "individual_tps": [
+            98.5412101942276,
+            102.19982012873159,
+            103.92691192417809
+          ],
+          "input_tokens": [
+            70,
+            70,
+            70
+          ],
+          "mtp": [
+            {
+              "windows": 198,
+              "drafted": 396,
+              "accepted": 313,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 201,
+              "drafted": 400,
+              "accepted": 310,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 201,
+              "drafted": 400,
+              "accepted": 310,
+              "committed": 511,
+              "lookup_windows": 0
+            }
+          ]
+        },
+        "70-0": {
+          "median_tps": 95.69843763040787,
+          "individual_tps": [
+            99.34127983239786,
+            95.42775735030402,
+            95.69843763040787
+          ],
+          "input_tokens": [
+            70,
+            70,
+            70
+          ],
+          "mtp": [
+            {
+              "windows": 223,
+              "drafted": 446,
+              "accepted": 288,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 236,
+              "drafted": 471,
+              "accepted": 275,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 236,
+              "drafted": 471,
+              "accepted": 275,
+              "committed": 511,
+              "lookup_windows": 0
+            }
+          ]
+        },
+        "diverse-4096-0": {
+          "median_tps": 99.8517484868814,
+          "individual_tps": [
+            98.37259388052784,
+            99.8517484868814,
+            100.71126195476808
+          ],
+          "input_tokens": [
+            4096,
+            4096,
+            4096
+          ],
+          "mtp": [
+            {
+              "windows": 202,
+              "drafted": 404,
+              "accepted": 309,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 202,
+              "drafted": 404,
+              "accepted": 309,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 202,
+              "drafted": 404,
+              "accepted": 309,
+              "committed": 511,
+              "lookup_windows": 0
+            }
+          ]
+        }
+      },
+      "resource": {
+        "min_gpu_free": 678522880,
+        "min_commit_available": 12135612416
+      }
+    },
+    "cap3_copied_subset": {
+      "report": "draft-subset-three-fivekeys-v1.json",
+      "results": {
+        "english": {
+          "median_tps": 96.48359040693397,
+          "individual_tps": [
+            90.99192415525603,
+            96.48359040693397,
+            99.46663886042604
+          ],
+          "input_tokens": [
+            62,
+            62,
+            62
+          ],
+          "mtp": [
+            {
+              "windows": 197,
+              "drafted": 590,
+              "accepted": 314,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 197,
+              "drafted": 590,
+              "accepted": 314,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 197,
+              "drafted": 590,
+              "accepted": 314,
+              "committed": 511,
+              "lookup_windows": 0
+            }
+          ]
+        },
+        "chinese": {
+          "median_tps": 98.86231721758374,
+          "individual_tps": [
+            95.78871027501101,
+            99.36320436281089,
+            98.86231721758374
+          ],
+          "input_tokens": [
+            66,
+            66,
+            66
+          ],
+          "mtp": [
+            {
+              "windows": 200,
+              "drafted": 599,
+              "accepted": 311,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 198,
+              "drafted": 589,
+              "accepted": 313,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 198,
+              "drafted": 589,
+              "accepted": 313,
+              "committed": 511,
+              "lookup_windows": 0
+            }
+          ]
+        },
+        "code": {
+          "median_tps": 99.15135559237883,
+          "individual_tps": [
+            96.24471576992829,
+            99.15135559237883,
+            101.96602264660288
+          ],
+          "input_tokens": [
+            70,
+            70,
+            70
+          ],
+          "mtp": [
+            {
+              "windows": 172,
+              "drafted": 516,
+              "accepted": 339,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 171,
+              "drafted": 511,
+              "accepted": 340,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 171,
+              "drafted": 511,
+              "accepted": 340,
+              "committed": 511,
+              "lookup_windows": 0
+            }
+          ]
+        },
+        "70-0": {
+          "median_tps": 96.26152632892106,
+          "individual_tps": [
+            92.61885709044235,
+            96.26152632892106,
+            96.81638913894568
+          ],
+          "input_tokens": [
+            70,
+            70,
+            70
+          ],
+          "mtp": [
+            {
+              "windows": 201,
+              "drafted": 602,
+              "accepted": 310,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 198,
+              "drafted": 591,
+              "accepted": 313,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 198,
+              "drafted": 591,
+              "accepted": 313,
+              "committed": 511,
+              "lookup_windows": 0
+            }
+          ]
+        },
+        "diverse-4096-0": {
+          "median_tps": 96.91593945751211,
+          "individual_tps": [
+            96.05068889939469,
+            97.25992709769774,
+            96.91593945751211
+          ],
+          "input_tokens": [
+            4096,
+            4096,
+            4096
+          ],
+          "mtp": [
+            {
+              "windows": 174,
+              "drafted": 521,
+              "accepted": 337,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 174,
+              "drafted": 521,
+              "accepted": 337,
+              "committed": 511,
+              "lookup_windows": 0
+            },
+            {
+              "windows": 174,
+              "drafted": 521,
+              "accepted": 337,
+              "committed": 511,
+              "lookup_windows": 0
+            }
+          ]
+        }
+      },
+      "resource": {
+        "min_gpu_free": 484536320,
+        "min_commit_available": 11820527616
+      }
+    }
+  },
+  "quality": {
+    "cap2": {
+      "report": "mtp-cap2-quality-on-v1.json",
+      "score": 15,
+      "thinking_score": 3,
+      "regressions": [],
+      "rebuild": [
+        {
+          "usable": 10,
+          "logical_slots": 11,
+          "recurrent_slots": 7,
+          "reserved": [
+            7,
+            8,
+            9,
+            10
+          ]
+        },
+        {
+          "usable": 9,
+          "logical_slots": 10,
+          "recurrent_slots": 6,
+          "reserved": [
+            6,
+            7,
+            8,
+            9
+          ]
+        }
+      ],
+      "draft_subset_check": null
+    },
+    "copied_subset": {
+      "report": "draft-subset-quality-on-v1.json",
+      "score": 15,
+      "thinking_score": 3,
+      "regressions": [],
+      "rebuild": [
+        {
+          "usable": 10,
+          "logical_slots": 11,
+          "recurrent_slots": 7,
+          "reserved": [
+            7,
+            8,
+            9,
+            10
+          ]
+        },
+        {
+          "usable": 9,
+          "logical_slots": 10,
+          "recurrent_slots": 6,
+          "reserved": [
+            6,
+            7,
+            8,
+            9
+          ]
+        }
+      ],
+      "draft_subset_check": {
+        "rows": 106299,
+        "packed_bytes": 187086240,
+        "index_bytes": 850392,
+        "exact_full_head_subset_checks": [
+          true,
+          true,
+          true
+        ],
+        "target_full_rows": 248320,
+        "vocab_sha256": "b1e1d3a7a9e4bf862dcd5923ce661fb59bbd07907e594df5cf86a62ac235cb91"
+      }
+    },
+    "mapped_subset": {
+      "report": "draft-mapped-quality-on-v2.json",
+      "score": 15,
+      "thinking_score": 3,
+      "regressions": [],
+      "rebuild": [
+        {
+          "usable": 10,
+          "logical_slots": 11,
+          "recurrent_slots": 7,
+          "reserved": [
+            7,
+            8,
+            9,
+            10
+          ]
+        },
+        {
+          "usable": 9,
+          "logical_slots": 10,
+          "recurrent_slots": 6,
+          "reserved": [
+            6,
+            7,
+            8,
+            9
+          ]
+        }
+      ],
+      "draft_subset_check": {
+        "rows": 106299,
+        "packed_bytes": 0,
+        "index_bytes": 850392,
+        "exact_full_head_subset_checks": [
+          true,
+          true,
+          true
+        ],
+        "target_full_rows": 248320,
+        "vocab_sha256": "b1e1d3a7a9e4bf862dcd5923ce661fb59bbd07907e594df5cf86a62ac235cb91",
+        "mode": "indexed_original_weights"
+      }
+    }
+  },
+  "strata": {
+    "full_head": {
+      "report": "reference-mtp-fullhead-3x-v1.json",
+      "results": {
+        "english": {
+          "median_tps": 109.0387000967335,
+          "individual_tps": [
+            107.90808748139813,
+            110.67645754071488,
+            109.0387000967335
+          ],
+          "input_tokens": [
+            62,
+            62,
+            62
+          ],
+          "mtp": [
+            [
+              "DONE",
+              "512",
+              "62",
+              "451.2",
+              "4747.9",
+              "length",
+              "319",
+              "585",
+              "0",
+              "317466",
+              "351196",
+              "50981",
+              "0",
+              "0.0",
+              "62",
+              "23684"
+            ],
+            [
+              "DONE",
+              "512",
+              "62",
+              "57.7",
+              "4630.8",
+              "length",
+              "310",
+              "606",
+              "55",
+              "346545",
+              "371147",
+              "40152",
+              "0",
+              "0.0",
+              "7",
+              "17173"
+            ],
+            [
+              "DONE",
+              "512",
+              "62",
+              "57.6",
+              "4700.4",
+              "length",
+              "314",
+              "600",
+              "55",
+              "335581",
+              "364302",
+              "45122",
+              "0",
+              "0.0",
+              "7",
+              "20178"
+            ]
+          ]
+        },
+        "chinese": {
+          "median_tps": 111.14373163967224,
+          "individual_tps": [
+            111.14373163967224,
+            106.90681410061532,
+            116.17447942684893
+          ],
+          "input_tokens": [
+            66,
+            66,
+            66
+          ],
+          "mtp": [
+            [
+              "DONE",
+              "512",
+              "66",
+              "484.8",
+              "4612.0",
+              "length",
+              "314",
+              "597",
+              "0",
+              "337563",
+              "363989",
+              "41901",
+              "0",
+              "0.0",
+              "66",
+              "18571"
+            ],
+            [
+              "DONE",
+              "512",
+              "66",
+              "55.5",
+              "4793.2",
+              "length",
+              "299",
+              "636",
+              "59",
+              "364996",
+              "390525",
+              "39882",
+              "0",
+              "0.0",
+              "7",
+              "16995"
+            ],
+            [
+              "DONE",
+              "512",
+              "66",
+              "57.7",
+              "4413.2",
+              "length",
+              "320",
+              "579",
+              "59",
+              "332292",
+              "355241",
+              "37425",
+              "0",
+              "0.0",
+              "7",
+              "15799"
+            ]
+          ]
+        },
+        "code": {
+          "median_tps": 128.74580373038086,
+          "individual_tps": [
+            118.42435995139999,
+            128.74580373038086,
+            131.8112937928702
+          ],
+          "input_tokens": [
+            70,
+            70,
+            70
+          ],
+          "mtp": [
+            [
+              "DONE",
+              "512",
+              "70",
+              "576.0",
+              "4332.8",
+              "length",
+              "348",
+              "498",
+              "0",
+              "254286",
+              "291283",
+              "56148",
+              "0",
+              "0.0",
+              "70",
+              "27917"
+            ],
+            [
+              "DONE",
+              "512",
+              "70",
+              "62.1",
+              "3986.4",
+              "length",
+              "346",
+              "501",
+              "63",
+              "279165",
+              "303515",
+              "39909",
+              "0",
+              "0.0",
+              "7",
+              "17605"
+            ],
+            [
+              "DONE",
+              "512",
+              "70",
+              "62.6",
+              "3890.7",
+              "length",
+              "350",
+              "483",
+              "63",
+              "267475",
+              "291851",
+              "39507",
+              "0",
+              "0.0",
+              "7",
+              "17749"
+            ]
+          ]
+        }
+      },
+      "command": [
+        "C:\\workspace\\mats\\strata\\flash-perf-01\\strata.exe",
+        "--pack",
+        "C:\\workspace\\models\\strata\\flash-next-q2-reference",
+        "--native",
+        "C:\\workspace\\models\\siltok-speed\\flash-next\\sources\\ISTA-DASLab\\Qwen3.8-Flash-Next-GSQ-RCO-GGUF\\ed59f92082b1e93c0e96d60a8b11aab089b52f09\\Q2_0\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "--serve",
+        "--max-context",
+        "8192",
+        "--expert-cache",
+        "7019",
+        "--expert-profile",
+        "C:\\workspace\\wt\\strata\\flash-perf\\data\\expert-profile.bin",
+        "--resident-experts",
+        "--prefill",
+        "4096",
+        "--vram-reserve-mib",
+        "1024",
+        "--spec",
+        "4",
+        "--suffix-draft",
+        "0",
+        "--adapt-every",
+        "4",
+        "--mtp",
+        "C:\\workspace\\models\\strata\\flash-next-mtp-reference"
+      ],
+      "draft_full_head_env": "1"
+    }
+  },
+  "components": {
+    "gather-aligned-components-v1.json": {
+      "status": "passed",
+      "scope": "mapped host and GPU owner copies, actual Q2 payload geometry; not model TPS",
+      "cases": [
+        {
+          "host_fraction": 1.0,
+          "count": 1,
+          "calls_per_graph": 64,
+          "exact": true,
+          "baseline_us": 37.765354545492876,
+          "aligned_us": 37.60870820597599,
+          "gain_percent": 0.4165161394509065
+        },
+        {
+          "host_fraction": 1.0,
+          "count": 4,
+          "calls_per_graph": 32,
+          "exact": true,
+          "baseline_us": 120.65046351888905,
+          "aligned_us": 120.57021182516347,
+          "gain_percent": 0.0665601333121657
+        },
+        {
+          "host_fraction": 1.0,
+          "count": 16,
+          "calls_per_graph": 32,
+          "exact": true,
+          "baseline_us": 448.82224400838214,
+          "aligned_us": 448.77064625422156,
+          "gain_percent": 0.011497577791974578
+        },
+        {
+          "host_fraction": 1.0,
+          "count": 40,
+          "calls_per_graph": 32,
+          "exact": true,
+          "baseline_us": 1126.0779857635498,
+          "aligned_us": 1127.1949529647827,
+          "gain_percent": -0.0990926368411249
+        },
+        {
+          "host_fraction": 0.55,
+          "count": 1,
+          "calls_per_graph": 64,
+          "exact": true,
+          "baseline_us": 37.61109897964879,
+          "aligned_us": 37.59114648166455,
+          "gain_percent": 0.05307765219122462
+        },
+        {
+          "host_fraction": 0.55,
+          "count": 4,
+          "calls_per_graph": 32,
+          "exact": true,
+          "baseline_us": 120.5750444661016,
+          "aligned_us": 120.57306973830514,
+          "gain_percent": 0.0016377851213000838
+        },
+        {
+          "host_fraction": 0.55,
+          "count": 16,
+          "calls_per_graph": 32,
+          "exact": true,
+          "baseline_us": 285.9092879295349,
+          "aligned_us": 285.95848083496094,
+          "gain_percent": -0.0172028139478142
+        },
+        {
+          "host_fraction": 0.55,
+          "count": 40,
+          "calls_per_graph": 32,
+          "exact": true,
+          "baseline_us": 784.0192715326945,
+          "aligned_us": 784.3386729558309,
+          "gain_percent": -0.040722386151481604
+        },
+        {
+          "host_fraction": 0.0,
+          "count": 1,
+          "calls_per_graph": 64,
+          "exact": true,
+          "baseline_us": 8.175566400352277,
+          "aligned_us": 7.951672846757914,
+          "gain_percent": 2.815678636548169
+        },
+        {
+          "host_fraction": 0.0,
+          "count": 4,
+          "calls_per_graph": 32,
+          "exact": true,
+          "baseline_us": 25.55895867171111,
+          "aligned_us": 25.869081417719524,
+          "gain_percent": -1.1988162277613346
+        },
+        {
+          "host_fraction": 0.0,
+          "count": 16,
+          "calls_per_graph": 32,
+          "exact": true,
+          "baseline_us": 87.97682944466085,
+          "aligned_us": 88.2353705518386,
+          "gain_percent": -0.29301300097771543
+        },
+        {
+          "host_fraction": 0.0,
+          "count": 40,
+          "calls_per_graph": 32,
+          "exact": true,
+          "baseline_us": 218.08785200119019,
+          "aligned_us": 217.99151386533467,
+          "gain_percent": 0.0441935257695647
+        }
+      ],
+      "variant_sha256": "76994738474211eadd5d1717ce3b197f3b79612f5fa639cf2da07cc5d5d85193"
+    },
+    "mapped-head-components-v1.json": {
+      "status": "passed",
+      "scope": "synthetic finite Q5 blocks with original native arithmetic; GPU kernel graph cost, not model TPS",
+      "checks": [
+        {
+          "seed": 41,
+          "rows": 1,
+          "exact": true
+        },
+        {
+          "seed": 41,
+          "rows": 17,
+          "exact": true
+        },
+        {
+          "seed": 41,
+          "rows": 106299,
+          "exact": true
+        },
+        {
+          "seed": 41,
+          "rows": 106299,
+          "exact": true
+        },
+        {
+          "seed": 41,
+          "rows": 3,
+          "exact": true
+        },
+        {
+          "seed": 42,
+          "rows": 1,
+          "exact": true
+        },
+        {
+          "seed": 42,
+          "rows": 17,
+          "exact": true
+        },
+        {
+          "seed": 42,
+          "rows": 106299,
+          "exact": true
+        },
+        {
+          "seed": 42,
+          "rows": 106299,
+          "exact": true
+        },
+        {
+          "seed": 42,
+          "rows": 3,
+          "exact": true
+        },
+        {
+          "seed": 43,
+          "rows": 1,
+          "exact": true
+        },
+        {
+          "seed": 43,
+          "rows": 17,
+          "exact": true
+        },
+        {
+          "seed": 43,
+          "rows": 106299,
+          "exact": true
+        },
+        {
+          "seed": 43,
+          "rows": 106299,
+          "exact": true
+        },
+        {
+          "seed": 43,
+          "rows": 3,
+          "exact": true
+        }
+      ],
+      "microseconds": {
+        "full": 515.028717283861,
+        "copied": 221.59312544786425,
+        "mapped": 259.68199239923825
+      },
+      "avoided_packed_bytes": 187086240,
+      "native_header_sha256": "91bc6aa92b8c24d93e84d76e65c55c86a5d3ac4f5c66b86c129e8286d25b6557",
+      "vocab_sha256": "b1e1d3a7a9e4bf862dcd5923ce661fb59bbd07907e594df5cf86a62ac235cb91"
+    }
+  }
+}

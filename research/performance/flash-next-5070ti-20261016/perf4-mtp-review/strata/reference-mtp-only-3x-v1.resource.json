@@ -1,0 +1,30 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\strata\\flash-perf\\Scripts\\python.exe",
+    "-B",
+    "probe-repeat-v1.py",
+    "--output",
+    "reference-mtp-only-3x-v1.json",
+    "--repetitions",
+    "3",
+    "--mtp",
+    "--suffix",
+    "0"
+  ],
+  "cwd": "C:\\workspace\\runs\\strata\\flash-perf-20261016",
+  "started": 1792140634.0460236,
+  "samples": 185,
+  "min_commit_available": 13520887808,
+  "min_ram_available": 4669800448,
+  "min_gpu_free": 1129410560,
+  "max_commit_used": 56798023680,
+  "max_gpu_used": 15965523968,
+  "max_tree_rss": 52535046144,
+  "max_tree_private": 45388115968,
+  "stop_reason": null,
+  "pid": 14352,
+  "returncode": 0,
+  "elapsed_s": 93.54700000002049,
+  "remaining_before_cleanup": [],
+  "remaining_descendants": []
+}

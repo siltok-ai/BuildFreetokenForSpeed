@@ -1,0 +1,683 @@
+{
+  "scope": "same_full_Q2,frozen_input_ids,3x512_per_language,fresh_process_per_mode",
+  "limitations": "Framework arithmetic,generated texts,cache policies/capacities,EOS warmup accounting differ; comparisons are local protocol measurements,not universal speed claims.",
+  "strata": {
+    "off": {
+      "report": "reference-off-3x-v1.json",
+      "workloads": {
+        "english": {
+          "median_tps": 91.07366999074,
+          "tps": [
+            87.03266884475262,
+            91.07366999074,
+            91.60518438000113
+          ],
+          "ttft_ms": [
+            420.2682000177447,
+            61.65139999939129,
+            65.84429999929853
+          ],
+          "accepted": [
+            0,
+            0,
+            0
+          ],
+          "drafted": [
+            0,
+            0,
+            0
+          ]
+        },
+        "chinese": {
+          "median_tps": 92.60996241437549,
+          "tps": [
+            89.34738258864205,
+            92.60996241437549,
+            94.59953821715541
+          ],
+          "ttft_ms": [
+            469.64150000712834,
+            60.35439998959191,
+            60.23460000869818
+          ],
+          "accepted": [
+            0,
+            0,
+            0
+          ],
+          "drafted": [
+            0,
+            0,
+            0
+          ]
+        },
+        "code": {
+          "median_tps": 90.87691294780926,
+          "tps": [
+            82.86821856405183,
+            91.80735919915378,
+            90.87691294780926
+          ],
+          "ttft_ms": [
+            555.7033999939449,
+            66.15080000483431,
+            63.31800000043586
+          ],
+          "accepted": [
+            0,
+            0,
+            0
+          ],
+          "drafted": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "resource": {
+        "command": [
+          "C:\\workspace\\envs\\strata\\flash-perf\\Scripts\\python.exe",
+          "-B",
+          "probe-repeat-v1.py",
+          "--output",
+          "reference-off-3x-v1.json",
+          "--repetitions",
+          "3"
+        ],
+        "cwd": "C:\\workspace\\runs\\strata\\flash-perf-20261016",
+        "started": 1792140480.29149,
+        "samples": 186,
+        "min_commit_available": 14585135104,
+        "min_ram_available": 6721540096,
+        "min_gpu_free": 1131507712,
+        "max_commit_used": 55733776384,
+        "max_gpu_used": 15963426816,
+        "max_tree_rss": 50420064256,
+        "max_tree_private": 44355248128,
+        "stop_reason": null,
+        "pid": 8900,
+        "returncode": 0,
+        "elapsed_s": 94.09400000001187,
+        "remaining_before_cleanup": [],
+        "remaining_descendants": []
+      },
+      "report_sha256": "f85314988f2cf449c2cc823088377b06e28f153d64c305d7fc6ff294e80bf6ca"
+    },
+    "mtp_only": {
+      "report": "reference-mtp-only-3x-v1.json",
+      "workloads": {
+        "english": {
+          "median_tps": 122.52639940369502,
+          "tps": [
+            112.77945994269419,
+            123.52536160611437,
+            122.52639940369502
+          ],
+          "ttft_ms": [
+            464.01339999283664,
+            71.92709998344071,
+            82.21160000539385
+          ],
+          "accepted": [
+            321,
+            323,
+            325
+          ],
+          "drafted": [
+            576,
+            564,
+            561
+          ]
+        },
+        "chinese": {
+          "median_tps": 117.44362326857392,
+          "tps": [
+            120.29960770276472,
+            117.44362326857392,
+            109.30660382547053
+          ],
+          "ttft_ms": [
+            518.0648999812547,
+            68.08430000091903,
+            75.53289999486879
+          ],
+          "accepted": [
+            322,
+            311,
+            296
+          ],
+          "drafted": [
+            570,
+            600,
+            648
+          ]
+        },
+        "code": {
+          "median_tps": 125.55489551129916,
+          "tps": [
+            114.136283502639,
+            128.1971323682544,
+            125.55489551129916
+          ],
+          "ttft_ms": [
+            590.4723000130616,
+            70.5454999988433,
+            70.33379998756573
+          ],
+          "accepted": [
+            336,
+            340,
+            339
+          ],
+          "drafted": [
+            525,
+            516,
+            525
+          ]
+        }
+      },
+      "resource": {
+        "command": [
+          "C:\\workspace\\envs\\strata\\flash-perf\\Scripts\\python.exe",
+          "-B",
+          "probe-repeat-v1.py",
+          "--output",
+          "reference-mtp-only-3x-v1.json",
+          "--repetitions",
+          "3",
+          "--mtp",
+          "--suffix",
+          "0"
+        ],
+        "cwd": "C:\\workspace\\runs\\strata\\flash-perf-20261016",
+        "started": 1792140634.0460236,
+        "samples": 185,
+        "min_commit_available": 13520887808,
+        "min_ram_available": 4669800448,
+        "min_gpu_free": 1129410560,
+        "max_commit_used": 56798023680,
+        "max_gpu_used": 15965523968,
+        "max_tree_rss": 52535046144,
+        "max_tree_private": 45388115968,
+        "stop_reason": null,
+        "pid": 14352,
+        "returncode": 0,
+        "elapsed_s": 93.54700000002049,
+        "remaining_before_cleanup": [],
+        "remaining_descendants": []
+      },
+      "report_sha256": "79986dc3dd79b96a84a4f3cf2ea29a2dc76c42c67c6e5df79fc15070a859db16"
+    },
+    "mtp_lookup": {
+      "report": "reference-mtp-lookup-3x-v1.json",
+      "workloads": {
+        "english": {
+          "median_tps": 116.51180970295985,
+          "tps": [
+            112.89557804174277,
+            116.51180970295985,
+            117.4321931924761
+          ],
+          "ttft_ms": [
+            409.8502999986522,
+            59.333200013497844,
+            65.35220000660047
+          ],
+          "accepted": [
+            313,
+            310,
+            314
+          ],
+          "drafted": [
+            596,
+            603,
+            591
+          ]
+        },
+        "chinese": {
+          "median_tps": 113.24717092607663,
+          "tps": [
+            109.5775261000495,
+            117.14924398762955,
+            113.24717092607663
+          ],
+          "ttft_ms": [
+            451.7610000038985,
+            62.31490001664497,
+            55.22860001656227
+          ],
+          "accepted": [
+            301,
+            315,
+            303
+          ],
+          "drafted": [
+            639,
+            591,
+            627
+          ]
+        },
+        "code": {
+          "median_tps": 125.91717478718482,
+          "tps": [
+            115.28971266983136,
+            126.49104725577851,
+            125.91717478718482
+          ],
+          "ttft_ms": [
+            506.78379999590106,
+            57.11300001712516,
+            57.71779999486171
+          ],
+          "accepted": [
+            337,
+            336,
+            338
+          ],
+          "drafted": [
+            531,
+            525,
+            528
+          ]
+        }
+      },
+      "resource": {
+        "command": [
+          "C:\\workspace\\envs\\strata\\flash-perf\\Scripts\\python.exe",
+          "-B",
+          "probe-repeat-v1.py",
+          "--output",
+          "reference-mtp-lookup-3x-v1.json",
+          "--repetitions",
+          "3",
+          "--mtp",
+          "--suffix",
+          "3"
+        ],
+        "cwd": "C:\\workspace\\runs\\strata\\flash-perf-20261016",
+        "started": 1792140766.4572015,
+        "samples": 188,
+        "min_commit_available": 13532401664,
+        "min_ram_available": 4672774144,
+        "min_gpu_free": 1112633344,
+        "max_commit_used": 56786509824,
+        "max_gpu_used": 15982301184,
+        "max_tree_rss": 52543201280,
+        "max_tree_private": 45444268032,
+        "stop_reason": null,
+        "pid": 10924,
+        "returncode": 0,
+        "elapsed_s": 95.06200000000536,
+        "remaining_before_cleanup": [],
+        "remaining_descendants": []
+      },
+      "report_sha256": "1cf30b23f7aa82f6a4f5244c61b83b069049b47d0dc95e05400d0c842c2f2ebb"
+    }
+  },
+  "freetoken_perf3": {
+    "off": {
+      "report": "candidate3-wheel-performance-off-v1.json",
+      "resource": {
+        "command": [
+          "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand3\\Scripts\\python.exe",
+          "-B",
+          "probe10.py",
+          "--output",
+          "candidate3-wheel-performance-off-v1.json",
+          "--variant",
+          "base",
+          "--adaptive-owners",
+          "--adapt-every",
+          "32",
+          "--resident",
+          "5120",
+          "--prefill",
+          "1024",
+          "--state-cache-slots",
+          "1",
+          "--suite",
+          "performance",
+          "--keys",
+          "english",
+          "chinese",
+          "code",
+          "70-0",
+          "diverse-4096-0",
+          "--repetitions",
+          "3",
+          "--inventory"
+        ],
+        "cwd": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016",
+        "started": 1792138217.059795,
+        "samples": 337,
+        "min_commit_available": 13085122560,
+        "min_ram_available": 29160300544,
+        "min_gpu_free": 716271616,
+        "max_commit_used": 57233788928,
+        "max_gpu_used": 16378662912,
+        "max_tree_rss": 28969619456,
+        "max_tree_private": 45792448512,
+        "stop_reason": null,
+        "pid": 1892,
+        "returncode": 0,
+        "elapsed_s": 170.125,
+        "remaining_before_cleanup": [],
+        "remaining_descendants": []
+      },
+      "settings": {
+        "resident": 5120,
+        "dynamic": 1024,
+        "prefill": 1024,
+        "state_cache_slots": 1,
+        "mtp": false,
+        "adaptive_owners": true,
+        "adapt_every": 32
+      },
+      "workloads": {
+        "english": {
+          "median_tps": 92.83730235524314,
+          "tps": [
+            88.50845840360165,
+            92.83730235524314,
+            93.67850483083619
+          ],
+          "ttft_ms": [
+            1011.9467999902554,
+            674.0448999917135,
+            643.8457999902312
+          ],
+          "request_seconds": [
+            6.785680099972524,
+            6.178653699986171,
+            6.098930099979043
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "chinese": {
+          "median_tps": 92.85015807000016,
+          "tps": [
+            92.10587077785023,
+            92.85015807000016,
+            93.09458949562766
+          ],
+          "ttft_ms": [
+            975.55669999565,
+            1616.1830000055488,
+            73.25519999722019
+          ],
+          "request_seconds": [
+            6.523818899993785,
+            7.119915499992203,
+            5.562546000001021
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "code": {
+          "median_tps": 85.4254159803263,
+          "tps": [
+            84.82810497538088,
+            85.4254159803263,
+            88.39961135971889
+          ],
+          "ttft_ms": [
+            982.0182000112254,
+            12168.088100006571,
+            91.5839999797754
+          ],
+          "request_seconds": [
+            7.006214299995918,
+            18.15020450000884,
+            5.872429499984719
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "70-0": {
+          "median_tps": 91.29229441610161,
+          "tps": [
+            90.11971690134177,
+            91.29229441610161,
+            91.96508767719891
+          ],
+          "ttft_ms": [
+            670.0726000126451,
+            106.09750001458451,
+            86.28680001129396
+          ],
+          "request_seconds": [
+            6.340592600026866,
+            5.703767300001346,
+            5.643015100009507
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "diverse-4096-0": {
+          "median_tps": 84.43199014784481,
+          "tps": [
+            84.43199014784481,
+            83.45630617347865,
+            85.51696696801106
+          ],
+          "ttft_ms": [
+            9546.579899993958,
+            968.1869999913033,
+            639.5188000169583
+          ],
+          "request_seconds": [
+            15.599038299988024,
+            7.091372399998363,
+            6.6151688000245485
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        }
+      }
+    },
+    "on": {
+      "report": "candidate3-wheel-performance-on-v1.json",
+      "resource": {
+        "command": [
+          "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand3\\Scripts\\python.exe",
+          "-B",
+          "probe10.py",
+          "--output",
+          "candidate3-wheel-performance-on-v1.json",
+          "--variant",
+          "compact-mtp",
+          "--mtp",
+          "--adaptive-owners",
+          "--adapt-every",
+          "32",
+          "--resident",
+          "4352",
+          "--prefill",
+          "1024",
+          "--state-cache-slots",
+          "1",
+          "--suite",
+          "performance",
+          "--keys",
+          "english",
+          "chinese",
+          "code",
+          "70-0",
+          "diverse-4096-0",
+          "--repetitions",
+          "3",
+          "--inventory"
+        ],
+        "cwd": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016",
+        "started": 1792138423.2759671,
+        "samples": 297,
+        "min_commit_available": 11695120384,
+        "min_ram_available": 27918168064,
+        "min_gpu_free": 674328576,
+        "max_commit_used": 58623791104,
+        "max_gpu_used": 16420605952,
+        "max_tree_rss": 30220705792,
+        "max_tree_private": 47149039616,
+        "stop_reason": null,
+        "pid": 1220,
+        "returncode": 0,
+        "elapsed_s": 149.9529999999795,
+        "remaining_before_cleanup": [],
+        "remaining_descendants": []
+      },
+      "settings": {
+        "resident": 4352,
+        "dynamic": 1024,
+        "prefill": 1024,
+        "state_cache_slots": 1,
+        "mtp": true,
+        "adaptive_owners": true,
+        "adapt_every": 32
+      },
+      "workloads": {
+        "english": {
+          "median_tps": 92.95754376119649,
+          "tps": [
+            88.72353091449804,
+            92.95754376119649,
+            96.054218640064
+          ],
+          "ttft_ms": [
+            706.6659999836702,
+            657.9243000014685,
+            659.9586999800522
+          ],
+          "request_seconds": [
+            6.466427000006661,
+            6.1553630999987945,
+            5.980149599985452
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "chinese": {
+          "median_tps": 95.6109986255577,
+          "tps": [
+            92.69931068336209,
+            95.6109986255577,
+            96.54722924198457
+          ],
+          "ttft_ms": [
+            711.521699995501,
+            83.37619999656454,
+            66.24479999300092
+          ],
+          "request_seconds": [
+            6.224236000009114,
+            5.428205499978503,
+            5.359241699974518
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "code": {
+          "median_tps": 102.72136846933361,
+          "tps": [
+            99.30735934813816,
+            102.72136846933361,
+            104.79610983714845
+          ],
+          "ttft_ms": [
+            715.4630000004545,
+            404.47239999775775,
+            89.34160001808777
+          ],
+          "request_seconds": [
+            5.861377699999139,
+            5.379351699986728,
+            4.965727400005562
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "70-0": {
+          "median_tps": 95.25933085156736,
+          "tps": [
+            94.52787212597191,
+            95.25933085156736,
+            95.92918226150653
+          ],
+          "ttft_ms": [
+            673.0457000085153,
+            108.12910000095144,
+            75.96049999119714
+          ],
+          "request_seconds": [
+            6.079119500005618,
+            5.4727023000014015,
+            5.403070500004105
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "diverse-4096-0": {
+          "median_tps": 96.92174820608128,
+          "tps": [
+            95.48739288012779,
+            96.92174820608128,
+            97.3394610844225
+          ],
+          "ttft_ms": [
+            10049.91100000916,
+            681.7086999944877,
+            685.8231000078376
+          ],
+          "request_seconds": [
+            15.401653900014935,
+            5.954246600012993,
+            5.935727300005965
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        }
+      }
+    }
+  },
+  "strata_mtp_only_gain": {
+    "english": 0.3453548036018863,
+    "chinese": 0.2681532332675214,
+    "code": 0.38159287588703106
+  },
+  "lookup_gain_vs_mtp_only": {
+    "english": -0.0490881126843411,
+    "chinese": -0.03573163212872521,
+    "code": 0.0028854253305723443
+  }
+}

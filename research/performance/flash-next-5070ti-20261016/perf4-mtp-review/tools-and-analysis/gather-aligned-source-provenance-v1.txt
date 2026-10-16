@@ -1,0 +1,3 @@
+C:\workspace\build\freetoken-mats\flash-perf-materials-03\candidate-source\build-source\python\freetoken\moe\q2_residency.py
+sha256=577e9fcb004461f10b7b2088f950dfd1fb587ed4d077b147740c74c3d2db4028
+Only pointer alignment hints added; 16-byte row copying and all routing unchanged.

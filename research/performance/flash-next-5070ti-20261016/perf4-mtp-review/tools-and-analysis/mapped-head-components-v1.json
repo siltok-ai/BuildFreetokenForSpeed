@@ -1,0 +1,89 @@
+{
+  "status": "passed",
+  "scope": "synthetic finite Q5 blocks with original native arithmetic; GPU kernel graph cost, not model TPS",
+  "checks": [
+    {
+      "seed": 41,
+      "rows": 1,
+      "exact": true
+    },
+    {
+      "seed": 41,
+      "rows": 17,
+      "exact": true
+    },
+    {
+      "seed": 41,
+      "rows": 106299,
+      "exact": true
+    },
+    {
+      "seed": 41,
+      "rows": 106299,
+      "exact": true
+    },
+    {
+      "seed": 41,
+      "rows": 3,
+      "exact": true
+    },
+    {
+      "seed": 42,
+      "rows": 1,
+      "exact": true
+    },
+    {
+      "seed": 42,
+      "rows": 17,
+      "exact": true
+    },
+    {
+      "seed": 42,
+      "rows": 106299,
+      "exact": true
+    },
+    {
+      "seed": 42,
+      "rows": 106299,
+      "exact": true
+    },
+    {
+      "seed": 42,
+      "rows": 3,
+      "exact": true
+    },
+    {
+      "seed": 43,
+      "rows": 1,
+      "exact": true
+    },
+    {
+      "seed": 43,
+      "rows": 17,
+      "exact": true
+    },
+    {
+      "seed": 43,
+      "rows": 106299,
+      "exact": true
+    },
+    {
+      "seed": 43,
+      "rows": 106299,
+      "exact": true
+    },
+    {
+      "seed": 43,
+      "rows": 3,
+      "exact": true
+    }
+  ],
+  "microseconds": {
+    "full": 515.028717283861,
+    "copied": 221.59312544786425,
+    "mapped": 259.68199239923825
+  },
+  "avoided_packed_bytes": 187086240,
+  "native_header_sha256": "91bc6aa92b8c24d93e84d76e65c55c86a5d3ac4f5c66b86c129e8286d25b6557",
+  "vocab_sha256": "b1e1d3a7a9e4bf862dcd5923ce661fb59bbd07907e594df5cf86a62ac235cb91"
+}

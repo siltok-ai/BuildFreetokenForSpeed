@@ -1,0 +1,32 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\strata\\flash-perf\\Scripts\\python.exe",
+    "-B",
+    "probe-repeat-head-v1.py",
+    "--output",
+    "reference-mtp-fullhead-3x-v1.json",
+    "--mtp",
+    "--suffix",
+    "0",
+    "--slots",
+    "7019",
+    "--repetitions",
+    "3"
+  ],
+  "cwd": "C:\\workspace\\runs\\strata\\flash-perf-20261016",
+  "started": 1792144307.0055535,
+  "samples": 167,
+  "min_commit_available": 13824253952,
+  "min_ram_available": 5554896896,
+  "min_gpu_free": 1315008512,
+  "max_commit_used": 56494657536,
+  "max_gpu_used": 15779926016,
+  "max_tree_rss": 52416434176,
+  "max_tree_private": 45195849728,
+  "stop_reason": null,
+  "pid": 1416,
+  "returncode": 0,
+  "elapsed_s": 84.48399999999674,
+  "remaining_before_cleanup": [],
+  "remaining_descendants": []
+}
