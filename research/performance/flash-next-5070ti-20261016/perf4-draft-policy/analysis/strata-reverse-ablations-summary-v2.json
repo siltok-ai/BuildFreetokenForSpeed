@@ -1,0 +1,475 @@
+{
+  "correction": "Supersedes v1 derived accepted/offered fields only: DONE has accepted at index6,offered at7. All raw outputs, timings, median TPS and ID comparisons remain valid. v1 immutable archive preserved.",
+  "scope": "fixed unmodified Strata; full original Q2; 7019 slots; MTP only; 3x512 each; fresh engine per mode",
+  "caveat": "sequential fresh processes; draft choices change acceptance and expert routing; no universal speedup claim",
+  "ablations": {
+    "cjk": {
+      "report": "reference-mtp-cjk-fixed-3x-v1.json",
+      "sha256": "356684fccac756a3f7d754c25cd10ed0f0515c0830cbfb43dc4f7360024fdf36",
+      "results": {
+        "english": {
+          "median_tps": 122.15916880684225,
+          "individual_tps": [
+            113.230468364516,
+            123.49890226174122,
+            122.15916880684225
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 321,
+              "offered": 576
+            },
+            {
+              "accepted": 323,
+              "offered": 564
+            },
+            {
+              "accepted": 325,
+              "offered": 561
+            }
+          ],
+          "percent_vs_cjk": 0.0
+        },
+        "chinese": {
+          "median_tps": 117.63167340752076,
+          "individual_tps": [
+            120.46548239565425,
+            117.63167340752076,
+            109.19598589532043
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 322,
+              "offered": 570
+            },
+            {
+              "accepted": 311,
+              "offered": 600
+            },
+            {
+              "accepted": 296,
+              "offered": 648
+            }
+          ],
+          "percent_vs_cjk": 0.0
+        },
+        "code": {
+          "median_tps": 125.58249634547741,
+          "individual_tps": [
+            114.5206618916978,
+            128.45964964283468,
+            125.58249634547741
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 336,
+              "offered": 525
+            },
+            {
+              "accepted": 340,
+              "offered": 516
+            },
+            {
+              "accepted": 339,
+              "offered": 525
+            }
+          ],
+          "percent_vs_cjk": 0.0
+        }
+      },
+      "min_gpu_free": 1126264832,
+      "min_ram_available": 5343113216,
+      "identical_output_runs_to_cjk": 9
+    },
+    "english_subset": {
+      "report": "reference-mtp-en-fixed-3x-v1.json",
+      "sha256": "06cfc865d2988359bb7a75f448dda8eb2137e83c621bccfad1c2688804814f31",
+      "results": {
+        "english": {
+          "median_tps": 123.81843052111155,
+          "individual_tps": [
+            114.61557901205839,
+            123.81843052111155,
+            124.69909327940572
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 321,
+              "offered": 576
+            },
+            {
+              "accepted": 323,
+              "offered": 564
+            },
+            {
+              "accepted": 325,
+              "offered": 561
+            }
+          ],
+          "percent_vs_cjk": 1.358278490657483
+        },
+        "chinese": {
+          "median_tps": 75.33039417043159,
+          "individual_tps": [
+            75.16209455851174,
+            77.33466895796933,
+            75.33039417043159
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 211,
+              "offered": 906
+            },
+            {
+              "accepted": 212,
+              "offered": 900
+            },
+            {
+              "accepted": 198,
+              "offered": 945
+            }
+          ],
+          "percent_vs_cjk": -35.96079016111714
+        },
+        "code": {
+          "median_tps": 128.26620091197987,
+          "individual_tps": [
+            119.3368783625019,
+            128.38926297908202,
+            128.26620091197987
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 341,
+              "offered": 513
+            },
+            {
+              "accepted": 339,
+              "offered": 516
+            },
+            {
+              "accepted": 341,
+              "offered": 516
+            }
+          ],
+          "percent_vs_cjk": 2.1370052711164433
+        }
+      },
+      "min_gpu_free": 1241608192,
+      "min_ram_available": 5379100672,
+      "identical_output_runs_to_cjk": 3
+    },
+    "full_head": {
+      "report": "reference-mtp-fullhead-3x-v1.json",
+      "sha256": "cba6bec959c88c250079a48595a8783012c648f0583583db53dc86c385706b89",
+      "results": {
+        "english": {
+          "median_tps": 109.0387000967335,
+          "individual_tps": [
+            107.90808748139813,
+            110.67645754071488,
+            109.0387000967335
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 319,
+              "offered": 585
+            },
+            {
+              "accepted": 310,
+              "offered": 606
+            },
+            {
+              "accepted": 314,
+              "offered": 600
+            }
+          ],
+          "percent_vs_cjk": -10.740469862605885
+        },
+        "chinese": {
+          "median_tps": 111.14373163967224,
+          "individual_tps": [
+            111.14373163967224,
+            106.90681410061532,
+            116.17447942684893
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 314,
+              "offered": 597
+            },
+            {
+              "accepted": 299,
+              "offered": 636
+            },
+            {
+              "accepted": 320,
+              "offered": 579
+            }
+          ],
+          "percent_vs_cjk": -5.51547179420957
+        },
+        "code": {
+          "median_tps": 128.74580373038086,
+          "individual_tps": [
+            118.42435995139999,
+            128.74580373038086,
+            131.8112937928702
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 348,
+              "offered": 498
+            },
+            {
+              "accepted": 346,
+              "offered": 501
+            },
+            {
+              "accepted": 350,
+              "offered": 483
+            }
+          ],
+          "percent_vs_cjk": 2.5189078708876655
+        }
+      },
+      "min_gpu_free": 1315008512,
+      "min_ram_available": 5554896896,
+      "identical_output_runs_to_cjk": 0
+    },
+    "synchronous_commit": {
+      "report": "reference-mtp-commitsync-fixed-3x-v1.json",
+      "sha256": "1130f84b5717fc8e64300c2e9a346b14fbc350e2a2719045fcdfe4f8100d62cc",
+      "results": {
+        "english": {
+          "median_tps": 121.94875446004633,
+          "individual_tps": [
+            112.2535367608254,
+            122.3331376004485,
+            121.94875446004633
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 321,
+              "offered": 576
+            },
+            {
+              "accepted": 323,
+              "offered": 564
+            },
+            {
+              "accepted": 325,
+              "offered": 561
+            }
+          ],
+          "percent_vs_cjk": -0.17224605312158303
+        },
+        "chinese": {
+          "median_tps": 116.09418714585999,
+          "individual_tps": [
+            119.13988834434127,
+            116.09418714585999,
+            108.64134074708555
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 322,
+              "offered": 570
+            },
+            {
+              "accepted": 311,
+              "offered": 600
+            },
+            {
+              "accepted": 296,
+              "offered": 648
+            }
+          ],
+          "percent_vs_cjk": -1.3070342511700361
+        },
+        "code": {
+          "median_tps": 124.81769532826391,
+          "individual_tps": [
+            113.70016953745113,
+            127.55777680817825,
+            124.81769532826391
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 336,
+              "offered": 525
+            },
+            {
+              "accepted": 340,
+              "offered": 516
+            },
+            {
+              "accepted": 339,
+              "offered": 525
+            }
+          ],
+          "percent_vs_cjk": -0.6090028781634782
+        }
+      },
+      "min_gpu_free": 1126264832,
+      "min_ram_available": 5414064128,
+      "identical_output_runs_to_cjk": 9
+    },
+    "fixed_two_drafts": {
+      "report": "reference-mtp-spec3-fixed-3x-v1.json",
+      "sha256": "c435b7a79970b60ef64d82f80fa3ac944ccfcc6f768fdf49ee5b0cc401493694",
+      "results": {
+        "english": {
+          "median_tps": 105.03526091307162,
+          "individual_tps": [
+            92.34357215711223,
+            109.38284784473069,
+            105.03526091307162
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 279,
+              "offered": 466
+            },
+            {
+              "accepted": 284,
+              "offered": 454
+            },
+            {
+              "accepted": 288,
+              "offered": 448
+            }
+          ],
+          "percent_vs_cjk": -14.01770170919131
+        },
+        "chinese": {
+          "median_tps": 105.03704858167974,
+          "individual_tps": [
+            97.73746565326965,
+            105.03704858167974,
+            107.13733404435719
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 275,
+              "offered": 476
+            },
+            {
+              "accepted": 273,
+              "offered": 476
+            },
+            {
+              "accepted": 285,
+              "offered": 456
+            }
+          ],
+          "percent_vs_cjk": -10.706831298921049
+        },
+        "code": {
+          "median_tps": 114.96522853061046,
+          "individual_tps": [
+            98.79396350690985,
+            115.18379366272323,
+            114.96522853061046
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 301,
+              "offered": 420
+            },
+            {
+              "accepted": 302,
+              "offered": 418
+            },
+            {
+              "accepted": 302,
+              "offered": 420
+            }
+          ],
+          "percent_vs_cjk": -8.454416916238749
+        }
+      },
+      "min_gpu_free": 1138847744,
+      "min_ram_available": 5103812608,
+      "identical_output_runs_to_cjk": 0
+    },
+    "confidence_03": {
+      "report": "reference-mtp-minp03-fixed-3x-v2.json",
+      "sha256": "6743529d2b6279da6676b7421f5cef8ebf36c9e45b9d407def97b0871de5c821",
+      "results": {
+        "english": {
+          "median_tps": 102.12924485898736,
+          "individual_tps": [
+            102.29982826474426,
+            98.40223084620821,
+            102.12924485898736
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 314,
+              "offered": 509
+            },
+            {
+              "accepted": 310,
+              "offered": 546
+            },
+            {
+              "accepted": 310,
+              "offered": 537
+            }
+          ],
+          "percent_vs_cjk": -16.396578450469114
+        },
+        "chinese": {
+          "median_tps": 101.14040857803926,
+          "individual_tps": [
+            101.14040857803926,
+            108.38826773180057,
+            96.21912865236443
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 311,
+              "offered": 515
+            },
+            {
+              "accepted": 297,
+              "offered": 519
+            },
+            {
+              "accepted": 314,
+              "offered": 514
+            }
+          ],
+          "percent_vs_cjk": -14.019408507732024
+        },
+        "code": {
+          "median_tps": 112.16067308344284,
+          "individual_tps": [
+            90.68420987932573,
+            112.16067308344284,
+            126.8882952425708
+          ],
+          "accepted_and_offered": [
+            {
+              "accepted": 341,
+              "offered": 504
+            },
+            {
+              "accepted": 339,
+              "offered": 505
+            },
+            {
+              "accepted": 338,
+              "offered": 502
+            }
+          ],
+          "percent_vs_cjk": -10.687654452345917
+        }
+      },
+      "min_gpu_free": 1126264832,
+      "min_ram_available": 5074755584,
+      "identical_output_runs_to_cjk": 1
+    }
+  }
+}
