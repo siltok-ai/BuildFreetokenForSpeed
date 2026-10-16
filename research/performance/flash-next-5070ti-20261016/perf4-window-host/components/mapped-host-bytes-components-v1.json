@@ -1,0 +1,31 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "tokens": 1,
+      "exact": true,
+      "changed_graph": true
+    },
+    {
+      "tokens": 4,
+      "exact": true,
+      "changed_graph": true
+    },
+    {
+      "tokens": 64,
+      "exact": true,
+      "changed_graph": true
+    },
+    {
+      "tokens": 2048,
+      "exact": true,
+      "changed_graph": true
+    }
+  ],
+  "bytes": 282700,
+  "cuda_alias_ptr": 8669626368,
+  "device_visible_ptr": 8669626368,
+  "host_ptr": 8669626368,
+  "zero_copy": true,
+  "ownership": "interface owns CPU storage; no alias mutation; drain graph readers before release"
+}

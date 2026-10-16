@@ -1,0 +1,86 @@
+{
+  "scope": "No-MTP first objective; process-only host mapping/cache comparison, not a new release",
+  "source_checkpoint": "18f3f31e20306e2122715482d92cba70a2280dd4",
+  "decision": "Keep mapped embedding direction; do not adopt7424-slot preset with late workload slowdown. Root cause not confirmed by passing resource floor.",
+  "priority": "First approach Strata no-MTP performance, second obtain clear MTP uplift; neither objective removed.",
+  "files": [
+    {
+      "path": "native/host-embedding-r5376-fivekeys-off-v1.json",
+      "bytes": 297294,
+      "sha256": "9ef8b48131ae755ea02aaea8768d88204891b29c75fea1e6bee19cf9ed3b1eac",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r5376-fivekeys-off-v1.json"
+    },
+    {
+      "path": "native/host-embedding-r5376-fivekeys-off-v1.resource.json",
+      "bytes": 1140,
+      "sha256": "3ed207b6c1cc5fc7146ce66b26aa96c2d6e5b67880ea702c81018920fc12d80b",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r5376-fivekeys-off-v1.resource.json"
+    },
+    {
+      "path": "native/host-embedding-r5376-fivekeys-off-v1.stdout.log",
+      "bytes": 18051,
+      "sha256": "f6f3c321b4efc3062a95c0b793ed8af86b5cb8d46a73c976877b11043e110ed8",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r5376-fivekeys-off-v1.stdout.log"
+    },
+    {
+      "path": "native/host-embedding-r5376-fivekeys-off-v1.stderr.log",
+      "bytes": 1169,
+      "sha256": "2b0dad1a890e6ddae48f2b90a1ec1e655dd79b2ca7def08689810d3a55a439b6",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r5376-fivekeys-off-v1.stderr.log"
+    },
+    {
+      "path": "native/host-embedding-r5376-fivekeys-off-v1.samples.jsonl",
+      "bytes": 72371,
+      "sha256": "d3c5789561d25c0eb75be77171b12f45ecc449884b00ab8c9f0455f71e1fd0fc",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r5376-fivekeys-off-v1.samples.jsonl"
+    },
+    {
+      "path": "native/host-embedding-r5120-fivekeys-off-v1.json",
+      "bytes": 297285,
+      "sha256": "1fdf038422623cb4922cbb291b98edef614128743cc73cad3d840691126a6d6e",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r5120-fivekeys-off-v1.json"
+    },
+    {
+      "path": "native/host-embedding-r5120-fivekeys-off-v1.resource.json",
+      "bytes": 1141,
+      "sha256": "f6849a28de958144a9715746ea4aad9f7f58bfb5042f8334cfddd756b0cd52e5",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r5120-fivekeys-off-v1.resource.json"
+    },
+    {
+      "path": "native/host-embedding-r5120-fivekeys-off-v1.stdout.log",
+      "bytes": 18048,
+      "sha256": "832e9920ecdf2e8ab2374a24cd1562135a2d98e3fa6e0ef9e930ecb555e65730",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r5120-fivekeys-off-v1.stdout.log"
+    },
+    {
+      "path": "native/host-embedding-r5120-fivekeys-off-v1.stderr.log",
+      "bytes": 1169,
+      "sha256": "9e7d9f86dcd1fda4d8b227e88c5c9d970919a49d4739a0d328fc38963963e913",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r5120-fivekeys-off-v1.stderr.log"
+    },
+    {
+      "path": "native/host-embedding-r5120-fivekeys-off-v1.samples.jsonl",
+      "bytes": 99688,
+      "sha256": "089bb37d4d0800208448c7b04ad364378e07b7aae3f192e1bfefb1609b669060",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r5120-fivekeys-off-v1.samples.jsonl"
+    },
+    {
+      "path": "analysis/summarize-off-host-v1.py",
+      "bytes": 2564,
+      "sha256": "973e3efbc67a0283391166c8726332b3d6df5fdaf38ff46b2d693fb499ce1536",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\summarize-off-host-v1.py"
+    },
+    {
+      "path": "analysis/off-host-comparison-v1.json",
+      "bytes": 5948,
+      "sha256": "2cc3658acfd4f4c3c45534c2ec3d7e5d841dbddbd04307a7ee8e87ede218e618",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\off-host-comparison-v1.json"
+    },
+    {
+      "path": "tools/archive-off-host-v1.py",
+      "bytes": 2136,
+      "sha256": "79ae1139c0db6ca2e2f7d37ff766c7e7000514ac8b986dbca9d65a20232ae1e7",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\archive-off-host-v1.py"
+    }
+  ]
+}

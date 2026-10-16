@@ -1,0 +1,346 @@
+{
+  "scope": "Research process-only prototypes on immutable perf3 ordinary wheel; no new profile/wheel/Speed HTTP/installer claim",
+  "base_build_commit": "18f3f31e20306e2122715482d92cba70a2280dd4",
+  "speed_commit": "76e2ad286e67771f1ddac7847379dfb5d03b699c",
+  "weight_policy": "Original full Q2 main model/all experts unchanged; original full Q3_K embedding bytes and dequantization unchanged",
+  "mapped_embedding": {
+    "bytes": 273152000,
+    "quality_mtp_exact": "27/27",
+    "performance_exact": "17/17 each at4352 and4608 resident",
+    "lifetime": "Explicit pinned CPU owner retained by embedding; CUDA alias device pointer checked; graphs drain before release"
+  },
+  "window_projection": "FP32 split-K changes reduction order within tested bounds; full performance trajectories differ15/17, quality gate unchanged; not universally faster",
+  "cache_comparison": "FT off7168/on6400 total versus Strata off7774/on7019; resident4352 excludes2048 borrowed dynamic/prefill slots;4608 variant total6656",
+  "files": [
+    {
+      "path": "native/bf16-four-down-quality-on-v1.json",
+      "bytes": 145197,
+      "sha256": "abfc92f9ada429e044c7b64dadad7154940af3901dcedfdf0ad4a5daddb0234a",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bf16-four-down-quality-on-v1.json"
+    },
+    {
+      "path": "native/bf16-four-down-quality-on-v1.resource.json",
+      "bytes": 1233,
+      "sha256": "da528f5d1a1ef2d7b1243aaee97b4365536e754dd2e64e86a3ee7c7358d5d8a5",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bf16-four-down-quality-on-v1.resource.json"
+    },
+    {
+      "path": "native/bf16-four-down-quality-on-v1.stdout.log",
+      "bytes": 25909,
+      "sha256": "79d4bd0050f53daf7a6146a93c68259fd87de6509d995b7ea31c51696bfe2e8c",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bf16-four-down-quality-on-v1.stdout.log"
+    },
+    {
+      "path": "native/bf16-four-down-quality-on-v1.stderr.log",
+      "bytes": 1999,
+      "sha256": "17ec9085e568238b66dd9cabbe968d4b9d3490b98836d36e6d16346495e785a3",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bf16-four-down-quality-on-v1.stderr.log"
+    },
+    {
+      "path": "native/bf16-four-down-quality-on-v1.samples.jsonl",
+      "bytes": 36429,
+      "sha256": "9775baa888efbc6024b57639ef12d110ed1129fa731f9b37ea327f71b2c3380e",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bf16-four-down-quality-on-v1.samples.jsonl"
+    },
+    {
+      "path": "native/bf16-four-down-fivekeys-v1.json",
+      "bytes": 665801,
+      "sha256": "680df02e5e3f67d86853e0a126239dcb494a5ffca7d2894250de42d3ff262a70",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bf16-four-down-fivekeys-v1.json"
+    },
+    {
+      "path": "native/bf16-four-down-fivekeys-v1.resource.json",
+      "bytes": 1346,
+      "sha256": "87017aa90858b54b9d852cc212f24c831cb2b22855ce34fda70f1695efa4b80d",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bf16-four-down-fivekeys-v1.resource.json"
+    },
+    {
+      "path": "native/bf16-four-down-fivekeys-v1.stdout.log",
+      "bytes": 18641,
+      "sha256": "71e1975af5ebc7d7dafa7164f9a2b70df3de5788acd9c529add91d0c2cad5ebb",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bf16-four-down-fivekeys-v1.stdout.log"
+    },
+    {
+      "path": "native/bf16-four-down-fivekeys-v1.stderr.log",
+      "bytes": 1169,
+      "sha256": "9c346274775cdf940539e24fbe3ab625c3c572e762aee291dd6f553a770c3e8b",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bf16-four-down-fivekeys-v1.stderr.log"
+    },
+    {
+      "path": "native/bf16-four-down-fivekeys-v1.samples.jsonl",
+      "bytes": 62676,
+      "sha256": "8411f1e7b3983a573d9392d5ff90a730902fd02ddb877bcf0ca227cf941e94b6",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bf16-four-down-fivekeys-v1.samples.jsonl"
+    },
+    {
+      "path": "native/host-embedding-quality-on-v1.json",
+      "bytes": 145763,
+      "sha256": "acd7491f89b4e5e7db5c805cd3acab2cccaff9c7bf84c14c272baa2346cf7f60",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-quality-on-v1.json"
+    },
+    {
+      "path": "native/host-embedding-quality-on-v1.resource.json",
+      "bytes": 1059,
+      "sha256": "dc6161dc2d34fd8b63e0ee1a2366c3f691099537111639c6c35186e566732926",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-quality-on-v1.resource.json"
+    },
+    {
+      "path": "native/host-embedding-quality-on-v1.stdout.log",
+      "bytes": 25897,
+      "sha256": "856c969bccf5a4e08a14c83fabccb6bcf4aa45bec902e2fa441d4797fce68e0f",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-quality-on-v1.stdout.log"
+    },
+    {
+      "path": "native/host-embedding-quality-on-v1.stderr.log",
+      "bytes": 1999,
+      "sha256": "6964b797a7cdd35d72dd970766876d2ec2fc504c58c44c9892918a9ee90f5a4a",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-quality-on-v1.stderr.log"
+    },
+    {
+      "path": "native/host-embedding-quality-on-v1.samples.jsonl",
+      "bytes": 37059,
+      "sha256": "6c11fd153dae01fe02d5be51e5d1e1fcb7604ea5c33299454fe372459d57b2c9",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-quality-on-v1.samples.jsonl"
+    },
+    {
+      "path": "native/host-embedding-r4352-fivekeys-v1.json",
+      "bytes": 662977,
+      "sha256": "dc0b177014c98a4a53e7d4fa1d53c2b9805fd0e98ac3f74ef0466746a2314f5f",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r4352-fivekeys-v1.json"
+    },
+    {
+      "path": "native/host-embedding-r4352-fivekeys-v1.resource.json",
+      "bytes": 1188,
+      "sha256": "6acb3acc8ea8b85f7e229dec1e500879cf60f3a3a165a4cc8885ff214345a203",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r4352-fivekeys-v1.resource.json"
+    },
+    {
+      "path": "native/host-embedding-r4352-fivekeys-v1.stdout.log",
+      "bytes": 18634,
+      "sha256": "024322c072672c84ac2a99ca8e1e877e7fa681dd125050129a178e3055de88a5",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r4352-fivekeys-v1.stdout.log"
+    },
+    {
+      "path": "native/host-embedding-r4352-fivekeys-v1.stderr.log",
+      "bytes": 1169,
+      "sha256": "55f19bb100bd1a96246f351ece1ed5c9c782fd3d7d3ea9651ee8bf7a368ab5cc",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r4352-fivekeys-v1.stderr.log"
+    },
+    {
+      "path": "native/host-embedding-r4352-fivekeys-v1.samples.jsonl",
+      "bytes": 63581,
+      "sha256": "377f3bc07ddcb019bb25185cbf53465271d008cc972f63550740e0ce0a817a67",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r4352-fivekeys-v1.samples.jsonl"
+    },
+    {
+      "path": "native/host-embedding-r4608-fivekeys-v1.json",
+      "bytes": 662976,
+      "sha256": "0d8099db2ca1a96041088257e6f0bddcf10ced323a080063738a889e6ac2a953",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r4608-fivekeys-v1.json"
+    },
+    {
+      "path": "native/host-embedding-r4608-fivekeys-v1.resource.json",
+      "bytes": 1189,
+      "sha256": "37a4f638d1ffd450ccd1f1bd18beb4884246129a22db7b7be736961bc8031e53",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r4608-fivekeys-v1.resource.json"
+    },
+    {
+      "path": "native/host-embedding-r4608-fivekeys-v1.stdout.log",
+      "bytes": 18636,
+      "sha256": "578c3eb4ab635d1d1103dc5282ac7d3c25234d694804f25b67061ac2f55704bf",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r4608-fivekeys-v1.stdout.log"
+    },
+    {
+      "path": "native/host-embedding-r4608-fivekeys-v1.stderr.log",
+      "bytes": 1169,
+      "sha256": "02719f3f6a4ad0f313b7b3a6f45ae8f3f9a4cf25cb1f42d34fc28206d127d0a3",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r4608-fivekeys-v1.stderr.log"
+    },
+    {
+      "path": "native/host-embedding-r4608-fivekeys-v1.samples.jsonl",
+      "bytes": 98704,
+      "sha256": "1bb4b586bfa84801fa84bdadd268650a0394453ac09c4f9cc6068fdb1759cbe5",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r4608-fivekeys-v1.samples.jsonl"
+    },
+    {
+      "path": "native/host-embedding-r5376-quality-off-v1.json",
+      "bytes": 121493,
+      "sha256": "17a0d6d1a53205de0eb14d95fc76dbccc23f48399fc98c2bec70f243e4f130b5",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r5376-quality-off-v1.json"
+    },
+    {
+      "path": "native/host-embedding-r5376-quality-off-v1.resource.json",
+      "bytes": 1025,
+      "sha256": "972f02ed6011aceae7de1b6f65577ddd38edc57664ea191d40774555413c5ff2",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r5376-quality-off-v1.resource.json"
+    },
+    {
+      "path": "native/host-embedding-r5376-quality-off-v1.stdout.log",
+      "bytes": 23475,
+      "sha256": "ddf11e4af9e6f0ffa33dd28d8e11184a7f43ab79c753da1bbba9b35cc970b119",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r5376-quality-off-v1.stdout.log"
+    },
+    {
+      "path": "native/host-embedding-r5376-quality-off-v1.stderr.log",
+      "bytes": 1999,
+      "sha256": "7f1746612fdfce21475f295fecae4ca083d24f90f7c452edd613293e0a77ddf7",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r5376-quality-off-v1.stderr.log"
+    },
+    {
+      "path": "native/host-embedding-r5376-quality-off-v1.samples.jsonl",
+      "bytes": 36010,
+      "sha256": "458d92af581b944915aa17e5d7d938f0a526b7e775f8a9a48c431519e385ee4f",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host-embedding-r5376-quality-off-v1.samples.jsonl"
+    },
+    {
+      "path": "native/prefill2048-r4096-quality-on-v1.json",
+      "bytes": 143264,
+      "sha256": "c23a41ba4d5968c6f9c54ca05d4b4e532bb9dfaead2dcb397db420be51284438",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\prefill2048-r4096-quality-on-v1.json"
+    },
+    {
+      "path": "native/prefill2048-r4096-quality-on-v1.resource.json",
+      "bytes": 1031,
+      "sha256": "d6a3db25a10ec7919edc295d99742fc4d7acc32907f4483b21867f68fa1296af",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\prefill2048-r4096-quality-on-v1.resource.json"
+    },
+    {
+      "path": "native/prefill2048-r4096-quality-on-v1.stdout.log",
+      "bytes": 22878,
+      "sha256": "2998680a2e5f736c9e3454a6ba5f550bf9bec8d4c4e19828c0ca650bd2a61d5c",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\prefill2048-r4096-quality-on-v1.stdout.log"
+    },
+    {
+      "path": "native/prefill2048-r4096-quality-on-v1.stderr.log",
+      "bytes": 1169,
+      "sha256": "953aaabeff59c41ff1ce9e65c1e439c0bef8039e8c4ce7776244d9faf837c98d",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\prefill2048-r4096-quality-on-v1.stderr.log"
+    },
+    {
+      "path": "native/prefill2048-r4096-quality-on-v1.samples.jsonl",
+      "bytes": 68397,
+      "sha256": "f4642e7e2c2b8349699070ec318508b103f37640e114c393a625169fea0a25d8",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\prefill2048-r4096-quality-on-v1.samples.jsonl"
+    },
+    {
+      "path": "components/bf16-small-batch-components-v1.json",
+      "bytes": 18290,
+      "sha256": "25a519016bbd0b8197fe9e818fad87c58494445f36eb4267e19fa10cf773b308",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bf16-small-batch-components-v1.json"
+    },
+    {
+      "path": "components/bf16-window-simt-components-v1.json",
+      "bytes": 12850,
+      "sha256": "4901ac73afd0e4fed2006a372172d544b6cbc706eb46802e52dc7296a3a4dfba",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bf16-window-simt-components-v1.json"
+    },
+    {
+      "path": "components/bf16-window-contig-components-v1.json",
+      "bytes": 12852,
+      "sha256": "a41e7b15dfe1e6fd4bd12b2e873b4cec6c727ec26addc63274542798dbd207fb",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bf16-window-contig-components-v1.json"
+    },
+    {
+      "path": "components/mapped-host-bytes-components-v1.json",
+      "bytes": 636,
+      "sha256": "25de13d2bc2ce3b395f49037c201e1e0027c81c7617ee48f3277b0f908fc5d57",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\mapped-host-bytes-components-v1.json"
+    },
+    {
+      "path": "tools/bf16_small_batch_variant.py",
+      "bytes": 1818,
+      "sha256": "79bb0409576cf4dd9ce2b05565dce958c514a842747d6c3cb0a416307a28f870",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bf16_small_batch_variant.py"
+    },
+    {
+      "path": "tools/bf16_window_simt_variant.py",
+      "bytes": 3528,
+      "sha256": "cdbc9f784d46ecda48cf2be9fc71e3157419454a2e1280dde9a68078536c96b6",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bf16_window_simt_variant.py"
+    },
+    {
+      "path": "tools/mapped_host_bytes.py",
+      "bytes": 1086,
+      "sha256": "837bde3bb69e565dff90e38e206e6265b644259ed3e97c16faf2655837a547b9",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\mapped_host_bytes.py"
+    },
+    {
+      "path": "tools/host_embedding_variant.py",
+      "bytes": 2359,
+      "sha256": "511e851c1a7ffc0c07084eccae450c5f8c4a9a8c3ead1738d7bf5d7139a4b80b",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\host_embedding_variant.py"
+    },
+    {
+      "path": "tools/test-mapped-host-bytes-v1.py",
+      "bytes": 2253,
+      "sha256": "0f6b88d0ff8d00ab01430462b0ba1c6fc7d90248aee4cd6157a6699717e34a5f",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\test-mapped-host-bytes-v1.py"
+    },
+    {
+      "path": "tools/bench-bf16-small-batch-v1.py",
+      "bytes": 2751,
+      "sha256": "91273b4afd7551b7a2bdba47b19f6017cfb0c8f7327708d5e839f25dd18d2172",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bench-bf16-small-batch-v1.py"
+    },
+    {
+      "path": "tools/bench-bf16-window-simt-v1.py",
+      "bytes": 2879,
+      "sha256": "60219813ec8c2c33875fa97973977c1c34b19dc2b2324bec87132f5b395cc7a3",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bench-bf16-window-simt-v1.py"
+    },
+    {
+      "path": "tools/bench-bf16-window-contig-v1.py",
+      "bytes": 2887,
+      "sha256": "98a009167005fe1fc18f9feb0ea3f4a4664810de0e6719954e61fc928aa01afa",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\bench-bf16-window-contig-v1.py"
+    },
+    {
+      "path": "tools/probe18.py",
+      "bytes": 17389,
+      "sha256": "dcdfe5ff4c6d6907380621d358ea6b274375923d9e36ff706677528d8fcb327c",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\probe18.py"
+    },
+    {
+      "path": "tools/probe19.py",
+      "bytes": 17816,
+      "sha256": "c024b2c336db0b00c3776e92c1092b3e2e149097c2aa8381a4a52254571f7210",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\probe19.py"
+    },
+    {
+      "path": "tools/admission_runtime_base_variant.py",
+      "bytes": 2800,
+      "sha256": "f811275d67369b1b77309b2edb295538b88a2ce6c442a5bb2ce51c31b1921433",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\admission_runtime_base_variant.py"
+    },
+    {
+      "path": "tools/consumer-tools/supervise.py",
+      "bytes": 5060,
+      "sha256": "acf6a68d3f40c4c642de941f0fa4f93269c0ca45783b0a6ef959ece86a917ad2",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\consumer-tools\\supervise.py"
+    },
+    {
+      "path": "analysis/summarize-window-host-v1.py",
+      "bytes": 2021,
+      "sha256": "e6e2fefd5740a80c20f411acd18763b0f15a868a13bbd5e34dffb3bdfe0d720b",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\summarize-window-host-v1.py"
+    },
+    {
+      "path": "analysis/summarize-window-host-v2.py",
+      "bytes": 2585,
+      "sha256": "93eeaa049075ceb22b9b944984cae56413bf2fdd5747946680afd5ed463e5742",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\summarize-window-host-v2.py"
+    },
+    {
+      "path": "analysis/window-host-screen-summary-v1.json",
+      "bytes": 7841,
+      "sha256": "519e924f677abdcc5b6d74c551b7b50860365f21bdbda2d82a5cdb1ec16cedd6",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\window-host-screen-summary-v1.json"
+    },
+    {
+      "path": "analysis/window-host-screen-summary-v2.json",
+      "bytes": 10029,
+      "sha256": "a9cc99a619f1a6dd4a52f05fc01a2c53958384016126bfb16bfcc988890a425c",
+      "source": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\window-host-screen-summary-v2.json"
+    }
+  ]
+}
