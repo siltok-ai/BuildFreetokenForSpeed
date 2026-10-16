@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "freetoken_version": "0.1.3+speed.strataq2perf7",
+  "torch_version": "2.11.0+cu130",
+  "torch_cuda": "13.0",
+  "python_minor": [
+    3,
+    12
+  ],
+  "cuda_capabilities": [
+    [
+      12,
+      0
+    ]
+  ],
+  "spec_names": [
+    "freetoken__store_1024_128_1_false",
+    "freetoken__store_2048_128_1_false",
+    "freetoken__index_4096_4_128_1_false",
+    "freetoken__index_10240_4_128_1_false",
+    "freetoken__fast_index_copy_update_flag",
+    "freetoken__fast_index_copy_128_8_128_1024_4_1",
+    "freetoken__fast_index_copy_256_8_256_1024_4_1",
+    "freetoken__fast_index_copy_2048_16_2048_1024_4_1",
+    "freetoken__fast_index_copy_4096_32_2048_1024_4_1",
+    "freetoken__fast_index_copy_65536_32_2048_1024_4_1",
+    "freetoken__fast_index_copy_131072_32_2048_1024_4_1",
+    "freetoken__fast_index_copy_524288_32_2048_1024_4_1",
+    "freetoken__fast_index_copy_1048576_32_2048_1024_4_1",
+    "freetoken__fast_index_copy_2097152_32_2048_1024_4_1",
+    "freetoken__fast_index_copy_4194304_32_2048_1024_4_1",
+    "freetoken__fast_index_copy_multi_1024_8",
+    "freetoken__fast_index_copy_multi_1024_64",
+    "freetoken__batch_memcpy",
+    "freetoken__radix",
+    "freetoken__fast_index_copy_102400_32_2048_1024_4_1",
+    "freetoken__fast_index_copy_1638400_32_2048_1024_4_1",
+    "freetoken__fast_index_copy_204800_32_2048_1024_4_1",
+    "freetoken__fast_index_copy_2560_32_512_1024_4_1",
+    "freetoken__fast_index_copy_5120_32_1024_1024_4_1",
+    "freetoken__fast_index_copy_819200_32_2048_1024_4_1",
+    "freetoken__index_5120_2_128_1_false",
+    "freetoken__gguf_mmvq_r3"
+  ],
+  "artifacts": [
+    {
+      "path": "freetoken__store_1024_128_1_false/freetoken__store_1024_128_1_false.dll",
+      "size": 319488
+    },
+    {
+      "path": "freetoken__store_2048_128_1_false/freetoken__store_2048_128_1_false.dll",
+      "size": 319488
+    },
+    {
+      "path": "freetoken__index_4096_4_128_1_false/freetoken__index_4096_4_128_1_false.dll",
+      "size": 337408
+    },
+    {
+      "path": "freetoken__index_10240_4_128_1_false/freetoken__index_10240_4_128_1_false.dll",
+      "size": 337408
+    },
+    {
+      "path": "freetoken__fast_index_copy_update_flag/freetoken__fast_index_copy_update_flag.dll",
+      "size": 312832
+    },
+    {
+      "path": "freetoken__fast_index_copy_128_8_128_1024_4_1/freetoken__fast_index_copy_128_8_128_1024_4_1.dll",
+      "size": 340992
+    },
+    {
+      "path": "freetoken__fast_index_copy_256_8_256_1024_4_1/freetoken__fast_index_copy_256_8_256_1024_4_1.dll",
+      "size": 340480
+    },
+    {
+      "path": "freetoken__fast_index_copy_2048_16_2048_1024_4_1/freetoken__fast_index_copy_2048_16_2048_1024_4_1.dll",
+      "size": 340992
+    },
+    {
+      "path": "freetoken__fast_index_copy_4096_32_2048_1024_4_1/freetoken__fast_index_copy_4096_32_2048_1024_4_1.dll",
+      "size": 340992
+    },
+    {
+      "path": "freetoken__fast_index_copy_65536_32_2048_1024_4_1/freetoken__fast_index_copy_65536_32_2048_1024_4_1.dll",
+      "size": 340992
+    },
+    {
+      "path": "freetoken__fast_index_copy_131072_32_2048_1024_4_1/freetoken__fast_index_copy_131072_32_2048_1024_4_1.dll",
+      "size": 340992
+    },
+    {
+      "path": "freetoken__fast_index_copy_524288_32_2048_1024_4_1/freetoken__fast_index_copy_524288_32_2048_1024_4_1.dll",
+      "size": 340992
+    },
+    {
+      "path": "freetoken__fast_index_copy_1048576_32_2048_1024_4_1/freetoken__fast_index_copy_1048576_32_2048_1024_4_1.dll",
+      "size": 340992
+    },
+    {
+      "path": "freetoken__fast_index_copy_2097152_32_2048_1024_4_1/freetoken__fast_index_copy_2097152_32_2048_1024_4_1.dll",
+      "size": 340992
+    },
+    {
+      "path": "freetoken__fast_index_copy_4194304_32_2048_1024_4_1/freetoken__fast_index_copy_4194304_32_2048_1024_4_1.dll",
+      "size": 340992
+    },
+    {
+      "path": "freetoken__fast_index_copy_multi_1024_8/freetoken__fast_index_copy_multi_1024_8.dll",
+      "size": 322560
+    },
+    {
+      "path": "freetoken__fast_index_copy_multi_1024_64/freetoken__fast_index_copy_multi_1024_64.dll",
+      "size": 322560
+    },
+    {
+      "path": "freetoken__batch_memcpy/freetoken__batch_memcpy.dll",
+      "size": 313856
+    },
+    {
+      "path": "freetoken__radix/freetoken__radix.dll",
+      "size": 49664
+    },
+    {
+      "path": "freetoken__fast_index_copy_102400_32_2048_1024_4_1/freetoken__fast_index_copy_102400_32_2048_1024_4_1.dll",
+      "size": 340992
+    },
+    {
+      "path": "freetoken__fast_index_copy_1638400_32_2048_1024_4_1/freetoken__fast_index_copy_1638400_32_2048_1024_4_1.dll",
+      "size": 340992
+    },
+    {
+      "path": "freetoken__fast_index_copy_204800_32_2048_1024_4_1/freetoken__fast_index_copy_204800_32_2048_1024_4_1.dll",
+      "size": 340992
+    },
+    {
+      "path": "freetoken__fast_index_copy_2560_32_512_1024_4_1/freetoken__fast_index_copy_2560_32_512_1024_4_1.dll",
+      "size": 340480
+    },
+    {
+      "path": "freetoken__fast_index_copy_5120_32_1024_1024_4_1/freetoken__fast_index_copy_5120_32_1024_1024_4_1.dll",
+      "size": 340480
+    },
+    {
+      "path": "freetoken__fast_index_copy_819200_32_2048_1024_4_1/freetoken__fast_index_copy_819200_32_2048_1024_4_1.dll",
+      "size": 340992
+    },
+    {
+      "path": "freetoken__index_5120_2_128_1_false/freetoken__index_5120_2_128_1_false.dll",
+      "size": 337408
+    },
+    {
+      "path": "freetoken__gguf_mmvq_r3/freetoken__gguf_mmvq_r3.dll",
+      "size": 2471424
+    }
+  ]
+}

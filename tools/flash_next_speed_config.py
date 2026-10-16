@@ -16,6 +16,7 @@ PRESETS = {
     'sm120-16g-perf3-candidate': 'integration/speed/presets/flash-next-sm120-16g-perf3.json',
     'sm120-16g-perf5-candidate': 'integration/speed/presets/flash-next-sm120-16g-perf5.json',
     'sm120-16g-perf6-candidate': 'integration/speed/presets/flash-next-sm120-16g-perf6.json',
+    'sm120-16g-perf8-candidate': 'integration/speed/presets/flash-next-sm120-16g-perf8.json',
 }
 
 
@@ -31,6 +32,8 @@ def configuration(mode, preset):
     extra.update(preset.get('runtime_extra', {}))
     if mode == 'on' and preset.get('compact_mtp', False):
         extra['mtp_compact_state'] = True
+    if mode == 'on' and 'mtp_draft_policy' in preset:
+        extra['mtp_draft_policy'] = preset['mtp_draft_policy']
     if 'startup_timeout_seconds' in preset:
         extra.update(startup_timeout_seconds=preset['startup_timeout_seconds'], request_deadline_seconds=1800)
     artifacts = dict(weights=dict(path='checkpoints/flash-next-strata-q2', layout='hf_model'))

@@ -1,0 +1,55 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+___ test_prefill_exception_keeps_backing_banks_and_blocks_future_execution ____
+
+    def test_prefill_exception_keeps_backing_banks_and_blocks_future_execution():
+        """An exception traceback can retain tensors, so the engine must require unload."""
+        workspace, batch, _ = _fixture()
+    
+        def fail():
+            batch.attn_metadata.cmp_rows = torch.arange(8192, device='cuda')
+            raise ValueError('deliberate prefill failure')
+    
+        with pytest.raises(ValueError, match='deliberate'):
+            workspace.forward(fail, batch)
+        with pytest.raises(RuntimeError, match='unload'):
+            workspace.check_usable()
+        from freetoken.engine.engine import Engine
+        from freetoken.models.qwen4_exp.mtp_runtime import MtpRuntime
+        engine = Engine.__new__(Engine)
+        engine.stream = torch.cuda.current_stream()
+        engine.prefill_workspace = workspace
+        runtime = MtpRuntime.__new__(MtpRuntime)
+        runtime.engine = engine
+        with pytest.raises(RuntimeError, match='unload'):
+            engine.forward_batch(None, None)
+        with pytest.raises(RuntimeError, match='unload'):
+            engine.rebuild_runtime_cache()
+        with pytest.raises(RuntimeError, match='unload'):
+>           runtime.forward(None, None, None, None, None, None)
+
+C:\workspace\build\freetoken-mats\flash-perf-candidate8\build-source\tests\moe\test_prefill_workspace.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <freetoken.models.qwen4_exp.mtp_runtime.MtpRuntime object at 0x00000207E5F451F0>
+batch = None, manager = None, token_pool = None, eos_ids = None, clip = None
+anchor_id = None
+
+    def forward(self, batch, manager, token_pool, eos_ids, clip, anchor_id):
+>       started = time.perf_counter() if self.draft.draft_policy == 'paired_cjk' else None
+                                         ^^^^^^^^^^
+E       AttributeError: 'MtpRuntime' object has no attribute 'draft'
+
+C:\workspace\envs\siltok-speed\flash-perf-cand7\Lib\site-packages\freetoken\models\qwen4_exp\mtp_runtime.py:198: AttributeError
+============================== warnings summary ===============================
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED ..\..\workspace\build\freetoken-mats\flash-perf-candidate8\build-source\tests\moe\test_prefill_workspace.py::test_prefill_exception_keeps_backing_banks_and_blocks_future_execution
+1 failed, 2 deselected, 2 warnings in 23.75s
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

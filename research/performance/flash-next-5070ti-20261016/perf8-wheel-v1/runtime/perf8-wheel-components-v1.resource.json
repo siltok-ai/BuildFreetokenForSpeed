@@ -1,0 +1,23 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand8\\Scripts\\python.exe",
+    "-B",
+    "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\test-wheel8-components-v1.py"
+  ],
+  "cwd": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016",
+  "started": 1792180823.8329237,
+  "samples": 73,
+  "min_commit_available": 55127429120,
+  "min_ram_available": 55319699456,
+  "min_gpu_free": 15999266816,
+  "max_commit_used": 15191482368,
+  "max_gpu_used": 1095667712,
+  "max_tree_rss": 1545236480,
+  "max_tree_private": 2964017152,
+  "stop_reason": null,
+  "pid": 6000,
+  "returncode": 0,
+  "elapsed_s": 36.844000000011874,
+  "remaining_before_cleanup": [],
+  "remaining_descendants": []
+}

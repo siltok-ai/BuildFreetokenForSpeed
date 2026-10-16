@@ -68,6 +68,18 @@ class PythonMaterials(unittest.TestCase):
                         validate_gguf_rebuild_changes(before, after)
                     path.write_bytes(original)
 
+    def test_r3_rebuild_retains_already_fixed_builder_and_rejects_shared_source_edits(self):
+        """使用真实r2/r3候选，保留既有构建器字节并守住其他26项AOT边界。"""
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            before,_=prepare(ROOT/'build/profiles/strataq2perf6.json',root/'base')
+            after,_=prepare(ROOT/'build/profiles/strataq2perf7.json',root/'candidate')
+            validate_gguf_rebuild_changes(before,after,'freetoken__gguf_mmvq_r2','freetoken__gguf_mmvq_r3')
+            path=after/'python/freetoken/kernel/csrc/include/freetoken/utils.cuh'
+            path.write_bytes(path.read_bytes()+b'\n// unrelated shared native change\n')
+            with self.assertRaisesRegex(ValueError,'source boundary'):
+                validate_gguf_rebuild_changes(before,after,'freetoken__gguf_mmvq_r2','freetoken__gguf_mmvq_r3')
+
     def test_review_revision_reuses_native_bytes_without_inheriting_acceptance(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / 'derived'
