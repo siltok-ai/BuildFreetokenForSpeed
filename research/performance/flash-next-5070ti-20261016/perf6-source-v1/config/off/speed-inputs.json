@@ -1,0 +1,13 @@
+{
+  "format": 1,
+  "mode": "off",
+  "preset": "sm120-16g-perf6-candidate",
+  "scope": "RTX5070Ti/64GB perf6 source acceptance candidate. Reserves additional headroom for cold non-greedy Triton autotuning (256MiB transient); OFF5760/ON4992. Original full GSQ Q2, no expert skipping; scoped prefill workspace and actual NVML/commit floors retained. Final acceptance pending.",
+  "freetoken_version": "0.1.3+speed.strataq2perf6",
+  "materials": "artifacts/strataq2perf6-cp312-cu130-sm120",
+  "weight_root": "C:\\workspace\\models\\siltok-speed\\flash-next",
+  "deployment_root": "C:\\workspace\\cfg\\siltok-speed\\flash-perf\\perf6-off-v2",
+  "preset_file": "integration/speed/presets/flash-next-sm120-16g-perf6.json",
+  "kernel_cache": "artifacts/strataq2perf6-cp312-cu130-sm120/kernel-cache",
+  "note": "Set SILITOK_FREETOKEN_KERNEL_CACHE_DIR explicitly to this release cache. Set SILITOK_CONFIG to the speed-config directory; pass --models-dir to this model root."
+}

@@ -69,3 +69,5 @@ python -B tools/verify_flash_next_5070ti.py
 5070 Ti新Cython整包已真实安装验收并清理，按用户决定带已知长输出风险接受，详见当前消费合同；独立整合分支亦已完整构建、实际安装回归并清理；干净操作系统尚未验收。第三方有版本锁但未提供完整离线wheelhouse。源码/格式/许可与维护规则见 [upstream](upstream/README.md)、[NOTICE](NOTICE)、[维护说明](docs/maintenance.md)。
 
 旧版本保持可回滚：`q2opt2` 为 HF主干+Q2专家混合模型；`strataq2dev7` 为无MTP全GGUF检查点；`strataq2mtp1` 为首次MTP候选。旧入口 `integration/speed/consumer-contract.json` 代表历史win1，不是当前选择。历史README保存在 [历史记录](docs/history/readme-before-current-20261014.txt)。
+
+perf6后续源码检查点已通过真实TCP、冷采样与取消/卸载重载验收。公开preset使用更稳妥的OFF5760/ON4992永久专家；上文普通wheel的较大greedy容量不等于交付容量。精确测试范围、冷JIT协议修复和性能见[第六轮记录](docs/flash-next-5070ti-perf6.txt)，当前默认材料指针在最终编译验收前继续保持历史版本。

@@ -19,3 +19,9 @@ FreeToken 0.1.3+speed.strataq2perf6：在perf5的40组冻结补丁上增加3组�
 材料：artifacts/strataq2perf6-cp312-cu130-sm120；普通wheel及源码运行证据：research/performance/flash-next-5070ti-20261016/perf6-wheel-v1/index.json（85份SHA文件）。完整repository validator和46项工具测试通过。此检查点还未包含Speed perf6源码、编译或安装验收；当前默认current-release指针仍为历史已验收版本，最终交付时另行更新。
 
 补充MTP/紧凑事务与状态池回归22项通过，普通wheel来源检查与进程清场通过；证据为同目录perf6-wheel-mtp-v1/index.json。
+
+2026-10-17 Speed源码验收及交付容量修正
+Speed干净提交fe9938ebb2f90089722d7db6ab176a7a6730131f，普通FreeToken perf6 wheel，真实TCP。backend两模式质量15/20、thinking3/3，无新增失败；每题token IDs均与冻结wheel原生输出一致。HTTP算术/首都/翻译/1975-token约束推理、stop字符串、非greedy采样、断开流后同worker复用、完全卸载与重新加载均通过，所有监督树正常退出且无后代残留。源码消费合同consumer-contract-strataq2perf6.json及perf6-source-v1/index.json封存56项原始文件；不宣称编译包或新安装版已验收。
+上文R5888/5120属于普通wheel greedy容量。第一次HTTP非greedy冷JIT因原生stdout污染IPC失败，Speed修复CRT fd/Win32标准句柄并保留不可继承的私有协议fd；真实子进程回归失败前复现、修复后通过，相关141项测试通过。第二次实际GPU空闲522285056降到253849600B，正好额外256MiB，与Triton冷autotune的缓存清空buffer吻合；该次被实际256MiB底线终止，未算成功。失败原始资源与日志保留在source归档diagnostics目录。
+交付preset6将两种模式各回退128个永久专家：OFF R5760/ON R4992，D1024+P1024，合计7808/7040槽，仍略高于Strata7774/7019。新目录cfg/perf6-{off,on}-v2完整验权重/生成配置，明确workspace=True/reserve=0/C1。第三次使用全新Triton缓存通过完整HTTP：OFF最低空闲430010368B（410.09MiB），ON664891392B；commit余量均超过9GiB。不能放宽资源底线去掩盖冷启动临时开销。
+安全容量下真实HTTP三次512输出中位，短输入/4K：OFF97.6027/93.0535，ON96.7862/115.0875 tps。对照perf5源码OFF95.9206/91.6425、ON94.9781/113.6249，均小幅改善；同配置开MTP在短样本无稳定收益，4K约+23.7%。与Strata三语言原生指标分开解读，安全容量五项原生重测尚待后续记录。现已冻结来源与资源/生命周期证据，编译验收继续进行。

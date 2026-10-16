@@ -1,0 +1,205 @@
+{
+  "scope": "speed_source_with_ordinary_freetoken_wheel_not_installer",
+  "modes": {
+    "off": {
+      "median_tps": {
+        "70-0": 97.60268700422456,
+        "diverse-4096-0": 93.05346759358653
+      },
+      "resource": {
+        "command": [
+          "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand6\\Scripts\\python.exe",
+          "-B",
+          "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\consumer-tools\\run-http-performance.py",
+          "--source",
+          "C:\\workspace\\wt\\siltok-speed\\flash-perf",
+          "--model",
+          "C:\\workspace\\models\\siltok-speed\\flash-next\\checkpoints\\flash-next-strata-q2",
+          "--kernel-cache",
+          "C:\\workspace\\wt\\siltok-speed\\flash-perf\\silitok_speed\\qwen36\\kernel_cache_strataq2perf6",
+          "--protected-experts",
+          "5760",
+          "--vram-estimate-gib",
+          "15",
+          "--host-commit-estimate-gib",
+          "31",
+          "--max-prefill-length",
+          "1024",
+          "--linear-state-cache-slots",
+          "1",
+          "--moe-q2-adapt-every",
+          "32",
+          "--moe-q2-adapt-decay",
+          "0.7",
+          "--gguf-embedding-host",
+          "--ple-row-cache-rows",
+          "1048576",
+          "--moe-q2-prefill-workspace",
+          "--fixed-q2-rebuild-reserve-mib",
+          "0",
+          "--prompts-json",
+          "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\consumer-tools\\frozen-prompts.json",
+          "--output",
+          "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\speed6-source-http-off-performance-v3.json",
+          "--tokens",
+          "512",
+          "--repetitions",
+          "3",
+          "--vram-safety-gib",
+          ".25",
+          "--commit-safety-gib",
+          "4"
+        ],
+        "cwd": "C:\\workspace\\wt\\siltok-speed\\flash-perf",
+        "started": 1792175693.750446,
+        "samples": 216,
+        "min_commit_available": 11631886336,
+        "min_ram_available": 28354994176,
+        "min_gpu_free": 759263232,
+        "max_commit_used": 58687025152,
+        "max_gpu_used": 16335671296,
+        "max_tree_rss": 29361283072,
+        "max_tree_private": 46956449792,
+        "stop_reason": null,
+        "pid": 20396,
+        "returncode": 0,
+        "elapsed_s": 109.09299999999348,
+        "remaining_before_cleanup": [],
+        "remaining_descendants": []
+      },
+      "first_use": {
+        "70-0": {
+          "ttft_ms": 2589.04240000993,
+          "elapsed_seconds": 8.076202900003409,
+          "decode_tps": 93.22816175002315
+        },
+        "diverse-4096-0": {
+          "ttft_ms": 9677.481999999145,
+          "elapsed_seconds": 15.33602059999248,
+          "decode_tps": 90.39303688447265
+        }
+      }
+    },
+    "on": {
+      "median_tps": {
+        "70-0": 96.78622752091351,
+        "diverse-4096-0": 115.08746433286244
+      },
+      "resource": {
+        "command": [
+          "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand6\\Scripts\\python.exe",
+          "-B",
+          "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\consumer-tools\\run-http-performance.py",
+          "--source",
+          "C:\\workspace\\wt\\siltok-speed\\flash-perf",
+          "--model",
+          "C:\\workspace\\models\\siltok-speed\\flash-next\\checkpoints\\flash-next-strata-q2",
+          "--kernel-cache",
+          "C:\\workspace\\wt\\siltok-speed\\flash-perf\\silitok_speed\\qwen36\\kernel_cache_strataq2perf6",
+          "--protected-experts",
+          "4992",
+          "--vram-estimate-gib",
+          "15",
+          "--host-commit-estimate-gib",
+          "31",
+          "--max-prefill-length",
+          "1024",
+          "--linear-state-cache-slots",
+          "1",
+          "--moe-q2-adapt-every",
+          "32",
+          "--moe-q2-adapt-decay",
+          "0.7",
+          "--gguf-embedding-host",
+          "--ple-row-cache-rows",
+          "1048576",
+          "--moe-q2-prefill-workspace",
+          "--fixed-q2-rebuild-reserve-mib",
+          "0",
+          "--mtp-runtime",
+          "C:\\workspace\\models\\siltok-speed\\flash-next\\checkpoints\\flash-next-mtp",
+          "--mtp-compact-state",
+          "--prompts-json",
+          "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\consumer-tools\\frozen-prompts.json",
+          "--output",
+          "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\speed6-source-http-on-performance-v3.json",
+          "--tokens",
+          "512",
+          "--repetitions",
+          "3",
+          "--vram-safety-gib",
+          ".25",
+          "--commit-safety-gib",
+          "4"
+        ],
+        "cwd": "C:\\workspace\\wt\\siltok-speed\\flash-perf",
+        "started": 1792175946.6516833,
+        "samples": 205,
+        "min_commit_available": 10243874816,
+        "min_ram_available": 27119546368,
+        "min_gpu_free": 713125888,
+        "max_commit_used": 60075036672,
+        "max_gpu_used": 16381808640,
+        "max_tree_rss": 30569365504,
+        "max_tree_private": 48293175296,
+        "stop_reason": null,
+        "pid": 14760,
+        "returncode": 0,
+        "elapsed_s": 103.53100000001723,
+        "remaining_before_cleanup": [],
+        "remaining_descendants": []
+      },
+      "first_use": {
+        "70-0": {
+          "ttft_ms": 756.0430000012275,
+          "elapsed_seconds": 6.288739000010537,
+          "decode_tps": 92.45411914568635
+        },
+        "diverse-4096-0": {
+          "ttft_ms": 10069.738899997901,
+          "elapsed_seconds": 14.748962999990908,
+          "decode_tps": 109.3328020318995
+        }
+      }
+    }
+  },
+  "historical": {
+    "http-ft2-off-clean": {
+      "median_tps": {
+        "70-0": 71.6200775492619,
+        "diverse-4096-0": 68.77555025154506
+      },
+      "first_use_4k": {
+        "ttft_ms": 12049.683100005495,
+        "elapsed_seconds": 19.489763499994297,
+        "decode_tps": 68.73297261671595
+      }
+    },
+    "http-perf2-off-clean": {
+      "median_tps": {
+        "70-0": 81.72260635037559,
+        "diverse-4096-0": 79.77535260726617
+      },
+      "first_use_4k": {
+        "ttft_ms": 8369.188999990001,
+        "elapsed_seconds": 14.789470199990319,
+        "decode_tps": 79.6549155764249
+      }
+    },
+    "http-perf2-on-clean": {
+      "median_tps": {
+        "70-0": 75.42076855650046,
+        "diverse-4096-0": 81.90605225131844
+      },
+      "first_use_4k": {
+        "ttft_ms": 8582.43740000762,
+        "elapsed_seconds": 14.796752499998547,
+        "decode_tps": 82.30192061760891
+      }
+    }
+  },
+  "mtp_gain_vs_best_off": {
+    "70-0": -0.0083651332598631,
+    "diverse-4096-0": 0.23678856155592154
+  }
+}

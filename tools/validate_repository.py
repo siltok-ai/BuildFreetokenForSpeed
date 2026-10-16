@@ -279,6 +279,10 @@ def main():
         from validate_pinned_tensor_revision import validate as validate_pinned_tensor
         performance_revision6 = validate_pinned_tensor(ROOT/'build/profiles/strataq2perf6.json',
             ROOT/'artifacts/strataq2perf6-cp312-cu130-sm120')
+    performance_consumer6 = None
+    if (ROOT/'integration/speed/consumer-contract-strataq2perf6.json').exists():
+        from verify_performance6_consumer import verify as verify_performance6
+        performance_consumer6 = verify_performance6()
     print(json.dumps({"official_files": len(original_hashes), "changed_files": len(changed),
                       "patches": len(series["patches"]), "split_equals_historical": True,
                       "wheel_python_matches_prepared_source": True, "aot_count": len(specs),
@@ -290,6 +294,7 @@ def main():
                       "performance_revision5":performance_revision5,
                       "performance_consumer5":performance_consumer5,
                       "performance_revision6":performance_revision6,
+                      "performance_consumer6":performance_consumer6,
                       "strata_research_dev2":research_dev2,
                       "strata_research_dev3":research_dev3, "strata_research_dev4":research_dev4,
                       "strata_research_dev5":research_dev5,

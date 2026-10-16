@@ -15,6 +15,7 @@ PRESETS = {
     'sm120-16g-roomy-measured': 'integration/speed/presets/flash-next-sm120-16g-roomy.json',
     'sm120-16g-perf3-candidate': 'integration/speed/presets/flash-next-sm120-16g-perf3.json',
     'sm120-16g-perf5-candidate': 'integration/speed/presets/flash-next-sm120-16g-perf5.json',
+    'sm120-16g-perf6-candidate': 'integration/speed/presets/flash-next-sm120-16g-perf6.json',
 }
 
 

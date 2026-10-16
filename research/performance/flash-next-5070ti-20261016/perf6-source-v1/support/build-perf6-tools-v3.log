@@ -1,0 +1,76 @@
+test_existing_artifacts_are_preserved (test_derive_python_materials.PythonMaterials.test_existing_artifacts_are_preserved) ... ok
+test_native_input_changes_are_rejected (test_derive_python_materials.PythonMaterials.test_native_input_changes_are_rejected) ... ok
+test_perf3_reuses_all_native_inputs_and_includes_compact_kernels (test_derive_python_materials.PythonMaterials.test_perf3_reuses_all_native_inputs_and_includes_compact_kernels)
+实际重放31补丁、生成新wheel，核对新模块/RECORD及全部原生复用边界。 ... {"custom_version": "0.1.3+speed.strataq2perf2", "aot_count": 27, "wheel_sha256": "9c6ca866b7752f42cf01c7a1e83608ad7ee7437f4d1ac36bbc64fca5e134e330", "status": "partially_rebuilt_requires_runtime_validation", "verified": true}
+{"custom_version": "0.1.3+speed.strataq2perf3", "aot_count": 27, "wheel_sha256": "2a075cace8849611ea170de9cf110355755b6b54c890c0c4eda34da7b5684afd", "status": "derived_requires_runtime_validation", "verified": true}
+ok
+test_protected_revision_includes_ranking_and_preserves_native_identity (test_derive_python_materials.PythonMaterials.test_protected_revision_includes_ranking_and_preserves_native_identity)
+实际封装新 JSON 资源并核对 RECORD，防止可导入却缺少专家排名。 ... {"custom_version": "0.1.3+speed.strataq2dev4", "aot_count": 27, "wheel_sha256": "102615fc21180ed7ae38c69b4260b6b56158ef3253538adf9e6bbeac70556611", "status": "built_requires_runtime_validation", "verified": true}
+{"custom_version": "0.1.3+speed.strataq2dev6", "aot_count": 27, "wheel_sha256": "fa0b57ae017917608af1d2e7f02dcc006de51fbd1864200a4981990dc585c450", "status": "derived_requires_runtime_validation", "verified": true}
+ok
+test_real_profile_replays_and_repackages_without_changing_native_bytes (test_derive_python_materials.PythonMaterials.test_real_profile_replays_and_repackages_without_changing_native_bytes) ... {"custom_version": "0.1.3+speed.q2exp1", "aot_count": 26, "wheel_sha256": "6dc83a35b14a2126669805e652cfb59619f4454826f5c5fc020a670b91fd8a1d", "status": "built_requires_runtime_validation", "verified": true}
+{"custom_version": "0.1.3+speed.q2opt1", "aot_count": 26, "wheel_sha256": "babbc0b8d0316c2b570a9b1d3294ac51e79ae5ef8bd6f6894a537ab327370c31", "status": "derived_requires_runtime_validation", "verified": true}
+ok
+test_review_revision_reuses_native_bytes_without_inheriting_acceptance (test_derive_python_materials.PythonMaterials.test_review_revision_reuses_native_bytes_without_inheriting_acceptance) ... {"custom_version": "0.1.3+speed.q2opt1", "aot_count": 26, "wheel_sha256": "babbc0b8d0316c2b570a9b1d3294ac51e79ae5ef8bd6f6894a537ab327370c31", "status": "validated_speed_source_q2_performance_revision", "verified": true}
+{"custom_version": "0.1.3+speed.q2opt2", "aot_count": 26, "wheel_sha256": "f17519571a760c7fb025b9958885d5edcb931785d63b6f64cd2b345de163c79c", "status": "derived_requires_runtime_validation", "verified": true}
+ok
+test_selective_gguf_rebuild_rejects_shared_native_or_unrelated_spec_changes (test_derive_python_materials.PythonMaterials.test_selective_gguf_rebuild_rejects_shared_native_or_unrelated_spec_changes)
+重放真实候选；禁止把其他CUDA、AOT规格或构建行为混入26项复用边界。 ... ok
+test_unlisted_package_data_cannot_bypass_native_reuse_guard (test_derive_python_materials.PythonMaterials.test_unlisted_package_data_cannot_bypass_native_reuse_guard) ... ok
+test_16g_cli_selects_fitting_pools_and_preserves_dry_run_roots (test_flash_next_delivery.DeliveryBoundaries.test_16g_cli_selects_fitting_pools_and_preserves_dry_run_roots)
+真实CLI选择16GiB方案，不能继续误用24GiB预算或创建空模型目录。 ... ok
+test_complete_checkpoint_records_portable_sources_and_preserves_weights (test_flash_next_delivery.DeliveryBoundaries.test_complete_checkpoint_records_portable_sources_and_preserves_weights) ... ok
+test_default_points_to_current_speed_and_old_profile_is_explicitly_available (test_flash_next_delivery.DeliveryBoundaries.test_default_points_to_current_speed_and_old_profile_is_explicitly_available) ... ok
+test_metadata_only_reuses_verified_files_without_requiring_gguf (test_flash_next_delivery.DeliveryBoundaries.test_metadata_only_reuses_verified_files_without_requiring_gguf) ... ok
+test_mtp_canonical_identity_is_the_existing_speed_release (test_flash_next_delivery.DeliveryBoundaries.test_mtp_canonical_identity_is_the_existing_speed_release) ... ok
+test_mtp_failed_conversion_never_installs_a_runtime_manifest (test_flash_next_delivery.DeliveryBoundaries.test_mtp_failed_conversion_never_installs_a_runtime_manifest) ... ok
+test_perf3_candidate_cli_rejects_wrong_material_and_projects_measured_geometry (test_flash_next_delivery.DeliveryBoundaries.test_perf3_candidate_cli_rejects_wrong_material_and_projects_measured_geometry)
+候选不能误用默认FT2材料；真实CLI明确传递已测配置且不创建模型目录。 ... ok
+test_plan_and_config_dry_run_create_nothing (test_flash_next_delivery.DeliveryBoundaries.test_plan_and_config_dry_run_create_nothing) ... ok
+test_refresh_preserves_receipts_when_original_metadata_is_corrupt (test_flash_next_delivery.DeliveryBoundaries.test_refresh_preserves_receipts_when_original_metadata_is_corrupt) ... ok
+test_relocated_tree_refreshes_only_after_full_hash_verification (test_flash_next_delivery.DeliveryBoundaries.test_relocated_tree_refreshes_only_after_full_hash_verification) ... ok
+test_same_budget_on_off_and_best_off_are_explicit (test_flash_next_delivery.DeliveryBoundaries.test_same_budget_on_off_and_best_off_are_explicit) ... ok
+test_same_length_corruption_cannot_be_accepted_by_refresh (test_flash_next_delivery.DeliveryBoundaries.test_same_length_corruption_cannot_be_accepted_by_refresh) ... ok
+test_shared_checkpoint_entry_reads_original_bytes_and_refuses_replacement (test_flash_next_delivery.DeliveryBoundaries.test_shared_checkpoint_entry_reads_original_bytes_and_refuses_replacement)
+实际目录共享必须读取源文件，并拒绝覆盖已有入口。 ... ok
+test_unowned_and_modified_configuration_is_not_adopted (test_flash_next_delivery.DeliveryBoundaries.test_unowned_and_modified_configuration_is_not_adopted) ... ok
+test_rejects_changed_contract_bindings (test_installed_5070ti_consumer.InstalledConsumerTests.test_rejects_changed_contract_bindings)
+真正执行冻结报告核对，拒绝身份、封存摘要和已知风险被改写。 ... ok
+test_claimed_pass_cannot_hide_output_case_score_or_lifecycle_changes (test_performance3_consumer.SourceQualityTests.test_claimed_pass_cannot_hide_output_case_score_or_lifecycle_changes) ... ok
+test_real_native_cases_can_be_cross_checked (test_performance3_consumer.SourceQualityTests.test_real_native_cases_can_be_cross_checked) ... ok
+test_actual_stream_timing (test_performance_consumer.PerformanceConsumerTests.test_actual_stream_timing) ... ok
+test_installer_ownership_rejects_staging_and_existing_data (test_performance_consumer.PerformanceConsumerTests.test_installer_ownership_rejects_staging_and_existing_data) ... ok
+test_rejects_fabricated_statistics_and_broken_stream (test_performance_consumer.PerformanceConsumerTests.test_rejects_fabricated_statistics_and_broken_stream) ... ok
+test_changed_pinned_tensor_is_not_python_only_and_is_explicitly_allowed (test_pinned_tensor_rebuild_boundary.PinnedTensorRebuildBoundary.test_changed_pinned_tensor_is_not_python_only_and_is_explicitly_allowed)
+同一真实文件差异，默认复用拒绝，指定工作区pinned重编才允许。 ... ok
+test_rebuild_flag_requires_an_actual_pinned_tensor_change (test_pinned_tensor_rebuild_boundary.PinnedTensorRebuildBoundary.test_rebuild_flag_requires_an_actual_pinned_tensor_change)
+不能给纯Python修订贴一个未发生的原生重编标签。 ... ok
+test_two_native_rebuild_modes_are_not_silently_combined (test_pinned_tensor_rebuild_boundary.PinnedTensorRebuildBoundary.test_two_native_rebuild_modes_are_not_silently_combined)
+当前每次只证明一个独立重编边界，不能隐式放宽为任意原生更新。 ... ok
+test_archive_traversal_is_rejected_before_extraction (test_prepare_source.PreparationBoundaries.test_archive_traversal_is_rejected_before_extraction) ... ok
+test_changed_input_is_rejected_before_creating_output (test_prepare_source.PreparationBoundaries.test_changed_input_is_rejected_before_creating_output) ... ok
+test_existing_output_is_preserved (test_prepare_source.PreparationBoundaries.test_existing_output_is_preserved) ... ok
+test_failed_patch_stops_without_modifying_source (test_prepare_source.PreparationBoundaries.test_failed_patch_stops_without_modifying_source) ... ok
+test_patch_replay_does_not_depend_on_callers_git_line_endings (test_prepare_source.PreparationBoundaries.test_patch_replay_does_not_depend_on_callers_git_line_endings) ... ok
+test_unfrozen_declared_input_is_rejected (test_prepare_source.PreparationBoundaries.test_unfrozen_declared_input_is_rejected) ... ok
+test_nested_text_config_uses_the_outer_architecture (test_q2_source_identity.ExpertIdentity.test_nested_text_config_uses_the_outer_architecture) ... ok
+test_same_size_corruption_cannot_refresh_a_download_receipt (test_q2_source_identity.ExpertIdentity.test_same_size_corruption_cannot_refresh_a_download_receipt) ... ok
+test_source_filename_cannot_escape_its_directory (test_q2_source_identity.ExpertIdentity.test_source_filename_cannot_escape_its_directory) ... ok
+test_changed_row_store_is_not_python_only_and_is_explicitly_allowed (test_row_store_rebuild_boundary.RowStoreRebuildBoundary.test_changed_row_store_is_not_python_only_and_is_explicitly_allowed)
+同一真实文件差异，默认复用拒绝，指定行存储重编才允许。 ... ok
+test_rebuild_flag_requires_an_actual_row_store_change (test_row_store_rebuild_boundary.RowStoreRebuildBoundary.test_rebuild_flag_requires_an_actual_row_store_change)
+不能给纯Python修订贴一个未发生的原生重编标签。 ... ok
+test_two_native_rebuild_modes_are_not_silently_combined (test_row_store_rebuild_boundary.RowStoreRebuildBoundary.test_two_native_rebuild_modes_are_not_silently_combined)
+当前每次只证明一个独立重编边界，不能隐式放宽为任意原生更新。 ... ok
+test_dry_run_never_creates_destination (test_weight_source_tools.WeightSourceBoundaries.test_dry_run_never_creates_destination) ... ok
+test_same_size_corruption_is_rejected (test_weight_source_tools.WeightSourceBoundaries.test_same_size_corruption_is_rejected) ... ok
+test_truncation_is_rejected (test_weight_source_tools.WeightSourceBoundaries.test_truncation_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 46 tests in 47.085s
+
+OK
+{"wheel": "C:\\Users\\UserPC\\AppData\\Local\\Temp\\tmpdqhonfzb\\derived\\wheels\\freetoken-0.1.3+speed.strataq2perf3-cp312-cp312-win_amd64.whl", "sha256": "2a075cace8849611ea170de9cf110355755b6b54c890c0c4eda34da7b5684afd", "status": "derived_requires_runtime_validation"}
+{"wheel": "C:\\Users\\UserPC\\AppData\\Local\\Temp\\tmp60z84xcp\\derived\\wheels\\freetoken-0.1.3+speed.strataq2dev6-cp312-cp312-win_amd64.whl", "sha256": "fa0b57ae017917608af1d2e7f02dcc006de51fbd1864200a4981990dc585c450", "status": "derived_requires_runtime_validation"}
+{"wheel": "C:\\Users\\UserPC\\AppData\\Local\\Temp\\tmp8af8dk8o\\derived\\wheels\\freetoken-0.1.3+speed.q2opt1-cp312-cp312-win_amd64.whl", "sha256": "babbc0b8d0316c2b570a9b1d3294ac51e79ae5ef8bd6f6894a537ab327370c31", "status": "derived_requires_runtime_validation"}
+{"wheel": "C:\\Users\\UserPC\\AppData\\Local\\Temp\\tmp_1pbh4j6\\derived\\wheels\\freetoken-0.1.3+speed.q2opt2-cp312-cp312-win_amd64.whl", "sha256": "f17519571a760c7fb025b9958885d5edcb931785d63b6f64cd2b345de163c79c", "status": "derived_requires_runtime_validation"}
