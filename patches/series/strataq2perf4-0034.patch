@@ -1,0 +1,57 @@
+--- a/python/freetoken/engine/config.py
++++ b/python/freetoken/engine/config.py
+@@ -50,6 +50,7 @@
+     moe_q2_decode_overlap: bool = True
+     # Online owner exchange is opt-in; zero retains the frozen initial residency.
+     moe_q2_adapt_every: int = 0
++    moe_q2_adapt_decay: float = 1.0
+     gguf_embedding_host: bool = False
+     moe_cache_rate: float | None = None
+     moe_cache_auto: bool = False
+@@ -115,6 +116,8 @@
+             raise ValueError('Linear snapshot cache slots cannot be negative')
+         if self.moe_q2_adapt_every < 0 or (self.moe_q2_adapt_every and not self.moe_q2_resident_experts):
+             raise ValueError('Online Q2 adaptation requires protected owners and a nonnegative interval')
++        if not 0 < self.moe_q2_adapt_decay <= 1:
++            raise ValueError('Online Q2 heat decay must be in (0, 1]')
+         if self.mtp_compact_state and self.mtp_runtime_path is None:
+             raise ValueError('Compact transaction state requires MTP weights')
+         if self.mtp_runtime_path is not None:
+--- a/python/freetoken/engine/engine.py
++++ b/python/freetoken/engine/engine.py
+@@ -766,7 +766,7 @@
+         cache_type = ProtectedQ2Cache if ownership is not None else OffloadMoeCache
+         cache = cache_type(
+             **({'ownership': ownership, 'decode_overlap': config.moe_q2_decode_overlap,
+-                'adapt_every': config.moe_q2_adapt_every}
++                'adapt_every': config.moe_q2_adapt_every, 'adapt_decay': config.moe_q2_adapt_decay}
+                if ownership is not None else {}),
+             # Models with leading dense layers (GLM-4) only have experts on the MoE
+             # layers; num_moe_layers == num_layers when first_k_dense_replace == 0.
+--- a/python/freetoken/moe/q2_residency.py
++++ b/python/freetoken/moe/q2_residency.py
+@@ -211,10 +211,14 @@
+ 
+ 
+ class ProtectedQ2Cache(OffloadMoeCache):
+-    def __init__(self, *args, ownership: Q2Ownership, decode_overlap=True, adapt_every=0, **kwargs):
++    def __init__(self, *args, ownership: Q2Ownership, decode_overlap=True, adapt_every=0,
++                 adapt_decay=1.0, **kwargs):
+         """单独持有decode copy流；prefill和decode不共享事件或借用缓冲协议。"""
+         self.protected_payload = ownership
++        if not 0 < adapt_decay <= 1:
++            raise ValueError('Online Q2 heat decay must be in (0, 1]')
+         self.adapt_every = adapt_every
++        self.adapt_decay = adapt_decay
+         super().__init__(*args, **kwargs)
+         self.collect_decode_freq = bool(adapt_every)
+         self.decode_copy_stream = torch.cuda.Stream(device=self.device) if decode_overlap else None
+@@ -224,7 +228,7 @@
+         if not self.adapt_every:
+             return None
+         from .q2_adaptive import AdaptiveQ2Owners
+-        return AdaptiveQ2Owners(self, every=self.adapt_every)
++        return AdaptiveQ2Owners(self, every=self.adapt_every, decay=self.adapt_decay)
+ 
+     def set_bank_sources(self, sources, layer_residency=None):
+         from freetoken.kernel.pinned import device_ptr

@@ -17,6 +17,8 @@ from prepare_source import ROOT, prepare, sha256
 
 # 这些改动不影响原生 ABI、AOT 代码或规格，允许按字节复用已验收二进制。
 PYTHON_ONLY_CHANGES = {
+    # A mapped CUDA byte view reuses the existing pinned extension ABI unchanged.
+    'python/freetoken/kernel/pinned.py',
     'python/freetoken/moe/fused_q2_0.py',
     'python/freetoken/layers/moe.py',
     'python/freetoken/layers/quantization/moe/q2_0.py',

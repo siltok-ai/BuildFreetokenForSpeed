@@ -1,0 +1,422 @@
+{
+  "version": "0.1.3+speed.strataq2perf4",
+  "scope": "ordinary_wheel_not_speed_or_installer",
+  "modes": {
+    "on": {
+      "settings": {
+        "output": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\candidate4-wheel-performance-on-v1.json",
+        "resident": 4608,
+        "dynamic": 1024,
+        "prefill": 1024,
+        "state_cache_slots": 1,
+        "mtp": true,
+        "stats": false,
+        "inventory": false,
+        "adaptive_owners": true,
+        "adapt_every": 32,
+        "rebuild": false,
+        "admission_runtime_base": false,
+        "q2_word16": false,
+        "grouped_meta": false,
+        "draft_subset": false,
+        "draft_subset_mapped": false,
+        "bf16_window_simt": false,
+        "host_embedding": false,
+        "mapped_embedding": true,
+        "dxgi": false,
+        "adapt_decay": 0.7,
+        "bf16_mode": "down",
+        "bf16_min_tokens": 4,
+        "bf16_down_bn": 4,
+        "bf16_down_bk": 256,
+        "bf16_down_split": 4,
+        "bf16_up_bn": 8,
+        "bf16_up_bk": 128,
+        "draft_cap": 3,
+        "trace": false,
+        "tokens": 512,
+        "repetitions": 3,
+        "keys": [
+          "english",
+          "chinese",
+          "code",
+          "70-0",
+          "diverse-4096-0"
+        ],
+        "variant": "compact-mtp",
+        "suite": "performance"
+      },
+      "embedding": {
+        "requested": "mapped_host",
+        "actual": "mapped_host",
+        "host_bytes": 273152000,
+        "fallback_reason": null
+      },
+      "quality": {
+        "score": 15,
+        "thinking_score": 3,
+        "regressions": [],
+        "ids_equal": 27,
+        "requests": 27,
+        "min_gpu_free": 589524992
+      },
+      "performance": {
+        "workloads": {
+          "english": {
+            "median_tps": 94.6588985116619,
+            "tps": [
+              89.9669602941098,
+              94.6588985116619,
+              97.04618384195689
+            ],
+            "ttft_ms": [
+              2601.3198000146076,
+              652.1099999954458,
+              684.3490999890491
+            ],
+            "elapsed_seconds": [
+              8.281471399997827,
+              6.0506951000133995,
+              5.950179499981459
+            ]
+          },
+          "chinese": {
+            "median_tps": 97.5614207848433,
+            "tps": [
+              94.3599837441822,
+              97.5614207848433,
+              98.5457444428315
+            ],
+            "ttft_ms": [
+              2569.780699996045,
+              381.32849999237806,
+              65.15430001309142
+            ],
+            "elapsed_seconds": [
+              7.985469799983548,
+              5.619308599998476,
+              5.250817499996629
+            ]
+          },
+          "code": {
+            "median_tps": 106.11541473845386,
+            "tps": [
+              99.60019002379887,
+              106.11541473845386,
+              110.37716416969019
+            ],
+            "ttft_ms": [
+              2561.7762000183575,
+              1179.321000003256,
+              74.4974999979604
+            ],
+            "elapsed_seconds": [
+              7.692538700008299,
+              5.995097400009399,
+              4.7043436000240035
+            ]
+          },
+          "70-0": {
+            "median_tps": 96.23647580881158,
+            "tps": [
+              91.84324999277099,
+              96.23647580881158,
+              97.4703153292923
+            ],
+            "ttft_ms": [
+              675.5922999873292,
+              76.07310000457801,
+              88.05130000109784
+            ],
+            "elapsed_seconds": [
+              6.239685200009262,
+              5.3861946999968495,
+              5.330937100021401
+            ]
+          },
+          "diverse-4096-0": {
+            "median_tps": 101.35404642468113,
+            "tps": [
+              99.10358960799556,
+              101.35404642468113,
+              103.23134097064099
+            ],
+            "ttft_ms": [
+              9984.172099997522,
+              2560.5945000133943,
+              684.0330999984872
+            ],
+            "elapsed_seconds": [
+              15.140626899985364,
+              7.602599500009092,
+              5.634312100009993
+            ]
+          }
+        },
+        "ids_equal": 17,
+        "requests": 17,
+        "resource": {
+          "command": [
+            "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand4\\Scripts\\python.exe",
+            "-B",
+            "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\probe27-wheel4.py",
+            "--output",
+            "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\candidate4-wheel-performance-on-v1.json",
+            "--mapped-embedding",
+            "--adapt-decay",
+            "0.7",
+            "--variant",
+            "compact-mtp",
+            "--adaptive-owners",
+            "--adapt-every",
+            "32",
+            "--resident",
+            "4608",
+            "--prefill",
+            "1024",
+            "--state-cache-slots",
+            "1",
+            "--suite",
+            "performance",
+            "--keys",
+            "english",
+            "chinese",
+            "code",
+            "70-0",
+            "diverse-4096-0",
+            "--repetitions",
+            "3",
+            "--mtp"
+          ],
+          "cwd": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016",
+          "started": 1792151968.3632503,
+          "samples": 303,
+          "min_commit_available": 11936243712,
+          "min_ram_available": 28055126016,
+          "min_gpu_free": 595816448,
+          "max_commit_used": 58382667776,
+          "max_gpu_used": 16499118080,
+          "max_tree_rss": 30131220480,
+          "max_tree_private": 47085346816,
+          "stop_reason": null,
+          "pid": 10476,
+          "returncode": 0,
+          "elapsed_s": 152.93799999999464,
+          "remaining_before_cleanup": [],
+          "remaining_descendants": []
+        }
+      }
+    },
+    "off": {
+      "settings": {
+        "output": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\candidate4-wheel-performance-off-v1.json",
+        "resident": 5376,
+        "dynamic": 1024,
+        "prefill": 1024,
+        "state_cache_slots": 1,
+        "mtp": false,
+        "stats": false,
+        "inventory": false,
+        "adaptive_owners": true,
+        "adapt_every": 32,
+        "rebuild": false,
+        "admission_runtime_base": false,
+        "q2_word16": false,
+        "grouped_meta": false,
+        "draft_subset": false,
+        "draft_subset_mapped": false,
+        "bf16_window_simt": false,
+        "host_embedding": false,
+        "mapped_embedding": true,
+        "dxgi": false,
+        "adapt_decay": 0.7,
+        "bf16_mode": "down",
+        "bf16_min_tokens": 4,
+        "bf16_down_bn": 4,
+        "bf16_down_bk": 256,
+        "bf16_down_split": 4,
+        "bf16_up_bn": 8,
+        "bf16_up_bk": 128,
+        "draft_cap": 3,
+        "trace": false,
+        "tokens": 512,
+        "repetitions": 3,
+        "keys": [
+          "english",
+          "chinese",
+          "code",
+          "70-0",
+          "diverse-4096-0"
+        ],
+        "variant": "base",
+        "suite": "performance"
+      },
+      "embedding": {
+        "requested": "mapped_host",
+        "actual": "mapped_host",
+        "host_bytes": 273152000,
+        "fallback_reason": null
+      },
+      "quality": {
+        "score": 15,
+        "thinking_score": 3,
+        "regressions": [],
+        "ids_equal": 27,
+        "requests": 27,
+        "min_gpu_free": 629370880
+      },
+      "performance": {
+        "workloads": {
+          "english": {
+            "median_tps": 91.72288387968113,
+            "tps": [
+              88.99809549283363,
+              91.72288387968113,
+              92.18241026501481
+            ],
+            "ttft_ms": [
+              715.76369999093,
+              635.9706000075676,
+              660.4808000265621
+            ],
+            "elapsed_seconds": [
+              6.457730800000718,
+              6.207351599994581,
+              6.2041058000177145
+            ]
+          },
+          "chinese": {
+            "median_tps": 93.31067971591358,
+            "tps": [
+              93.58221244994836,
+              93.12048456747631,
+              93.31067971591358
+            ],
+            "ttft_ms": [
+              712.7244000148494,
+              87.4877999885939,
+              92.05279999878258
+            ],
+            "elapsed_seconds": [
+              6.173416700010421,
+              5.575263399980031,
+              5.5686316000064835
+            ]
+          },
+          "code": {
+            "median_tps": 90.85936637946682,
+            "tps": [
+              85.30915285737393,
+              90.85936637946682,
+              91.56813714112207
+            ],
+            "ttft_ms": [
+              741.2439000036102,
+              114.09940000157803,
+              84.10730000468902
+            ],
+            "elapsed_seconds": [
+              6.731475800013868,
+              5.738424099981785,
+              5.664901799988002
+            ]
+          },
+          "70-0": {
+            "median_tps": 92.28284109326475,
+            "tps": [
+              85.40320935896492,
+              92.28284109326475,
+              93.5933947606419
+            ],
+            "ttft_ms": [
+              683.5292000032496,
+              73.7414000032004,
+              85.70419999887235
+            ],
+            "elapsed_seconds": [
+              6.667170600005193,
+              5.611327599996002,
+              5.545746299991151
+            ]
+          },
+          "diverse-4096-0": {
+            "median_tps": 87.85252329304306,
+            "tps": [
+              87.25330770723583,
+              87.85252329304306,
+              88.8994184152169
+            ],
+            "ttft_ms": [
+              9577.503800013801,
+              689.204599999357,
+              633.1773000129033
+            ],
+            "elapsed_seconds": [
+              15.434256900014589,
+              6.506026099988958,
+              6.381483600009233
+            ]
+          }
+        },
+        "ids_equal": 17,
+        "requests": 17,
+        "resource": {
+          "command": [
+            "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand4\\Scripts\\python.exe",
+            "-B",
+            "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\probe27-wheel4.py",
+            "--output",
+            "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\candidate4-wheel-performance-off-v1.json",
+            "--mapped-embedding",
+            "--adapt-decay",
+            "0.7",
+            "--variant",
+            "base",
+            "--adaptive-owners",
+            "--adapt-every",
+            "32",
+            "--resident",
+            "5376",
+            "--prefill",
+            "1024",
+            "--state-cache-slots",
+            "1",
+            "--suite",
+            "performance",
+            "--keys",
+            "english",
+            "chinese",
+            "code",
+            "70-0",
+            "diverse-4096-0",
+            "--repetitions",
+            "3"
+          ],
+          "cwd": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016",
+          "started": 1792152121.4574215,
+          "samples": 294,
+          "min_commit_available": 13468688384,
+          "min_ram_available": 29446631424,
+          "min_gpu_free": 631468032,
+          "max_commit_used": 56850223104,
+          "max_gpu_used": 16463466496,
+          "max_tree_rss": 28743909376,
+          "max_tree_private": 45670596608,
+          "stop_reason": null,
+          "pid": 14588,
+          "returncode": 0,
+          "elapsed_s": 148.375,
+          "remaining_before_cleanup": [],
+          "remaining_descendants": []
+        }
+      }
+    }
+  },
+  "mtp_gain": {
+    "english": 0.03200961971313654,
+    "chinese": 0.04555471122781651,
+    "code": 0.16790837276226855,
+    "70-0": 0.04284257689412829,
+    "diverse-4096-0": 0.15368395380747413
+  }
+}

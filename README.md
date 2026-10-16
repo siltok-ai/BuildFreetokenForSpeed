@@ -17,6 +17,7 @@
 
 5070 Ti 性能分支另有显式候选 `strataq2perf2`，包含缓存借用、搬运重叠与交错投影；默认当前指针保持上述已验收版本。实测范围、原生重建边界和待完成验收见 [性能候选记录](docs/flash-next-5070ti-performance.txt)。
 后续独立候选 `strataq2perf3` 增加紧凑MTP事务、快照容量配置、在线热点所有者交换和宽tile，原生材料字节沿用perf2；已测范围与尚未完成的Speed验收见 [第三轮记录](docs/flash-next-5070ti-perf3.txt)。
+独立候选 `strataq2perf4` 提前将原始压缩embedding放映射主存、支持专家旧热度衰减并复用跨层准入JIT；源码开关MTP质量与状态扩缩容通过，普通wheel/Speed验收边界见 [第四轮记录](docs/flash-next-5070ti-perf4.txt)。
 
 后续研究检查点保存了 [MTP词表原型与Strata反向消融](docs/flash-next-5070ti-mtp-review.txt)：对照CJK/英文/完整词表、同步提交，以及草稿KV ring、窗口流水和长度策略的实际接线。该检查点尚未形成新的正式profile或Speed交付版本。
 
