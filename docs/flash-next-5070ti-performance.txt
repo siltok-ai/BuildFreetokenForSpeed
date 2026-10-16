@@ -1,0 +1,43 @@
+Flash Next Q2 / RTX 5070 Ti 性能候选（2026-10-16）
+
+范围与身份
+Speed从f13ffb99（dev fc7dd6a7）追加，Build从9dc4cf3追加。
+保留完整GSQ Q2 GGUF、原始MTP来源和既有数值语义；未跳过专家或复用其他专家权重。
+默认当前指针仍为已验收strataq2mtp2，性能候选通过独立profile显式选择；旧profile/制品/合同不可覆盖。
+perf1材料提交3d032431，FreeToken 0.1.3+speed.strataq2perf1。
+perf2为27组补丁：build/profiles/strataq2perf2.json、patches/strataq2perf2-series.json。
+wheel SHA256：9c6ca866b7752f42cf01c7a1e83608ad7ee7437f4d1ac36bbc64fca5e134e330。
+制品：artifacts/strataq2perf2-cp312-cu130-sm120。
+
+实现
+perf1：Q2 decode把专家搬运与独立shared专家计算放入两条有依赖的流；BF16小K宽输出分组GEMV和大批tf32x3投影，激活/累加/输出保留FP32。
+perf2：空闲prefill双缓冲参与动态LRU，GPU bank总字节和永久所有者不变；覆盖prefill前撤销借用映射，begin/release/ready事件保护跨流阶段转换。
+perf2：MTP verify小窗口采用同样的搬运/shared重叠。
+perf2：接通此前已移植的Strata交错Q8 MMVQ；Q5_K在2..4列且输出>=8192，Q4_K/IQ4_XS在3..4列且输出>=1024时启用，其他几何保留旧路径。每次调用重新生成交错输入，不缓存可能已改写的Q8内容。
+GGUF AOT改名r2，新增接口实际重新编译；26个独立AOT和3个native模块输入/字节保持原样。不能把本次原生变化描述为全部复用。
+
+已测事实（候选原型和实际安装wheel分开）
+硬件RTX5070Ti 16GB、Ryzen9700X；Torch2.11.0+cu130、Triton3.6.0.post26、TVM FFI0.1.13.post3。
+原FT2与perf1空闲机器Speed HTTP，短/4K各3次、实际512输出：71.6201/68.7756 → 75.5346/72.1972 token/s，+5.47%/+4.97%。
+perf2原型无MTP、不收集统计：短/4K各3次中位82.9937/81.0291；完整IDs与perf1相同。
+perf1 MTP英/中/代码各2次：65.7424/59.2034/67.5630；perf2原型75.9431/72.5013/83.7818，六次各512输出IDs相同。仍须实际冻结wheel和HTTP/编译安装验证。
+实际安装perf2 wheel + matching r2 AOT：20项GPU组件、24个子测试通过。包括真实Q2跨流图、decode/prefill交替、换路由、永久字节不变，以及多列MMVQ逐位旧路径参考、stride、改变输入后的图重放。
+质量基线15/20、thinking3/3；实际安装perf2 wheel的MTP开/关均为15/20、thinking3/3，无新增逐题失败。HTTP/编译安装版验收正在进行，尚不能视作最终交付。
+此前偶发长输出重复风险仍未定位，不宣称本轮修复；认证仅在外部测试进程按用户授权绕过，产品认证不变。
+
+Strata参考及排除项
+固定Strata6674a006、其固定llama.cpp 3cf03257，在本机用同一份Q2 GGUF构建原生pack；英/中/代码各一次512实际输出：无MTP87.16/90.64/70.49，MTP4+lookup112.75/113.28/117.38。框架算术、缓存容量、文本不同，仅为方向性参考。
+两边64个完整MTP窗口trace中，专家搬运工作perf1约16.26ms/窗口、Strata3.24ms；这是最大差距。Strata自动MTP缓存7016槽，Speed为2304永久+1024动态+1024prefill；容量和实际miss数不同。
+gather严格微测的大批量传输约50GB/s，优化重点为减少miss。
+小词表在代码场景降低草稿接受率；最小lookup在这些输入未见稳定收益；衰减LFU比借用LRU慢且4K miss率更高。本候选均不纳入，不推断其他输入或Strata实现无效。
+
+重建与复核
+在Windows x64 / CPython3.12 / Torch cu130 / TVM FFI固定环境中初始化MSVC/CUDA，再运行：
+python -B build/derive_python_materials.py --profile build/profiles/strataq2perf2.json --base-profile build/profiles/strataq2perf1.json --base-materials artifacts/strataq2perf1-cp312-cu130-sm120 --output <全新目录> --rebuild-gguf
+本机r2使用CUDA Toolkit13.2.78、MSVC19.50.35739，旧26项AOT沿用原始工具链身份；build-record.json分别记录，不将Toolkit版本与Torch cu130混同。
+选择性生成器拒绝其他原生源码变化、其他AOT规格改变和超出CUDA库路径引号的builder变化；默认纯Python模式仍拒绝本轮原生变化。
+python -B tools/verify_materials.py artifacts/strataq2perf2-cp312-cu130-sm120
+python -B tools/validate_performance_revision.py
+python -B tools/validate_repository.py
+python -B -m unittest discover -s tests -v
+这些离线检查不替代真实GPU和Speed安装版验收。完整原始日志在本机runs/siltok-speed/flash-perf-20261016，待最终验收后封存消费合同和关键证据。

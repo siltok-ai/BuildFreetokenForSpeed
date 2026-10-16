@@ -12,10 +12,33 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'build'))
-from derive_python_materials import derive, validate_python_only_changes
+from derive_python_materials import derive, validate_python_only_changes, validate_gguf_rebuild_changes
+from prepare_source import prepare
 
 
 class PythonMaterials(unittest.TestCase):
+    def test_selective_gguf_rebuild_rejects_shared_native_or_unrelated_spec_changes(self):
+        """重放真实候选；禁止把其他CUDA、AOT规格或构建行为混入26项复用边界。"""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            before, _ = prepare(ROOT / 'build/profiles/strataq2perf1.json', root / 'base')
+            after, _ = prepare(ROOT / 'build/profiles/strataq2perf2.json', root / 'candidate')
+            validate_gguf_rebuild_changes(before, after)
+            with self.assertRaisesRegex(ValueError, 'binary reuse forbidden'):
+                validate_python_only_changes(before, after)
+            for name, suffix, error in [
+                ('python/freetoken/kernel/csrc/include/freetoken/utils.cuh', b'\n// changed shared header\n', 'source boundary'),
+                ('python/freetoken/kernel/aot.py', b'\n# unrelated spec edit\n', 'unrelated AOT'),
+                ('tools/build_windows_kernel_cache.py', b'\n# unrelated build edit\n', 'builder change'),
+            ]:
+                with self.subTest(name=name):
+                    path = after / name
+                    original = path.read_bytes()
+                    path.write_bytes(original + suffix)
+                    with self.assertRaisesRegex(ValueError, error):
+                        validate_gguf_rebuild_changes(before, after)
+                    path.write_bytes(original)
+
     def test_review_revision_reuses_native_bytes_without_inheriting_acceptance(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / 'derived'

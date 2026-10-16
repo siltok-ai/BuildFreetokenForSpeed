@@ -94,8 +94,70 @@ def validate_python_only_changes(base_source, source):
     return changed
 
 
-def derive(profile_path, base_profile_path, base_materials, output):
-    """重放新旧冻结源码并核对差异，重新封装 Python，复用且追溯原生字节。"""
+GGUF_HEADER = 'python/freetoken/kernel/csrc/jit/gguf_mmvq.cuh'
+GGUF_AOT = 'python/freetoken/kernel/aot.py'
+WINDOWS_BUILDER = 'tools/build_windows_kernel_cache.py'
+GGUF_OLD = 'freetoken__gguf_mmvq_r1'
+GGUF_NEW = 'freetoken__gguf_mmvq_r2'
+
+
+def validate_gguf_rebuild_changes(base_source, source):
+    """只允许GGUF独立头文件及其命名/路径引号改变，其他原生输入仍须相同。"""
+    old, new = tree_hashes(base_source), tree_hashes(source)
+    changed = {name for name in old.keys() | new.keys() if old.get(name) != new.get(name)}
+    native = {GGUF_HEADER, GGUF_AOT, WINDOWS_BUILDER}
+    if not changed <= PYTHON_ONLY_CHANGES | native or not native <= changed:
+        raise ValueError(f'GGUF selective rebuild source boundary differs: {sorted(changed - PYTHON_ONLY_CHANGES)}')
+    expected = (base_source / GGUF_AOT).read_text().replace('gguf_mmvq_r1', 'gguf_mmvq_r2')
+    if (source / GGUF_AOT).read_text() != expected:
+        raise ValueError('unrelated AOT spec changed during GGUF-only rebuild')
+    before = (base_source / WINDOWS_BUILDER).read_text()
+    expected = before.replace('f"ldflags = /LIBPATH:{cuda_lib} cudart.lib ",',
+                              'f\'ldflags = /LIBPATH:"{cuda_lib}" cudart.lib \',')
+    if expected == before or (source / WINDOWS_BUILDER).read_text() != expected:
+        raise ValueError('builder change exceeds quoting the CUDA library path')
+    # gguf_mmvq.cuh是单独编译入口，任何其他CUDA源引用它都会使选择性重建失效。
+    for path in (source / 'python/freetoken/kernel/csrc').rglob('*'):
+        if path.is_file() and path.suffix in ('.cuh', '.cu', '.h', '.cpp') and path != source / GGUF_HEADER:
+            if 'gguf_mmvq.cuh' in path.read_text(encoding='utf-8'):
+                raise ValueError(f'GGUF header is shared by another native input: {path}')
+    return changed
+
+
+def rebuild_gguf_cache(source, output, base_wheel, native_modules, cache):
+    """用冻结r2源码实际编译一个AOT，保留编译日志、输入哈希和实际工具链身份。"""
+    with zipfile.ZipFile(base_wheel) as wheel:
+        for name in native_modules:
+            target = source / 'python' / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(wheel.read(name))
+    rebuilt = output / 'rebuilt-cache'
+    command = [sys.executable, '-B', str(source / WINDOWS_BUILDER), '--output', str(rebuilt),
+               '--build-dir', str(output / 'gguf-aot-build'), '--spec', GGUF_NEW,
+               '--arch', '12.0', '--jobs', '1', '--keep-build']
+    log = output / 'gguf-aot-build.log'
+    with log.open('wb') as stream:
+        subprocess.run(command, cwd=source, stdout=stream, stderr=subprocess.STDOUT, check=True)
+    old_dir = (cache / GGUF_OLD).resolve(strict=True)
+    if old_dir.parent != cache.resolve():
+        raise ValueError('old GGUF cache path escapes the new private output')
+    shutil.rmtree(old_dir)
+    shutil.copytree(rebuilt / GGUF_NEW, cache / GGUF_NEW)
+    dll = cache / GGUF_NEW / (GGUF_NEW + '.dll')
+    compiler = subprocess.run(['nvcc', '--version'], capture_output=True, check=True).stdout.decode('utf-8', errors='replace')
+    msvc = subprocess.run(['cl'], capture_output=True)
+    inputs = {p.relative_to(source).as_posix(): sha256(p) for p in source.rglob('*')
+              if p.is_file() and (p.is_relative_to(source / 'python/freetoken/kernel/csrc')
+                                  or p.relative_to(source).as_posix() in (WINDOWS_BUILDER, 'python/freetoken/kernel/gguf_native.py', GGUF_AOT))}
+    return {'spec': GGUF_NEW, 'replaces': GGUF_OLD, 'command': command,
+            'cuda_compiler': compiler, 'msvc_compiler': (msvc.stdout + msvc.stderr).decode('utf-8', errors='replace'),
+            'build_python': sys.executable, 'source_sha256': inputs, 'log_sha256': sha256(log),
+            'metadata': json.loads((rebuilt / 'build-metadata.json').read_text()),
+            'artifact': {'path': dll.relative_to(cache).as_posix(), 'size': dll.stat().st_size, 'sha256': sha256(dll)}}
+
+
+def derive(profile_path, base_profile_path, base_materials, output, *, rebuild_gguf=False):
+    """重放新旧源码，默认仅复用原生字节；显式r2模式实际重建独立GGUF AOT。"""
     output = Path(output).resolve()
     if output.exists():
         raise FileExistsError('use a new output directory; accepted artifacts are never replaced')
@@ -103,15 +165,22 @@ def derive(profile_path, base_profile_path, base_materials, output):
     subprocess.run([sys.executable, '-B', str(ROOT / 'tools/verify_materials.py'), str(base_materials)], check=True)
     source, profile = prepare(profile_path, output / 'candidate-source')
     base_source, base_profile = prepare(base_profile_path, output / 'base-source')
-    changed = validate_python_only_changes(base_source, source)
+    changed = (validate_gguf_rebuild_changes if rebuild_gguf else validate_python_only_changes)(base_source, source)
     if profile['custom_version'] == base_profile['custom_version']:
         raise ValueError('changed Python source requires a new custom version')
-    for key in ('source_commit', 'torch', 'cuda', 'apache_tvm_ffi', 'sm', 'spec_file', 'requirements_lock'):
+    for key in ('source_commit', 'torch', 'cuda', 'apache_tvm_ffi', 'sm', 'requirements_lock'):
         if profile[key] != base_profile[key]:
             raise ValueError(f'binary reuse contract changed: {key}')
-    for key in (profile['spec_file'], profile['requirements_lock']):
+    for key in (profile['requirements_lock'],):
         if profile['input_sha256'][key] != base_profile['input_sha256'][key]:
             raise ValueError(f'binary reuse input changed: {key}')
+    old_specs = (ROOT / base_profile['spec_file']).read_text().splitlines()
+    new_specs = (ROOT / profile['spec_file']).read_text().splitlines()
+    expected_specs = [s.replace(GGUF_OLD, GGUF_NEW) for s in old_specs] if rebuild_gguf else old_specs
+    if new_specs != expected_specs or (not rebuild_gguf and profile['spec_file'] != base_profile['spec_file']):
+        raise ValueError('AOT inventory changed beyond the selected GGUF rebuild')
+    if not rebuild_gguf and profile['input_sha256'][profile['spec_file']] != base_profile['input_sha256'][base_profile['spec_file']]:
+        raise ValueError('binary reuse AOT specification input changed')
     base_record = json.loads((base_materials / 'build-record.json').read_text(encoding='utf-8'))
     for key in ('source_commit', 'custom_version', 'wheel_filename', 'torch', 'cuda', 'apache_tvm_ffi', 'sm', 'input_sha256'):
         if base_record[key] != base_profile[key]:
@@ -139,6 +208,8 @@ def derive(profile_path, base_profile_path, base_materials, output):
     # 与 setuptools 的 package-data 规则一致；新排名必须进入 wheel 和 RECORD。
     for path in (source / 'python/freetoken/moe/configs').rglob('*.json'):
         members[path.relative_to(source / 'python').as_posix()] = path.read_bytes()
+    if rebuild_gguf:
+        members[GGUF_HEADER.removeprefix('python/')] = (source / GGUF_HEADER).read_bytes()
     records = io.StringIO(newline='')
     writer = csv.writer(records, lineterminator='\n')
     for name, data in sorted(members.items()):
@@ -156,9 +227,14 @@ def derive(profile_path, base_profile_path, base_materials, output):
             archive.writestr(info, data)
     cache = output / 'kernel-cache'
     shutil.copytree(base_materials / 'kernel-cache', cache)
+    rebuild = rebuild_gguf_cache(source, output, base_wheel, base_record['native_modules'], cache) if rebuild_gguf else None
     manifest_path = cache / 'speed-kernel-manifest.json'
     manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
     manifest['freetoken_version'] = profile['custom_version']
+    if rebuild:
+        manifest['spec_names'] = new_specs
+        manifest['artifacts'] = [({'path': rebuild['artifact']['path'], 'size': rebuild['artifact']['size']}
+                                  if Path(a['path']).stem == GGUF_OLD else a) for a in manifest['artifacts']]
     manifest_path.write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
     metadata_path = cache / 'build-metadata.json'
     metadata = json.loads(metadata_path.read_text(encoding='utf-8'))
@@ -166,13 +242,20 @@ def derive(profile_path, base_profile_path, base_materials, output):
     metadata['binary_reuse'] = {'base_materials': base_materials.name,
                               'base_build_record_sha256': sha256(base_materials / 'build-record.json'),
                               'reason': 'Allowlisted Python-only revision; native/AOT source and inputs identical'}
+    if rebuild:
+        metadata['binary_reuse']['reason'] = 'Three native modules and 26 independent AOT inputs unchanged; GGUF r2 actually rebuilt'
+        metadata['selective_rebuild'] = rebuild
+        metadata['artifacts'] = [({'name': GGUF_NEW, **rebuild['artifact']}
+                                  if a['name'] == GGUF_OLD else a) for a in metadata['artifacts']]
     metadata_path.write_text(json.dumps(metadata, indent=2) + '\n', encoding='utf-8')
     native_hashes = {name: hashlib.sha256(members[name]).hexdigest() for name in base_record['native_modules']}
     with zipfile.ZipFile(base_wheel) as archive:
         if native_hashes != {name: hashlib.sha256(archive.read(name)).hexdigest() for name in native_hashes}:
             raise ValueError('native module bytes changed during repack')
-    files = [wheel, *(cache / name.removeprefix('kernel-cache/') for name in base_record['artifacts'] if name.endswith('.dll')),
+    files = [wheel, *(cache / a['path'] for a in manifest['artifacts']),
              manifest_path, metadata_path]
+    if rebuild:
+        files.append(output / 'gguf-aot-build.log')
     # 复用构建环境身份，不能继承旧 wheel 的运行验收或证据路径。
     inherited = {key: base_record[key] for key in ('format', 'python', 'build_python', 'native_modules',
                                                   'dependencies', 'cuda_compiler', 'msvc_compiler', 'aot_count')}
@@ -184,6 +267,11 @@ def derive(profile_path, base_profile_path, base_materials, output):
                                'native_sha256': native_hashes, 'changed_source_files': sorted(changed)},
               'wheel_sha256': sha256(wheel),
               'artifacts': {p.relative_to(output).as_posix(): {'bytes': p.stat().st_size, 'sha256': sha256(p)} for p in files}}
+    if rebuild:
+        record['selective_rebuild'] = rebuild
+        record['status'] = 'partially_rebuilt_requires_runtime_validation'
+        record['binary_reuse']['aot_sha256'] = {name: data['sha256'] for name, data in record['artifacts'].items()
+                                               if name.endswith('.dll') and Path(name).stem != GGUF_NEW}
     (output / 'build-record.json').write_text(json.dumps(record, indent=2) + '\n', encoding='utf-8')
     subprocess.run([sys.executable, '-B', str(ROOT / 'tools/verify_materials.py'), str(output)], check=True)
     print(json.dumps({'wheel': str(wheel), 'sha256': record['wheel_sha256'], 'status': record['status']}))
@@ -196,8 +284,9 @@ def main():
     parser.add_argument('--base-profile', type=Path, default=ROOT / 'build/profiles/q2exp1.json')
     parser.add_argument('--base-materials', type=Path, default=ROOT / 'artifacts/q2exp1-cp312-cu130-sm120')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--rebuild-gguf', action='store_true', help='rebuild isolated GGUF r2 AOT; reject other native changes')
     args = parser.parse_args()
-    derive(args.profile, args.base_profile, args.base_materials, args.output)
+    derive(args.profile, args.base_profile, args.base_materials, args.output, rebuild_gguf=args.rebuild_gguf)
 
 
 if __name__ == '__main__':

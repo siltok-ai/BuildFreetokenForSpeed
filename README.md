@@ -15,6 +15,8 @@
 
 本次供应层完善保留 FT2、wheel/AOT 和 Speed 既有 SHA 合同，不更改推理计算。历史版本、补丁和验收资料保持不可变。
 
+5070 Ti 性能分支另有显式候选 `strataq2perf2`，包含缓存借用、搬运重叠与交错投影；默认当前指针保持上述已验收版本。实测范围、原生重建边界和待完成验收见 [性能候选记录](docs/flash-next-5070ti-performance.txt)。
+
 ## 使用当前版本
 
 ```powershell
