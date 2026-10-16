@@ -79,6 +79,26 @@ Speed parsing/IPC/native-config checks pass133 tests, but this does not constitu
 HTTP, compiled-package or installed application acceptance. Speed release binding
 and the current-release pointer remain separate, pending consumer acceptance.
 
-The current-release pointer remains unchanged until complete consumer acceptance.
+Speed source acceptance checkpoint
+Speed da8e95d2 binds producer10954aa0 and this ordinary wheel. The application
+backend quality retains15/20 and thinking3/3, no added failures; all23 scored
+outputs per mode match the corresponding native wheel. Cancellation reuses the
+worker. Both real TCP HTTP functional runs cover four quality probes, SSE,
+stop strings, non-greedy fallback, disconnect/cancel and unload/reload; worker
+trees exit cleanly. Short/4K HTTP three-run medians:
+OFF95.921/91.643, ON94.978/113.625 token/s. MTP is near flat on short input and
++23.99% on4K. Native improvement must not be presented as universal HTTP gain.
+The frozen46-file source evidence index is perf5-source-v1/index.json under
+research/performance/flash-next-5070ti-20261016; the separately verified consumer
+contract is integration/speed/consumer-contract-strataq2perf5.json.
+Public config generation verifies the full original checkpoint pair and MTP
+runtime, with preset sm120-16g-perf5-candidate. Its host estimate31GiB is CPU
+heap; Speed separately adds15GiB GPU commit for46GiB effective peak. Supplying
+the combined46GiB again as host heap double counts it. Functional HTTP must
+explicitly use NVML/.25GiB VRAM/4GiB commit margins on this machine.
+Full repository validation and43 tools tests pass again after config/evidence
+creation. This checkpoint still has no perf5 compiled/installer acceptance.
+
+The current-release pointer remains unchanged until final consumer delivery.
 After the explicit21:16:01UTC exploration deadline, stop new experiments and
 consolidate, review, accept, and push Build main plus Speed's integration branch.

@@ -1,0 +1,13 @@
+{
+  "format": 1,
+  "mode": "on",
+  "preset": "sm120-16g-perf5-candidate",
+  "scope": "RTX5070Ti/64GB: ordinary perf5 wheel components, both quality/state rebuild and native throughput passed. Speed source/compiled acceptance pending. Same full GSQ Q2, no expert skipping. Original embedding mapped to host, bounded PLE row cache; live NVML/commit supervision retained.",
+  "freetoken_version": "0.1.3+speed.strataq2perf5",
+  "materials": "artifacts/strataq2perf5-cp312-cu130-sm120",
+  "weight_root": "C:\\workspace\\models\\siltok-speed\\flash-next",
+  "deployment_root": "C:\\workspace\\cfg\\siltok-speed\\flash-perf\\perf5-on-v1",
+  "preset_file": "integration/speed/presets/flash-next-sm120-16g-perf5.json",
+  "kernel_cache": "artifacts/strataq2perf5-cp312-cu130-sm120/kernel-cache",
+  "note": "Set SILITOK_FREETOKEN_KERNEL_CACHE_DIR explicitly to this release cache. Set SILITOK_CONFIG to the speed-config directory; pass --models-dir to this model root."
+}
