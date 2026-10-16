@@ -28,6 +28,7 @@ PYTHON_ONLY_CHANGES = {
     'python/freetoken/attention/qsa_sparse.py',
     'python/freetoken/engine/engine.py',
     'python/freetoken/kernel/gguf_quant.py',
+    'python/freetoken/kernel/gguf_native.py',
     'python/freetoken/kernel/triton/gguf_gdn.py',
     'python/freetoken/kernel/triton/qsa/attend.py',
     'python/freetoken/kernel/triton/qsa/score.py',

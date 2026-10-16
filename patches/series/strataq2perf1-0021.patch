@@ -1,0 +1,180 @@
+--- a/python/freetoken/engine/config.py
++++ b/python/freetoken/engine/config.py
+@@ -46,6 +46,8 @@
+     # Explicit opt-in: GPU-only owners plus compact host complements, fixed for this load.
+     moe_q2_resident_experts: int = 0
+     moe_q2_dynamic_slots: int = 1024
++    # 仅永久Q2所有者缓存：将缺失专家搬运与共享专家计算重叠。
++    moe_q2_decode_overlap: bool = True
+     moe_cache_rate: float | None = None
+     moe_cache_auto: bool = False
+     kv_reserve_tokens: int = 8192  # KV floor for --moe-cache-auto; small by design (MoE-priority)
+--- a/python/freetoken/engine/engine.py
++++ b/python/freetoken/engine/engine.py
+@@ -755,7 +755,8 @@
+             max_slots = method.slot_limit()
+         cache_type = ProtectedQ2Cache if ownership is not None else OffloadMoeCache
+         cache = cache_type(
+-            **({'ownership': ownership} if ownership is not None else {}),
++            **({'ownership': ownership, 'decode_overlap': config.moe_q2_decode_overlap}
++               if ownership is not None else {}),
+             # Models with leading dense layers (GLM-4) only have experts on the MoE
+             # layers; num_moe_layers == num_layers when first_k_dense_replace == 0.
+             num_layers=config.model_config.num_moe_layers,
+--- a/python/freetoken/moe/q2_residency.py
++++ b/python/freetoken/moe/q2_residency.py
+@@ -210,9 +210,11 @@
+ 
+ 
+ class ProtectedQ2Cache(OffloadMoeCache):
+-    def __init__(self, *args, ownership: Q2Ownership, **kwargs):
++    def __init__(self, *args, ownership: Q2Ownership, decode_overlap=True, **kwargs):
++        """单独持有decode copy流；prefill和decode不共享事件或借用缓冲协议。"""
+         self.protected_payload = ownership
+         super().__init__(*args, **kwargs)
++        self.decode_copy_stream = torch.cuda.Stream(device=self.device) if decode_overlap else None
+ 
+     def set_bank_sources(self, sources, layer_residency=None):
+         from freetoken.kernel.pinned import device_ptr
+@@ -311,6 +313,8 @@
+         self._prefill_buffer_released[buffer] = False
+ 
+     def reset(self):
++        if self.decode_copy_stream is not None:
++            self.decode_copy_stream.synchronize()
+         if self.prefill_copy_stream is not None:
+             self.prefill_copy_stream.synchronize()
+         torch.cuda.current_stream(self.device).synchronize()
+--- a/python/freetoken/layers/moe.py
++++ b/python/freetoken/layers/moe.py
+@@ -295,6 +295,24 @@
+             is_prefill=False,
+         )
+ 
++    def decode_with_shared(self, hidden_states, router_logits, shared_forward):
++        """copy流按真实路由搬运专家；主流完成共享分支后合流，才允许专家改写输入。"""
++        cache = self.offload_cache
++        weights, ids = fused_topk(hidden_states=hidden_states, gating_output=router_logits,
++                                  topk=self.top_k, renormalize=self.renormalize)
++        main = torch.cuda.current_stream(hidden_states.device)
++        copy = cache.decode_copy_stream
++        copy.wait_stream(main)
++        with torch.cuda.stream(copy):
++            cache.ensure_experts(self.layer_id, ids)
++            cache.copy_missing()
++        shared = shared_forward(hidden_states)
++        main.wait_stream(copy)
++        routed = self._expert_gemm(cache, hidden_states, weights, ids,
++            views=cache.bank_views(), n=None, alphas=cache.alphas_for_slots(self.layer_id),
++            is_prefill=False)
++        return self._maybe_all_reduce(routed), shared
++
+     def _decode_hybrid(
+         self,
+         cache: OffloadMoeCache,
+--- a/python/freetoken/models/qwen4_exp/moe.py
++++ b/python/freetoken/models/qwen4_exp/moe.py
+@@ -3,6 +3,7 @@
+ from typing import TYPE_CHECKING
+ 
+ import torch
++from freetoken.core import get_global_ctx
+ from freetoken.kernel.triton.moe_shared_gate import shared_gate_mul_add, shared_gate_sigmoid
+ from freetoken.models.qwen3_5_moe.moe import Qwen3_5MoE
+ 
+@@ -27,10 +28,23 @@
+             self.shared_expert_gate = LinearReplicated(config.hidden_size, 1, has_bias=False,
+                                                        quant_config=config.quant, prefix=f"{prefix}.shared_expert_gate")
+ 
++    def _shared_gguf(self, hidden_states):
++        """共享专家和门控在routed分支可能改写输入之前完成。"""
++        shared = self.shared_expert.forward(hidden_states)
++        gate = self.shared_expert_gate.forward(hidden_states).sigmoid().view(-1)
++        return shared, gate
++
+     def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
++        """永久Q2的单token decode重叠搬运；prefill、验证窗口和其他模型沿用既有顺序。"""
+         num_tokens, hidden_dim = hidden_states.shape
+         hidden_states = hidden_states.view(-1, hidden_dim)
+         router_logits = self.gate.forward(hidden_states)
++        cache = getattr(self.experts, 'offload_cache', None)
++        if (self._gguf and get_global_ctx().batch.is_decode
++                and getattr(cache, 'decode_copy_stream', None) is not None):
++            routed, (shared, gate) = self.experts.decode_with_shared(
++                hidden_states, router_logits, self._shared_gguf)
++            return shared_gate_mul_add(routed, shared, gate).view(num_tokens, hidden_dim)
+         shared = self.shared_expert.forward(hidden_states)
+         if self._gguf:
+             gate = self.shared_expert_gate.forward(hidden_states).sigmoid().view(-1)
+--- a/tests/moe/test_q2_residency.py
++++ b/tests/moe/test_q2_residency.py
+@@ -26,12 +26,17 @@
+         protected_ranking(48, 511, 9216)
+ 
+ 
+-def _make_cache():
++def _make_cache(valid_scales=False):
+     layers, experts, hidden, intermediate = 3, 16, 128, 64
+     layout = {'gate_up': BankSpec((2 * intermediate, hidden // 64 * 18), torch.uint8),
+               'down': BankSpec((hidden, intermediate // 64 * 18), torch.uint8)}
+     original = {role: [torch.randint(0, 256, (experts, *spec.shape), dtype=torch.uint8)
+                        for _ in range(layers)] for role, spec in layout.items()}
++    if valid_scales:
++        scale = torch.tensor([.015625], dtype=torch.float16).view(torch.uint8)
++        for banks in original.values():
++            for bank in banks:
++                bank.view(*bank.shape[:-1], -1, 18)[..., :2] = scale
+     pieces = [(layer, e, min(e + 3, experts),
+                {role: per_layer[layer][e:min(e + 3, experts)] for role, per_layer in original.items()})
+               for layer in range(layers) for e in range(0, experts, 3)]
+@@ -53,6 +58,50 @@
+         ownership=ownership, prefill_overlap=True, quant_format='q2_0', layout=layout)
+     cache.set_bank_sources(banks.sources)
+     return cache, original
++
++
++@pytest.mark.skipif(not torch.cuda.is_available(), reason='requires CUDA')
++def test_decode_copy_overlap_graph_prefill_reset_and_changed_routes():
++    """真实Q2计算覆盖跨流依赖、换路由、prefill穿插和reset，不用host同步掩盖遗漏事件。"""
++    from freetoken.layers.moe import OffloadMoELayer
++    from freetoken.moe.fused import fused_topk
++    from freetoken.moe.fused_q2_q8 import fused_experts_q2_q8
++    cache, original = _make_cache(valid_scales=True)
++    x = torch.randn(1, 128, device='cuda')
++    logits = torch.randn(1, 16, device='cuda')
++    shared_weight = torch.randn(128, 128, device='cuda')
++    full = {role: banks[1].to('cuda') for role, banks in original.items()}
++
++    def gemm(cache, value, weights, ids, **kwargs):
++        return fused_experts_q2_q8(value, cache.bank_caches['gate_up'],
++                                   cache.bank_caches['down'], weights, ids)
++
++    layer = SimpleNamespace(offload_cache=cache, top_k=3, renormalize=True, layer_id=1,
++                            _expert_gemm=gemm, _maybe_all_reduce=lambda value: value)
++    def shared(value):
++        return value @ shared_weight
++    def forward():
++        return OffloadMoELayer.decode_with_shared(layer, x, logits, shared)
++    forward()
++    graph = torch.cuda.CUDAGraph()
++    with torch.cuda.graph(graph):
++        routed, independent = forward()
++    for cycle in range(6):
++        cache.reset()
++        if cycle % 2:
++            cache.begin_prefill()
++            for index in range(3):
++                cache.prefetch_prefill_layer(index)
++                cache.wait_prefill_layer(index)
++                cache.release_prefill_layer(index)
++        x.normal_()
++        logits.normal_()
++        graph.replay()
++        weights, ids = fused_topk(hidden_states=x, gating_output=logits, topk=3, renormalize=True)
++        reference = fused_experts_q2_q8(x, full['gate_up'], full['down'], weights, ids)
++        torch.testing.assert_close(routed, reference, rtol=0, atol=0)
++        torch.testing.assert_close(independent, x @ shared_weight, rtol=0, atol=0)
++    graph.reset()
+ 
+ 
+ @pytest.mark.skipif(not torch.cuda.is_available(), reason='requires CUDA')
