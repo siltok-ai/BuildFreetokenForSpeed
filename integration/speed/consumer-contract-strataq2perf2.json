@@ -1,0 +1,45 @@
+{
+  "format": 1,
+  "kind": "flash_next_5070ti_performance_consumer",
+  "profile": "build/profiles/strataq2perf2.json",
+  "profile_sha256": "66e8232f5cc1b4f1c9c3cba62153447072eaefe1f8fd85c6ddc6445de43b2f08",
+  "materials": "artifacts/strataq2perf2-cp312-cu130-sm120",
+  "version": "0.1.3+speed.strataq2perf2",
+  "materials_commit": "b389de3bf4435e65290db77ee38a8457c3f6e305",
+  "wheel": {
+    "path": "wheels/freetoken-0.1.3+speed.strataq2perf2-cp312-cp312-win_amd64.whl",
+    "sha256": "9c6ca866b7752f42cf01c7a1e83608ad7ee7437f4d1ac36bbc64fca5e134e330"
+  },
+  "speed_release_wheel": {
+    "path": "wheels/freetoken-0.1.3+speed.strataq2perf2-cp312-cp312-win_amd64.whl",
+    "sha256": "9c6ca866b7752f42cf01c7a1e83608ad7ee7437f4d1ac36bbc64fca5e134e330",
+    "native_modules": [
+      "freetoken/kernel/_cpu_moe.cp312-win_amd64.pyd",
+      "freetoken/kernel/_pinned_tensor.cp312-win_amd64.pyd",
+      "freetoken/kernel/_row_store.cp312-win_amd64.pyd"
+    ]
+  },
+  "speed_commit": "3256f12a5738c644a742f32f887ac943be4ed6a5",
+  "speed_source_files_normalization": "lf",
+  "speed_source_files": {
+    ".gitattributes": "77cfa83e09f73e21164fc3ada9cfaa5827b2c95e4b0fad55209cad472a2bdefd",
+    "silitok_speed/pyproject.toml": "efd1a28d02c1ee90e52b1fbb1e16366cc26ee06ed2ed1362ca5238882c4b27d9",
+    "silitok_speed/qwen36/FLASH-NEXT-PERFORMANCE.md": "26ba202732fa3597c7c36dc562447f0627628bd42b7f18b27768efb0ef97b9c2",
+    "silitok_speed/qwen36/release.json": "47245a904ecf8cdc6730c8eab62396b1441a9e4b9912c7478815ac0bdfc8f671",
+    "tools/verify_flash_next_checkpoint.py": "96d7175d1c662614697cbc8960d530e42488b6487deaf552cffee6500d41a61b"
+  },
+  "bundle_sha256": "6d2267afaf1aab6651ed19ecd7b479e3e406eeec282c3720fd538e50bae3c814",
+  "installer_sha256": "be5eccf429c262f19ef077768520286db34c0b0b7d959c0030c24b461368f8a3",
+  "mtp_default_enabled": false,
+  "clean_os_validated": false,
+  "runtime_scope": "actual_installed_payload_not_clean_os",
+  "actual_install_validated": true,
+  "prompts_sha256": "a4a066558c5fc734e8c97b01a58cd19da4e49049410a027d881abbf5694b1f10",
+  "evidence": {
+    "index": "research/performance/flash-next-5070ti-20261016/perf2/index.json",
+    "sha256": "3d0a8f38204992c449ab930adde67b7a50780c34d505e821bb709b5335ae7e6b"
+  },
+  "known_issues": [
+    "intermittent-long-output-token0: unresolved"
+  ]
+}

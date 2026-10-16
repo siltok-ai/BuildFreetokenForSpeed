@@ -1,0 +1,26 @@
+[
+  {
+    "environment": "flash-perf-rel",
+    "source": "C:\\workspace\\envs\\siltok-speed\\flash-int-rel\\Scripts\\ninja.exe",
+    "target": "C:\\workspace\\envs\\siltok-speed\\flash-perf-rel\\Scripts\\ninja.exe",
+    "sha256": "cb4590bad18f01607e819908d536fba71afbe36eb0f1d5a13c60d88d635ca959",
+    "bytes": 598528,
+    "record_matches": true
+  },
+  {
+    "environment": "flash-perf-build",
+    "source": "C:\\workspace\\envs\\siltok-speed\\flash-int-rel\\Scripts\\ninja.exe",
+    "target": "C:\\workspace\\envs\\siltok-speed\\flash-perf-build\\Scripts\\ninja.exe",
+    "sha256": "cb4590bad18f01607e819908d536fba71afbe36eb0f1d5a13c60d88d635ca959",
+    "bytes": 598528,
+    "record_matches": true
+  },
+  {
+    "environment": "flash-perf-cand2",
+    "source": "C:\\workspace\\envs\\siltok-speed\\flash-int-rel\\Scripts\\ninja.exe",
+    "target": "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand2\\Scripts\\ninja.exe",
+    "sha256": "cb4590bad18f01607e819908d536fba71afbe36eb0f1d5a13c60d88d635ca959",
+    "bytes": 598528,
+    "record_matches": true
+  }
+]

@@ -1,0 +1,104 @@
+{
+  "scope": "actual ordinary wheel, isolated task environment; no compiled installer yet",
+  "version": "0.1.3+speed.strataq2perf2",
+  "quality": {
+    "off": {
+      "status": "passed",
+      "score": 15,
+      "thinking_score": 3,
+      "regressions": [],
+      "shutdown_complete": true,
+      "all_full_ids_match_perf1": true
+    },
+    "on": {
+      "status": "passed",
+      "score": 15,
+      "thinking_score": 3,
+      "regressions": [],
+      "shutdown_complete": true,
+      "all_full_ids_match_perf1": true
+    }
+  },
+  "performance": {
+    "installed-perf2-native-off": {
+      "medians_tps": {
+        "70-0": 82.38758512285558,
+        "diverse-4096-0": 81.26025075783161
+      },
+      "actual_512_outputs": 6,
+      "all_full_ids_match_comparison": true,
+      "comparison": "decode-borrow-clean-v1",
+      "resources": {
+        "command": [
+          "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand2\\Scripts\\python.exe",
+          "-B",
+          "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\probe2.py",
+          "--output",
+          "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\installed-perf2-native-off.json",
+          "--repetitions",
+          "3"
+        ],
+        "cwd": "C:\\workspace\\wt\\siltok-speed\\flash-perf",
+        "started": 1792127755.2481134,
+        "samples": 218,
+        "min_commit_available": 9233362944,
+        "min_ram_available": 26404327424,
+        "min_gpu_free": 485584896,
+        "max_commit_used": 61085548544,
+        "max_gpu_used": 16609349632,
+        "max_tree_rss": 31031508992,
+        "max_tree_private": 48089874432,
+        "stop_reason": null,
+        "pid": 6456,
+        "returncode": 0,
+        "elapsed_s": 110.15599999998813,
+        "remaining_before_cleanup": [],
+        "remaining_descendants": []
+      }
+    },
+    "installed-perf2-mtp-workloads": {
+      "medians_tps": {
+        "english": 75.36231305728258,
+        "chinese": 72.28274054119889,
+        "code": 84.13838753041537
+      },
+      "actual_512_outputs": 6,
+      "all_full_ids_match_comparison": true,
+      "comparison": "perf1-mtp-workloads-v1",
+      "resources": {
+        "command": [
+          "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand2\\Scripts\\python.exe",
+          "-B",
+          "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\probe2.py",
+          "--output",
+          "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\installed-perf2-mtp-workloads.json",
+          "--keys",
+          "english",
+          "chinese",
+          "code",
+          "--repetitions",
+          "2",
+          "--mtp",
+          "--resident",
+          "2304"
+        ],
+        "cwd": "C:\\workspace\\wt\\siltok-speed\\flash-perf",
+        "started": 1792127865.5558443,
+        "samples": 195,
+        "min_commit_available": 11529752576,
+        "min_ram_available": 24824315904,
+        "min_gpu_free": 3234951168,
+        "max_commit_used": 58789158912,
+        "max_gpu_used": 13859983360,
+        "max_tree_rss": 33076293632,
+        "max_tree_private": 47405121536,
+        "stop_reason": null,
+        "pid": 11608,
+        "returncode": 0,
+        "elapsed_s": 98.54699999999139,
+        "remaining_before_cleanup": [],
+        "remaining_descendants": []
+      }
+    }
+  }
+}

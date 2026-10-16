@@ -20,15 +20,19 @@ GGUF AOT改名r2，新增接口实际重新编译；26个独立AOT和3个native�
 硬件RTX5070Ti 16GB、Ryzen9700X；Torch2.11.0+cu130、Triton3.6.0.post26、TVM FFI0.1.13.post3。
 原FT2与perf1空闲机器Speed HTTP，短/4K各3次、实际512输出：71.6201/68.7756 → 75.5346/72.1972 token/s，+5.47%/+4.97%。
 perf2原型无MTP、不收集统计：短/4K各3次中位82.9937/81.0291；完整IDs与perf1相同。
-perf1 MTP英/中/代码各2次：65.7424/59.2034/67.5630；perf2原型75.9431/72.5013/83.7818，六次各512输出IDs相同。仍须实际冻结wheel和HTTP/编译安装验证。
+perf1 MTP英/中/代码各2次：65.7424/59.2034/67.5630；perf2原型75.9431/72.5013/83.7818，六次各512输出IDs相同。该原型后续已用冻结wheel和实际安装版复核，见下文。
+实际冻结wheel原生无MTP短/4K为82.3876/81.2603；MTP英/中/代码75.3623/72.2827/84.1384，完整IDs匹配perf1。Speed材料消费提交3256f12a，供应材料b389de3。
+实际Speed TCP HTTP无MTP短/4K为81.7226/79.7754，相对FT2同协议+14.11%/+15.99%；MTP开启75.4208/81.9061，同容量关闭76.2982/75.0005。每种各6次实际512输出，资源/退出通过。编译暂存及实际安装包均已验收，见下文。
 实际安装perf2 wheel + matching r2 AOT：20项GPU组件、24个子测试通过。包括真实Q2跨流图、decode/prefill交替、换路由、永久字节不变，以及多列MMVQ逐位旧路径参考、stride、改变输入后的图重放。
-质量基线15/20、thinking3/3；实际安装perf2 wheel的MTP开/关均为15/20、thinking3/3，无新增逐题失败。HTTP/编译安装版验收正在进行，尚不能视作最终交付。
+质量基线15/20、thinking3/3；普通环境perf2 wheel的MTP开/关均为15/20、thinking3/3，无新增逐题失败。编译暂存和实际安装质量检查同样通过。
+完整p03安装器已实际安装到隔离i06（管理员子进程、退出0）。10组实际安装验收通过：Q2开/关质量、HTTP性能/功能、取消复用、旧35B和H3；模块来源为安装版embedded Python/受保护编译模块。卸载退出0，15项清理核查全通过；干净操作系统尚未验收。此前i05提权未完成/退出2的失败记录保留。
 此前偶发长输出重复风险仍未定位，不宣称本轮修复；认证仅在外部测试进程按用户授权绕过，产品认证不变。
 
 Strata参考及排除项
 固定Strata6674a006、其固定llama.cpp 3cf03257，在本机用同一份Q2 GGUF构建原生pack；英/中/代码各一次512实际输出：无MTP87.16/90.64/70.49，MTP4+lookup112.75/113.28/117.38。框架算术、缓存容量、文本不同，仅为方向性参考。
 两边64个完整MTP窗口trace中，专家搬运工作perf1约16.26ms/窗口、Strata3.24ms；这是最大差距。Strata自动MTP缓存7016槽，Speed为2304永久+1024动态+1024prefill；容量和实际miss数不同。
 gather严格微测的大批量传输约50GB/s，优化重点为减少miss。
+优化后64个完整MTP窗口中，专家搬运16.26→12.61ms，GPU kernel并集38.11→32.94ms，总工作38.28→36.68ms；跨流重叠减少了关键路径。采样只用于归因，不当作吞吐成绩。
 小词表在代码场景降低草稿接受率；最小lookup在这些输入未见稳定收益；衰减LFU比借用LRU慢且4K miss率更高。本候选均不纳入，不推断其他输入或Strata实现无效。
 
 重建与复核
@@ -40,4 +44,8 @@ python -B tools/verify_materials.py artifacts/strataq2perf2-cp312-cu130-sm120
 python -B tools/validate_performance_revision.py
 python -B tools/validate_repository.py
 python -B -m unittest discover -s tests -v
-这些离线检查不替代真实GPU和Speed安装版验收。完整原始日志在本机runs/siltok-speed/flash-perf-20261016，待最终验收后封存消费合同和关键证据。
+这些离线检查不替代真实GPU和Speed安装版验收。可搬迁消费合同：integration/speed/consumer-contract-strataq2perf2.json；139份封存证据：research/performance/flash-next-5070ti-20261016/perf2。原始日志仍在本机runs/siltok-speed/flash-perf-20261016。
+python -B tools/verify_performance_consumer.py --speed-root <Speed工作树>
+实际安装HTTP关闭短/4K为81.1778/79.1184，开启75.5142/82.1136 token/s，各3次512输出。曾因上一模型Windows backing commit未完全回收触发准入429；等待资源恢复后按相同策略复跑通过，保留失败原始日志。
+后续验证频率按用户要求：日常源码/wheel/GPU/HTTP验证，重要交付节点或安装相关改动再做真实安装/卸载。perf2是检查点，继续深入MTP优化。
+封存后完整validate_repository通过，工具单元测试36项通过；从Speed工作树运行verify_flash_next_checkpoint通过，复核实际安装来源、随包459份FreeToken代码/27 AOT、7组HTTP速度、质量/生命周期和清理。

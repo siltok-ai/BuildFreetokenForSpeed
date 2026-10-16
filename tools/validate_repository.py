@@ -240,10 +240,20 @@ def main():
     if (ROOT/'integration/speed/consumer-contract-strataq2mtp2.json').exists():
         from verify_mtp2_consumer import verify as verify_mtp_consumer
         mtp_speed_consumer = verify_mtp_consumer()
+    performance_revision = None
+    if (ROOT/'build/profiles/strataq2perf2.json').exists():
+        from validate_performance_revision import validate as validate_performance
+        performance_revision = validate_performance(ROOT/'build/profiles/strataq2perf2.json',
+            ROOT/'artifacts/strataq2perf2-cp312-cu130-sm120')
+    performance_consumer = None
+    if (ROOT/'integration/speed/consumer-contract-strataq2perf2.json').exists():
+        from verify_performance_consumer import verify as verify_performance
+        performance_consumer = verify_performance()
     print(json.dumps({"official_files": len(original_hashes), "changed_files": len(changed),
                       "patches": len(series["patches"]), "split_equals_historical": True,
                       "wheel_python_matches_prepared_source": True, "aot_count": len(specs),
                       "packaged_acceptance_evidence_verified": True, "strata_research":research,
+                      "performance_revision":performance_revision, "performance_consumer":performance_consumer,
                       "strata_research_dev2":research_dev2,
                       "strata_research_dev3":research_dev3, "strata_research_dev4":research_dev4,
                       "strata_research_dev5":research_dev5,

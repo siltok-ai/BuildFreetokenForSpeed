@@ -1,0 +1,33 @@
+{
+  "scope": "64 complete MTP graph windows, same English input, different profiling runs; diagnostics only",
+  "base": {
+    "kernel_ms_per_step": 38.27518362499995,
+    "union_ms_per_step": 38.10602207565308,
+    "span_ms_per_step": 43.406799716949465,
+    "groups_ms_per_step": {
+      "other": 2.7198548906249678,
+      "compressed_projection": 7.656525578125009,
+      "bf16_projection": 3.674444015625027,
+      "qsa_attention": 0.9482879531249986,
+      "expert_compute": 5.593967578125003,
+      "gdn_recurrence": 0.8552736250000013,
+      "cache_admission": 0.5651022968749996,
+      "expert_copy": 16.261727687499945
+    }
+  },
+  "perf2": {
+    "kernel_ms_per_step": 36.67867681249992,
+    "union_ms_per_step": 32.9444779663086,
+    "span_ms_per_step": 38.07590151977539,
+    "groups_ms_per_step": {
+      "other": 3.506791249999959,
+      "compressed_projection": 8.30404553124994,
+      "bf16_projection": 4.253671999999969,
+      "qsa_attention": 0.9517647343749995,
+      "expert_compute": 5.634262468750046,
+      "gdn_recurrence": 0.8595266562500016,
+      "cache_admission": 0.5551650312499995,
+      "expert_copy": 12.61344914062501
+    }
+  }
+}

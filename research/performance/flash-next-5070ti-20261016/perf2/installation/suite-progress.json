@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "scope": "actual_installed_payload_not_clean_os",
+  "completed": [
+    "backend-off-quality-v1",
+    "backend-on-quality-v1",
+    "http-off-performance-v1",
+    "http-on-performance-v1",
+    "http-off-matched-performance-v1",
+    "http-off-functional-v1",
+    "http-on-functional-v1",
+    "qwen36-backend-v1",
+    "qwen36-http-v1",
+    "h3-http-v1"
+  ],
+  "result_paths": {
+    "backend-off-quality-v1": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-i06\\results-final\\backend-off-quality-v1.json",
+    "backend-on-quality-v1": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-i06\\results-final\\backend-on-quality-v1.json",
+    "http-off-performance-v1": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-i06\\results-final\\http-off-performance-v1.json",
+    "http-on-performance-v1": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-i06\\results-r2\\http-on-performance-v1.json",
+    "http-off-matched-performance-v1": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-i06\\results-r2\\http-off-matched-performance-v1.json",
+    "http-off-functional-v1": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-i06\\results-r2\\http-off-functional-v1.json",
+    "http-on-functional-v1": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-i06\\results-r2\\http-on-functional-v1.json",
+    "qwen36-backend-v1": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-i06\\results-r2\\qwen36-backend-v1.json",
+    "qwen36-http-v1": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-i06\\results-r2\\qwen36-http-v1.json",
+    "h3-http-v1": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-i06\\results-r2\\h3-http-v1.json"
+  },
+  "source_commit": "3256f12a5738c644a742f32f887ac943be4ed6a5",
+  "install_root": "C:\\workspace\\build\\siltok-speed\\i06"
+}

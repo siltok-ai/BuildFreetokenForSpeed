@@ -1,0 +1,9 @@
+{
+  "PATH": "C:\\workspace\\build\\siltok-speed\\i06\\python\\Scripts;C:\\Windows\\System32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\Program Files\\NVIDIA Corporation\\NVSMI",
+  "TEMP": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-i06\\tmp",
+  "SILITOK_CONFIG": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-i06\\probe-config",
+  "SILITOK_FREETOKEN_KERNEL_CACHE_DIR": "C:\\workspace\\build\\siltok-speed\\i06\\runtime\\kernel-cache",
+  "FREETOKEN_KERNEL_CACHE_DIR": "C:\\workspace\\build\\siltok-speed\\i06\\runtime\\kernel-cache",
+  "TRITON_CACHE_DIR": "C:\\workspace\\cache\\triton\\installed-i06",
+  "TORCH_EXTENSIONS_DIR": "C:\\workspace\\cache\\ext\\installed-i06"
+}

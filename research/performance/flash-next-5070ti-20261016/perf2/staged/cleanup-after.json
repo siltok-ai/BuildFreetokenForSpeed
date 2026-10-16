@@ -1,0 +1,24 @@
+{
+  "scope": "compiled_staged_payload_not_installer",
+  "actual_install_validated": false,
+  "removed": [
+    "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\staged-p03\\tmp",
+    "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\staged-p03\\triton",
+    "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\staged-p03\\extensions",
+    "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\staged-p03\\config",
+    "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\staged-p03\\probe-config",
+    "C:\\workspace\\cache\\triton\\installed-app"
+  ],
+  "after_checks": {
+    "owned_processes_absent": true,
+    "owned_temporary_trees_absent": true,
+    "failed_install_i05_absent": true,
+    "separate_i06_service_preserved": true,
+    "separate_i06_install_preserved": true,
+    "compiled_build_preserved": true,
+    "models_preserved": true,
+    "environments_preserved": true,
+    "installer_preserved": true
+  },
+  "ok": true
+}

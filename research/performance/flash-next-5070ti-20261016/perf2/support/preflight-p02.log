@@ -1,0 +1,63 @@
+{
+  "covered_dependencies": [
+    "apache-tvm-ffi",
+    "einops",
+    "fastapi",
+    "flashlib",
+    "gguf",
+    "huggingface-hub",
+    "modelscope",
+    "msgpack",
+    "numpy",
+    "openai",
+    "partial-json-parser",
+    "pillow",
+    "prompt-toolkit",
+    "pydantic",
+    "pyzmq",
+    "safetensors",
+    "torchvision",
+    "tqdm",
+    "transformers",
+    "uvicorn"
+  ],
+  "external_pins": [
+    "torch"
+  ],
+  "freetoken_version": "0.1.3+speed.strataq2perf2",
+  "wheel": "freetoken-0.1.3+speed.strataq2perf2-cp312-cp312-win_amd64.whl",
+  "wheel_sha256": "9c6ca866b7752f42cf01c7a1e83608ad7ee7437f4d1ac36bbc64fca5e134e330"
+}
+{
+  "manifest": "C:\\workspace\\tmp\\flash-perf-preflight-02\\speed-kernel-manifest.json"
+}
+{
+  "freetoken": "0.1.3+speed.strataq2perf2",
+  "imports": [
+    "freetoken",
+    "freetoken.core",
+    "freetoken.engine.engine",
+    "freetoken.kernel.aot",
+    "freetoken.llm.llm",
+    "freetoken.message",
+    "freetoken.models.qwen3_5_moe.model",
+    "freetoken.models.qwen3_5_moe.weight",
+    "freetoken.models.qwen4_exp.model",
+    "freetoken.models.qwen4_exp.ple_disk",
+    "freetoken.attention.qsa_sparse",
+    "freetoken.kernel._row_store",
+    "freetoken.moe.fused_nvfp4",
+    "freetoken.moe.fused_q2_0",
+    "freetoken.models.qwen4_exp.q2_source",
+    "freetoken.moe.offload_cache",
+    "freetoken.scheduler.scheduler",
+    "freetoken.server.api_server",
+    "freetoken.server.reasoning_parser",
+    "freetoken.tokenizer"
+  ],
+  "kernel_artifacts": 27,
+  "pip_check": "certified_exception_only",
+  "torch": "2.11.0+cu130",
+  "torch_cuda": "13.0",
+  "triton_windows": "3.6.0.post26"
+}

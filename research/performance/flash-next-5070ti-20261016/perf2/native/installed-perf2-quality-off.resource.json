@@ -1,0 +1,29 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand2\\Scripts\\python.exe",
+    "-B",
+    "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\probe2.py",
+    "--output",
+    "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\installed-perf2-quality-off.json",
+    "--suite",
+    "quality",
+    "--repetitions",
+    "0"
+  ],
+  "cwd": "C:\\workspace\\wt\\siltok-speed\\flash-perf",
+  "started": 1792127547.651659,
+  "samples": 197,
+  "min_commit_available": 11910320128,
+  "min_ram_available": 26832363520,
+  "min_gpu_free": 1691447296,
+  "max_commit_used": 58408591360,
+  "max_gpu_used": 15403487232,
+  "max_tree_rss": 31085817856,
+  "max_tree_private": 46925639680,
+  "stop_reason": null,
+  "pid": 11156,
+  "returncode": 0,
+  "elapsed_s": 99.56299999999464,
+  "remaining_before_cleanup": [],
+  "remaining_descendants": []
+}

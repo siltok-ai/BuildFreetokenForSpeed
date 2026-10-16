@@ -1,0 +1,8 @@
+{
+  "scope": "64 warmed MTP verify windows, same GSQ Q2 input; output paths/runtime arithmetic differ",
+  "windows": 64,
+  "kernel_count": 157981,
+  "kernel_sum_ms": 20.587379390625,
+  "union_ms": 19.31316840625,
+  "span_ms": 22.907015765625
+}

@@ -1,0 +1,584 @@
+{
+  "path": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\trace-perf1-mtp-v2.trace.json",
+  "captured_graph_launches": 178,
+  "inferred_decode_steps": 64.0,
+  "scope": "Complete CUDA graph launches with captured runtime correlation; excludes boundary partials and outside-graph helpers",
+  "kernel_ms_per_step": 38.27518362499995,
+  "union_ms_per_step": 38.10602207565308,
+  "span_ms_per_step": 43.406799716949465,
+  "groups_ms_per_step": {
+    "other": 2.7198548906249678,
+    "compressed_projection": 7.656525578125009,
+    "bf16_projection": 3.674444015625027,
+    "qsa_attention": 0.9482879531249986,
+    "expert_compute": 5.593967578125003,
+    "gdn_recurrence": 0.8552736250000013,
+    "cache_admission": 0.5651022968749996,
+    "expert_copy": 16.261727687499945
+  },
+  "streams": {
+    "13": 227163
+  },
+  "kernels": [
+    {
+      "name": "_owner_gather",
+      "calls": 3072,
+      "ms_per_step": 16.261727687499945
+    },
+    {
+      "name": "_routed_vector",
+      "calls": 6528,
+      "ms_per_step": 5.387364609375
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e924native_mmvq_multi_kernelINS1_9Q3KTraitsELi4ELi4ELi2ELb0ELb0EEEvPKNT_5BlockEPKNS1_8Q81BlockEPfiiS7_SB_",
+      "calls": 5760,
+      "ms_per_step": 2.172841578125003
+    },
+    {
+      "name": "_bf16_rows",
+      "calls": 16498,
+      "ms_per_step": 2.164990328125036
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e923native_q5_k_mmvq_kernelILb0EEEvPKNS1_8Q5KBlockEPKNS1_8Q81BlockEPfii",
+      "calls": 192,
+      "ms_per_step": 1.548356359375
+    },
+    {
+      "name": "_bf16_row_tiles",
+      "calls": 6834,
+      "ms_per_step": 1.5094536874999906
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e924native_mmvq_multi_kernelINS1_9Q5KTraitsELi4ELi4ELi2ELb0ELb0EEEvPKNT_5BlockEPKNS1_8Q81BlockEPfiiS7_SB_",
+      "calls": 1024,
+      "ms_per_step": 1.0780350937499983
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e924native_mmvq_multi_kernelINS1_11IQ4XSTraitsELi4ELi4ELi2ELb0ELb0EEEvPKNT_5BlockEPKNS1_8Q81BlockEPfiiS7_SB_",
+      "calls": 3584,
+      "ms_per_step": 1.0199834531250014
+    },
+    {
+      "name": "_qsa_sparse_paged_gqa_splitk_kernel",
+      "calls": 960,
+      "ms_per_step": 0.9482879531249986
+    },
+    {
+      "name": "_recurrent",
+      "calls": 2304,
+      "ms_per_step": 0.8552736250000013
+    },
+    {
+      "name": "_ensure",
+      "calls": 3072,
+      "ms_per_step": 0.5651022968749996
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e924native_mmvq_multi_kernelINS1_9Q4KTraitsELi4ELi4ELi2ELb0ELb0EEEvPKNT_5BlockEPKNS1_8Q81BlockEPfiiS7_SB_",
+      "calls": 2432,
+      "ms_per_step": 0.5367639531249996
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e924native_mmvq_multi_kernelINS1_9Q20TraitsELi4ELi4ELi2ELb0ELb0EEEvPKNT_5BlockEPKNS1_8Q81BlockEPfiiS7_SB_",
+      "calls": 3712,
+      "ms_per_step": 0.40978421875000165
+    },
+    {
+      "name": "_ZN2at6native18elementwise_kernelILi128ELi2EZNS0_22gpu_kernel_impl_nocastIZZZNS0_23direct_copy_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE1_clEvENKUlvE5_clEvEUlfE_EEvS4_RKT_EUliE_EEviT1_",
+      "calls": 23922,
+      "ms_per_step": 0.3895373281249394
+    },
+    {
+      "name": "_hc_combine_kernel",
+      "calls": 6528,
+      "ms_per_step": 0.272158484374998
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e924native_small_mmvq_kernelINS1_8Q80BlockELi8ELb0EEEvPKT_PKNS1_8Q81BlockEPfii",
+      "calls": 1392,
+      "ms_per_step": 0.25918514062499964
+    },
+    {
+      "name": "_causal_conv1d_update_kernel",
+      "calls": 9216,
+      "ms_per_step": 0.1996185312500074
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e927native_quantize_q8_1_kernelEPKfPNS1_8Q81BlockEi",
+      "calls": 14536,
+      "ms_per_step": 0.18930060937500603
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e924native_mmvq_multi_kernelINS1_9Q6KTraitsELi4ELi4ELi2ELb0ELb0EEEvPKNT_5BlockEPKNS1_8Q81BlockEPfiiS7_SB_",
+      "calls": 768,
+      "ms_per_step": 0.18334176562499951
+    },
+    {
+      "name": "_grouped_gemma_rmsnorm_kernel",
+      "calls": 7026,
+      "ms_per_step": 0.17321915625000434
+    },
+    {
+      "name": "_ZN2at6native24index_elementwise_kernelILi128ELi4EZNS0_22index_copy_kernel_implINS0_10OpaqueTypeILi4EEEEEvRNS_14TensorIteratorExxxEUliE_EEvxT1_",
+      "calls": 6244,
+      "ms_per_step": 0.15639274999999767
+    },
+    {
+      "name": "_router_triton_kernel",
+      "calls": 3072,
+      "ms_per_step": 0.132337750000002
+    },
+    {
+      "name": "_ZN2at6native27unrolled_elementwise_kernelIZZZNS0_23direct_copy_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE1_clEvENKUlvE2_clEvEUlxE_St5arrayIPcLy2EELi4E23TrivialOffsetCalculatorILi1EjESB_NS0_6memory12LoadWithCastILi1EEENSC_13StoreWithCastILi1EEEEEviT_T0_T2_T3_T4_T5_",
+      "calls": 7332,
+      "ms_per_step": 0.12025334375000243
+    },
+    {
+      "name": "_hc_gate_mix_kernel",
+      "calls": 6834,
+      "ms_per_step": 0.10477700000000936
+    },
+    {
+      "name": "_quantize",
+      "calls": 6528,
+      "ms_per_step": 0.09460410937500231
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e924native_mmvq_multi_kernelINS1_11SmallTraitsINS1_8Q40BlockELi4EEELi4ELi4ELi2ELb0ELb0EEEvPKNT_5BlockEPKNS1_8Q81BlockEPfiiS9_SD_",
+      "calls": 1024,
+      "ms_per_step": 0.08627837499999999
+    },
+    {
+      "name": "_hc_silu_kernel",
+      "calls": 6834,
+      "ms_per_step": 0.07821520312499676
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4EZZZNS0_19sigmoid_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE0_clEvENKUlvE0_clEvEUlfE_St5arrayIPcLy2EEEEviT0_T1_",
+      "calls": 4224,
+      "ms_per_step": 0.07745904687500141
+    },
+    {
+      "name": "_ZN2at6native18elementwise_kernelILi128ELi2EZNS0_22gpu_kernel_impl_nocastINS0_11FillFunctorIfEEEEvRNS_18TensorIteratorBaseERKT_EUliE_EEviT1_",
+      "calls": 6144,
+      "ms_per_step": 0.07512337500000302
+    },
+    {
+      "name": "_ZN2at6native44_GLOBAL__N__516f300d_11_Indexing_cu_2a2c434e21indexSelectSmallIndexIfxjLi2ELi2ELin2EEEvNS_4cuda6detail10TensorInfoIT_T1_EENS5_IKS6_S7_EENS5_IKT0_S7_EEiiS7_x",
+      "calls": 3328,
+      "ms_per_step": 0.07365320312500083
+    },
+    {
+      "name": "_reduce",
+      "calls": 3264,
+      "ms_per_step": 0.07296454687499972
+    },
+    {
+      "name": "_ZN2at6native40_GLOBAL__N__0b46c3ea_8_Shape_cu_85d9f36c19CatArrayBatchedCopyINS1_10OpaqueTypeILj4EEEjLi2ELi64ELi64EEEvPT_NS1_25CatArrInputTensorMetadataIS5_T0_XT2_EXT3_EEENS1_16TensorSizeStrideIS8_Lj4EEEiS8_",
+      "calls": 2432,
+      "ms_per_step": 0.05851565625000087
+    },
+    {
+      "name": "_gate_mul_add_kernel",
+      "calls": 3072,
+      "ms_per_step": 0.05789917187500076
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_13BUnaryFunctorIxxxZZZNS0_21remainder_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE_clEvENKUlvE2_clEvEUlxxE_EESt5arrayIPcLy2EEEEviT0_T1_",
+      "calls": 3200,
+      "ms_per_step": 0.0530101093749998
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e924native_mmvq_multi_kernelINS1_11SmallTraitsINS1_8Q50BlockELi4EEELi4ELi4ELi2ELb0ELb0EEEvPKNT_5BlockEPKNS1_8Q81BlockEPfiiS9_SD_",
+      "calls": 448,
+      "ms_per_step": 0.04737545312500004
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e924native_mmvq_multi_kernelINS1_11SmallTraitsINS1_8Q80BlockELi8EEELi4ELi4ELi2ELb0ELb0EEEvPKNT_5BlockEPKNS1_8Q81BlockEPfiiS9_SD_",
+      "calls": 357,
+      "ms_per_step": 0.04730967187500005
+    },
+    {
+      "name": "_gguf_plus_one_norm",
+      "calls": 2454,
+      "ms_per_step": 0.04574657812500036
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e924native_mmvq_multi_kernelINS1_11SmallTraitsINS1_10IQ4NLBlockELi4EEELi4ELi4ELi2ELb0ELb0EEEvPKNT_5BlockEPKNS1_8Q81BlockEPfiiS9_SD_",
+      "calls": 448,
+      "ms_per_step": 0.04481440624999994
+    },
+    {
+      "name": "_ZN2at6native24vectorized_gather_kernelILi16ExEEvPcS2_PT0_ixxxxb",
+      "calls": 2432,
+      "ms_per_step": 0.044465453125000415
+    },
+    {
+      "name": "_layer_norm_fwd_1pass_kernel",
+      "calls": 2304,
+      "ms_per_step": 0.04364079687499983
+    },
+    {
+      "name": "_qsa_mqa_paged_kernel",
+      "calls": 768,
+      "ms_per_step": 0.04358667187499989
+    },
+    {
+      "name": "_grouped_gate_act",
+      "calls": 3264,
+      "ms_per_step": 0.039034312500000654
+    },
+    {
+      "name": "_ZN2at6native18elementwise_kernelILi128ELi2EZNS0_22gpu_kernel_impl_nocastINS0_15CUDAFunctor_addIxEEEEvRNS_18TensorIteratorBaseERKT_EUliE_EEviT1_",
+      "calls": 2752,
+      "ms_per_step": 0.03741910937500061
+    },
+    {
+      "name": "_act_and_mul_kernel",
+      "calls": 3072,
+      "ms_per_step": 0.03621537500000091
+    },
+    {
+      "name": "_index_norm_rope_kernel",
+      "calls": 1536,
+      "ms_per_step": 0.03255434374999964
+    },
+    {
+      "name": "_ZN2at6native40_GLOBAL__N__0b46c3ea_8_Shape_cu_85d9f36c30CatArrayBatchedCopy_vectorizedINS1_10OpaqueTypeILj4EEEjLi1ELi128ELi1ELi16ELi4EEEvPcNS1_25CatArrInputTensorMetadataIT_T0_XT2_EXT3_EEENS1_16TensorSizeStrideIS8_Lj4EEEiS8_",
+      "calls": 2304,
+      "ms_per_step": 0.030796546875000982
+    },
+    {
+      "name": "_ZN50_GLOBAL__N__2530b397_17_RangeFactories_cu_4cc9e74429elementwise_kernel_with_indexIiZZZN2at6native15arange_cuda_outERKN3c106ScalarES6_S6_RNS1_6TensorEENKUlvE_clEvENKUlvE2_clEvEUlxE_EEvT_T0_PN15function_traitsISD_E11result_typeE",
+      "calls": 2816,
+      "ms_per_step": 0.02568242187500026
+    },
+    {
+      "name": "_ZN2at6native13reduce_kernelILi512ELi1ENS0_8ReduceOpIfNS0_9ArgMaxOpsIfEEjxLi4ELi4EEEEEvT1_",
+      "calls": 256,
+      "ms_per_step": 0.025588437500000005
+    },
+    {
+      "name": "_rope_tiled",
+      "calls": 1202,
+      "ms_per_step": 0.023941531249999974
+    },
+    {
+      "name": "_qsa_block_topk_kernel",
+      "calls": 768,
+      "ms_per_step": 0.02323185937499997
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4EZNS0_24float16_copy_kernel_cudaERNS_18TensorIteratorBaseEEUlfE_St5arrayIPcLy2EEEEviT0_T1_",
+      "calls": 1536,
+      "ms_per_step": 0.019252531250000263
+    },
+    {
+      "name": "_ZN39_GLOBAL__N__75760b52_7_cuda_cu_e5bc402614store_kv_cacheILy128ELy1ELb0ELy1024EiEEvNS_17StoreKernelParamsE",
+      "calls": 768,
+      "ms_per_step": 0.017638515624999948
+    },
+    {
+      "name": "_qsa_merge_splitk_kernel",
+      "calls": 960,
+      "ms_per_step": 0.017629125000000117
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_13BinaryFunctorIfffNS0_15binary_internal10MulFunctorIfEEEESt5arrayIPcLy3EEEEviT0_T1_",
+      "calls": 1152,
+      "ms_per_step": 0.01720946875000011
+    },
+    {
+      "name": "_compress_qsa_groups_kernel",
+      "calls": 768,
+      "ms_per_step": 0.015867343750000144
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e924native_small_mmvq_kernelINS1_8Q80BlockELi8ELb1EEEvPKT_PKNS1_8Q81BlockEPfii",
+      "calls": 192,
+      "ms_per_step": 0.013164390625000003
+    },
+    {
+      "name": "_ZN2at6native6sbtopk10gatherTopKIfjLi1ELb0EEEvNS_4cuda6detail10TensorInfoIKT_T0_EES8_S8_bS8_S8_NS5_IS6_S8_EES8_NS5_IxS8_EES8_PS6_",
+      "calls": 192,
+      "ms_per_step": 0.013002609375000003
+    },
+    {
+      "name": "_expand_qsa_indices_kernel",
+      "calls": 768,
+      "ms_per_step": 0.011958453124999952
+    },
+    {
+      "name": "_store_qsa_rows_kernel",
+      "calls": 768,
+      "ms_per_step": 0.011315531250000023
+    },
+    {
+      "name": "_ZN2at6native27unrolled_elementwise_kernelIZZZNS0_23direct_copy_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE1_clEvENKUlvE1_clEvEUliE_St5arrayIPcLy2EELi4E23TrivialOffsetCalculatorILi1EjESB_NS0_6memory12LoadWithCastILi1EEENSC_13StoreWithCastILi1EEEEEviT_T0_T2_T3_T4_T5_",
+      "calls": 704,
+      "ms_per_step": 0.010503953124999982
+    },
+    {
+      "name": "_ZN2at6native18elementwise_kernelILi128ELi4EZNS0_22gpu_kernel_impl_nocastINS0_50_GLOBAL__N__3a2b9ae4_17_CompareKernels_cu_8f1b29aa14CompareFunctorIiEEEEvRNS_18TensorIteratorBaseERKT_EUliE_EEviT1_",
+      "calls": 192,
+      "ms_per_step": 0.010109890624999993
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e924native_mmvq_multi_kernelINS1_11SmallTraitsINS1_8Q80BlockELi8EEELi8ELi4ELi2ELb0ELb0EEEvPKNT_5BlockEPKNS1_8Q81BlockEPfiiS9_SD_",
+      "calls": 34,
+      "ms_per_step": 0.009926281250000002
+    },
+    {
+      "name": "memcpy32_post",
+      "calls": 768,
+      "ms_per_step": 0.00903076562500003
+    },
+    {
+      "name": "_ZN2at6native20bitonicSortKVInPlaceILin2ELin1ELi16ELi16EfxNS0_4GTOpIfLb1EEEjEEvNS_4cuda6detail10TensorInfoIT3_T6_EES8_S8_S8_NS6_IT4_S8_EES8_T5_",
+      "calls": 192,
+      "ms_per_step": 0.008663171874999997
+    },
+    {
+      "name": "_ZN2at6native24index_elementwise_kernelILi128ELi4EZNS0_16gpu_index_kernelIZNS0_17index_kernel_implINS0_10OpaqueTypeILi8EEEEEvRNS_18TensorIteratorBaseEN3c108ArrayRefIxEESA_EUlPcPKcxE_EEvS7_SA_SA_RKT_bEUliE_EEvxT1_",
+      "calls": 384,
+      "ms_per_step": 0.008408562500000003
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_15CUDAFunctor_addIfEESt5arrayIPcLy3EEEEviT0_T1_",
+      "calls": 562,
+      "ms_per_step": 0.008366062499999981
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_21CUDAFunctorOnSelf_addIxEESt5arrayIPcLy2EEEEviT0_T1_",
+      "calls": 576,
+      "ms_per_step": 0.007657656249999985
+    },
+    {
+      "name": "_rows",
+      "calls": 370,
+      "ms_per_step": 0.006898328125000003
+    },
+    {
+      "name": "_ZN2at6native18elementwise_kernelILi128ELi2EZNS0_22gpu_kernel_impl_nocastINS0_13BinaryFunctorIfffNS0_15binary_internal10MulFunctorIfEEEEEEvRNS_18TensorIteratorBaseERKT_EUliE_EEviT1_",
+      "calls": 320,
+      "ms_per_step": 0.006363203124999997
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e924native_mmvq_multi_kernelINS1_11SmallTraitsINS1_8Q80BlockELi8EEELi3ELi4ELi2ELb0ELb0EEEvPKNT_5BlockEPKNS1_8Q81BlockEPfiiS9_SD_",
+      "calls": 63,
+      "ms_per_step": 0.006074328125000002
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_11FillFunctorIfEESt5arrayIPcLy1EEEEviT0_T1_",
+      "calls": 498,
+      "ms_per_step": 0.005340718749999999
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4EZZZNS0_62_GLOBAL__N__bd18916b_23_ActivationSiluKernel_cu_4d4cca09_1220411silu_kernelERNS_18TensorIteratorBaseEENKUlvE_clEvENKUlvE0_clEvEUlfE_St5arrayIPcLy2EEEEviT0_T1_",
+      "calls": 256,
+      "ms_per_step": 0.004682562499999991
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_11FillFunctorIxEESt5arrayIPcLy1EEEEviT0_T1_",
+      "calls": 448,
+      "ms_per_step": 0.004416906249999992
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi2EZZZNS0_49_GLOBAL__N__97375e57_16_TensorCompare_cu_71e06f4e19launch_clamp_scalarERNS_18TensorIteratorBaseEN3c106ScalarES6_NS0_6detail11ClampLimitsEENKUlvE_clEvENKUlvE2_clEvEUlxE_St5arrayIPcLy2EEEEviT0_T1_",
+      "calls": 320,
+      "ms_per_step": 0.0042216718749999976
+    },
+    {
+      "name": "_ZN2at6native18elementwise_kernelILi128ELi2EZNS0_22gpu_kernel_impl_nocastINS0_13BinaryFunctorIxxxNS0_15binary_internal10MulFunctorIxEEEEEEvRNS_18TensorIteratorBaseERKT_EUliE_EEviT1_",
+      "calls": 320,
+      "ms_per_step": 0.004152046875000005
+    },
+    {
+      "name": "_ZN9freetoken11gguf_native39_GLOBAL__N__22fff01e_7_cuda_cu_156734e924native_mmvq_multi_kernelINS1_11SmallTraitsINS1_8Q80BlockELi8EEELi2ELi4ELi2ELb0ELb0EEEvPKNT_5BlockEPKNS1_8Q81BlockEPfiiS9_SD_",
+      "calls": 39,
+      "ms_per_step": 0.0039905
+    },
+    {
+      "name": "_ZN2at6native18elementwise_kernelILi128ELi2EZNS0_22gpu_kernel_impl_nocastIZZZNS0_49_GLOBAL__N__97375e57_16_TensorCompare_cu_71e06f4e17where_kernel_implERNS_14TensorIteratorEENKUlvE_clEvENKUlvE6_clEvEUlbxxE_EEvRNS_18TensorIteratorBaseERKT_EUliE_EEviT1_",
+      "calls": 256,
+      "ms_per_step": 0.0036893437499999856
+    },
+    {
+      "name": "_ZN2at6native34_scatter_gather_elementwise_kernelILi128ELi8EZNS0_36_cuda_scatter_gather_internal_kernelILb0ENS0_10OpaqueTypeILi8EEExEclINS0_12TensorAssignEEEvRNS_14TensorIteratorExxxRKT_EUliE_EEviT1_",
+      "calls": 192,
+      "ms_per_step": 0.003680359374999996
+    },
+    {
+      "name": "_ZN2at6native18elementwise_kernelILi128ELi2EZNS0_22gpu_kernel_impl_nocastIZZZNS0_49_GLOBAL__N__97375e57_16_TensorCompare_cu_71e06f4e17where_kernel_implERNS_14TensorIteratorEENKUlvE_clEvENKUlvE5_clEvEUlbiiE_EEvRNS_18TensorIteratorBaseERKT_EUliE_EEviT1_",
+      "calls": 192,
+      "ms_per_step": 0.0035313749999999933
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4EZNS0_21compare_scalar_kernelIxEEvRNS_18TensorIteratorBaseENS0_50_GLOBAL__N__3a2b9ae4_17_CompareKernels_cu_8f1b29aa6OpTypeET_EUlxE_St5arrayIPcLy2EEEEviT0_T1_",
+      "calls": 256,
+      "ms_per_step": 0.0032774218750000056
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_21CUDAFunctorOnSelf_addIiEESt5arrayIPcLy2EEEEviT0_T1_",
+      "calls": 192,
+      "ms_per_step": 0.003166437500000002
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi2EZZZNS0_49_GLOBAL__N__97375e57_16_TensorCompare_cu_71e06f4e17where_kernel_implERNS_14TensorIteratorEENKUlvE_clEvENKUlvE6_clEvEUlbxxE_St5arrayIPcLy4EEEEviT0_T1_",
+      "calls": 192,
+      "ms_per_step": 0.0029835156250000005
+    },
+    {
+      "name": "_ZN43_GLOBAL__N__c5dc35cd_10_SoftMax_cu_0af7be2120softmax_warp_forwardIfffLi4ELb0ELb0EEEvPT0_PKT_iiiPKbib",
+      "calls": 192,
+      "ms_per_step": 0.0026958281249999934
+    },
+    {
+      "name": "_ZN2at6native44_GLOBAL__N__516f300d_11_Indexing_cu_2a2c434e21indexSelectSmallIndexIxxjLi1ELi1ELin2EEEvNS_4cuda6detail10TensorInfoIT_T1_EENS5_IKS6_S7_EENS5_IKT0_S7_EEiiS7_x",
+      "calls": 128,
+      "ms_per_step": 0.0026334062500000003
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_15CUDAFunctor_addIxEESt5arrayIPcLy3EEEEviT0_T1_",
+      "calls": 192,
+      "ms_per_step": 0.002632156249999993
+    },
+    {
+      "name": "_ZN2at6native13reduce_kernelILi512ELi1ENS0_8ReduceOpIfNS0_14func_wrapper_tIfZNS0_11sum_functorIfffEclERNS_14TensorIteratorEEUlffE_EEjfLi4ELi4EEEEEvT1_",
+      "calls": 64,
+      "ms_per_step": 0.002470359374999999
+    },
+    {
+      "name": "_ZN2at6native18elementwise_kernelILi128ELi2EZNS0_22gpu_kernel_impl_nocastINS0_13BinaryFunctorIxxxZZZNS0_21remainder_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE_clEvENKUlvE2_clEvEUlxxE_EEEEvS5_RKT_EUliE_EEviT1_",
+      "calls": 128,
+      "ms_per_step": 0.0024443750000000004
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_13BinaryFunctorIxxxNS0_17BitwiseXorFunctorIxEEEESt5arrayIPcLy3EEEEviT0_T1_",
+      "calls": 192,
+      "ms_per_step": 0.002381312499999998
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_11FillFunctorIiEESt5arrayIPcLy1EEEEviT0_T1_",
+      "calls": 192,
+      "ms_per_step": 0.001961749999999999
+    },
+    {
+      "name": "_ZN2at6native27unrolled_elementwise_kernelINS0_21CUDAFunctorOnSelf_addIxEESt5arrayIPcLy2EELi4E23TrivialOffsetCalculatorILi1EjES8_NS0_6memory15LoadWithoutCastENS9_16StoreWithoutCastEEEviT_T0_T2_T3_T4_T5_",
+      "calls": 128,
+      "ms_per_step": 0.0018202343749999987
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_13BinaryFunctorIbbbNS0_17BitwiseAndFunctorIbEEEESt5arrayIPcLy3EEEEviT0_T1_",
+      "calls": 128,
+      "ms_per_step": 0.0017963593749999993
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_13AUnaryFunctorIxxbNS0_51_GLOBAL__N__ec705ec5_18_CompareEQKernel_cu_d8008c9616CompareEqFunctorIxEEEESt5arrayIPcLy2EEEEviT0_T1_",
+      "calls": 128,
+      "ms_per_step": 0.0016826562499999969
+    },
+    {
+      "name": "_ZN2at6native24index_elementwise_kernelILi128ELi4EZNS0_16gpu_index_kernelIZNS0_21index_put_kernel_implINS0_10OpaqueTypeILi8EEEEEvRNS_14TensorIteratorEN3c108ArrayRefIxEESA_EUlPcPKcxE_EEvRNS_18TensorIteratorBaseESA_SA_RKT_bEUliE_EEvxT1_",
+      "calls": 64,
+      "ms_per_step": 0.0016361874999999998
+    },
+    {
+      "name": "_ZN2at6native18elementwise_kernelILi128ELi2EZNS0_22gpu_kernel_impl_nocastIZZZNS0_49_GLOBAL__N__97375e57_16_TensorCompare_cu_71e06f4e17where_kernel_implERNS_14TensorIteratorEENKUlvE_clEvENKUlvE9_clEvEUlbffE_EEvRNS_18TensorIteratorBaseERKT_EUliE_EEviT1_",
+      "calls": 64,
+      "ms_per_step": 0.0014671562499999986
+    },
+    {
+      "name": "_ZN2at6native45tensor_kernel_scan_innermost_dim_with_indicesIxSt13greater_equalIxEEEvPKT_PS4_PxiijjS4_T0_",
+      "calls": 64,
+      "ms_per_step": 0.0013546562499999997
+    },
+    {
+      "name": "_ZN2at6native44_GLOBAL__N__516f300d_11_Indexing_cu_2a2c434e21indexSelectSmallIndexIixjLi2ELi2ELin2EEEvNS_4cuda6detail10TensorInfoIT_T1_EENS5_IKS6_S7_EENS5_IKT0_S7_EEiiS7_x",
+      "calls": 64,
+      "ms_per_step": 0.0011977343749999994
+    },
+    {
+      "name": "_gguf_ple_gate",
+      "calls": 64,
+      "ms_per_step": 0.0011476406250000002
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_13BUnaryFunctorIxxxZZZNS0_15binary_internal21div_floor_kernel_cudaERNS_18TensorIteratorBaseEENKUlvE_clEvENKUlvE2_clEvEUlxxE_EESt5arrayIPcLy2EEEEviT0_T1_",
+      "calls": 64,
+      "ms_per_step": 0.0011311093750000002
+    },
+    {
+      "name": "_ZN2at6native49_GLOBAL__N__83754288_16_Bucketization_cu_723a43a424searchsorted_cuda_kernelIxxEEvPT0_PKT_S7_PKxxxxbb",
+      "calls": 64,
+      "ms_per_step": 0.0011057187499999997
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4EZNS0_23bitwise_not_kernel_cudaERNS_18TensorIteratorBaseEEUlbE_St5arrayIPcLy2EEEEviT0_T1_",
+      "calls": 64,
+      "ms_per_step": 0.0010276250000000005
+    },
+    {
+      "name": "_ZN2at6native40_GLOBAL__N__0b46c3ea_8_Shape_cu_85d9f36c35CatArrayBatchedCopy_alignedK_contigINS1_10OpaqueTypeILj8EEEjLi2ELi128ELi1ELi16EEEvPT_NS1_25CatArrInputTensorMetadataIS5_T0_XT2_EXT3_EEENS1_16TensorSizeStrideIS8_Lj4EEEiS8_",
+      "calls": 64,
+      "ms_per_step": 0.0009801562500000001
+    },
+    {
+      "name": "_ZN2at6native18elementwise_kernelILi128ELi4EZNS0_22gpu_kernel_impl_nocastINS0_50_GLOBAL__N__3a2b9ae4_17_CompareKernels_cu_8f1b29aa14CompareFunctorIxEEEEvRNS_18TensorIteratorBaseERKT_EUliE_EEviT1_",
+      "calls": 64,
+      "ms_per_step": 0.000949125
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4EZZZNS0_44_GLOBAL__N__516f300d_11_Indexing_cu_2a2c434e18masked_fill_kernelERNS_14TensorIteratorERKN3c106ScalarEENKUlvE_clEvENKUlvE1_clEvEUlibE_St5arrayIPcLy3EEEEviT0_T1_",
+      "calls": 64,
+      "ms_per_step": 0.0009426249999999997
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_50_GLOBAL__N__3a2b9ae4_17_CompareKernels_cu_8f1b29aa14CompareFunctorIxEESt5arrayIPcLy3EEEEviT0_T1_",
+      "calls": 64,
+      "ms_per_step": 0.0008946406250000004
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi2ENS0_13AUnaryFunctorIxxxNS0_15binary_internal10MulFunctorIxEEEESt5arrayIPcLy2EEEEviT0_T1_",
+      "calls": 64,
+      "ms_per_step": 0.0008876093749999998
+    },
+    {
+      "name": "_ZN2at6native27unrolled_elementwise_kernelINS0_15CUDAFunctor_addIxEESt5arrayIPcLy3EELi4E23TrivialOffsetCalculatorILi2EjES7_ILi1EjENS0_6memory15LoadWithoutCastENSA_16StoreWithoutCastEEEviT_T0_T2_T3_T4_T5_",
+      "calls": 64,
+      "ms_per_step": 0.0008576249999999996
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4EZNS0_21compare_scalar_kernelIiEEvRNS_18TensorIteratorBaseENS0_50_GLOBAL__N__3a2b9ae4_17_CompareKernels_cu_8f1b29aa6OpTypeET_EUliE_St5arrayIPcLy2EEEEviT0_T1_",
+      "calls": 64,
+      "ms_per_step": 0.0008530624999999999
+    },
+    {
+      "name": "_ZN2at6native40_GLOBAL__N__0b46c3ea_8_Shape_cu_85d9f36c30CatArrayBatchedCopy_vectorizedINS1_10OpaqueTypeILj8EEEjLi2ELi128ELi1ELi16ELi2EEEvPcNS1_25CatArrInputTensorMetadataIT_T0_XT2_EXT3_EEENS1_16TensorSizeStrideIS8_Lj4EEEiS8_",
+      "calls": 64,
+      "ms_per_step": 0.0008196875
+    },
+    {
+      "name": "_ZN2at6native40_GLOBAL__N__0b46c3ea_8_Shape_cu_85d9f36c30CatArrayBatchedCopy_vectorizedINS1_10OpaqueTypeILj8EEEjLi1ELi128ELi1ELi16ELi2EEEvPcNS1_25CatArrInputTensorMetadataIT_T0_XT2_EXT3_EEENS1_16TensorSizeStrideIS8_Lj4EEEiS8_",
+      "calls": 64,
+      "ms_per_step": 0.0007651406250000002
+    },
+    {
+      "name": "_ZN2at6native18elementwise_kernelILi128ELi2EZNS0_22gpu_kernel_impl_nocastINS0_15CUDAFunctor_addIiEEEEvRNS_18TensorIteratorBaseERKT_EUliE_EEviT1_",
+      "calls": 34,
+      "ms_per_step": 0.000524078125
+    },
+    {
+      "name": "_ZN50_GLOBAL__N__2530b397_17_RangeFactories_cu_4cc9e74429elementwise_kernel_with_indexIiZZZN2at6native15arange_cuda_outERKN3c106ScalarES6_S6_RNS1_6TensorEENKUlvE_clEvENKUlvE1_clEvEUlxE_EEvT_T0_PN15function_traitsISD_E11result_typeE",
+      "calls": 50,
+      "ms_per_step": 0.00048556250000000015
+    },
+    {
+      "name": "_ZN2at6native29vectorized_elementwise_kernelILi4ENS0_15CUDAFunctor_addIiEESt5arrayIPcLy3EEEEviT0_T1_",
+      "calls": 16,
+      "ms_per_step": 0.000252546875
+    }
+  ]
+}
