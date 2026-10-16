@@ -1,0 +1,23 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand4\\Scripts\\python.exe",
+    "-B",
+    "test-cached-adaptation-v1.py"
+  ],
+  "cwd": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016",
+  "started": 1792156796.1322577,
+  "samples": 19,
+  "min_commit_available": 56479518720,
+  "min_ram_available": 57124417536,
+  "min_gpu_free": 16037015552,
+  "max_commit_used": 13839392768,
+  "max_gpu_used": 1057918976,
+  "max_tree_rss": 1268953088,
+  "max_tree_private": 2730090496,
+  "stop_reason": null,
+  "pid": 1756,
+  "returncode": 0,
+  "elapsed_s": 9.578000000008615,
+  "remaining_before_cleanup": [],
+  "remaining_descendants": []
+}

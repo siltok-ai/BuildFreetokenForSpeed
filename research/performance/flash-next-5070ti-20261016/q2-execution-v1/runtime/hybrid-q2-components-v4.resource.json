@@ -1,0 +1,23 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand4\\Scripts\\python.exe",
+    "-B",
+    "bench-hybrid-q2-v4.py"
+  ],
+  "cwd": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016",
+  "started": 1792155300.13323,
+  "samples": 18,
+  "min_commit_available": 56935297024,
+  "min_ram_available": 57305649152,
+  "min_gpu_free": 16095735808,
+  "max_commit_used": 13383614464,
+  "max_gpu_used": 999198720,
+  "max_tree_rss": 1074569216,
+  "max_tree_private": 2208948224,
+  "stop_reason": null,
+  "pid": 7452,
+  "returncode": 0,
+  "elapsed_s": 9.078000000008615,
+  "remaining_before_cleanup": [],
+  "remaining_descendants": []
+}

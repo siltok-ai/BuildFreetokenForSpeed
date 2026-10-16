@@ -1,0 +1,101 @@
+[1m[2026-10-16|20:10:56|core|rank=0][0m [32mINFO    [0m Enabled expandable_segments (override via PYTORCH_ALLOC_CONF)
+[1m[2026-10-16|20:10:56|core|rank=0][0m [33mWARNING [0m Page size is overridden to 64 for the qsa_sparse backend
+[1m[2026-10-16|20:10:56|core|rank=0][0m [32mINFO    [0m Resolved config: moe_strategy='offload', attention_backend='qsa_sparse', cache_type='hybrid_radix', page_size=64
+[1m[2026-10-16|20:10:56|core|rank=0][0m [32mINFO    [0m Free memory before loading model: 14.67 GiB
+[1m[2026-10-16|20:11:00|core|rank=0][0m [32mINFO    [0m Input embedding: 273152000 original compressed bytes in mapped host memory
+[1m[2026-10-16|20:11:01|core|rank=0][0m [32mINFO    [0m PLE disk backend: ReadFile pool x16, NO_BUFFERING, wait-sync
+[1m[2026-10-16|20:11:01|core|rank=0][0m [32mINFO    [0m MoE experts: q2_0 via triton
+[1m[2026-10-16|20:11:04|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 0: 434 compact host rows
+[1m[2026-10-16|20:11:05|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 1: 416 compact host rows
+[1m[2026-10-16|20:11:05|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 2: 424 compact host rows
+[1m[2026-10-16|20:11:06|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 3: 427 compact host rows
+[1m[2026-10-16|20:11:06|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 4: 416 compact host rows
+[1m[2026-10-16|20:11:07|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 5: 419 compact host rows
+[1m[2026-10-16|20:11:08|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 6: 402 compact host rows
+[1m[2026-10-16|20:11:08|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 7: 407 compact host rows
+[1m[2026-10-16|20:11:09|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 8: 417 compact host rows
+[1m[2026-10-16|20:11:09|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 9: 410 compact host rows
+[1m[2026-10-16|20:11:10|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 10: 424 compact host rows
+[1m[2026-10-16|20:11:11|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 11: 419 compact host rows
+[1m[2026-10-16|20:11:11|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 12: 410 compact host rows
+[1m[2026-10-16|20:11:12|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 13: 398 compact host rows
+[1m[2026-10-16|20:11:12|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 14: 423 compact host rows
+[1m[2026-10-16|20:11:13|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 15: 428 compact host rows
+[1m[2026-10-16|20:11:13|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 16: 415 compact host rows
+[1m[2026-10-16|20:11:14|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 17: 409 compact host rows
+[1m[2026-10-16|20:11:15|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 18: 405 compact host rows
+[1m[2026-10-16|20:11:15|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 19: 405 compact host rows
+[1m[2026-10-16|20:11:16|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 20: 420 compact host rows
+[1m[2026-10-16|20:11:16|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 21: 405 compact host rows
+[1m[2026-10-16|20:11:17|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 22: 411 compact host rows
+[1m[2026-10-16|20:11:18|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 23: 423 compact host rows
+[1m[2026-10-16|20:11:18|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 24: 416 compact host rows
+[1m[2026-10-16|20:11:19|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 25: 414 compact host rows
+[1m[2026-10-16|20:11:19|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 26: 415 compact host rows
+[1m[2026-10-16|20:11:20|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 27: 423 compact host rows
+[1m[2026-10-16|20:11:20|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 28: 432 compact host rows
+[1m[2026-10-16|20:11:21|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 29: 415 compact host rows
+[1m[2026-10-16|20:11:22|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 30: 427 compact host rows
+[1m[2026-10-16|20:11:22|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 31: 425 compact host rows
+[1m[2026-10-16|20:11:23|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 32: 426 compact host rows
+[1m[2026-10-16|20:11:23|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 33: 415 compact host rows
+[1m[2026-10-16|20:11:24|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 34: 411 compact host rows
+[1m[2026-10-16|20:11:25|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 35: 411 compact host rows
+[1m[2026-10-16|20:11:25|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 36: 421 compact host rows
+[1m[2026-10-16|20:11:26|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 37: 396 compact host rows
+[1m[2026-10-16|20:11:26|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 38: 410 compact host rows
+[1m[2026-10-16|20:11:27|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 39: 420 compact host rows
+[1m[2026-10-16|20:11:28|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 40: 426 compact host rows
+[1m[2026-10-16|20:11:28|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 41: 411 compact host rows
+[1m[2026-10-16|20:11:29|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 42: 407 compact host rows
+[1m[2026-10-16|20:11:29|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 43: 422 compact host rows
+[1m[2026-10-16|20:11:30|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 44: 413 compact host rows
+[1m[2026-10-16|20:11:30|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 45: 417 compact host rows
+[1m[2026-10-16|20:11:31|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 46: 420 compact host rows
+[1m[2026-10-16|20:11:32|core|rank=0][0m [32mINFO    [0m Protected Q2 layer 47: 408 compact host rows
+[1m[2026-10-16|20:11:32|core|rank=0][0m [32mINFO    [0m Multimodal disabled: --text-model-only
+[1m[2026-10-16|20:11:32|core|rank=0][0m [32mINFO    [0m Allocating 8192 tokens for KV cache, K + V = 0.23 GiB
+[1m[2026-10-16|20:11:32|core|rank=0][0m [32mINFO    [0m qsa_sparse block top-k: triton qsa_block_topk
+[1m[2026-10-16|20:11:32|core|rank=0][0m [32mINFO    [0m Free memory after initialization: 0.94 GiB
+[1m[2026-10-16|20:11:32|core|rank=0][0m [32mINFO    [0m Start capturing CUDA graphs with sizes: [1]
+[1m[2026-10-16|20:11:32|core|rank=0][0m [32mINFO    [0m Free GPU memory before capturing CUDA graphs: 0.94 GiB
+[1m[2026-10-16|20:11:33|core|rank=0][0m [32mINFO    [0m Free GPU memory after capturing CUDA graphs: 0.92 GiB
+[1m[2026-10-16|20:11:36|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 26, #cached-token: 0, token usage: 0.01, #mamba-slot: 7/9, mamba usage: 0.78, #running-req: 1, #queue-req: 0, input throughput (token/s): 37.49
+{"name": "warmup", "input_tokens": 26, "output_tokens": 3, "arrivals": 3, "terminal": {"token": 248046, "finished": true, "reason": "stop"}, "elapsed_seconds": 0.7307407999760471, "ttft_ms": 663.2769999851007, "decode_tps": 29.819591476019106, "allocated": 14551939584, "reserved": 14801698816, "mtp": {"windows": 1, "drafted": 3, "accepted": 2, "committed": 3, "lookup_windows": 0}}
+[1m[2026-10-16|20:11:37|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 62, #cached-token: 0, token usage: 0.01, #mamba-slot: 7/9, mamba usage: 0.78, #running-req: 1, #queue-req: 0, input throughput (token/s): 80.66
+{"name": "english-0", "input_tokens": 62, "output_tokens": 512, "arrivals": 512, "terminal": {"token": 220, "finished": true, "reason": "length"}, "elapsed_seconds": 6.032432600011816, "ttft_ms": 699.6082999976352, "decode_tps": 95.82675243260401, "allocated": 14551939584, "reserved": 14822670336, "mtp": {"windows": 187, "drafted": 557, "accepted": 324, "committed": 511, "lookup_windows": 0}}
+[1m[2026-10-16|20:11:43|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 62, #cached-token: 0, token usage: 0.01, #mamba-slot: 7/9, mamba usage: 0.78, #running-req: 1, #queue-req: 0, input throughput (token/s): 10.36
+{"name": "english-1", "input_tokens": 62, "output_tokens": 512, "arrivals": 512, "terminal": {"token": 220, "finished": true, "reason": "length"}, "elapsed_seconds": 5.714189699996496, "ttft_ms": 651.2917999934871, "decode_tps": 100.9359069632291, "allocated": 14551939584, "reserved": 14822670336, "mtp": {"windows": 187, "drafted": 557, "accepted": 324, "committed": 511, "lookup_windows": 0}}
+[1m[2026-10-16|20:11:49|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 62, #cached-token: 0, token usage: 0.01, #mamba-slot: 7/9, mamba usage: 0.78, #running-req: 1, #queue-req: 0, input throughput (token/s): 10.78
+{"name": "english-2", "input_tokens": 62, "output_tokens": 512, "arrivals": 512, "terminal": {"token": 220, "finished": true, "reason": "length"}, "elapsed_seconds": 5.609709100011969, "ttft_ms": 683.4069000033196, "decode_tps": 103.7345177502686, "allocated": 14551939584, "reserved": 14822670336, "mtp": {"windows": 187, "drafted": 557, "accepted": 324, "committed": 511, "lookup_windows": 0}}
+[1m[2026-10-16|20:11:55|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 66, #cached-token: 0, token usage: 0.02, #mamba-slot: 8/9, mamba usage: 0.89, #running-req: 1, #queue-req: 0, input throughput (token/s): 11.74
+{"name": "chinese-0", "input_tokens": 66, "output_tokens": 512, "arrivals": 512, "terminal": {"token": 99159, "finished": true, "reason": "length"}, "elapsed_seconds": 6.033705700014252, "ttft_ms": 694.5655999879818, "decode_tps": 95.71304816061148, "allocated": 14551940608, "reserved": 14822670336, "mtp": {"windows": 202, "drafted": 601, "accepted": 309, "committed": 511, "lookup_windows": 0}}
+[1m[2026-10-16|20:12:00|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 2, #cached-token: 64, token usage: 0.02, #mamba-slot: 8/9, mamba usage: 0.89, #running-req: 1, #queue-req: 0, input throughput (token/s): 0.37
+{"name": "chinese-1", "input_tokens": 66, "output_tokens": 512, "arrivals": 512, "terminal": {"token": 332, "finished": true, "reason": "length"}, "elapsed_seconds": 5.276664600009099, "ttft_ms": 84.01869999943301, "decode_tps": 98.41343483981977, "allocated": 14551940608, "reserved": 14822670336, "mtp": {"windows": 200, "drafted": 596, "accepted": 311, "committed": 511, "lookup_windows": 0}}
+[1m[2026-10-16|20:12:05|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 2, #cached-token: 64, token usage: 0.02, #mamba-slot: 8/9, mamba usage: 0.89, #running-req: 1, #queue-req: 0, input throughput (token/s): 0.38
+[1m[2026-10-16|20:12:06|core|rank=0][0m [32mINFO    [0m Decode batch, #running-req: 1, #token: 192, token usage: 0.02, #mamba-slot: 8/9, mamba usage: 0.89, gen throughput (token/s): 86.59, #queue-req: 0
+{"name": "chinese-2", "input_tokens": 66, "output_tokens": 512, "arrivals": 512, "terminal": {"token": 332, "finished": true, "reason": "length"}, "elapsed_seconds": 5.209185799991246, "ttft_ms": 65.53019999410026, "decode_tps": 99.3506453481291, "allocated": 14551940608, "reserved": 14822670336, "mtp": {"windows": 200, "drafted": 596, "accepted": 311, "committed": 511, "lookup_windows": 0}}
+[1m[2026-10-16|20:12:11|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 70, #cached-token: 0, token usage: 0.02, #mamba-slot: 8/9, mamba usage: 0.89, #running-req: 1, #queue-req: 0, input throughput (token/s): 11.94
+{"name": "code-0", "input_tokens": 70, "output_tokens": 512, "arrivals": 512, "terminal": {"token": 67921, "finished": true, "reason": "length"}, "elapsed_seconds": 5.8182204000186175, "ttft_ms": 714.4791000173427, "decode_tps": 100.12769710442089, "allocated": 14551941120, "reserved": 14822670336, "mtp": {"windows": 165, "drafted": 491, "accepted": 346, "committed": 511, "lookup_windows": 0}}
+[1m[2026-10-16|20:12:16|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 6, #cached-token: 64, token usage: 0.02, #mamba-slot: 8/9, mamba usage: 0.89, #running-req: 1, #queue-req: 0, input throughput (token/s): 1.15
+{"name": "code-1", "input_tokens": 70, "output_tokens": 512, "arrivals": 512, "terminal": {"token": 682, "finished": true, "reason": "length"}, "elapsed_seconds": 4.934270199999446, "ttft_ms": 93.19600000162609, "decode_tps": 105.56059762929118, "allocated": 14551941120, "reserved": 14822670336, "mtp": {"windows": 163, "drafted": 487, "accepted": 348, "committed": 511, "lookup_windows": 0}}
+[1m[2026-10-16|20:12:21|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 6, #cached-token: 64, token usage: 0.02, #mamba-slot: 8/9, mamba usage: 0.89, #running-req: 1, #queue-req: 0, input throughput (token/s): 1.22
+{"name": "code-2", "input_tokens": 70, "output_tokens": 512, "arrivals": 512, "terminal": {"token": 682, "finished": true, "reason": "length"}, "elapsed_seconds": 4.709718300000532, "ttft_ms": 85.0198999978602, "decode_tps": 110.49940954211527, "allocated": 14551941120, "reserved": 14822670336, "mtp": {"windows": 163, "drafted": 487, "accepted": 348, "committed": 511, "lookup_windows": 0}}
+[1m[2026-10-16|20:12:27|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 70, #cached-token: 0, token usage: 0.02, #mamba-slot: 8/9, mamba usage: 0.89, #running-req: 1, #queue-req: 0, input throughput (token/s): 13.22
+{"name": "70-0-0", "input_tokens": 70, "output_tokens": 512, "arrivals": 512, "terminal": {"token": 21360, "finished": true, "reason": "length"}, "elapsed_seconds": 6.152692600007867, "ttft_ms": 666.5999999968335, "decode_tps": 93.1492211328382, "allocated": 14551941120, "reserved": 14822670336, "mtp": {"windows": 194, "drafted": 579, "accepted": 317, "committed": 511, "lookup_windows": 0}}
+[1m[2026-10-16|20:12:32|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 6, #cached-token: 64, token usage: 0.02, #mamba-slot: 8/9, mamba usage: 0.89, #running-req: 1, #queue-req: 0, input throughput (token/s): 1.08
+[1m[2026-10-16|20:12:36|core|rank=0][0m [32mINFO    [0m Decode batch, #running-req: 1, #token: 512, token usage: 0.06, #mamba-slot: 8/9, mamba usage: 0.89, gen throughput (token/s): 95.82, #queue-req: 0
+{"name": "70-0-1", "input_tokens": 70, "output_tokens": 512, "arrivals": 512, "terminal": {"token": 11069, "finished": true, "reason": "length"}, "elapsed_seconds": 5.3541754000179935, "ttft_ms": 75.5168000177946, "decode_tps": 96.8100592892104, "allocated": 14551941120, "reserved": 14822670336, "mtp": {"windows": 193, "drafted": 578, "accepted": 318, "committed": 511, "lookup_windows": 0}}
+[1m[2026-10-16|20:12:38|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 6, #cached-token: 64, token usage: 0.02, #mamba-slot: 8/9, mamba usage: 0.89, #running-req: 1, #queue-req: 0, input throughput (token/s): 1.12
+{"name": "70-0-2", "input_tokens": 70, "output_tokens": 512, "arrivals": 512, "terminal": {"token": 11069, "finished": true, "reason": "length"}, "elapsed_seconds": 6.654628699994646, "ttft_ms": 74.61599999805912, "decode_tps": 77.66265854897216, "allocated": 14551941120, "reserved": 14822670336, "mtp": {"windows": 193, "drafted": 578, "accepted": 318, "committed": 511, "lookup_windows": 0}}
+[1m[2026-10-16|20:12:47|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 1024, #cached-token: 0, token usage: 0.12, #mamba-slot: 7/9, mamba usage: 0.78, #running-req: 0, #queue-req: 1, input throughput (token/s): 106.57
+[1m[2026-10-16|20:12:50|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 1024, #cached-token: 0, token usage: 0.25, #mamba-slot: 7/9, mamba usage: 0.78, #running-req: 0, #queue-req: 1, input throughput (token/s): 371.20
+[1m[2026-10-16|20:12:53|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 1024, #cached-token: 0, token usage: 0.38, #mamba-slot: 7/9, mamba usage: 0.78, #running-req: 0, #queue-req: 1, input throughput (token/s): 345.72
+[1m[2026-10-16|20:12:55|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 1024, #cached-token: 0, token usage: 0.50, #mamba-slot: 8/9, mamba usage: 0.89, #running-req: 1, #queue-req: 0, input throughput (token/s): 397.68
+{"name": "diverse-4096-0-0", "input_tokens": 4096, "output_tokens": 512, "arrivals": 512, "terminal": {"token": 57018, "finished": true, "reason": "length"}, "elapsed_seconds": 18.888818999985233, "ttft_ms": 11317.979799991008, "decode_tps": 67.49858920009123, "allocated": 14551972864, "reserved": 15472787456, "mtp": {"windows": 183, "drafted": 543, "accepted": 328, "committed": 511, "lookup_windows": 0}}
+[1m[2026-10-16|20:13:04|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 64, #cached-token: 4032, token usage: 0.50, #mamba-slot: 8/9, mamba usage: 0.89, #running-req: 1, #queue-req: 0, input throughput (token/s): 7.59
+{"name": "diverse-4096-0-1", "input_tokens": 4096, "output_tokens": 512, "arrivals": 512, "terminal": {"token": 57018, "finished": true, "reason": "length"}, "elapsed_seconds": 7.502326899993932, "ttft_ms": 847.9104999860283, "decode_tps": 76.79392256188484, "allocated": 14551972864, "reserved": 15472787456, "mtp": {"windows": 183, "drafted": 543, "accepted": 328, "committed": 511, "lookup_windows": 0}}
+[1m[2026-10-16|20:13:11|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 64, #cached-token: 4032, token usage: 0.50, #mamba-slot: 8/9, mamba usage: 0.89, #running-req: 1, #queue-req: 0, input throughput (token/s): 8.62
+{"name": "diverse-4096-0-2", "input_tokens": 4096, "output_tokens": 512, "arrivals": 512, "terminal": {"token": 57018, "finished": true, "reason": "length"}, "elapsed_seconds": 7.992784199974267, "ttft_ms": 761.5684999909718, "decode_tps": 70.66843334977028, "allocated": 14551972864, "reserved": 15472787456, "mtp": {"windows": 183, "drafted": 543, "accepted": 328, "committed": 511, "lookup_windows": 0}}
+[1m[2026-10-16|20:13:19|core|rank=0][0m [32mINFO    [0m Prefill batch, #new-seq: 1, #new-token: 26, #cached-token: 0, token usage: 0.01, #mamba-slot: 7/9, mamba usage: 0.78, #running-req: 1, #queue-req: 0, input throughput (token/s): 3.29
+{"name": "after", "input_tokens": 26, "output_tokens": 3, "arrivals": 3, "terminal": {"token": 248046, "finished": true, "reason": "stop"}, "elapsed_seconds": 0.7054074000043329, "ttft_ms": 652.532699983567, "decode_tps": 37.87104152948378, "allocated": 14551956480, "reserved": 15472787456, "mtp": {"windows": 1, "drafted": 3, "accepted": 2, "committed": 3, "lookup_windows": 0}}

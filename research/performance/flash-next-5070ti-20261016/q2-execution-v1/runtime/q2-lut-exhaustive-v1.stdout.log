@@ -1,0 +1,1 @@
+{"status": "passed", "inputs": 65536, "decoded_values": 524288, "exact": true, "scope": "Original Q2 code domain, no model or precision change"}

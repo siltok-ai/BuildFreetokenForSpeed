@@ -1,0 +1,23 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand4\\Scripts\\python.exe",
+    "-B",
+    "bench-native-grouped-q2-v3.py"
+  ],
+  "cwd": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016",
+  "started": 1792154280.1942184,
+  "samples": 36,
+  "min_commit_available": 56735789056,
+  "min_ram_available": 57309388800,
+  "min_gpu_free": 16037146624,
+  "max_commit_used": 13583122432,
+  "max_gpu_used": 1057787904,
+  "max_tree_rss": 1036718080,
+  "max_tree_private": 2412969984,
+  "stop_reason": null,
+  "pid": 11516,
+  "returncode": 0,
+  "elapsed_s": 18.171999999991385,
+  "remaining_before_cleanup": [],
+  "remaining_descendants": []
+}

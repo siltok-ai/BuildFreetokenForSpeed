@@ -19,6 +19,8 @@
 后续独立候选 `strataq2perf3` 增加紧凑MTP事务、快照容量配置、在线热点所有者交换和宽tile，原生材料字节沿用perf2；已测范围与尚未完成的Speed验收见 [第三轮记录](docs/flash-next-5070ti-perf3.txt)。
 独立候选 `strataq2perf4` 提前将原始压缩embedding放映射主存、支持专家旧热度衰减并复用跨层准入JIT；源码开关MTP质量与状态扩缩容通过，普通wheel/Speed验收边界见 [第四轮记录](docs/flash-next-5070ti-perf4.txt)。
 
+后续 [Q2执行研究检查点](docs/flash-next-5070ti-q2-execution.txt)保存了有收益的字节置换解码、GPU所有权元数据发布及缓存副本晋升原型，以及未采用的CPU协作/原生聚合实验。OFF原生性能已进入同Q2 Strata参考范围，ON仍有差距；这些原型尚未形成新交付材料。
+
 后续研究检查点保存了 [MTP词表原型与Strata反向消融](docs/flash-next-5070ti-mtp-review.txt)：对照CJK/英文/完整词表、同步提交，以及草稿KV ring、窗口流水和长度策略的实际接线。该检查点尚未形成新的正式profile或Speed交付版本。
 
 ## 使用当前版本

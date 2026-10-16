@@ -1,0 +1,31 @@
+{
+  "scope": "Unversioned source5 GPU metadata publication and zero dynamic quota; not perf4 frozen artifacts",
+  "parent_profile": "strataq2perf4",
+  "files": [
+    {
+      "path": "python/freetoken/moe/q2_adaptive.py",
+      "sha256": "db9710eefe66f4e2df4344fc1d0a49c4942bbaadcd614869d913cacc2a97e7ae",
+      "base_sha256": "9227eeaa5cdb638dd270c61d70ad58dc7aa34a693ddd4e46a70612cc1c9bdb91"
+    },
+    {
+      "path": "python/freetoken/moe/q2_residency.py",
+      "sha256": "9a9aed6cf0bbeed8dec84d6faedff07c5dec7e46490be319260a69d8b9aa7063",
+      "base_sha256": "c5646112c3a9b9f241687493f0d9da2cdd2a12131a040dab38b4dec0f934e01e"
+    },
+    {
+      "path": "python/freetoken/engine/config.py",
+      "sha256": "d8a5247a2335d419d3c52bbd860a85083b84ef14c25db5644114e7ce2ca967ca",
+      "base_sha256": "1d05bc1f32dcf47a48d782440a6e4d0d376e9594589a822edc46ceb25f430b4b"
+    },
+    {
+      "path": "tests/moe/test_q2_adaptive.py",
+      "sha256": "57e2f7db0591f28b611a13ac27134d05beab56daeaf3ba7b8785428082de2517",
+      "base_sha256": "eab39543a854e80a7e704399dceb02f009dd3e5a646a719984f2e56f8f9076b4"
+    },
+    {
+      "path": "tests/moe/test_q2_residency.py",
+      "sha256": "697111f8c971823a8edf34bc23c59ab975a6ca3628f0654f9b839056473fcaeb",
+      "base_sha256": "cc1a16a2aa1b0f1d9701fbefb6e3a69e1cad1e53f4d42b2efd344605a90c8cff"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand4\\Scripts\\python.exe",
+    "-B",
+    "test-candidate5-source-v1.py"
+  ],
+  "cwd": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016",
+  "started": 1792155189.9993408,
+  "samples": 22,
+  "min_commit_available": 56454598656,
+  "min_ram_available": 57103147008,
+  "min_gpu_free": 16034918400,
+  "max_commit_used": 13864312832,
+  "max_gpu_used": 1060016128,
+  "max_tree_rss": 1264549888,
+  "max_tree_private": 2726522880,
+  "stop_reason": null,
+  "pid": 19348,
+  "returncode": 0,
+  "elapsed_s": 11.110000000015134,
+  "remaining_before_cleanup": [],
+  "remaining_descendants": []
+}

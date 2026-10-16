@@ -1,0 +1,23 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand4\\Scripts\\python.exe",
+    "-B",
+    "test-q2-lut-exhaustive-v1.py"
+  ],
+  "cwd": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016",
+  "started": 1792156153.9872482,
+  "samples": 7,
+  "min_commit_available": 57155022848,
+  "min_ram_available": 57552891904,
+  "min_gpu_free": 16112513024,
+  "max_commit_used": 13163888640,
+  "max_gpu_used": 982421504,
+  "max_tree_rss": 799625216,
+  "max_tree_private": 2018107392,
+  "stop_reason": null,
+  "pid": 18024,
+  "returncode": 0,
+  "elapsed_s": 3.5309999999881256,
+  "remaining_before_cleanup": [],
+  "remaining_descendants": []
+}
