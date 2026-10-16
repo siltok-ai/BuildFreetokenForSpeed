@@ -1,0 +1,226 @@
+--- a/python/freetoken/kernel/csrc/row_store/row_store_ext.cpp
++++ b/python/freetoken/kernel/csrc/row_store/row_store_ext.cpp
+@@ -1,6 +1,6 @@
+ // Disk-backed PLE row store: rows read straight from the checkpoint's fp8 shard tensors
+ // through an extent table (PleRowSource in ple_ssd.py). Engine-thread only, no locks.
+-// Duplicate rows in one fill dedup into ONE batched read round; no RAM cache and no
++// Duplicate rows in one fill dedup into ONE batched read round; a bounded optional RAM cache and no
+ // per-sequence state. Hash reference: tests/models/qwen4_exp/test_ple_disk.py.
+ // Platform seams: TableFile (O_DIRECT+pread; Win: NO_BUFFERING), BatchReader (io_uring,
+ // pread-pool fallback = the portable shape), cumemop_* (dlopen libcuda; Win: nvcuda).
+@@ -563,6 +563,18 @@
+     bounce_ = page_aligned_alloc((size_t)reader_->capacity() * kSpanMax);
+   }
+ 
++  void set_row_cache(int64_t rows) {
++    if (rows < 0 || rows > (1LL << 24))
++      throw std::invalid_argument("row cache capacity must be between0 and16777216 rows");
++    if (!pending_.empty()) throw std::runtime_error("cannot replace a row cache with unflushed reads");
++    const size_t capacity = (size_t)(rows / 8) * 8;
++    std::vector<int64_t> keys(capacity, -1);
++    std::vector<uint8_t> data(capacity * (size_t)row_bytes_);
++    std::vector<uint8_t> next(capacity / 8, 0);
++    cache_keys_.swap(keys); cache_data_.swap(data); cache_next_.swap(next);
++    cache_hits_ = cache_misses_ = 0;
++  }
++
+   // reader first: a still-running read must not land in freed bounce memory
+   virtual ~RowStore() {
+     reader_.reset();
+@@ -622,7 +634,10 @@
+   std::unordered_map<std::string, int64_t> io_stats() const {
+     int64_t direct_files = 0;
+     for (const auto &f : files_) direct_files += f->direct_io() ? 1 : 0;
+-    return {{"read_requests_completed", reads_completed_},
++    return {{"row_cache_capacity", (int64_t)cache_keys_.size()},
++            {"row_cache_bytes", (int64_t)(cache_keys_.size()*sizeof(int64_t)+cache_data_.size()+cache_next_.size())},
++            {"row_cache_hits", cache_hits_}, {"row_cache_misses", cache_misses_},
++            {"read_requests_completed", reads_completed_},
+             {"aligned_read_bytes_requested", read_bytes_requested_},
+             {"payload_rows_delivered", rows_delivered_},
+             {"largest_read_offset", largest_read_offset_},
+@@ -632,6 +647,18 @@
+  protected:
+   // Queue dst on this fill's pending batch; duplicate rows fan out from one read.
+   void request_row(int64_t row_id, uint8_t *dst) {
++    if (!cache_next_.empty()) {
++      const size_t set = row_cache_set(row_id);
++      for (size_t way = 0; way < 8; ++way) {
++        const size_t slot = set * 8 + way;
++        if (cache_keys_[slot] == row_id) {
++          std::memcpy(dst, cache_data_.data() + slot * (size_t)row_bytes_, row_bytes_);
++          ++cache_hits_; ++rows_delivered_;
++          return;
++        }
++      }
++      ++cache_misses_;
++    }
+     auto pit = pending_index_.find(row_id);
+     if (pit != pending_index_.end()) {
+       pending_[pit->second].dsts.push_back(dst);
+@@ -639,7 +666,7 @@
+     }
+     const Extent &ext = extents_[row_id / rows_per_extent_];
+     const int64_t off = ext.base + (row_id % rows_per_extent_) * row_stride_;
+-    Pending p{ext.file, off, row_bytes_, 0, {dst}};
++    Pending p{ext.file, off, row_bytes_, 0, {dst}, row_id};
+     if (ext.file->direct_io()) {
+       // full aligned span even past EOF; truncating would break direct-I/O alignment
+       p.read_off = off & ~(kPage - 1);
+@@ -657,6 +684,7 @@
+     int64_t read_len;
+     int64_t row_off;  // row payload start inside the read buffer
+     std::vector<uint8_t *> dsts;
++    int64_t row_id;
+   };
+ 
+   // Read every pending row in reader-capacity batches and fan out the copies.
+@@ -690,6 +718,14 @@
+         rows_delivered_ += (int64_t)p.dsts.size();
+         largest_read_offset_ = std::max(largest_read_offset_, p.read_off);
+         const uint8_t *row = bounce_ + (size_t)tag * kSpanMax + p.row_off;
++        if (!cache_next_.empty()) {
++          const size_t set = row_cache_set(p.row_id);
++          const size_t way = cache_next_[set];
++          cache_next_[set] = (uint8_t)((way + 1) % 8);
++          const size_t slot = set * 8 + way;
++          cache_keys_[slot] = p.row_id;
++          std::memcpy(cache_data_.data() + slot * (size_t)row_bytes_, row, row_bytes_);
++        }
+         for (uint8_t *dst : p.dsts) std::memcpy(dst, row, row_bytes_);
+         p.file->discard_cache(p.read_off, p.read_len);
+         if (next < total) submit_slot(tag);
+@@ -699,6 +735,14 @@
+       throw;
+     }
+   }
++
++  size_t row_cache_set(int64_t row) const {
++    const uint64_t value = (uint64_t)row * 0x9e3779b97f4a7c15ULL;
++    return (size_t)((value ^ (value >> 29)) % cache_next_.size());
++  }
++  std::vector<int64_t> cache_keys_;
++  std::vector<uint8_t> cache_data_, cache_next_;
++  int64_t cache_hits_ = 0, cache_misses_ = 0;
+ 
+   int64_t row_bytes_, row_stride_, rows_per_extent_;
+   std::vector<std::unique_ptr<TableFile>> files_;
+@@ -775,6 +819,7 @@
+            py::call_guard<py::gil_scoped_release>())
+       .def("io_backend", &RowStore::io_backend)
+       .def("io_stats", &RowStore::io_stats)
++      .def("set_row_cache", &RowStore::set_row_cache, py::arg("rows"))
+       .def_property_readonly("row_bytes", &RowStore::row_bytes)
+       .def_property_readonly("total_rows", &RowStore::total_rows);
+   py::class_<PleStore, RowStore>(m, "PleStore")
+--- a/python/freetoken/engine/config.py
++++ b/python/freetoken/engine/config.py
+@@ -34,6 +34,7 @@
+     quant_backend: str | None = None
+     # PLE table backend: "disk" (default) reads rows from the checkpoint files per fill, "pinned" preloads the table into page-locked host RAM.
+     ple_backend: str = "disk"
++    ple_row_cache_rows: int = 0
+     # DeepSeek-V4.1 Decoder SWA Bounded Replay: "bounded" (default) runs the decoder layers on each
+     # prompt's last window; "exact" runs them on every token.
+     swa_decoder_replay: str = "bounded"
+@@ -112,6 +113,10 @@
+     mtp_compact_state: bool = False
+ 
+     def __post_init__(self):
++        if not 0 <= self.ple_row_cache_rows <= (1 << 24) or 0 < self.ple_row_cache_rows < 8:
++            raise ValueError('PLE row cache needs zero or8..16777216 rows')
++        if self.ple_row_cache_rows and self.ple_backend != 'disk':
++            raise ValueError('PLE row caching requires the disk backend')
+         if self.linear_state_cache_slots is not None and self.linear_state_cache_slots < 0:
+             raise ValueError('Linear snapshot cache slots cannot be negative')
+         if self.moe_q2_adapt_every < 0 or (self.moe_q2_adapt_every and not self.moe_q2_resident_experts):
+--- a/python/freetoken/models/qwen4_exp/ple_disk.py
++++ b/python/freetoken/models/qwen4_exp/ple_disk.py
+@@ -119,6 +119,7 @@
+         hash_constants: dict,
+         *,
+         max_graph_rows: int = 256,
++        row_cache_rows: int = 0,
+         max_extend_tokens: int = 8192,
+         dtype: torch.dtype = torch.bfloat16,
+     ) -> None:
+@@ -152,6 +153,8 @@
+             eos_token_id=self.eos_token_id,
+             use_io_uring=os.getenv(_IO_URING_ENV, "1") != "0",
+         )
++        if row_cache_rows:
++            self._store.set_row_cache(row_cache_rows)
+         self._device = torch.device("cuda", torch.cuda.current_device())
+         self._token_bytes = self.heads * source.row_bytes
+         # allocated up front: pinned alloc inside stream capture is illegal; one replay consumes it at a time
+--- a/python/freetoken/models/qwen4_exp/model.py
++++ b/python/freetoken/models/qwen4_exp/model.py
+@@ -236,6 +236,7 @@
+                 resolve_row_source(folder),
+                 constants,
+                 max_graph_rows=max(256, engine_config.cuda_graph_max_bs or 0),
++                row_cache_rows=engine_config.ple_row_cache_rows,
+                 max_extend_tokens=engine_config.max_extend_tokens,
+                 dtype=torch.float32 if getattr(self._config.quant, "dialect", None) == "gguf_strata" else torch.bfloat16,
+             )
+--- /dev/null
++++ b/tests/kernels/test_row_cache.py
+@@ -0,0 +1,58 @@
++"""Check exact bytes, duplicate destinations, eviction, disable/reset and extent boundaries."""
++from pathlib import Path
++import tempfile
++import torch
++import pytest
++_row_store=pytest.importorskip('freetoken.kernel._row_store')
++
++
++@pytest.mark.parametrize('cols',[90,160,264])
++def test_cached_rows_preserve_payloads_and_storage_boundaries(cols):
++    native=_row_store
++    rows=257
++    torch.manual_seed(613)
++    original=torch.randint(0,256,(rows,cols),dtype=torch.uint8)
++    results=[]
++    with tempfile.TemporaryDirectory(prefix='ple-row-cache-') as folder:
++        path=Path(folder)/'rows.bin'
++        path.write_bytes(bytes(original.flatten().tolist())+bytes(8192))
++        store=native.RowStore([str(path)],[0],[0],rows,cols,cols,False)
++
++        def read(ids,stride=0):
++            index=torch.tensor(ids,dtype=torch.int64)
++            actual_stride=stride or cols
++            out=torch.full((len(ids),actual_stride),173,dtype=torch.uint8)
++            store.stage_rows(index.data_ptr(),len(ids),out.data_ptr(),stride)
++            store.flush()
++            assert torch.equal(out[:,:cols],original[index])
++            if actual_stride>cols:assert torch.all(out[:,cols:]==173)
++            return out
++
++        store.set_row_cache(64)
++        read([0,1,1,45,46,90,91,256],cols+11)
++        before=store.io_stats()
++        read([0,1,1,45,46,90,91,256])
++        after=store.io_stats()
++        assert after['read_requests_completed']==before['read_requests_completed']
++        assert after['row_cache_hits']-before['row_cache_hits']==8
++        for start in range(0,rows,13):read(list(range(start,min(start+31,rows))))
++        read([0,45,46,255,256],cols+7)
++        assert store.io_stats()['row_cache_capacity']==64
++        for capacity in (8,0,128):
++            store.set_row_cache(capacity)
++            read([0,1,256]);baseline=store.io_stats();read([0,1,256]);current=store.io_stats()
++            assert current['row_cache_capacity']==capacity
++            if capacity==0:assert current['read_requests_completed']>baseline['read_requests_completed']
++            else:assert current['read_requests_completed']==baseline['read_requests_completed']
++            results.append(dict(capacity=capacity,stats=current))
++        index=torch.tensor([2],dtype=torch.int64);out=torch.empty((1,cols),dtype=torch.uint8)
++        store.stage_rows(index.data_ptr(),1,out.data_ptr())
++        try:store.set_row_cache(8)
++        except RuntimeError:pass
++        else:raise AssertionError('Unflushed cache resize must reject')
++        store.flush();assert torch.equal(out,original[2:3])
++        for capacity in (-1,1<<25):
++            try:store.set_row_cache(capacity)
++            except ValueError:pass
++            else:raise AssertionError('Invalid cache capacity accepted')
++        del store

@@ -1,0 +1,195 @@
+{
+  "scope": "Ordinary installed FreeToken wheel; Speed remains separate acceptance",
+  "files": [
+    {
+      "path": "runtime/perf5-wheel-quality-off-v1.json",
+      "bytes": 147454,
+      "sha256": "b8b427f8c8cc53faf14caaa85e6f2815c06cfa34a95ebb3ac941149e08ceb9d1"
+    },
+    {
+      "path": "runtime/perf5-wheel-quality-off-v1.resource.json",
+      "bytes": 1098,
+      "sha256": "a6c0947eb6394d54305a8c39810b3fd4c89505e6f52801f60d295d28ed0a54e6"
+    },
+    {
+      "path": "runtime/perf5-wheel-quality-off-v1.stdout.log",
+      "bytes": 31805,
+      "sha256": "01f4d03ea1d62117e2bbbe7b0e05fa396e25643af946f6794df0fe63fdbf499d"
+    },
+    {
+      "path": "runtime/perf5-wheel-quality-off-v1.stderr.log",
+      "bytes": 1999,
+      "sha256": "f72ff1e5d3613b29c3a966cb67e5ac44cecc5734ae0f2a2120804abbac8be3f1"
+    },
+    {
+      "path": "runtime/perf5-wheel-quality-off-v1.samples.jsonl",
+      "bytes": 57639,
+      "sha256": "3104350959749311ab14f784f29752638c9f48e91055d735a065424cf649db79"
+    },
+    {
+      "path": "runtime/perf5-wheel-performance-off-v1.json",
+      "bytes": 548503,
+      "sha256": "8967f182d266a31ac4478741897eab84746e317368c2c29dfbe1c8bfeb43b390"
+    },
+    {
+      "path": "runtime/perf5-wheel-performance-off-v1.resource.json",
+      "bytes": 1236,
+      "sha256": "db9a163e0178b507a904ddafa531b7b78253549f4f00d84015305f0fc0fb5350"
+    },
+    {
+      "path": "runtime/perf5-wheel-performance-off-v1.stdout.log",
+      "bytes": 23389,
+      "sha256": "25f8d9c95293c220bdb7e0577556856746ad1fbfd2358ce1bee50202a4f89878"
+    },
+    {
+      "path": "runtime/perf5-wheel-performance-off-v1.stderr.log",
+      "bytes": 1169,
+      "sha256": "41932b27f99e9d76e45837e998ba94ddbdae4edff2e1a1ce5a7e4bb4fb82ecd6"
+    },
+    {
+      "path": "runtime/perf5-wheel-performance-off-v1.samples.jsonl",
+      "bytes": 100863,
+      "sha256": "f5ef1cf0a967ced34f71755e8988fb05404a13c180d2a7367cf90beae9ff5c93"
+    },
+    {
+      "path": "runtime/perf5-wheel-quality-on-v1.json",
+      "bytes": 172365,
+      "sha256": "f94071e4e26b4ed80775c8508b671c80d14c0ca53ffff6ae2f244cf2b9bc93f6"
+    },
+    {
+      "path": "runtime/perf5-wheel-quality-on-v1.resource.json",
+      "bytes": 1119,
+      "sha256": "96a0bd3e83583d88e91a035dcee3846abe85f2d3331c3443c3f6d2da45ef8f17"
+    },
+    {
+      "path": "runtime/perf5-wheel-quality-on-v1.stdout.log",
+      "bytes": 34249,
+      "sha256": "fdbd3062697c255b15313afe68f143ac09c8e6d51c195e9683120659e821a487"
+    },
+    {
+      "path": "runtime/perf5-wheel-quality-on-v1.stderr.log",
+      "bytes": 1999,
+      "sha256": "71b7bfc796a79c27e0ac67ddf2da106f4d6c6f9ed9e3b8a1238217a7f20e29ad"
+    },
+    {
+      "path": "runtime/perf5-wheel-quality-on-v1.samples.jsonl",
+      "bytes": 96769,
+      "sha256": "e43c8a675e8c64ba2515350a099261cd982fa37cdab968cc5f0aac79da98ef97"
+    },
+    {
+      "path": "runtime/perf5-wheel-performance-on-v1.json",
+      "bytes": 917319,
+      "sha256": "5a1b339716357f4e103c5589f6a8ca6ae9265488ba5a9f1f61b8abcf300b1c99"
+    },
+    {
+      "path": "runtime/perf5-wheel-performance-on-v1.resource.json",
+      "bytes": 1255,
+      "sha256": "876e9f6db29faeea31a07b256893aa63305d6c30f8d61302a32b35142e6b8c8a"
+    },
+    {
+      "path": "runtime/perf5-wheel-performance-on-v1.stdout.log",
+      "bytes": 24014,
+      "sha256": "e9f70d8d86f5d5ec02e2fa2525adb7d374c493f0a3dafd6dc78de3a179b4e0cd"
+    },
+    {
+      "path": "runtime/perf5-wheel-performance-on-v1.stderr.log",
+      "bytes": 1169,
+      "sha256": "b7d0d1ec4b0c698a27bf07103c38b0366dc6017ea143ae14295cd1d37537fa2f"
+    },
+    {
+      "path": "runtime/perf5-wheel-performance-on-v1.samples.jsonl",
+      "bytes": 102586,
+      "sha256": "3702095b54c60a64f5249546af87fb80cab834df514656d1088062a48fcfffeb"
+    },
+    {
+      "path": "runtime/perf5-wheel-components-v1.resource.json",
+      "bytes": 677,
+      "sha256": "499c49eac70a86292c71c14aedf2811500e896b736957b07e05f44ac2608b111"
+    },
+    {
+      "path": "runtime/perf5-wheel-components-v1.stdout.log",
+      "bytes": 1077,
+      "sha256": "826ebe4181d56aaf5fa0e52f7a5b5c7230b390deba230c0f98e95f074f5e3a1b"
+    },
+    {
+      "path": "runtime/perf5-wheel-components-v1.stderr.log",
+      "bytes": 81,
+      "sha256": "fb3a9e7e8f08a76da0f3dc1a138aeaa9c59614b508c8e29e2155d1371c1c0bd6"
+    },
+    {
+      "path": "runtime/perf5-wheel-components-v1.samples.jsonl",
+      "bytes": 26029,
+      "sha256": "0470152eb6537b5e8d13bdd1d92426d1e448a5d72de1b617bbc38c2c1d19653e"
+    },
+    {
+      "path": "tools/probe49-wheel5.py",
+      "bytes": 22231,
+      "sha256": "b3152cdcb384375a3a189c342ffa0d94344604a69a146ef575c890989d3e2312"
+    },
+    {
+      "path": "tools/test-wheel5-components-v1.py",
+      "bytes": 1833,
+      "sha256": "398e6a1958cd8b4de8b31c34ec9edf9df040d9dfd1d7bf76da101d015c577f9f"
+    },
+    {
+      "path": "tools/run-wheel5-v1.py",
+      "bytes": 2134,
+      "sha256": "ec5a58a2dba86b003255aa58addfd41e03bc983b28f4f71653aac49ca17547fc"
+    },
+    {
+      "path": "tools/prepare-cand5-env.py",
+      "bytes": 1843,
+      "sha256": "5709246c37f8c9a033e2364de7cedc96702df8f72a3490566215a3d3b109b546"
+    },
+    {
+      "path": "tools/freeze_candidate5.py",
+      "bytes": 4499,
+      "sha256": "e2523f5edcce5a964c44808b82708f3e4a2cbab5df6334e1fed3bf7923e8c0e1"
+    },
+    {
+      "path": "tools/prepare-source6-consolidated-v1.py",
+      "bytes": 6235,
+      "sha256": "88b3e00e179ae7b2d24af61e342fd35e2a231e6e6b2723efe62b062ce79a6d32"
+    },
+    {
+      "path": "tools/memory_inventory_v2.py",
+      "bytes": 2095,
+      "sha256": "b913edbce9023dd4d22212b57a5c85cfb5c14ffe5d5e8f0737e9d0998e2664ac"
+    },
+    {
+      "path": "tools/supervise-v2.py",
+      "bytes": 5978,
+      "sha256": "ad707261264cd47a683608ecc7b8ebd9e72e992897e163dd5adefedd7606aae7"
+    },
+    {
+      "path": "checks/build-perf5-validator-v1.log",
+      "bytes": 13205,
+      "sha256": "1cf206e7374a59eab989da92a823f62a40ad48c14d4cc057972053d1885f5b7d"
+    },
+    {
+      "path": "checks/build-perf5-tools-v1.log",
+      "bytes": 10968,
+      "sha256": "abc72f6168b9cb428d2cd19466ef77e74cba989f0235d4225e6e6d5acf60f69a"
+    },
+    {
+      "path": "checks/build-perf5-offline-ok-v1.json",
+      "bytes": 418,
+      "sha256": "3c355423e991e256de589df06a45d72d64e9e9045d0d60dcf6d4d03823709a08"
+    },
+    {
+      "path": "analysis/nsys-lut-ple-comparison-v1.json",
+      "bytes": 19963,
+      "sha256": "59b193ddaba12a2d6b0491cb2a3fbab8175232ee0104580a6aa11cba72d9204f"
+    },
+    {
+      "path": "analysis/summary.json",
+      "bytes": 2202,
+      "sha256": "31917282aae55eba10ac0df4a610abfe071887f6717eca65a5380c516b8c578e"
+    },
+    {
+      "path": "tools/archive-perf5-wheel-v1.py",
+      "bytes": 3381,
+      "sha256": "e9d7bdbd14d67b96bea0573bcec78d81f07b94fdbc4739c62e1da50c0f36902e"
+    }
+  ]
+}

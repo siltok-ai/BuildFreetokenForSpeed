@@ -265,6 +265,11 @@ def main():
         validate_python_performance(ROOT/'build/profiles/strataq2perf4.json',
             ROOT/'artifacts/strataq2perf4-cp312-cu130-sm120')
         performance_revision4 = {'verified': True, 'scope': 'offline_source_and_binary_identity_only'}
+    performance_revision5 = None
+    if (ROOT/'build/profiles/strataq2perf5.json').exists():
+        from validate_row_store_revision import validate as validate_row_store
+        performance_revision5 = validate_row_store(ROOT/'build/profiles/strataq2perf5.json',
+            ROOT/'artifacts/strataq2perf5-cp312-cu130-sm120')
     print(json.dumps({"official_files": len(original_hashes), "changed_files": len(changed),
                       "patches": len(series["patches"]), "split_equals_historical": True,
                       "wheel_python_matches_prepared_source": True, "aot_count": len(specs),
@@ -273,6 +278,7 @@ def main():
                       "performance_revision3":performance_revision3,
                       "performance_consumer3":performance_consumer3,
                       "performance_revision4":performance_revision4,
+                      "performance_revision5":performance_revision5,
                       "strata_research_dev2":research_dev2,
                       "strata_research_dev3":research_dev3, "strata_research_dev4":research_dev4,
                       "strata_research_dev5":research_dev5,

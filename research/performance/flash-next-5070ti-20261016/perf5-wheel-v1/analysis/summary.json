@@ -1,0 +1,87 @@
+{
+  "scope": "Ordinary installed FreeToken wheel; Speed remains separate acceptance",
+  "version": "0.1.3+speed.strataq2perf5",
+  "wheel_sha256": "f311e65730b48c4d62642583203578a33413e8241741327f2317f7e9499b7e17",
+  "modes": {
+    "off": {
+      "quality": {
+        "ids_equal_source6": 27,
+        "outputs": 27,
+        "min_gpu_free": 629370880,
+        "score": 15,
+        "thinking": 3,
+        "rebuild_steps": [
+          {
+            "usable": 6,
+            "logical_slots": 7,
+            "recurrent_slots": 7,
+            "reserved": []
+          },
+          {
+            "usable": 5,
+            "logical_slots": 6,
+            "recurrent_slots": 6,
+            "reserved": []
+          }
+        ]
+      },
+      "performance": {
+        "ids_equal_source6": 17,
+        "outputs": 17,
+        "min_gpu_free": 631468032,
+        "medians": {
+          "english": 98.90794212007047,
+          "chinese": 98.62281251814717,
+          "code": 93.74873526348519,
+          "70-0": 96.67866957934761,
+          "diverse-4096-0": 93.36486081339314
+        }
+      }
+    },
+    "on": {
+      "quality": {
+        "ids_equal_source6": 27,
+        "outputs": 27,
+        "min_gpu_free": 589524992,
+        "score": 15,
+        "thinking": 3,
+        "rebuild_steps": [
+          {
+            "usable": 10,
+            "logical_slots": 11,
+            "recurrent_slots": 7,
+            "reserved": [
+              7,
+              8,
+              9,
+              10
+            ]
+          },
+          {
+            "usable": 9,
+            "logical_slots": 10,
+            "recurrent_slots": 6,
+            "reserved": [
+              6,
+              7,
+              8,
+              9
+            ]
+          }
+        ]
+      },
+      "performance": {
+        "ids_equal_source6": 17,
+        "outputs": 17,
+        "min_gpu_free": 595816448,
+        "medians": {
+          "english": 111.00080782938107,
+          "chinese": 101.07755997675513,
+          "code": 116.07511818293965,
+          "70-0": 96.78220384700843,
+          "diverse-4096-0": 117.81998443694148
+        }
+      }
+    }
+  }
+}

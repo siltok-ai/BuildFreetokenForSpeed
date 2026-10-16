@@ -85,6 +85,8 @@ PYTHON_ONLY_CHANGES = {
     'tests/models/qwen4_exp/test_mtp_compact.py',
     'tests/moe/test_q2_adaptive.py',
     'tests/moe/test_q2_q8_tiles.py',
+    'tests/moe/test_q2_lut.py',
+    'tests/kernels/test_row_cache.py',
 }
 
 
@@ -107,6 +109,36 @@ GGUF_AOT = 'python/freetoken/kernel/aot.py'
 WINDOWS_BUILDER = 'tools/build_windows_kernel_cache.py'
 GGUF_OLD = 'freetoken__gguf_mmvq_r1'
 GGUF_NEW = 'freetoken__gguf_mmvq_r2'
+ROW_STORE_CPP = 'python/freetoken/kernel/csrc/row_store/row_store_ext.cpp'
+
+
+def validate_row_store_changes(base_source, source):
+    """单独重编行存储时只开放该C++入口，其他原生/AOT输入仍逐字节保持。"""
+    old, new = tree_hashes(base_source), tree_hashes(source)
+    changed = {name for name in old.keys() | new.keys() if old.get(name) != new.get(name)}
+    if ROW_STORE_CPP not in changed or not changed <= PYTHON_ONLY_CHANGES | {ROW_STORE_CPP}:
+        raise ValueError(f'row-store selective rebuild source boundary differs: {sorted(changed - PYTHON_ONLY_CHANGES)}')
+    return changed
+
+
+def rebuild_row_store(source, output, torch_version):
+    """实际编译一个CPU扩展；旧的另外两个扩展及27项AOT不进入此编译过程。"""
+    destination = output / 'rebuilt-row-store'
+    command = [sys.executable, '-B', str(ROOT/'build/compile_row_store.py'),
+               '--source', str(source/ROW_STORE_CPP), '--output', str(destination), '--torch', torch_version]
+    log = output/'row-store-build.log'
+    with log.open('wb') as stream:
+        subprocess.run(command, cwd=source, stdout=stream, stderr=subprocess.STDOUT, check=True)
+    receipt_path = destination/'build-receipt.json'
+    receipt = json.loads(receipt_path.read_text(encoding='utf-8'))
+    if receipt['source_sha256'] != sha256(source/ROW_STORE_CPP):
+        raise ValueError('Row-store compiler receipt belongs to different source')
+    binary = (destination/receipt['artifact']['path']).resolve(strict=True)
+    if not binary.is_relative_to(destination.resolve()) or sha256(binary) != receipt['artifact']['sha256']:
+        raise ValueError('Row-store compiler output differs from its receipt')
+    return binary, dict(module='_row_store', source=ROW_STORE_CPP, command=command,
+        receipt=receipt, receipt_path=receipt_path.relative_to(output).as_posix(),
+        receipt_sha256=sha256(receipt_path), log_sha256=sha256(log))
 
 
 def validate_gguf_rebuild_changes(base_source, source):
@@ -164,16 +196,20 @@ def rebuild_gguf_cache(source, output, base_wheel, native_modules, cache):
             'artifact': {'path': dll.relative_to(cache).as_posix(), 'size': dll.stat().st_size, 'sha256': sha256(dll)}}
 
 
-def derive(profile_path, base_profile_path, base_materials, output, *, rebuild_gguf=False):
+def derive(profile_path, base_profile_path, base_materials, output, *, rebuild_gguf=False, rebuild_row_store_module=False):
     """重放新旧源码，默认仅复用原生字节；显式r2模式实际重建独立GGUF AOT。"""
     output = Path(output).resolve()
     if output.exists():
         raise FileExistsError('use a new output directory; accepted artifacts are never replaced')
+    if rebuild_gguf and rebuild_row_store_module:
+        raise ValueError('Select one independently bounded native rebuild at a time')
     base_materials = Path(base_materials).resolve(strict=True)
     subprocess.run([sys.executable, '-B', str(ROOT / 'tools/verify_materials.py'), str(base_materials)], check=True)
     source, profile = prepare(profile_path, output / 'candidate-source')
     base_source, base_profile = prepare(base_profile_path, output / 'base-source')
-    changed = (validate_gguf_rebuild_changes if rebuild_gguf else validate_python_only_changes)(base_source, source)
+    boundary = (validate_row_store_changes if rebuild_row_store_module else
+                validate_gguf_rebuild_changes if rebuild_gguf else validate_python_only_changes)
+    changed = boundary(base_source, source)
     if profile['custom_version'] == base_profile['custom_version']:
         raise ValueError('changed Python source requires a new custom version')
     for key in ('source_commit', 'torch', 'cuda', 'apache_tvm_ffi', 'sm', 'requirements_lock'):
@@ -218,6 +254,17 @@ def derive(profile_path, base_profile_path, base_materials, output, *, rebuild_g
         members[path.relative_to(source / 'python').as_posix()] = path.read_bytes()
     if rebuild_gguf:
         members[GGUF_HEADER.removeprefix('python/')] = (source / GGUF_HEADER).read_bytes()
+    row_rebuild = None
+    row_member = None
+    if rebuild_row_store_module:
+        row_member = next(name for name in base_record['native_modules'] if Path(name).name.startswith('_row_store.'))
+        binary, row_rebuild = rebuild_row_store(source, output, profile['torch'])
+        base_profile_file = Path(base_profile_path)
+        if not base_profile_file.is_absolute():
+            base_profile_file = ROOT/base_profile_file
+        row_rebuild['base_profile'] = base_profile_file.resolve(strict=True).relative_to(ROOT.resolve()).as_posix()
+        members[row_member] = binary.read_bytes()
+        members[ROW_STORE_CPP.removeprefix('python/')] = (source/ROW_STORE_CPP).read_bytes()
     records = io.StringIO(newline='')
     writer = csv.writer(records, lineterminator='\n')
     for name, data in sorted(members.items()):
@@ -250,6 +297,9 @@ def derive(profile_path, base_profile_path, base_materials, output, *, rebuild_g
     metadata['binary_reuse'] = {'base_materials': base_materials.name,
                               'base_build_record_sha256': sha256(base_materials / 'build-record.json'),
                               'reason': 'Allowlisted Python-only revision; native/AOT source and inputs identical'}
+    if row_rebuild:
+        metadata['binary_reuse']['reason'] = 'Two native modules and all AOT inputs unchanged; row-store CPU extension actually rebuilt'
+        metadata['row_store_rebuild'] = row_rebuild
     if rebuild:
         metadata['binary_reuse']['reason'] = 'Three native modules and 26 independent AOT inputs unchanged; GGUF r2 actually rebuilt'
         metadata['selective_rebuild'] = rebuild
@@ -258,12 +308,15 @@ def derive(profile_path, base_profile_path, base_materials, output, *, rebuild_g
     metadata_path.write_text(json.dumps(metadata, indent=2) + '\n', encoding='utf-8')
     native_hashes = {name: hashlib.sha256(members[name]).hexdigest() for name in base_record['native_modules']}
     with zipfile.ZipFile(base_wheel) as archive:
-        if native_hashes != {name: hashlib.sha256(archive.read(name)).hexdigest() for name in native_hashes}:
+        reused = {name: digest for name,digest in native_hashes.items() if name != row_member}
+        if reused != {name: hashlib.sha256(archive.read(name)).hexdigest() for name in reused}:
             raise ValueError('native module bytes changed during repack')
     files = [wheel, *(cache / a['path'] for a in manifest['artifacts']),
              manifest_path, metadata_path]
     if rebuild:
         files.append(output / 'gguf-aot-build.log')
+    if row_rebuild:
+        files.extend([output/'row-store-build.log',output/row_rebuild['receipt_path']])
     # 复用构建环境身份，不能继承旧 wheel 的运行验收或证据路径。
     inherited = {key: base_record[key] for key in ('format', 'python', 'build_python', 'native_modules',
                                                   'dependencies', 'cuda_compiler', 'msvc_compiler', 'aot_count')}
@@ -280,6 +333,12 @@ def derive(profile_path, base_profile_path, base_materials, output, *, rebuild_g
         record['status'] = 'partially_rebuilt_requires_runtime_validation'
         record['binary_reuse']['aot_sha256'] = {name: data['sha256'] for name, data in record['artifacts'].items()
                                                if name.endswith('.dll') and Path(name).stem != GGUF_NEW}
+    if row_rebuild:
+        record['status'] = 'partially_rebuilt_requires_runtime_validation'
+        record['row_store_rebuild'] = row_rebuild
+        record['native_sha256'] = native_hashes
+        record['binary_reuse']['native_sha256'] = reused
+        record['producer_sha256']['build/compile_row_store.py'] = sha256(ROOT/'build/compile_row_store.py')
     (output / 'build-record.json').write_text(json.dumps(record, indent=2) + '\n', encoding='utf-8')
     subprocess.run([sys.executable, '-B', str(ROOT / 'tools/verify_materials.py'), str(output)], check=True)
     print(json.dumps({'wheel': str(wheel), 'sha256': record['wheel_sha256'], 'status': record['status']}))
@@ -293,8 +352,10 @@ def main():
     parser.add_argument('--base-materials', type=Path, default=ROOT / 'artifacts/q2exp1-cp312-cu130-sm120')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--rebuild-gguf', action='store_true', help='rebuild isolated GGUF r2 AOT; reject other native changes')
+    parser.add_argument('--rebuild-row-store', action='store_true', help='actually rebuild only the row-store CPU extension')
     args = parser.parse_args()
-    derive(args.profile, args.base_profile, args.base_materials, args.output, rebuild_gguf=args.rebuild_gguf)
+    derive(args.profile, args.base_profile, args.base_materials, args.output,
+           rebuild_gguf=args.rebuild_gguf, rebuild_row_store_module=args.rebuild_row_store)
 
 
 if __name__ == '__main__':

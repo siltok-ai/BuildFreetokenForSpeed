@@ -21,6 +21,8 @@
 
 后续 [Q2执行研究检查点](docs/flash-next-5070ti-q2-execution.txt)保存了有收益的字节置换解码、GPU所有权元数据发布及缓存副本晋升原型，以及未采用的CPU协作/原生聚合实验。OFF原生性能已进入同Q2 Strata参考范围，ON仍有差距；这些原型尚未形成新交付材料。
 
+独立候选 `strataq2perf5` 已将有收益的Q2解码、所有权发布和有界PLE行缓存冻结为40组补丁；行存储扩展真实重编，另外两个扩展与27项AOT复用。[第五轮记录](docs/flash-next-5070ti-perf5.txt)区分了源码、普通wheel和Speed验收范围，当前默认指针仍保持已验收版本。
+
 后续研究检查点保存了 [MTP词表原型与Strata反向消融](docs/flash-next-5070ti-mtp-review.txt)：对照CJK/英文/完整词表、同步提交，以及草稿KV ring、窗口流水和长度策略的实际接线。该检查点尚未形成新的正式profile或Speed交付版本。
 
 ## 使用当前版本
