@@ -1,0 +1,383 @@
+--- a/python/freetoken/engine/config.py
++++ b/python/freetoken/engine/config.py
+@@ -53,6 +53,7 @@
+     moe_q2_adapt_every: int = 0
+     moe_q2_adapt_decay: float = 1.0
+     gguf_embedding_host: bool = False
++    moe_q2_prefill_workspace: bool = False
+     moe_cache_rate: float | None = None
+     moe_cache_auto: bool = False
+     kv_reserve_tokens: int = 8192  # KV floor for --moe-cache-auto; small by design (MoE-priority)
+@@ -113,6 +114,8 @@
+     mtp_compact_state: bool = False
+ 
+     def __post_init__(self):
++        if self.moe_q2_prefill_workspace and (not self.moe_q2_resident_experts or self.moe_q2_dynamic_slots != 1024):
++            raise ValueError('Prefill workspace borrowing requires protected Q2 with 1024 disposable dynamic rows')
+         if not 0 <= self.ple_row_cache_rows <= (1 << 24) or 0 < self.ple_row_cache_rows < 8:
+             raise ValueError('PLE row cache needs zero or8..16777216 rows')
+         if self.ple_row_cache_rows and self.ple_backend != 'disk':
+--- a/python/freetoken/engine/engine.py
++++ b/python/freetoken/engine/engine.py
+@@ -344,6 +344,7 @@
+         self.dtype = config.dtype
+         self.config = config  # retained for runtime cache rebuild (rebuild_runtime_cache)
+         self.mtp_runtime = None
++        self.prefill_workspace = None
+         self.q2_adaptive_owners = None
+         # KV pool family fixed at construction from the model config: its classmethods own the
+         # page-token geometry and cost arithmetic the engine needs BEFORE the pool exists
+@@ -945,6 +946,8 @@
+         re-capture. Does NOT reload weights or host expert banks. The caller (scheduler) must
+         guarantee no in-flight prefill/decode.
+         """
++        if self.prefill_workspace is not None:
++            self.prefill_workspace.check_usable()
+         config = self.config
+         if (moe_cache_size is None and num_pages is None and num_mamba_slots is None
+                 and num_swa_pages is None):
+@@ -1112,6 +1115,8 @@
+ 
+     def forward_batch(self, batch: Batch, args: BatchSamplingArgs) -> ForwardOutput:
+         assert torch.cuda.current_stream() == self.stream
++        if self.prefill_workspace is not None:
++            self.prefill_workspace.check_usable()
+         if batch.is_decode and self.q2_adaptive_owners is not None:
+             self.q2_adaptive_owners.step()
+         if batch.mm_gather_plan:
+@@ -1119,7 +1124,15 @@
+         native_state = self.mtp_runtime.before_native(batch) if self.mtp_runtime is not None else None
+         use_graph = self.graph_runner.can_use_cuda_graph(batch)
+         with self.ctx.forward_batch(batch), self.model.forward_host_ctx(batch, use_graph):
+-            logits = self.graph_runner.replay(batch) if use_graph else self.model.forward()
++            if use_graph:
++                logits = self.graph_runner.replay(batch)
++            elif self.config.moe_q2_prefill_workspace and batch.is_prefill and len(batch.input_ids) >= 128:
++                if self.prefill_workspace is None:
++                    from freetoken.moe.prefill_workspace import PrefillWorkspace
++                    self.prefill_workspace = PrefillWorkspace(self.moe_offload_cache, self.device)
++                logits = self.prefill_workspace.forward(self.model.forward, batch)
++            else:
++                logits = self.model.forward()
+         if self.cpu_moe_executor is not None:
+             # One pinned read: surfaces a fired flag-handshake watchdog (dead coordinator
+             # -> stale expert outputs) as a loud error instead of silent corruption.
+--- a/python/freetoken/kernel/csrc/pinned_tensor.cpp
++++ b/python/freetoken/kernel/csrc/pinned_tensor.cpp
+@@ -126,3 +126,77 @@
+   m.def("driver_cuda_version", &driver_cuda_version,
+         "Max CUDA version the installed NVIDIA driver supports (0 if none)");
+ }
++
++// Scoped prefill allocation callbacks. Original expert banks remain caller-owned.
++// The four-argument free ABI is pinned to Torch 2.11 CUDAPluggableAllocator.
++#ifdef _WIN32
++#define FT_WORKSPACE_EXPORT __declspec(dllexport)
++#else
++#define FT_WORKSPACE_EXPORT __attribute__((visibility("default")))
++#endif
++#include <cuda_runtime_api.h>
++#include <cstdint>
++#include <mutex>
++#include <unordered_map>
++#include <array>
++
++namespace {
++struct Region {uintptr_t begin=0;size_t bytes=0,offset=0;};
++std::mutex mutex;
++Region regions[2];
++std::unordered_map<void*,size_t> loans,fallbacks;
++std::array<uint64_t,9> stats{};
++}
++
++extern "C" FT_WORKSPACE_EXPORT int freetoken_workspace_setup(void* p0,size_t n0,void* p1,size_t n1) {
++    std::lock_guard lock(mutex);
++    if(!loans.empty()||!fallbacks.empty())return 1;
++    if((reinterpret_cast<uintptr_t>(p0)&511u)||(reinterpret_cast<uintptr_t>(p1)&511u))return 2;
++    regions[0]={reinterpret_cast<uintptr_t>(p0),n0,0};
++    regions[1]={reinterpret_cast<uintptr_t>(p1),n1,0};
++    stats.fill(0);
++    return 0;
++}
++
++extern "C" FT_WORKSPACE_EXPORT void* freetoken_workspace_alloc(size_t bytes,int device,cudaStream_t stream) {
++    std::lock_guard lock(mutex);
++    ++stats[0];
++    for(auto& region:regions) {
++        const size_t start=(region.offset+511)&~size_t(511);
++        if(region.begin&&start<=region.bytes&&bytes<=region.bytes-start) {
++            auto ptr=reinterpret_cast<void*>(region.begin+start);
++            region.offset=start+bytes;
++            loans.emplace(ptr,bytes);
++            stats[1]+=bytes;stats[2]+=bytes;
++            if(stats[2]>stats[3])stats[3]=stats[2];
++            return ptr;
++        }
++    }
++    void* pointer=nullptr;
++    if(cudaSetDevice(device)!=cudaSuccess||cudaMalloc(&pointer,bytes)!=cudaSuccess)return nullptr;
++    fallbacks.emplace(pointer,bytes);stats[4]+=bytes;stats[5]+=bytes;
++    return pointer;
++}
++
++extern "C" FT_WORKSPACE_EXPORT void freetoken_workspace_free(void* pointer,size_t bytes,int device,cudaStream_t stream) {
++    std::lock_guard lock(mutex);
++    ++stats[6];
++    if(auto it=loans.find(pointer);it!=loans.end()) {
++        stats[2]-=it->second;loans.erase(it);return;
++    }
++    if(auto it=fallbacks.find(pointer);it!=fallbacks.end()) {
++        stats[5]-=it->second;fallbacks.erase(it);
++        if(cudaSetDevice(device)!=cudaSuccess||cudaFree(pointer)!=cudaSuccess)++stats[7];
++        return;
++    }
++    // Never free an unknown pointer, especially a caller-owned bank segment.
++    ++stats[7];
++}
++
++extern "C" FT_WORKSPACE_EXPORT uint64_t freetoken_workspace_stat(int index) {
++    std::lock_guard lock(mutex);
++    if(index==8)return loans.size()+fallbacks.size();
++    return index>=0&&index<8?stats[index]:uint64_t(-1);
++}
++
++#undef FT_WORKSPACE_EXPORT
+--- a/python/freetoken/models/qwen4_exp/mtp_runtime.py
++++ b/python/freetoken/models/qwen4_exp/mtp_runtime.py
+@@ -182,6 +182,8 @@
+             req.mamba_next_track_idx = 1 - req.mamba_next_track_idx
+ 
+     def forward(self, batch, manager, token_pool, eos_ids, clip, anchor_id):
++        if self.engine.prefill_workspace is not None:
++            self.engine.prefill_workspace.check_usable()
+         from freetoken.engine.engine import ForwardOutput
+         if self.engine.q2_adaptive_owners is not None:
+             self.engine.q2_adaptive_owners.step()
+--- /dev/null
++++ b/python/freetoken/moe/prefill_workspace.py
+@@ -0,0 +1,103 @@
++"""Lend disposable Q2 payload rows to eager prefill without changing owner bytes."""
++from collections import deque
++import ctypes
++
++import torch
++
++from freetoken.kernel.pinned import _load_pinned_extension
++from freetoken.moe.offload_cache import OffloadMoeCache
++
++
++class PrefillWorkspace:
++    """Keep bank ownership and allocator lifetime together for one engine."""
++
++    def __init__(self, cache, device):
++        if not hasattr(cache, 'protected_payload') or cache.protected_payload.dynamic != 1024:
++            raise ValueError('Prefill workspace requires protected Q2 with 1024 dynamic rows')
++        self.cache, self.device = cache, device
++        self.failed = False
++        self.records = deque(maxlen=256)
++        extension = _load_pinned_extension()
++        self.native = ctypes.CDLL(extension.__file__)
++        self.native.freetoken_workspace_setup.argtypes = [
++            ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p, ctypes.c_size_t]
++        self.native.freetoken_workspace_setup.restype = ctypes.c_int
++        self.native.freetoken_workspace_stat.argtypes = [ctypes.c_int]
++        self.native.freetoken_workspace_stat.restype = ctypes.c_uint64
++        self.allocator = torch.cuda.memory.CUDAPluggableAllocator(
++            extension.__file__, 'freetoken_workspace_alloc', 'freetoken_workspace_free')
++
++    def check_usable(self):
++        """Reject all later native/MTP forwards after a failed loan; unload this engine."""
++        if self.failed:
++            raise RuntimeError('Prefill workspace failed; unload the engine before another request')
++
++    def statistics(self):
++        """Read bounded allocator counters only at the prefill transaction boundary."""
++        return [self.native.freetoken_workspace_stat(i) for i in range(9)]
++
++    @staticmethod
++    def _preserve_metadata(batch, regions):
++        """Keep per-forward QSA plans alive on the ordinary allocator after the loan."""
++        ranges = [(r.data_ptr(), r.data_ptr() + r.numel()) for r in regions]
++        names = []
++        for name, value in tuple(vars(batch.attn_metadata).items()):
++            if isinstance(value, torch.Tensor) and value.is_cuda:
++                base = value.untyped_storage().data_ptr()
++                if any(lo <= base < hi for lo, hi in ranges):
++                    setattr(batch.attn_metadata, name, value.clone())
++                    names.append(name)
++        return names
++
++    def forward(self, function, batch):
++        """Drain readers, lend only dynamic copies, and release every loan before decode."""
++        self.check_usable()
++        if torch.cuda.is_current_stream_capturing():
++            raise RuntimeError('Prefill workspace borrowing is eager-only')
++        cache = self.cache
++        begin, end = 2 * cache.num_experts, cache.protected_payload.protected_begin
++        if end - begin != 1024:
++            raise ValueError('Prefill workspace geometry changed')
++        for stream in (cache.decode_copy_stream, cache.prefill_copy_stream):
++            if stream is not None:
++                stream.synchronize()
++        torch.cuda.current_stream(self.device).synchronize()
++        for buffer in (2, 3):
++            OffloadMoeCache._invalidate_prefill_buffer(cache, buffer)
++        banks = [cache.protected_payload.caches[role] for role in cache.bank_schema]
++        if len(banks) != 2:
++            raise ValueError('Prefill workspace requires the gate/up and down banks')
++        regions = [bank[begin:end].view(-1) for bank in banks]
++        status = self.native.freetoken_workspace_setup(
++            regions[0].data_ptr(), regions[0].numel(), regions[1].data_ptr(), regions[1].numel())
++        if status:
++            raise RuntimeError(f'Previous prefill workspace remains live: {status}')
++        pool = torch.cuda.MemPool(allocator=self.allocator.allocator())
++        cache._workspace_borrow_active = True
++        try:
++            with torch.cuda.use_mem_pool(pool):
++                borrowed_logits = function()
++            logits = borrowed_logits.clone()
++            del borrowed_logits
++            preserved = self._preserve_metadata(batch, regions)
++            torch.cuda.synchronize(self.device)
++        except BaseException:
++            # A traceback can retain loan tensors. Keep their backing banks and pool alive,
++            # and block future native/MTP execution instead of reusing those bytes.
++            self.failed = True
++            self._failed_regions, self._failed_pool = regions, pool
++            raise
++        finally:
++            cache._workspace_borrow_active = False
++        before = self.statistics()
++        del pool
++        torch.cuda.empty_cache()
++        after = self.statistics()
++        self.records.append(dict(tokens=len(batch.input_ids), loan_bytes=sum(r.numel() for r in regions),
++            before_release=before, after_release=after, preserved_metadata=preserved,
++            allocated=torch.cuda.memory_allocated(self.device), reserved=torch.cuda.memory_reserved(self.device)))
++        if after[8] or after[7] or bool((cache.id_of_slot[begin:end] >= 0).any()):
++            self.failed = True
++            self._failed_regions = regions
++            raise RuntimeError(f'Prefill workspace did not return every disposable row: {self.records[-1]}')
++        return logits
+--- a/python/freetoken/moe/q2_residency.py
++++ b/python/freetoken/moe/q2_residency.py
+@@ -287,7 +287,7 @@
+             self.decode_freq[layer_id].scatter_add_(0, expert_ids.view(-1).to(torch.int64),
+                 torch.ones(n, dtype=torch.int64, device=self.device))
+         # decode/稀疏残余prefill可借用两个空闲prefill缓冲，永久所有者不变。
+-        begin, end = 0, p.protected_begin
++        begin, end = 0, 2 * self.num_experts if getattr(self, '_workspace_borrow_active', False) else p.protected_begin
+         _ensure[(1,)](expert_ids, self.slot_for_id.view(-1), self.id_of_slot[begin:end],
+                       self.usage[begin:end], self.step, self.src_indices, self.evict_slots,
+                       self.num_indices, self.lru_stats[layer_id], layer_id * self.num_experts,
+--- /dev/null
++++ b/tests/moe/test_prefill_workspace.py
+@@ -0,0 +1,108 @@
++"""Check real CUDA loan lifetimes, retained metadata, and failure quarantine."""
++from types import SimpleNamespace
++import gc
++
++import pytest
++import torch
++
++from freetoken.moe.prefill_workspace import PrefillWorkspace
++
++pytestmark = pytest.mark.skipif(not torch.cuda.is_available(), reason='requires CUDA')
++
++
++def _fixture():
++    """Use small real GPU banks with the production disposable-row boundaries."""
++    banks = {role: torch.full((2064, width), 177, device='cuda', dtype=torch.uint8)
++             for role, width in [('gate_up', 4096), ('down', 2048)]}
++    for bank in banks.values():
++        bank[2048:].fill_(231)
++    ids = torch.full((2064,), -1, device='cuda', dtype=torch.int32)
++    ids[1024:2048] = torch.arange(1024, device='cuda', dtype=torch.int32)
++    mapping = torch.arange(1024, device='cuda', dtype=torch.int32) + 1024
++    cache = SimpleNamespace(num_experts=512, bank_schema=tuple(banks),
++        protected_payload=SimpleNamespace(dynamic=1024, protected_begin=2048, caches=banks),
++        decode_copy_stream=torch.cuda.Stream(), prefill_copy_stream=torch.cuda.Stream(),
++        id_of_slot=ids, slot_for_id=mapping,
++        usage=torch.full((2064,), 19, device='cuda', dtype=torch.int64))
++    batch = SimpleNamespace(input_ids=list(range(128)), attn_metadata=SimpleNamespace())
++    return PrefillWorkspace(cache, torch.device('cuda')), batch, banks
++
++
++def test_real_prefill_loan_preserves_metadata_and_bank_boundaries():
++    """The original escaped row plans must survive without retaining a loan segment."""
++    workspace, batch, banks = _fixture()
++    for _ in range(2):
++        def forward():
++            batch.attn_metadata.cmp_rows = torch.arange(128, device='cuda', dtype=torch.int32)
++            batch.attn_metadata.ring_rows = batch.attn_metadata.cmp_rows + 3
++            return torch.arange(8192, device='cuda', dtype=torch.float32) * 3 + 7
++
++        result = workspace.forward(forward, batch)
++        assert torch.equal(result, torch.arange(8192, device='cuda', dtype=torch.float32) * 3 + 7)
++        assert torch.equal(batch.attn_metadata.ring_rows,
++                           torch.arange(128, device='cuda', dtype=torch.int32) + 3)
++        record = workspace.records[-1]
++        assert record['after_release'][8] == record['after_release'][7] == 0
++        assert record['before_release'][1] > 0 and record['after_release'][2] == 0
++        assert set(record['preserved_metadata']) == {'cmp_rows', 'ring_rows'}
++        for bank in banks.values():
++            assert bool((bank[:1024] == 177).all())
++            assert bool((bank[2048:] == 231).all())
++        assert bool((workspace.cache.slot_for_id == -1).all())
++        assert bool((workspace.cache.id_of_slot[1024:2048] == -1).all())
++
++
++def test_prefill_exception_keeps_backing_banks_and_blocks_future_execution():
++    """An exception traceback can retain tensors, so the engine must require unload."""
++    workspace, batch, _ = _fixture()
++
++    def fail():
++        batch.attn_metadata.cmp_rows = torch.arange(8192, device='cuda')
++        raise ValueError('deliberate prefill failure')
++
++    with pytest.raises(ValueError, match='deliberate'):
++        workspace.forward(fail, batch)
++    with pytest.raises(RuntimeError, match='unload'):
++        workspace.check_usable()
++    from freetoken.engine.engine import Engine
++    from freetoken.models.qwen4_exp.mtp_runtime import MtpRuntime
++    engine = Engine.__new__(Engine)
++    engine.stream = torch.cuda.current_stream()
++    engine.prefill_workspace = workspace
++    runtime = MtpRuntime.__new__(MtpRuntime)
++    runtime.engine = engine
++    with pytest.raises(RuntimeError, match='unload'):
++        engine.forward_batch(None, None)
++    with pytest.raises(RuntimeError, match='unload'):
++        engine.rebuild_runtime_cache()
++    with pytest.raises(RuntimeError, match='unload'):
++        runtime.forward(None, None, None, None, None, None)
++    assert workspace._failed_regions and workspace._failed_pool
++    assert workspace.statistics()[8] > 0
++    batch.attn_metadata.cmp_rows = None
++    workspace._failed_pool = None
++    gc.collect()
++    torch.cuda.synchronize()
++    torch.cuda.empty_cache()
++    assert workspace.statistics()[8] == 0
++
++
++def test_unrecognized_escaped_tensor_cannot_be_reused_for_decode():
++    """Keep the strict native live-block guard for survivors outside batch metadata."""
++    workspace, batch, _ = _fixture()
++    escaped = []
++
++    def forward():
++        escaped.append(torch.arange(8192, device='cuda'))
++        return torch.ones(8, device='cuda')
++
++    with pytest.raises(RuntimeError, match='did not return'):
++        workspace.forward(forward, batch)
++    with pytest.raises(RuntimeError, match='unload'):
++        workspace.check_usable()
++    assert workspace._failed_regions
++    escaped.clear()
++    gc.collect()
++    torch.cuda.synchronize()
++    torch.cuda.empty_cache()
++    assert workspace.statistics()[8] == 0

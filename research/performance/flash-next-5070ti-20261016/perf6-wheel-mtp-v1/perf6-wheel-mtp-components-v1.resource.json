@@ -1,0 +1,23 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand6\\Scripts\\python.exe",
+    "-B",
+    "test-wheel6-mtp-v1.py"
+  ],
+  "cwd": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016",
+  "started": 1792172249.772501,
+  "samples": 25,
+  "min_commit_available": 56121532416,
+  "min_ram_available": 56512577536,
+  "min_gpu_free": 15946838016,
+  "max_commit_used": 14197379072,
+  "max_gpu_used": 1148096512,
+  "max_tree_rss": 1342201856,
+  "max_tree_private": 2771574784,
+  "stop_reason": null,
+  "pid": 5548,
+  "returncode": 0,
+  "elapsed_s": 12.625,
+  "remaining_before_cleanup": [],
+  "remaining_descendants": []
+}

@@ -1,0 +1,430 @@
+{
+  "scope": "Ordinary installed FreeToken wheel; Speed remains separate acceptance",
+  "files": [
+    {
+      "path": "runtime/perf6-wheel-quality-off-v1.json",
+      "bytes": 179044,
+      "sha256": "e425aabc07d17a0e0c42abea2c597c397274ba6923f0cbc3079792fdcec1852e"
+    },
+    {
+      "path": "runtime/perf6-wheel-quality-off-v1.resource.json",
+      "bytes": 1098,
+      "sha256": "d8ed27e3b4d5fe49dee1cbe30c8af0efca014754ada5f718eb15dc908de43673"
+    },
+    {
+      "path": "runtime/perf6-wheel-quality-off-v1.stdout.log",
+      "bytes": 45224,
+      "sha256": "cb94376ace912b5b8c0bbfea7c0fe238b11de0d8ec1c15d4c88b48d2cc05ad68"
+    },
+    {
+      "path": "runtime/perf6-wheel-quality-off-v1.stderr.log",
+      "bytes": 1999,
+      "sha256": "729c4eb656a3189e787a82091770b6f29b757a55d0f7cb7fa448c632e050dd21"
+    },
+    {
+      "path": "runtime/perf6-wheel-quality-off-v1.samples.jsonl",
+      "bytes": 58347,
+      "sha256": "c58c10330d0f5b3efaf9ef1758f6a24ed8ab4c1655b42cbc3db53a6f86e1d73e"
+    },
+    {
+      "path": "runtime/perf6-wheel-performance-off-v1.json",
+      "bytes": 560184,
+      "sha256": "6c33a5853099052123b1f4298c038401135ae702f0f18b8609b62c2999d261d4"
+    },
+    {
+      "path": "runtime/perf6-wheel-performance-off-v1.resource.json",
+      "bytes": 1237,
+      "sha256": "e5292f328606293fd1238542f6ca210f5adc7e52d4aad0fd0f78d20006e1bb52"
+    },
+    {
+      "path": "runtime/perf6-wheel-performance-off-v1.stdout.log",
+      "bytes": 28428,
+      "sha256": "aab96d3426b7de90e59e2f67a1b023c2ead3c5f848d34e76a6c0192389dca156"
+    },
+    {
+      "path": "runtime/perf6-wheel-performance-off-v1.stderr.log",
+      "bytes": 1169,
+      "sha256": "ab3f6e6c67922a4779536531b3cc537f54ad1c1a456c82b3ab91ad09a291d85f"
+    },
+    {
+      "path": "runtime/perf6-wheel-performance-off-v1.samples.jsonl",
+      "bytes": 99667,
+      "sha256": "790d1d55fc0acb2f563192b54e82be48ec0c46581643a80b3dc028f1315b3ff4"
+    },
+    {
+      "path": "runtime/perf6-wheel-quality-on-v1.json",
+      "bytes": 203934,
+      "sha256": "e619cf1750723063d4b2876d6430a8dc594d293685686c0891b1e2578ae7eccd"
+    },
+    {
+      "path": "runtime/perf6-wheel-quality-on-v1.resource.json",
+      "bytes": 1118,
+      "sha256": "cb468a344251b589de4d35921a881ae4ad73afc181888b14b3d8c8cd97ef7128"
+    },
+    {
+      "path": "runtime/perf6-wheel-quality-on-v1.stdout.log",
+      "bytes": 54354,
+      "sha256": "5a1aa61a81abf5cd793f3427039868409564be6558cd9da43a842bbba6924e57"
+    },
+    {
+      "path": "runtime/perf6-wheel-quality-on-v1.stderr.log",
+      "bytes": 1999,
+      "sha256": "c087c8549610b48e226cfd942b3c2281d5922ecf7c3b5e4259ff6e9b9d427e17"
+    },
+    {
+      "path": "runtime/perf6-wheel-quality-on-v1.samples.jsonl",
+      "bytes": 102234,
+      "sha256": "0683feab71821f10d13e1c858c0cdeb638e77de076560a730e14972d12a8b6e8"
+    },
+    {
+      "path": "runtime/perf6-wheel-performance-on-v1.json",
+      "bytes": 929002,
+      "sha256": "6768b9914c75b750bac7e10c6c911d183a9603789dd88d6ed81a1ca3fcf94535"
+    },
+    {
+      "path": "runtime/perf6-wheel-performance-on-v1.resource.json",
+      "bytes": 1256,
+      "sha256": "73d29b71fc06cdeeeddb29780a4df83854c80f9e615f9db85790777d3d3732b6"
+    },
+    {
+      "path": "runtime/perf6-wheel-performance-on-v1.stdout.log",
+      "bytes": 29043,
+      "sha256": "b8712207e09546e4d34a1087f5f11982eb315ac8e62fd69f47228338f40faf11"
+    },
+    {
+      "path": "runtime/perf6-wheel-performance-on-v1.stderr.log",
+      "bytes": 1169,
+      "sha256": "08c9b3cb08837393cfcc2310a544e71f9c66ec105cea02d7b8b5905875cc538b"
+    },
+    {
+      "path": "runtime/perf6-wheel-performance-on-v1.samples.jsonl",
+      "bytes": 101711,
+      "sha256": "44fb0bec9c4a31af5b044fb4178d8be96efc2be0dff0e02c0eb5db61a2661ee2"
+    },
+    {
+      "path": "runtime/perf6-wheel-components-v1.resource.json",
+      "bytes": 677,
+      "sha256": "022b459b61deca7791363a4ad483b36f9d5b576eb5ae35c45257d9481ac6dac1"
+    },
+    {
+      "path": "runtime/perf6-wheel-components-v1.stdout.log",
+      "bytes": 1088,
+      "sha256": "e76b9a5798051504026998d5dad62f59c4e2a3ee0a69340b51d1b4a66e074698"
+    },
+    {
+      "path": "runtime/perf6-wheel-components-v1.stderr.log",
+      "bytes": 81,
+      "sha256": "fb3a9e7e8f08a76da0f3dc1a138aeaa9c59614b508c8e29e2155d1371c1c0bd6"
+    },
+    {
+      "path": "runtime/perf6-wheel-components-v1.samples.jsonl",
+      "bytes": 28096,
+      "sha256": "c78759a0c900188d96aceeb64f019cb03d6f9922df13de835f2e6ff9c0d4b525"
+    },
+    {
+      "path": "tools/probe63-wheel6.py",
+      "bytes": 22811,
+      "sha256": "aec2b31fde5db9cf1a6e42fd6f745ddc96baaf8fab67bbcdd5f2d8ab632bea22"
+    },
+    {
+      "path": "tools/test-wheel6-components-v1.py",
+      "bytes": 1936,
+      "sha256": "9e73f96053fe0f1ec8298d9fb4f366d6b22facbd90c41224584f6ed88bec8658"
+    },
+    {
+      "path": "tools/run-wheel6-v1.py",
+      "bytes": 2058,
+      "sha256": "153899f46081bb51a8d69774788783e116dcc6fed2150c36e04452dc69fc4244"
+    },
+    {
+      "path": "tools/prepare-cand6-env.py",
+      "bytes": 1585,
+      "sha256": "4dd47fbf082f6a4dd652795fa111be7a6a0d8929ae6359374d81cb101bc5f33a"
+    },
+    {
+      "path": "tools/freeze_candidate6.py",
+      "bytes": 5042,
+      "sha256": "78a68ab72572d9f200becb90f76b0648b13a010e83adf87fd85312145aafe3f3"
+    },
+    {
+      "path": "tools/probe62-source7.py",
+      "bytes": 23410,
+      "sha256": "90f7bb0f41e800c69d4fd3af912bb037032b0520a44bc1445036f61937eee84f"
+    },
+    {
+      "path": "tools/run-source7-v1.py",
+      "bytes": 1423,
+      "sha256": "96d76b02e1e779c38bf522d539bd1b49106cdc0277b31a0e12d58da26f31f84e"
+    },
+    {
+      "path": "tools/run-freeze6-materials-v1.py",
+      "bytes": 2581,
+      "sha256": "017c4205071bffaa9dcd343679de5a0f4db755fa0cdbae631b51ec4a39c5a6be"
+    },
+    {
+      "path": "tools/memory_inventory_v2.py",
+      "bytes": 2095,
+      "sha256": "b913edbce9023dd4d22212b57a5c85cfb5c14ffe5d5e8f0737e9d0998e2664ac"
+    },
+    {
+      "path": "tools/supervise-v2.py",
+      "bytes": 5978,
+      "sha256": "ad707261264cd47a683608ecc7b8ebd9e72e992897e163dd5adefedd7606aae7"
+    },
+    {
+      "path": "checks/build-perf6-validator-v1.log",
+      "bytes": 14384,
+      "sha256": "d643efe33a0d094aaeaaa8ae8c95339de9d79c22a48f3019957cca80611f12e3"
+    },
+    {
+      "path": "checks/build-perf6-tools-v1.log",
+      "bytes": 11811,
+      "sha256": "1c99ac9ec06086911f17e55cd240a0f81ebb8ee8113010f5ba8d172a01dcc958"
+    },
+    {
+      "path": "checks/build-perf6-offline-ok-v1.json",
+      "bytes": 264,
+      "sha256": "e742e0df48faef68a1a47c74a6382045ccf546ba44c06603418120011a7b0c03"
+    },
+    {
+      "path": "source-runtime/source7-quality-on-v1.json",
+      "bytes": 203689,
+      "sha256": "e4e6c72719cd3bbbebf15b67ca62587df26439a66dd125c79b8d89fd65c00fb6"
+    },
+    {
+      "path": "source-runtime/source7-quality-on-v1.resource.json",
+      "bytes": 1114,
+      "sha256": "241b07c3b8a51aac10bb1ff5465d156d2919bdd7189373a5f607846c65d009e6"
+    },
+    {
+      "path": "source-runtime/source7-quality-on-v1.stdout.log",
+      "bytes": 47657,
+      "sha256": "fbb8c2bc4439d6a920add6ed6af32091070f8042b1d09b1db09295ea2f146972"
+    },
+    {
+      "path": "source-runtime/source7-quality-on-v1.stderr.log",
+      "bytes": 2009,
+      "sha256": "ce23da79134c48e87dab6add44dbb7828aa3deb447f030940aaffbe94d2f9eb0"
+    },
+    {
+      "path": "source-runtime/source7-quality-on-v1.samples.jsonl",
+      "bytes": 65750,
+      "sha256": "e3fbaa146ab4caab289de0167342f98d9ec51e0236b2b40513fc6a7a04631fb3"
+    },
+    {
+      "path": "source-runtime/source7-performance-on-v1.json",
+      "bytes": 907406,
+      "sha256": "0e7194ffe362f738352c1133ed450e6f38c6259421a511bc8bbccd9c4f3441ab"
+    },
+    {
+      "path": "source-runtime/source7-performance-on-v1.resource.json",
+      "bytes": 1234,
+      "sha256": "14424cbd76b5cd8bc67f3e54a43a1435c51452dc7bd5258bfe05c79225954630"
+    },
+    {
+      "path": "source-runtime/source7-performance-on-v1.stdout.log",
+      "bytes": 29049,
+      "sha256": "6dbe547f5197045078ecd53d4c81742be625a1ca3a69eaa0ebacec889391ad2b"
+    },
+    {
+      "path": "source-runtime/source7-performance-on-v1.stderr.log",
+      "bytes": 1179,
+      "sha256": "819311afb4f71f0edc4402c92156ee80c5d283487a6cd438e0893bc9e1e5793d"
+    },
+    {
+      "path": "source-runtime/source7-performance-on-v1.samples.jsonl",
+      "bytes": 96062,
+      "sha256": "807cbb27488e96d060ff2c2504166f989b4b99fc16f740d216d5f3d9d2c90ef2"
+    },
+    {
+      "path": "source-runtime/source7-quality-off-v1.json",
+      "bytes": 178801,
+      "sha256": "aca9c3857431e704caf3667de73c0c82298b89484d11831fd9ab9a83c8db2ab0"
+    },
+    {
+      "path": "source-runtime/source7-quality-off-v1.resource.json",
+      "bytes": 1094,
+      "sha256": "d0110e1853f8e12b82a0414474a81672d5e549dba6b75388c8f5a6f432e03eb7"
+    },
+    {
+      "path": "source-runtime/source7-quality-off-v1.stdout.log",
+      "bytes": 45228,
+      "sha256": "939669560057b097bfadffad64c70a2fb017fc78069de23e5d5dc4d1fdc40578"
+    },
+    {
+      "path": "source-runtime/source7-quality-off-v1.stderr.log",
+      "bytes": 2009,
+      "sha256": "b9e91a17ac554a6274c289d516a46162024993938d46b01510a95ddbaa509985"
+    },
+    {
+      "path": "source-runtime/source7-quality-off-v1.samples.jsonl",
+      "bytes": 55864,
+      "sha256": "0d6578bcdd5d1bb6a771d3a0ae86d6d945d34f496498d5f537ebb8dd6f9afc2b"
+    },
+    {
+      "path": "source-runtime/source7-performance-off-v1.json",
+      "bytes": 538116,
+      "sha256": "d5602da89d996b197bfbb4deb24996476c4e9ae82e21f8b3e58aab253c4d4441"
+    },
+    {
+      "path": "source-runtime/source7-performance-off-v1.resource.json",
+      "bytes": 1203,
+      "sha256": "5ea47fc41060a64fa47b3749d9c00da426a56d6c7799d454d6b8cdc01fc7de7d"
+    },
+    {
+      "path": "source-runtime/source7-performance-off-v1.stdout.log",
+      "bytes": 28426,
+      "sha256": "5b057cbf2743c4ecb5155bcef0f38c50fea2693ca354b680d7436442f1093f1e"
+    },
+    {
+      "path": "source-runtime/source7-performance-off-v1.stderr.log",
+      "bytes": 1179,
+      "sha256": "9f86074af07e4bf688c22575fb5ea9df74f6061df4534db10e1ec72ae381760b"
+    },
+    {
+      "path": "source-runtime/source7-performance-off-v1.samples.jsonl",
+      "bytes": 99630,
+      "sha256": "1687d5966f711de48241bf52afa1f6af4e18efc7123ae692cf399647469a483e"
+    },
+    {
+      "path": "source-runtime/source7-components-v2.resource.json",
+      "bytes": 677,
+      "sha256": "32c1c6ccc0da357ad61d65b42e3e91714f577f96ff28872bbfaad9af0e56df01"
+    },
+    {
+      "path": "source-runtime/source7-components-v2.stdout.log",
+      "bytes": 576,
+      "sha256": "3721772cb5ddcd3a00e41477d2c24e4b7f2873ce21a1759c1fd689144a22cd68"
+    },
+    {
+      "path": "source-runtime/source7-components-v2.stderr.log",
+      "bytes": 81,
+      "sha256": "fb3a9e7e8f08a76da0f3dc1a138aeaa9c59614b508c8e29e2155d1371c1c0bd6"
+    },
+    {
+      "path": "source-runtime/source7-components-v2.samples.jsonl",
+      "bytes": 6260,
+      "sha256": "f16aabc519b4d723f332b29b58883564eb36c3e3b8cdd0c532545a430ae37562"
+    },
+    {
+      "path": "patch-stages/index.json",
+      "bytes": 3090,
+      "sha256": "c803fca46eba90915a47c7b34cf6dbd9568cf93cda7282301a01939059c8ad28"
+    },
+    {
+      "path": "patch-stages/41-prefill-workspace/after/python/freetoken/engine/config.py",
+      "bytes": 12479,
+      "sha256": "2fb348519f02f5ab51cf773e6359cf70e6a6e636af8649bc16910db8a56b3fdb"
+    },
+    {
+      "path": "patch-stages/41-prefill-workspace/after/python/freetoken/engine/engine.py",
+      "bytes": 102710,
+      "sha256": "7aebf87b6e8d9103d4f5f96df57e014925adca38b74b5279383f1687ac8921ec"
+    },
+    {
+      "path": "patch-stages/41-prefill-workspace/after/python/freetoken/moe/prefill_workspace.py",
+      "bytes": 5233,
+      "sha256": "43feff2c50233178ef27f854be3081b4363a4bd7f1959777a63bd28938bc0ba0"
+    },
+    {
+      "path": "patch-stages/41-prefill-workspace/after/python/freetoken/moe/q2_residency.py",
+      "bytes": 18987,
+      "sha256": "25b949ca61cb848bd00e65207425d30fa68a99974c695ffa4c9aa4da858de5f7"
+    },
+    {
+      "path": "patch-stages/41-prefill-workspace/after/python/freetoken/kernel/csrc/pinned_tensor.cpp",
+      "bytes": 7810,
+      "sha256": "4a916dc7ed3d7307ffce1ea883cbfec2c4dcaf92aef67181b2b4211faa60f9ff"
+    },
+    {
+      "path": "patch-stages/41-prefill-workspace/after/python/freetoken/models/qwen4_exp/mtp_runtime.py",
+      "bytes": 11901,
+      "sha256": "6534ac330fca2adcac6f2ba040ffec5d598d421bc91e09e258d4a0ee0c02e97d"
+    },
+    {
+      "path": "patch-stages/41-prefill-workspace/after/tests/moe/test_prefill_workspace.py",
+      "bytes": 4854,
+      "sha256": "e9baf5a5ca04b775b0d2997c8c26b7a50913272b8ae0678a4847b975e7b662ee"
+    },
+    {
+      "path": "patch-stages/41-prefill-workspace/before/python/freetoken/engine/config.py",
+      "bytes": 12420,
+      "sha256": "cb5cdd1e5cd7711ba4080554e366ff76e31301cd2f0702b178fe2fe1629777fb"
+    },
+    {
+      "path": "patch-stages/41-prefill-workspace/before/python/freetoken/engine/engine.py",
+      "bytes": 103945,
+      "sha256": "b894d2d460b044ece7cfc8f9a8ff59e2499cc05d9dd28432355b910c5f936dba"
+    },
+    {
+      "path": "patch-stages/41-prefill-workspace/before/python/freetoken/moe/prefill_workspace.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "patch-stages/41-prefill-workspace/before/python/freetoken/moe/q2_residency.py",
+      "bytes": 19274,
+      "sha256": "9a9aed6cf0bbeed8dec84d6faedff07c5dec7e46490be319260a69d8b9aa7063"
+    },
+    {
+      "path": "patch-stages/41-prefill-workspace/before/python/freetoken/kernel/csrc/pinned_tensor.cpp",
+      "bytes": 5218,
+      "sha256": "be360f45691d50ccf2a5a7b612412398610c8603d652e4ea08b94a3392f41dfb"
+    },
+    {
+      "path": "patch-stages/41-prefill-workspace/before/python/freetoken/models/qwen4_exp/mtp_runtime.py",
+      "bytes": 12024,
+      "sha256": "8d4b8925b561eb57da995e0557e4a97211baa6423c47bc0f83a4848233f572ed"
+    },
+    {
+      "path": "patch-stages/41-prefill-workspace/before/tests/moe/test_prefill_workspace.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "patch-stages/42-fixed-rebuild-reserve/after/python/freetoken/engine/config.py",
+      "bytes": 12843,
+      "sha256": "3a5c1b96b2411cf064cfccc8e4be7b473a3e36e0203e115b8a90d8521f2b40a1"
+    },
+    {
+      "path": "patch-stages/42-fixed-rebuild-reserve/after/python/freetoken/engine/engine.py",
+      "bytes": 102742,
+      "sha256": "c7c7c60d048c538371a549175354cf282d3a410df4e2b4d7b2ba32bc70d984a0"
+    },
+    {
+      "path": "patch-stages/42-fixed-rebuild-reserve/before/python/freetoken/engine/config.py",
+      "bytes": 12479,
+      "sha256": "2fb348519f02f5ab51cf773e6359cf70e6a6e636af8649bc16910db8a56b3fdb"
+    },
+    {
+      "path": "patch-stages/42-fixed-rebuild-reserve/before/python/freetoken/engine/engine.py",
+      "bytes": 102710,
+      "sha256": "7aebf87b6e8d9103d4f5f96df57e014925adca38b74b5279383f1687ac8921ec"
+    },
+    {
+      "path": "patch-stages/43-package-identity/after/python/freetoken/version.py",
+      "bytes": 42,
+      "sha256": "3464953cc5f69d0c3ed64b21376fad88ebf2c2527ed9af1ec2d0cfbe0d18a0d6"
+    },
+    {
+      "path": "patch-stages/43-package-identity/before/python/freetoken/version.py",
+      "bytes": 43,
+      "sha256": "9570e12605fd75d9383d049a32b0516ffc9f5271cef528e61bfd0dab622490a9"
+    },
+    {
+      "path": "analysis/nsys-lut-ple-comparison-v1.json",
+      "bytes": 19963,
+      "sha256": "59b193ddaba12a2d6b0491cb2a3fbab8175232ee0104580a6aa11cba72d9204f"
+    },
+    {
+      "path": "analysis/summary.json",
+      "bytes": 2202,
+      "sha256": "10b122c01101649b5b54260f7de1c603894c5e7fbc0e6ad0ce588aaadc7d82e6"
+    },
+    {
+      "path": "tools/archive-perf6-wheel-v1.py",
+      "bytes": 4016,
+      "sha256": "ea885b5e62c1091951d35f40c4c8752fe9e5a5012985803dc4f49a69381e6c92"
+    }
+  ]
+}

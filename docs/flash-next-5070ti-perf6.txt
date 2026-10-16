@@ -1,0 +1,21 @@
+Flash Next 5070 Ti perf6 候选材料
+
+FreeToken 0.1.3+speed.strataq2perf6：在perf5的40组冻结补丁上增加3组，历史补丁/制品保持。只重编pinned_tensor.cpp，保留真实MSVC编译回执、源文件与兼容头哈希；另外两个原生扩展和27项AOT均与perf5字节相同。build/derive_python_materials.py --rebuild-pinned-tensor 与独立校验器限定这一边界。
+
+参考Strata将整个prefill工作区借用缓存的设计，moe_q2_prefill_workspace显式开启时，借用1024个动态专家副本的payload区域承载大prefill临时分配。原始Q2专家、FP32激活/scale、永久所有者、主模型词表不变。两块512-expert prefill staging区域仍独立使用；借用期间稀疏路由不能覆盖临时工作区。返回的logits及QSA持有的行索引复制到普通分配器，排空流并检查所有原生loan归还后才允许decode。prefill异常或未知张量逃逸会保留底层bank并隔离该engine，后续native/MTP/rebuild要求卸载；不能把生命周期检查关掉继续运行。
+
+原默认行为保留：workspace=False；fixed_q2_rebuild_reserve_mib=512。5070 Ti实验显式配置workspace=True、reserve=0，外部资源监督仍保留256MiB实际显存底线。内部cudaMemGetInfo固定余量曾拦截更大池的扩缩容；实验在真实NVML监督下通过，因此提供独立配置而不是把旧估算当不可变约束。该配置必须结合本机真实资源测试，不能从此次结果推导出所有模型的默认值应改为零。
+
+完整输入embedding主存映射、PLE行缓存、C1前缀快照与8192 KV/MTP容量继续保留。OFF常驻5888，ON常驻5120；各另有1024动态和1024可借用prefill槽，总计7936/7168。相较perf5分别增加512槽，工作区不增加独立GPU bank。
+
+实际验证：39项普通wheel GPU组件、2项subtests通过，1项平台条件跳过；正常归还/边界/元数据持有、故障隔离、原有pinned/PLE/Q2图输入/owner变化覆盖。OFF和ON各质量15/20、thinking3/3，无新增失败项，缓存扩缩容通过。每模式27次质量和17次性能运行的token IDs与工作源码candidate7一致；工作源码对应输出也与perf5相同。保留既有质量失败与历史间歇性长输出token0问题，不声称已解决。
+
+原生普通wheel，5项各3次实际512个输出token中位tokens/s（英文/中文/代码/短/4K）：
+  OFF: 100.146/100.276/95.525/98.203/95.162
+  ON: 114.981/101.906/119.545/99.188/120.856
+
+同Q2 Strata参考（英文/中文/代码，3x512）：OFF91.074/92.610/90.877；ON122.159/117.632/125.582。OFF已在本组测量中接近并略超，ON仍有差距，中文最明显。不可用用户IQ2_XS指标作为同精度对照。
+
+材料：artifacts/strataq2perf6-cp312-cu130-sm120；普通wheel及源码运行证据：research/performance/flash-next-5070ti-20261016/perf6-wheel-v1/index.json（85份SHA文件）。完整repository validator和46项工具测试通过。此检查点还未包含Speed perf6源码、编译或安装验收；当前默认current-release指针仍为历史已验收版本，最终交付时另行更新。
+
+补充MTP/紧凑事务与状态池回归22项通过，普通wheel来源检查与进程清场通过；证据为同目录perf6-wheel-mtp-v1/index.json。

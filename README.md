@@ -25,6 +25,8 @@
 
 后续研究检查点保存了 [MTP词表原型与Strata反向消融](docs/flash-next-5070ti-mtp-review.txt)：对照CJK/英文/完整词表、同步提交，以及草稿KV ring、窗口流水和长度策略的实际接线。该检查点尚未形成新的正式profile或Speed交付版本。
 
+独立候选 `strataq2perf6` 借用整个prefill临时工作区，扩大专家缓存后开关MTP五项吞吐均改善。pinned扩展实际重编，原始Q2/FP32语义与完整专家保留；普通wheel、故障隔离及状态扩缩容已验收，[第六轮记录](docs/flash-next-5070ti-perf6.txt)说明资源配置与尚未完成的Speed验收。
+
 ## 使用当前版本
 
 ```powershell

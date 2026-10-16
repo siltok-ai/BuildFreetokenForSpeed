@@ -87,6 +87,8 @@ PYTHON_ONLY_CHANGES = {
     'tests/moe/test_q2_q8_tiles.py',
     'tests/moe/test_q2_lut.py',
     'tests/kernels/test_row_cache.py',
+    'python/freetoken/moe/prefill_workspace.py',
+    'tests/moe/test_prefill_workspace.py',
 }
 
 
@@ -110,6 +112,7 @@ WINDOWS_BUILDER = 'tools/build_windows_kernel_cache.py'
 GGUF_OLD = 'freetoken__gguf_mmvq_r1'
 GGUF_NEW = 'freetoken__gguf_mmvq_r2'
 ROW_STORE_CPP = 'python/freetoken/kernel/csrc/row_store/row_store_ext.cpp'
+PINNED_TENSOR_CPP = 'python/freetoken/kernel/csrc/pinned_tensor.cpp'
 
 
 def validate_row_store_changes(base_source, source):
@@ -137,6 +140,35 @@ def rebuild_row_store(source, output, torch_version):
     if not binary.is_relative_to(destination.resolve()) or sha256(binary) != receipt['artifact']['sha256']:
         raise ValueError('Row-store compiler output differs from its receipt')
     return binary, dict(module='_row_store', source=ROW_STORE_CPP, command=command,
+        receipt=receipt, receipt_path=receipt_path.relative_to(output).as_posix(),
+        receipt_sha256=sha256(receipt_path), log_sha256=sha256(log))
+
+
+def validate_pinned_tensor_changes(base_source, source):
+    """工作区原生改动只开放pinned扩展入口；其他扩展和AOT输入必须保持。"""
+    old, new = tree_hashes(base_source), tree_hashes(source)
+    changed = {name for name in old.keys() | new.keys() if old.get(name) != new.get(name)}
+    if PINNED_TENSOR_CPP not in changed or not changed <= PYTHON_ONLY_CHANGES | {PINNED_TENSOR_CPP}:
+        raise ValueError(f'pinned-tensor selective rebuild source boundary differs: {sorted(changed - PYTHON_ONLY_CHANGES)}')
+    return changed
+
+
+def rebuild_pinned_tensor(source, output, torch_version):
+    """实际重编CUDA主存扩展并保存回执，不触碰其余两个扩展和27项AOT。"""
+    destination = output/'rebuilt-pinned-tensor'
+    command = [sys.executable, '-B', str(ROOT/'build/compile_pinned_tensor.py'),
+               '--source', str(source/PINNED_TENSOR_CPP), '--output', str(destination), '--torch', torch_version]
+    log = output/'pinned-tensor-build.log'
+    with log.open('wb') as stream:
+        subprocess.run(command, cwd=source, stdout=stream, stderr=subprocess.STDOUT, check=True)
+    receipt_path = destination/'build-receipt.json'
+    receipt = json.loads(receipt_path.read_text(encoding='utf-8'))
+    if receipt['source_sha256'] != sha256(source/PINNED_TENSOR_CPP):
+        raise ValueError('Pinned-tensor compiler receipt belongs to different source')
+    binary = (destination/receipt['artifact']['path']).resolve(strict=True)
+    if not binary.is_relative_to(destination.resolve()) or sha256(binary) != receipt['artifact']['sha256']:
+        raise ValueError('Pinned-tensor compiler output differs from its receipt')
+    return binary, dict(module='_pinned_tensor', source=PINNED_TENSOR_CPP, command=command,
         receipt=receipt, receipt_path=receipt_path.relative_to(output).as_posix(),
         receipt_sha256=sha256(receipt_path), log_sha256=sha256(log))
 
@@ -196,18 +228,19 @@ def rebuild_gguf_cache(source, output, base_wheel, native_modules, cache):
             'artifact': {'path': dll.relative_to(cache).as_posix(), 'size': dll.stat().st_size, 'sha256': sha256(dll)}}
 
 
-def derive(profile_path, base_profile_path, base_materials, output, *, rebuild_gguf=False, rebuild_row_store_module=False):
+def derive(profile_path, base_profile_path, base_materials, output, *, rebuild_gguf=False, rebuild_row_store_module=False, rebuild_pinned_module=False):
     """重放新旧源码，默认仅复用原生字节；显式r2模式实际重建独立GGUF AOT。"""
     output = Path(output).resolve()
     if output.exists():
         raise FileExistsError('use a new output directory; accepted artifacts are never replaced')
-    if rebuild_gguf and rebuild_row_store_module:
+    if sum((rebuild_gguf, rebuild_row_store_module, rebuild_pinned_module)) > 1:
         raise ValueError('Select one independently bounded native rebuild at a time')
     base_materials = Path(base_materials).resolve(strict=True)
     subprocess.run([sys.executable, '-B', str(ROOT / 'tools/verify_materials.py'), str(base_materials)], check=True)
     source, profile = prepare(profile_path, output / 'candidate-source')
     base_source, base_profile = prepare(base_profile_path, output / 'base-source')
-    boundary = (validate_row_store_changes if rebuild_row_store_module else
+    boundary = (validate_pinned_tensor_changes if rebuild_pinned_module else
+                validate_row_store_changes if rebuild_row_store_module else
                 validate_gguf_rebuild_changes if rebuild_gguf else validate_python_only_changes)
     changed = boundary(base_source, source)
     if profile['custom_version'] == base_profile['custom_version']:
@@ -265,6 +298,17 @@ def derive(profile_path, base_profile_path, base_materials, output, *, rebuild_g
         row_rebuild['base_profile'] = base_profile_file.resolve(strict=True).relative_to(ROOT.resolve()).as_posix()
         members[row_member] = binary.read_bytes()
         members[ROW_STORE_CPP.removeprefix('python/')] = (source/ROW_STORE_CPP).read_bytes()
+    pinned_rebuild = None
+    pinned_member = None
+    if rebuild_pinned_module:
+        pinned_member = next(name for name in base_record['native_modules'] if Path(name).name.startswith('_pinned_tensor.'))
+        binary, pinned_rebuild = rebuild_pinned_tensor(source, output, profile['torch'])
+        base_profile_file = Path(base_profile_path)
+        if not base_profile_file.is_absolute():
+            base_profile_file = ROOT/base_profile_file
+        pinned_rebuild['base_profile'] = base_profile_file.resolve(strict=True).relative_to(ROOT.resolve()).as_posix()
+        members[pinned_member] = binary.read_bytes()
+        members[PINNED_TENSOR_CPP.removeprefix('python/')] = (source/PINNED_TENSOR_CPP).read_bytes()
     records = io.StringIO(newline='')
     writer = csv.writer(records, lineterminator='\n')
     for name, data in sorted(members.items()):
@@ -297,6 +341,9 @@ def derive(profile_path, base_profile_path, base_materials, output, *, rebuild_g
     metadata['binary_reuse'] = {'base_materials': base_materials.name,
                               'base_build_record_sha256': sha256(base_materials / 'build-record.json'),
                               'reason': 'Allowlisted Python-only revision; native/AOT source and inputs identical'}
+    if pinned_rebuild:
+        metadata['binary_reuse']['reason'] = 'Two native modules and all AOT inputs unchanged; pinned-tensor extension actually rebuilt'
+        metadata['pinned_tensor_rebuild'] = pinned_rebuild
     if row_rebuild:
         metadata['binary_reuse']['reason'] = 'Two native modules and all AOT inputs unchanged; row-store CPU extension actually rebuilt'
         metadata['row_store_rebuild'] = row_rebuild
@@ -308,7 +355,7 @@ def derive(profile_path, base_profile_path, base_materials, output, *, rebuild_g
     metadata_path.write_text(json.dumps(metadata, indent=2) + '\n', encoding='utf-8')
     native_hashes = {name: hashlib.sha256(members[name]).hexdigest() for name in base_record['native_modules']}
     with zipfile.ZipFile(base_wheel) as archive:
-        reused = {name: digest for name,digest in native_hashes.items() if name != row_member}
+        reused = {name: digest for name,digest in native_hashes.items() if name not in (row_member, pinned_member)}
         if reused != {name: hashlib.sha256(archive.read(name)).hexdigest() for name in reused}:
             raise ValueError('native module bytes changed during repack')
     files = [wheel, *(cache / a['path'] for a in manifest['artifacts']),
@@ -317,6 +364,8 @@ def derive(profile_path, base_profile_path, base_materials, output, *, rebuild_g
         files.append(output / 'gguf-aot-build.log')
     if row_rebuild:
         files.extend([output/'row-store-build.log',output/row_rebuild['receipt_path']])
+    if pinned_rebuild:
+        files.extend([output/'pinned-tensor-build.log',output/pinned_rebuild['receipt_path']])
     # 复用构建环境身份，不能继承旧 wheel 的运行验收或证据路径。
     inherited = {key: base_record[key] for key in ('format', 'python', 'build_python', 'native_modules',
                                                   'dependencies', 'cuda_compiler', 'msvc_compiler', 'aot_count')}
@@ -339,6 +388,12 @@ def derive(profile_path, base_profile_path, base_materials, output, *, rebuild_g
         record['native_sha256'] = native_hashes
         record['binary_reuse']['native_sha256'] = reused
         record['producer_sha256']['build/compile_row_store.py'] = sha256(ROOT/'build/compile_row_store.py')
+    if pinned_rebuild:
+        record['status'] = 'partially_rebuilt_requires_runtime_validation'
+        record['pinned_tensor_rebuild'] = pinned_rebuild
+        record['native_sha256'] = native_hashes
+        record['binary_reuse']['native_sha256'] = reused
+        record['producer_sha256']['build/compile_pinned_tensor.py'] = sha256(ROOT/'build/compile_pinned_tensor.py')
     (output / 'build-record.json').write_text(json.dumps(record, indent=2) + '\n', encoding='utf-8')
     subprocess.run([sys.executable, '-B', str(ROOT / 'tools/verify_materials.py'), str(output)], check=True)
     print(json.dumps({'wheel': str(wheel), 'sha256': record['wheel_sha256'], 'status': record['status']}))
@@ -353,9 +408,11 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--rebuild-gguf', action='store_true', help='rebuild isolated GGUF r2 AOT; reject other native changes')
     parser.add_argument('--rebuild-row-store', action='store_true', help='actually rebuild only the row-store CPU extension')
+    parser.add_argument('--rebuild-pinned-tensor', action='store_true', help='actually rebuild only the pinned-tensor CUDA runtime extension')
     args = parser.parse_args()
     derive(args.profile, args.base_profile, args.base_materials, args.output,
-           rebuild_gguf=args.rebuild_gguf, rebuild_row_store_module=args.rebuild_row_store)
+           rebuild_gguf=args.rebuild_gguf, rebuild_row_store_module=args.rebuild_row_store,
+           rebuild_pinned_module=args.rebuild_pinned_tensor)
 
 
 if __name__ == '__main__':
