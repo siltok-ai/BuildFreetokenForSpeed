@@ -1,0 +1,2758 @@
+{
+  "diagnostic": true,
+  "description": "CUDA stream spans include GPU idle/host launch gaps; not kernel work sums",
+  "rows": [
+    {
+      "position": 128,
+      "cpu_ms": 32.582699990598485,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.09070002124644816,
+          "stream_ms": 0.09251199662685394
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.974200004246086,
+          "stream_ms": 2.9672319889068604
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.13729999773204327,
+          "stream_ms": 0.13155199587345123
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 28.9049000130035,
+          "stream_ms": 28.899744033813477
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.10870001278817654,
+          "stream_ms": 0.33500799536705017
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.2364999963901937,
+          "stream_ms": 0.008191999979317188
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.05460000829771161,
+          "stream_ms": 0.0344959981739521
+        }
+      ]
+    },
+    {
+      "position": 129,
+      "cpu_ms": 29.065700015053153,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.062700011767447,
+          "stream_ms": 0.05961599946022034
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9184999875724316,
+          "stream_ms": 2.915584087371826
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05679999594576657,
+          "stream_ms": 0.05283199995756149
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 25.81979997921735,
+          "stream_ms": 25.815967559814453
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.029000017093494534,
+          "stream_ms": 0.017055999487638474
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.11690001701936126,
+          "stream_ms": 0.17260800302028656
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03329999162815511,
+          "stream_ms": 0.005663999821990728
+        }
+      ]
+    },
+    {
+      "position": 133,
+      "cpu_ms": 31.640700006391853,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.06920000305399299,
+          "stream_ms": 0.06543999910354614
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.876000013202429,
+          "stream_ms": 2.872447967529297
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05160001455806196,
+          "stream_ms": 0.047775998711586
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 28.227200004039332,
+          "stream_ms": 28.226911544799805
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.10790000669658184,
+          "stream_ms": 0.33715200424194336
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.24029999622143805,
+          "stream_ms": 0.008383999578654766
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.039099977584555745,
+          "stream_ms": 0.060447998344898224
+        }
+      ]
+    },
+    {
+      "position": 134,
+      "cpu_ms": 29.48699999251403,
+      "committed": 2,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.07389998063445091,
+          "stream_ms": 0.0681919977068901
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.922500018030405,
+          "stream_ms": 2.9188480377197266
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.053800002206116915,
+          "stream_ms": 0.05020799860358238
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 25.812200008658692,
+          "stream_ms": 25.812095642089844
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.135600013891235,
+          "stream_ms": 0.3441599905490875
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.3606000100262463,
+          "stream_ms": 0.1756799966096878
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.07819998427294195,
+          "stream_ms": 0.06966400146484375
+        }
+      ]
+    },
+    {
+      "position": 136,
+      "cpu_ms": 27.699199999915436,
+      "committed": 3,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.11630001245066524,
+          "stream_ms": 0.10697600245475769
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.983599988510832,
+          "stream_ms": 2.9669439792633057
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.13260002015158534,
+          "stream_ms": 0.110944002866745
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 23.9708999870345,
+          "stream_ms": 23.9550724029541
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.10079998173750937,
+          "stream_ms": 0.32713600993156433
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.3273000183980912,
+          "stream_ms": 0.1520960032939911
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03339999238960445,
+          "stream_ms": 0.005696000065654516
+        }
+      ]
+    },
+    {
+      "position": 139,
+      "cpu_ms": 41.29200000897981,
+      "committed": 2,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.07219999679364264,
+          "stream_ms": 0.06803199648857117
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.890300005674362,
+          "stream_ms": 2.8872640132904053
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05379997310228646,
+          "stream_ms": 0.04972799867391586
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 37.445299996761605,
+          "stream_ms": 37.44540786743164
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.145500001963228,
+          "stream_ms": 0.34995201230049133
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.5003999976906925,
+          "stream_ms": 0.2922559976577759
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.1047999830916524,
+          "stream_ms": 0.1019200012087822
+        }
+      ]
+    },
+    {
+      "position": 141,
+      "cpu_ms": 35.43649998027831,
+      "committed": 2,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.11130000348202884,
+          "stream_ms": 0.1027199998497963
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9599000117741525,
+          "stream_ms": 2.946943998336792
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.12119999155402184,
+          "stream_ms": 0.11695999652147293
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 31.57869999995455,
+          "stream_ms": 31.576351165771484
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.14620000729337335,
+          "stream_ms": 0.349727988243103
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.3603000077418983,
+          "stream_ms": 0.19616000354290009
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.08719999459572136,
+          "stream_ms": 0.050592001527547836
+        }
+      ]
+    },
+    {
+      "position": 143,
+      "cpu_ms": 32.68149998621084,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.11020002420991659,
+          "stream_ms": 0.10265599936246872
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 3.076699998928234,
+          "stream_ms": 3.063999891281128
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.13370002852752805,
+          "stream_ms": 0.11107199639081955
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 28.933499997947365,
+          "stream_ms": 28.913631439208984
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.10560001828707755,
+          "stream_ms": 0.3381440043449402
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.24540000595152378,
+          "stream_ms": 0.012191999703645706
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.039300008211284876,
+          "stream_ms": 0.08726400136947632
+        }
+      ]
+    },
+    {
+      "position": 144,
+      "cpu_ms": 33.56750000966713,
+      "committed": 2,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.06150000263005495,
+          "stream_ms": 0.05843200162053108
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.918500016676262,
+          "stream_ms": 2.9151039123535156
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05400000372901559,
+          "stream_ms": 0.05004800111055374
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 30.04270000383258,
+          "stream_ms": 30.044479370117188
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.0976000155787915,
+          "stream_ms": 0.32790398597717285
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.32709998777136207,
+          "stream_ms": 0.14390400052070618
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.034199998481199145,
+          "stream_ms": 0.005663999821990728
+        }
+      ]
+    },
+    {
+      "position": 146,
+      "cpu_ms": 33.296599984169006,
+      "committed": 2,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.06439999560825527,
+          "stream_ms": 0.06092799827456474
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.901400002883747,
+          "stream_ms": 2.8985280990600586
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05420000525191426,
+          "stream_ms": 0.05004800111055374
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 29.645000002346933,
+          "stream_ms": 29.64441680908203
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.14409999130293727,
+          "stream_ms": 0.34963199496269226
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.36150001687929034,
+          "stream_ms": 0.19407999515533447
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.0748000165913254,
+          "stream_ms": 0.03977600112557411
+        }
+      ]
+    },
+    {
+      "position": 148,
+      "cpu_ms": 33.74360001180321,
+      "committed": 2,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.11300001642666757,
+          "stream_ms": 0.10518400371074677
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9867999837733805,
+          "stream_ms": 2.973759889602661
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.11320001794956625,
+          "stream_ms": 0.09062399715185165
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 29.999199992744252,
+          "stream_ms": 29.998239517211914
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.10829998063854873,
+          "stream_ms": 0.33744001388549805
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.3318000235594809,
+          "stream_ms": 0.14902399480342865
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03539997851476073,
+          "stream_ms": 0.005663999821990728
+        }
+      ]
+    },
+    {
+      "position": 150,
+      "cpu_ms": 28.076000016881153,
+      "committed": 2,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.0610999995842576,
+          "stream_ms": 0.05817599967122078
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.882800006773323,
+          "stream_ms": 2.8794240951538086
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05190001684240997,
+          "stream_ms": 0.04761600121855736
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 24.431099998764694,
+          "stream_ms": 24.42767906188965
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.13689999468624592,
+          "stream_ms": 0.3455039858818054
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.381199992261827,
+          "stream_ms": 0.19308799505233765
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.07929999264888465,
+          "stream_ms": 0.07491199672222137
+        }
+      ]
+    },
+    {
+      "position": 152,
+      "cpu_ms": 30.94789999886416,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.11210000957362354,
+          "stream_ms": 0.10284800082445145
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9821000061929226,
+          "stream_ms": 2.968832015991211
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.13160001253709197,
+          "stream_ms": 0.10796800255775452
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 27.30600000359118,
+          "stream_ms": 27.280160903930664
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.1044000091496855,
+          "stream_ms": 0.33420801162719727
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.24120000307448208,
+          "stream_ms": 0.008671999908983707
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03890000516548753,
+          "stream_ms": 0.06473600119352341
+        }
+      ]
+    },
+    {
+      "position": 153,
+      "cpu_ms": 36.69170002103783,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08980001439340413,
+          "stream_ms": 0.08339200168848038
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9195999959483743,
+          "stream_ms": 2.9159040451049805
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05440000677481294,
+          "stream_ms": 0.05036799982190132
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 33.209400018677115,
+          "stream_ms": 33.21142578125
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.040700018871575594,
+          "stream_ms": 0.03622400015592575
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.24739999207668006,
+          "stream_ms": 0.2916159927845001
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.07839998579584062,
+          "stream_ms": 0.035392001271247864
+        }
+      ]
+    },
+    {
+      "position": 157,
+      "cpu_ms": 35.406700015300885,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.11170000652782619,
+          "stream_ms": 0.1016319990158081
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9864000098314136,
+          "stream_ms": 2.9734079837799072
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.13719999697059393,
+          "stream_ms": 0.11638399958610535
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 31.90329999779351,
+          "stream_ms": 31.89583969116211
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.023299973690882325,
+          "stream_ms": 0.020096000283956528
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.1543999824207276,
+          "stream_ms": 0.20272000133991241
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03850000211969018,
+          "stream_ms": 0.005632000043988228
+        }
+      ]
+    },
+    {
+      "position": 161,
+      "cpu_ms": 31.341399997472763,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.06220000796020031,
+          "stream_ms": 0.057472001761198044
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.900099992984906,
+          "stream_ms": 2.896735906600952
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.07110001752153039,
+          "stream_ms": 0.04825599864125252
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 27.86740000010468,
+          "stream_ms": 27.86195182800293
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.045100023271515965,
+          "stream_ms": 0.03872000053524971
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.23510001483373344,
+          "stream_ms": 0.2770240008831024
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.09109999518841505,
+          "stream_ms": 0.04966399818658829
+        }
+      ]
+    },
+    {
+      "position": 165,
+      "cpu_ms": 33.859999995911494,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.11230001109652221,
+          "stream_ms": 0.10208000242710114
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9793000139761716,
+          "stream_ms": 2.9659841060638428
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.13149998267181218,
+          "stream_ms": 0.10924799740314484
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 30.382399971131235,
+          "stream_ms": 30.359840393066406
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.024200009647756815,
+          "stream_ms": 0.019168000668287277
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.15979999443516135,
+          "stream_ms": 0.20659199357032776
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.036699988413602114,
+          "stream_ms": 0.005632000043988228
+        }
+      ]
+    },
+    {
+      "position": 169,
+      "cpu_ms": 40.94850001274608,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.06049999501556158,
+          "stream_ms": 0.05740800127387047
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.897900005336851,
+          "stream_ms": 2.8946878910064697
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05110001075081527,
+          "stream_ms": 0.04793599992990494
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 37.517900025704876,
+          "stream_ms": 37.51996612548828
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.043599982745945454,
+          "stream_ms": 0.038784001022577286
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.23870001314207911,
+          "stream_ms": 0.26684799790382385
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.08849997539073229,
+          "stream_ms": 0.04435199871659279
+        }
+      ]
+    },
+    {
+      "position": 173,
+      "cpu_ms": 35.600699979113415,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.11129997437819839,
+          "stream_ms": 0.10131199657917023
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9932000034023076,
+          "stream_ms": 2.979840040206909
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.14429999282583594,
+          "stream_ms": 0.1379839926958084
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 32.062599988421425,
+          "stream_ms": 32.061248779296875
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.02540001878514886,
+          "stream_ms": 0.01929599978029728
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.152299995534122,
+          "stream_ms": 0.20336000621318817
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03580001066438854,
+          "stream_ms": 0.005696000065654516
+        }
+      ]
+    },
+    {
+      "position": 177,
+      "cpu_ms": 36.76950000226498,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.061400001868605614,
+          "stream_ms": 0.05648000165820122
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.889700001105666,
+          "stream_ms": 2.881632089614868
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.06570000550709665,
+          "stream_ms": 0.06268800050020218
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 33.25020000920631,
+          "stream_ms": 33.250816345214844
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.14699998428113759,
+          "stream_ms": 0.3554239869117737
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.22830002126283944,
+          "stream_ms": 0.019711999222636223
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.07809998351149261,
+          "stream_ms": 0.09657599776983261
+        }
+      ]
+    },
+    {
+      "position": 178,
+      "cpu_ms": 32.59339998476207,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.11019999510608613,
+          "stream_ms": 0.10156799852848053
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 3.0251999851316214,
+          "stream_ms": 3.012160062789917
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.1364000199828297,
+          "stream_ms": 0.1141119971871376
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 28.895399998873472,
+          "stream_ms": 28.891456604003906
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.11580000864341855,
+          "stream_ms": 0.33219200372695923
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.23370000417344272,
+          "stream_ms": 0.008224000222980976
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.04160002572461963,
+          "stream_ms": 0.06102399900555611
+        }
+      ]
+    },
+    {
+      "position": 179,
+      "cpu_ms": 30.164399999193847,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.07300000288523734,
+          "stream_ms": 0.06864000111818314
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9242000018712133,
+          "stream_ms": 2.9205760955810547
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05370000144466758,
+          "stream_ms": 0.04982399940490723
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 26.8688999931328,
+          "stream_ms": 26.863712310791016
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.02269999822601676,
+          "stream_ms": 0.01708799973130226
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.15430001076310873,
+          "stream_ms": 0.2011519968509674
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.0363999861292541,
+          "stream_ms": 0.005696000065654516
+        }
+      ]
+    },
+    {
+      "position": 183,
+      "cpu_ms": 36.187599995173514,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.06180000491440296,
+          "stream_ms": 0.056223999708890915
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.8831999807152897,
+          "stream_ms": 2.880000114440918
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05299999611452222,
+          "stream_ms": 0.048767998814582825
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 32.68400000524707,
+          "stream_ms": 32.683937072753906
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.14720001490786672,
+          "stream_ms": 0.35235199332237244
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.229199999012053,
+          "stream_ms": 0.02223999984562397
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.0777999812271446,
+          "stream_ms": 0.10118400305509567
+        }
+      ]
+    },
+    {
+      "position": 184,
+      "cpu_ms": 29.916900006355718,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.11110000195913017,
+          "stream_ms": 0.10320000350475311
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9961999971419573,
+          "stream_ms": 2.9832000732421875
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.11749999248422682,
+          "stream_ms": 0.11311999708414078
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 26.23309998307377,
+          "stream_ms": 26.226848602294922
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.10790000669658184,
+          "stream_ms": 0.3336640000343323
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.23969999165274203,
+          "stream_ms": 0.012095999903976917
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03860000288113952,
+          "stream_ms": 0.0785600021481514
+        }
+      ]
+    },
+    {
+      "position": 185,
+      "cpu_ms": 37.7124999940861,
+      "committed": 3,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.06359998951666057,
+          "stream_ms": 0.05750399827957153
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9362000059336424,
+          "stream_ms": 2.933120012283325
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.054100004490464926,
+          "stream_ms": 0.0498879998922348
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 33.97659998154268,
+          "stream_ms": 33.97209548950195
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.14620000729337335,
+          "stream_ms": 0.35023999214172363
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.39790000300854445,
+          "stream_ms": 0.22991999983787537
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.06590000702999532,
+          "stream_ms": 0.03417599946260452
+        }
+      ]
+    },
+    {
+      "position": 188,
+      "cpu_ms": 30.26790000149049,
+      "committed": 2,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.09079999290406704,
+          "stream_ms": 0.10153599828481674
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9765000217594206,
+          "stream_ms": 2.9632320404052734
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.13349999790079892,
+          "stream_ms": 0.11104000359773636
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 26.401299983263016,
+          "stream_ms": 26.381311416625977
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.14540000120177865,
+          "stream_ms": 0.355103999376297
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.36360000376589596,
+          "stream_ms": 0.19407999515533447
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.08369999704882503,
+          "stream_ms": 0.044863998889923096
+        }
+      ]
+    },
+    {
+      "position": 190,
+      "cpu_ms": 28.542200016090646,
+      "committed": 3,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.38720000884495676,
+          "stream_ms": 0.3911040127277374
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9901000089012086,
+          "stream_ms": 2.98524808883667
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.1585999852977693,
+          "stream_ms": 0.1350719928741455
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 24.46879999479279,
+          "stream_ms": 24.444032669067383
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.10830000974237919,
+          "stream_ms": 0.33689600229263306
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.3349999897181988,
+          "stream_ms": 0.1541759967803955
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03460000152699649,
+          "stream_ms": 0.005663999821990728
+        }
+      ]
+    },
+    {
+      "position": 193,
+      "cpu_ms": 31.016599998110905,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.06710001616738737,
+          "stream_ms": 0.06406400352716446
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.901600004406646,
+          "stream_ms": 2.8983359336853027
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05160001455806196,
+          "stream_ms": 0.047168001532554626
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 27.77139999670908,
+          "stream_ms": 27.767072677612305
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.023699976736679673,
+          "stream_ms": 0.01929599978029728
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.13529998250305653,
+          "stream_ms": 0.18665599822998047
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03530000685714185,
+          "stream_ms": 0.005696000065654516
+        }
+      ]
+    },
+    {
+      "position": 197,
+      "cpu_ms": 40.82550000748597,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08590001380071044,
+          "stream_ms": 0.0806720033288002
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.889600000344217,
+          "stream_ms": 2.886399984359741
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05160001455806196,
+          "stream_ms": 0.047040000557899475
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 37.52000001259148,
+          "stream_ms": 37.51465606689453
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.03749999450519681,
+          "stream_ms": 0.03455999866127968
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.1720000000204891,
+          "stream_ms": 0.21782399713993073
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03710002056322992,
+          "stream_ms": 0.005696000065654516
+        }
+      ]
+    },
+    {
+      "position": 201,
+      "cpu_ms": 35.432500008028,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08169998181983829,
+          "stream_ms": 0.0772159993648529
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9137000092305243,
+          "stream_ms": 2.887615919113159
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05260002217255533,
+          "stream_ms": 0.04806400090456009
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 32.18010001000948,
+          "stream_ms": 32.1767692565918
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.021499989088624716,
+          "stream_ms": 0.015168000012636185
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.12160002370364964,
+          "stream_ms": 0.17801600694656372
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03329999162815511,
+          "stream_ms": 0.005696000065654516
+        }
+      ]
+    },
+    {
+      "position": 205,
+      "cpu_ms": 39.272000023629516,
+      "committed": 3,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.062000006437301636,
+          "stream_ms": 0.057631999254226685
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.8888000233564526,
+          "stream_ms": 2.8854401111602783
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05469997995533049,
+          "stream_ms": 0.050144001841545105
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 35.763599997153506,
+          "stream_ms": 35.76300811767578
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.11100000119768083,
+          "stream_ms": 0.3346880078315735
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.3263000107835978,
+          "stream_ms": 0.1531199961900711
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03480000304989517,
+          "stream_ms": 0.005696000065654516
+        }
+      ]
+    },
+    {
+      "position": 208,
+      "cpu_ms": 36.55449999496341,
+      "committed": 3,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08030000026337802,
+          "stream_ms": 0.06988800317049026
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.924100001109764,
+          "stream_ms": 2.907776117324829
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05189998773857951,
+          "stream_ms": 0.04732799902558327
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 32.85570000298321,
+          "stream_ms": 32.85561752319336
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.14869999722577631,
+          "stream_ms": 0.3527039885520935
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.36189999082125723,
+          "stream_ms": 0.20640000700950623
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.07599999662488699,
+          "stream_ms": 0.023423999547958374
+        }
+      ]
+    },
+    {
+      "position": 211,
+      "cpu_ms": 37.50940001918934,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.11260001338087022,
+          "stream_ms": 0.1016319990158081
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.99429998267442,
+          "stream_ms": 2.98140811920166
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.13180001405999064,
+          "stream_ms": 0.11007999628782272
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 34.02079999796115,
+          "stream_ms": 34.02227020263672
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.025699991965666413,
+          "stream_ms": 0.022272000089287758
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.13669999316334724,
+          "stream_ms": 0.18748800456523895
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03580001066438854,
+          "stream_ms": 0.005663999821990728
+        }
+      ]
+    },
+    {
+      "position": 215,
+      "cpu_ms": 34.60020001512021,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.09429999045096338,
+          "stream_ms": 0.09113600105047226
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.8865999775007367,
+          "stream_ms": 2.882528066635132
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.051799986977130175,
+          "stream_ms": 0.04774399846792221
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 31.13580000353977,
+          "stream_ms": 31.135711669921875
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.11179997818544507,
+          "stream_ms": 0.3345920145511627
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.23370000417344272,
+          "stream_ms": 0.008895999751985073
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.05520001286640763,
+          "stream_ms": 0.08086399734020233
+        }
+      ]
+    },
+    {
+      "position": 216,
+      "cpu_ms": 27.378899976611137,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08820000221021473,
+          "stream_ms": 0.08297599852085114
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9494999907910824,
+          "stream_ms": 2.942431926727295
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.10469998233020306,
+          "stream_ms": 0.10096000134944916
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 24.029799998970702,
+          "stream_ms": 24.026784896850586
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.021199986804276705,
+          "stream_ms": 0.016736000776290894
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.11870000162161887,
+          "stream_ms": 0.17312000691890717
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03320001997053623,
+          "stream_ms": 0.005632000043988228
+        }
+      ]
+    },
+    {
+      "position": 220,
+      "cpu_ms": 38.91149998526089,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.06850002682767808,
+          "stream_ms": 0.06319999694824219
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.890500007197261,
+          "stream_ms": 2.8869760036468506
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05169998621568084,
+          "stream_ms": 0.04710400104522705
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 35.47149998485111,
+          "stream_ms": 35.46681594848633
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.10709997150115669,
+          "stream_ms": 0.332863986492157
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.2361000224482268,
+          "stream_ms": 0.008511999621987343
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.05609999061562121,
+          "stream_ms": 0.06470400094985962
+        }
+      ]
+    },
+    {
+      "position": 221,
+      "cpu_ms": 33.99670001817867,
+      "committed": 2,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.06010002107359469,
+          "stream_ms": 0.07686399668455124
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9495999915525317,
+          "stream_ms": 2.931135892868042
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05469997995533049,
+          "stream_ms": 0.05071999877691269
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 30.26159998262301,
+          "stream_ms": 30.261375427246094
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.14859999646432698,
+          "stream_ms": 0.352512001991272
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.38740001036785543,
+          "stream_ms": 0.22176000475883484
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.0785999873187393,
+          "stream_ms": 0.043296001851558685
+        }
+      ]
+    },
+    {
+      "position": 223,
+      "cpu_ms": 29.39789998345077,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08940001134760678,
+          "stream_ms": 0.10115200281143188
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9969000024721026,
+          "stream_ms": 2.9840641021728516
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.15219999477267265,
+          "stream_ms": 0.12617599964141846
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 25.897500017890707,
+          "stream_ms": 25.876928329467773
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.022499996703118086,
+          "stream_ms": 0.01833599992096424
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.15100001473911107,
+          "stream_ms": 0.19791999459266663
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.035500008380040526,
+          "stream_ms": 0.005663999821990728
+        }
+      ]
+    },
+    {
+      "position": 227,
+      "cpu_ms": 35.62799998326227,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08769999840296805,
+          "stream_ms": 0.08243200182914734
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.8868999797850847,
+          "stream_ms": 2.885119915008545
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.054199976148083806,
+          "stream_ms": 0.057440001517534256
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 32.06529997987673,
+          "stream_ms": 32.0654411315918
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.14710001414641738,
+          "stream_ms": 0.3534719944000244
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.22350001381710172,
+          "stream_ms": 0.025919999927282333
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.0847000046633184,
+          "stream_ms": 0.09878399968147278
+        }
+      ]
+    },
+    {
+      "position": 228,
+      "cpu_ms": 32.831600023200735,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08930001058615744,
+          "stream_ms": 0.0997759997844696
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 3.0316000047605485,
+          "stream_ms": 3.0183041095733643
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.13689999468624592,
+          "stream_ms": 0.11190400272607803
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 29.102700005751103,
+          "stream_ms": 29.084896087646484
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.11219998123124242,
+          "stream_ms": 0.3375360071659088
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.23520001559518278,
+          "stream_ms": 0.00848000030964613
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.06580000626854599,
+          "stream_ms": 0.04729599878191948
+        }
+      ]
+    },
+    {
+      "position": 229,
+      "cpu_ms": 29.3637000140734,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08520000847056508,
+          "stream_ms": 0.07923199981451035
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.932700008386746,
+          "stream_ms": 2.9296319484710693
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05529998452402651,
+          "stream_ms": 0.05350400134921074
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 25.866999989375472,
+          "stream_ms": 25.844928741455078
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.10359997395426035,
+          "stream_ms": 0.326911985874176
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.23430000874213874,
+          "stream_ms": 0.008927999995648861
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.055199983762577176,
+          "stream_ms": 0.059808000922203064
+        }
+      ]
+    },
+    {
+      "position": 230,
+      "cpu_ms": 30.776700004935265,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.06239998037926853,
+          "stream_ms": 0.0589120015501976
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9306999931577593,
+          "stream_ms": 2.9265921115875244
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.055100012104958296,
+          "stream_ms": 0.05075199902057648
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 27.257900015683845,
+          "stream_ms": 27.252960205078125
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.1120000088121742,
+          "stream_ms": 0.3344320058822632
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.23400000645779073,
+          "stream_ms": 0.009056000038981438
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.09180000051856041,
+          "stream_ms": 0.06911999732255936
+        }
+      ]
+    },
+    {
+      "position": 231,
+      "cpu_ms": 31.412100011948496,
+      "committed": 3,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08440000237897038,
+          "stream_ms": 0.07971200346946716
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.931300026830286,
+          "stream_ms": 2.928256034851074
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.054899981478229165,
+          "stream_ms": 0.05081599950790405
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 27.827999991131946,
+          "stream_ms": 27.82268714904785
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.11370002175681293,
+          "stream_ms": 0.3384000062942505
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.33260000054724514,
+          "stream_ms": 0.160288006067276
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.035299977753311396,
+          "stream_ms": 0.005663999821990728
+        }
+      ]
+    },
+    {
+      "position": 234,
+      "cpu_ms": 38.686799991410226,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.07300000288523734,
+          "stream_ms": 0.06815999746322632
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.8996999899391085,
+          "stream_ms": 2.8939199447631836
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.051000009989365935,
+          "stream_ms": 0.046879999339580536
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 35.4010000010021,
+          "stream_ms": 35.40143966674805
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.02789997961372137,
+          "stream_ms": 0.022175999358296394
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.1632000203244388,
+          "stream_ms": 0.20739200711250305
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.038799975300207734,
+          "stream_ms": 0.005408000200986862
+        }
+      ]
+    },
+    {
+      "position": 238,
+      "cpu_ms": 34.82400000211783,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08490000618621707,
+          "stream_ms": 0.08003199845552444
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9156999953556806,
+          "stream_ms": 2.8951361179351807
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05339999916031957,
+          "stream_ms": 0.049375999718904495
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 31.241399992723018,
+          "stream_ms": 31.238399505615234
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.1407999952789396,
+          "stream_ms": 0.35494399070739746
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.23559998953714967,
+          "stream_ms": 0.0208320003002882
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.10029997793026268,
+          "stream_ms": 0.1045759990811348
+        }
+      ]
+    },
+    {
+      "position": 239,
+      "cpu_ms": 29.851700004655868,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.1720000000204891,
+          "stream_ms": 0.15324799716472626
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 3.0750999867450446,
+          "stream_ms": 3.0678720474243164
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.16340002184733748,
+          "stream_ms": 0.157151997089386
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 26.12799999769777,
+          "stream_ms": 26.12460708618164
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.024999986635521054,
+          "stream_ms": 0.019007999449968338
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.1703999878372997,
+          "stream_ms": 0.2197120040655136
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03530000685714185,
+          "stream_ms": 0.00774399982765317
+        }
+      ]
+    },
+    {
+      "position": 243,
+      "cpu_ms": 37.145700014662,
+      "committed": 3,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08800000068731606,
+          "stream_ms": 0.08003199845552444
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.8882000187877566,
+          "stream_ms": 2.884351968765259
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05370000144466758,
+          "stream_ms": 0.04966399818658829
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 33.60300001804717,
+          "stream_ms": 33.60287857055664
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.11210000957362354,
+          "stream_ms": 0.3386879861354828
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.3294000052846968,
+          "stream_ms": 0.1520960032939911
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03560000914148986,
+          "stream_ms": 0.005696000065654516
+        }
+      ]
+    },
+    {
+      "position": 246,
+      "cpu_ms": 33.10929998406209,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08229998638853431,
+          "stream_ms": 0.07596799731254578
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.900499996030703,
+          "stream_ms": 2.897631883621216
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.053599971579387784,
+          "stream_ms": 0.04944000020623207
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 29.642699984833598,
+          "stream_ms": 29.643903732299805
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.041399995097890496,
+          "stream_ms": 0.035711999982595444
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.2612000098451972,
+          "stream_ms": 0.29388800263404846
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.07780001033097506,
+          "stream_ms": 0.031936001032590866
+        }
+      ]
+    },
+    {
+      "position": 250,
+      "cpu_ms": 34.090799978002906,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.10829998063854873,
+          "stream_ms": 0.12003199756145477
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9885999974794686,
+          "stream_ms": 2.9753921031951904
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.13390000094659626,
+          "stream_ms": 0.11078400164842606
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 30.439000023761764,
+          "stream_ms": 30.413055419921875
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.11029999586753547,
+          "stream_ms": 0.3362880051136017
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.23639999562874436,
+          "stream_ms": 0.00863999966531992
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.0405999890062958,
+          "stream_ms": 0.0607680007815361
+        }
+      ]
+    },
+    {
+      "position": 251,
+      "cpu_ms": 30.3935999982059,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08550001075491309,
+          "stream_ms": 0.08038400113582611
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9326000076252967,
+          "stream_ms": 2.928864002227783
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05470000905916095,
+          "stream_ms": 0.0504320003092289
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 27.07479998935014,
+          "stream_ms": 27.074432373046875
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.02600002335384488,
+          "stream_ms": 0.019999999552965164
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.15189999248832464,
+          "stream_ms": 0.19760000705718994
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.035900011425837874,
+          "stream_ms": 0.005663999821990728
+        }
+      ]
+    },
+    {
+      "position": 255,
+      "cpu_ms": 34.66710000066087,
+      "committed": 2,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.2209999947808683,
+          "stream_ms": 0.21641600131988525
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.892000018619001,
+          "stream_ms": 2.889695882797241
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.06520000169984996,
+          "stream_ms": 0.06092799827456474
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 30.985499994130805,
+          "stream_ms": 30.971519470214844
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.1100999943446368,
+          "stream_ms": 0.33318400382995605
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.3245999978389591,
+          "stream_ms": 0.1451839953660965
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03600001218728721,
+          "stream_ms": 0.0054720002226531506
+        }
+      ]
+    },
+    {
+      "position": 257,
+      "cpu_ms": 29.912899975897744,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.06309998570941389,
+          "stream_ms": 0.058240000158548355
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.914500015322119,
+          "stream_ms": 2.9108479022979736
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.052099989261478186,
+          "stream_ms": 0.047520000487565994
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 26.637999981176108,
+          "stream_ms": 26.6378231048584
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.02449998282827437,
+          "stream_ms": 0.01958400011062622
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.15249999705702066,
+          "stream_ms": 0.20147199928760529
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03610001294873655,
+          "stream_ms": 0.005632000043988228
+        }
+      ]
+    },
+    {
+      "position": 261,
+      "cpu_ms": 39.42059999099001,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08520000847056508,
+          "stream_ms": 0.07993599772453308
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9175999807193875,
+          "stream_ms": 2.907327890396118
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.06649998249486089,
+          "stream_ms": 0.061792001128196716
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 35.806799976853654,
+          "stream_ms": 35.807167053222656
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.043899985030293465,
+          "stream_ms": 0.038336001336574554
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.3462000167928636,
+          "stream_ms": 0.3234559893608093
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.08339999476447701,
+          "stream_ms": 0.09702400118112564
+        }
+      ]
+    },
+    {
+      "position": 265,
+      "cpu_ms": 43.64340001484379,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.1109000004362315,
+          "stream_ms": 0.12140800058841705
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 3.0014000076334924,
+          "stream_ms": 2.988447904586792
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.11409999569877982,
+          "stream_ms": 0.10918399691581726
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 39.98540001339279,
+          "stream_ms": 39.9793586730957
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.04329998046159744,
+          "stream_ms": 0.038975998759269714
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.23049997980706394,
+          "stream_ms": 0.26131200790405273
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03560000914148986,
+          "stream_ms": 0.005663999821990728
+        }
+      ]
+    },
+    {
+      "position": 269,
+      "cpu_ms": 38.26140001183376,
+      "committed": 3,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.1018000184558332,
+          "stream_ms": 0.11392000317573547
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.996700000949204,
+          "stream_ms": 2.983520030975342
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.13380000018514693,
+          "stream_ms": 0.11244799941778183
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 34.37160002067685,
+          "stream_ms": 34.34614562988281
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.15040001017041504,
+          "stream_ms": 0.3554239869117737
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.36449998151510954,
+          "stream_ms": 0.20534400641918182
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.08669999078847468,
+          "stream_ms": 0.005696000065654516
+        }
+      ]
+    },
+    {
+      "position": 272,
+      "cpu_ms": 32.511400000657886,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.11029999586753547,
+          "stream_ms": 0.10147199779748917
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9981000116094947,
+          "stream_ms": 2.9849600791931152
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.13130001025274396,
+          "stream_ms": 0.10784000158309937
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 29.040599998552352,
+          "stream_ms": 29.020896911621094
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.025200017262250185,
+          "stream_ms": 0.02127999998629093
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.1370999962091446,
+          "stream_ms": 0.1833599954843521
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.035200006095692515,
+          "stream_ms": 0.005696000065654516
+        }
+      ]
+    },
+    {
+      "position": 276,
+      "cpu_ms": 38.48019998986274,
+      "committed": 3,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08329999400302768,
+          "stream_ms": 0.07840000092983246
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.8898000018671155,
+          "stream_ms": 2.8862719535827637
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05329999839887023,
+          "stream_ms": 0.048448000103235245
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 34.85440000076778,
+          "stream_ms": 34.85408020019531
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.15119998715817928,
+          "stream_ms": 0.35920000076293945
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.36219999310560524,
+          "stream_ms": 0.20537599921226501
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.035999983083456755,
+          "stream_ms": 0.005696000065654516
+        }
+      ]
+    },
+    {
+      "position": 279,
+      "cpu_ms": 35.901399998692796,
+      "committed": 3,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.10950001887977123,
+          "stream_ms": 0.10224000364542007
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.978899981826544,
+          "stream_ms": 2.9651520252227783
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.13259999104775488,
+          "stream_ms": 0.10876800119876862
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 32.12970000458881,
+          "stream_ms": 32.12364959716797
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.12620000052265823,
+          "stream_ms": 0.3463039994239807
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.3316999936942011,
+          "stream_ms": 0.15724800527095795
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03580001066438854,
+          "stream_ms": 0.005663999821990728
+        }
+      ]
+    },
+    {
+      "position": 282,
+      "cpu_ms": 38.586099981330335,
+      "committed": 2,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08550001075491309,
+          "stream_ms": 0.08064000308513641
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9002999945078045,
+          "stream_ms": 2.8964478969573975
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05299999611452222,
+          "stream_ms": 0.04873599857091904
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 35.03579998505302,
+          "stream_ms": 35.03590393066406
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.11389999417588115,
+          "stream_ms": 0.3421440124511719
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.3296000068075955,
+          "stream_ms": 0.14496000111103058
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03429999924264848,
+          "stream_ms": 0.005632000043988228
+        }
+      ]
+    },
+    {
+      "position": 284,
+      "cpu_ms": 31.847600010223687,
+      "committed": 4,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08430000161752105,
+          "stream_ms": 0.07945600152015686
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9017000051680952,
+          "stream_ms": 2.899264097213745
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.053099996875971556,
+          "stream_ms": 0.04896000027656555
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 28.56220002286136,
+          "stream_ms": 28.55580711364746
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.025599991204217076,
+          "stream_ms": 0.01958400011062622
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.15330000314861536,
+          "stream_ms": 0.19913600385189056
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.035699980799108744,
+          "stream_ms": 0.005632000043988228
+        }
+      ]
+    },
+    {
+      "position": 288,
+      "cpu_ms": 33.87109999312088,
+      "committed": 1,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08349999552592635,
+          "stream_ms": 0.0790719985961914
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9238999995868653,
+          "stream_ms": 2.8991360664367676
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.05210001836530864,
+          "stream_ms": 0.04790399968624115
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 30.379600008018315,
+          "stream_ms": 30.3789119720459
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.10960001964122057,
+          "stream_ms": 0.335999995470047
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.23609999334439635,
+          "stream_ms": 0.008320000022649765
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.055800017435103655,
+          "stream_ms": 0.0342399999499321
+        }
+      ]
+    },
+    {
+      "position": 289,
+      "cpu_ms": 35.89940001256764,
+      "committed": 3,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.08520000847056508,
+          "stream_ms": 0.08019199967384338
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.93950000195764,
+          "stream_ms": 2.9359679222106934
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.07690000347793102,
+          "stream_ms": 0.07280000299215317
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 32.31549999327399,
+          "stream_ms": 32.312191009521484
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.09610000415705144,
+          "stream_ms": 0.32467201352119446
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.3231000155210495,
+          "stream_ms": 0.14800000190734863
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.033499993151053786,
+          "stream_ms": 0.005696000065654516
+        }
+      ]
+    },
+    {
+      "position": 292,
+      "cpu_ms": 30.99960001418367,
+      "committed": 2,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.06319998647086322,
+          "stream_ms": 0.058111999183893204
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.905600005760789,
+          "stream_ms": 2.9028480052948
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.07049998384900391,
+          "stream_ms": 0.05104000121355057
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 27.472199988551438,
+          "stream_ms": 27.47318458557129
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.0926000066101551,
+          "stream_ms": 0.3272320032119751
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.33110001822933555,
+          "stream_ms": 0.1398400068283081
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.03399999695830047,
+          "stream_ms": 0.007712000049650669
+        }
+      ]
+    },
+    {
+      "position": 294,
+      "cpu_ms": 26.654499990399927,
+      "committed": 2,
+      "drafted": 3,
+      "phases": [
+        {
+          "name": "setup",
+          "cpu_ms": 0.07499998901039362,
+          "stream_ms": 0.06934399902820587
+        },
+        {
+          "name": "draft",
+          "cpu_ms": 2.9035000188741833,
+          "stream_ms": 2.8990719318389893
+        },
+        {
+          "name": "publish_before_verify",
+          "cpu_ms": 0.07009998080320656,
+          "stream_ms": 0.05379199981689453
+        },
+        {
+          "name": "verify_readback",
+          "cpu_ms": 22.962999995797873,
+          "stream_ms": 22.959455490112305
+        },
+        {
+          "name": "select_commit",
+          "cpu_ms": 0.14100002590566874,
+          "stream_ms": 0.34678399562835693
+        },
+        {
+          "name": "catchup_publish",
+          "cpu_ms": 0.3625999961514026,
+          "stream_ms": 0.19302399456501007
+        },
+        {
+          "name": "scheduler_delivery",
+          "cpu_ms": 0.08749999688006938,
+          "stream_ms": 0.05382400006055832
+        }
+      ]
+    }
+  ]
+}

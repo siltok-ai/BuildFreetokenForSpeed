@@ -1,0 +1,30 @@
+{
+  "perf2": {
+    "count": 64,
+    "host_ms": 33.89354218825247,
+    "mean_committed": 2.625,
+    "phases": {
+      "setup": 0.09344375257569482,
+      "draft": 2.9395843766906182,
+      "publish_before_verify": 0.08377812446269672,
+      "verify_readback": 30.327135936204286,
+      "select_commit": 0.08934999959819834,
+      "catchup_publish": 0.2589593777884147,
+      "scheduler_delivery": 0.05362187312130118
+    }
+  },
+  "compact_larger_pool": {
+    "count": 64,
+    "host_ms": 29.55820781107832,
+    "mean_committed": 2.484375,
+    "phases": {
+      "setup": 0.0945640617828758,
+      "draft": 2.947046873941872,
+      "publish_before_verify": 0.09119218611886026,
+      "verify_readback": 25.85592187460861,
+      "select_commit": 0.14936093748474377,
+      "catchup_publish": 0.3181968727403728,
+      "scheduler_delivery": 0.055001563850964885
+    }
+  }
+}

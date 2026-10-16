@@ -1,0 +1,333 @@
+--- a/python/freetoken/engine/config.py
++++ b/python/freetoken/engine/config.py
+@@ -48,6 +48,8 @@
+     moe_q2_dynamic_slots: int = 1024
+     # 仅永久Q2所有者缓存：将缺失专家搬运与共享专家计算重叠。
+     moe_q2_decode_overlap: bool = True
++    # Online owner exchange is opt-in; zero retains the frozen initial residency.
++    moe_q2_adapt_every: int = 0
+     moe_cache_rate: float | None = None
+     moe_cache_auto: bool = False
+     kv_reserve_tokens: int = 8192  # KV floor for --moe-cache-auto; small by design (MoE-priority)
+@@ -110,6 +112,8 @@
+     def __post_init__(self):
+         if self.linear_state_cache_slots is not None and self.linear_state_cache_slots < 0:
+             raise ValueError('Linear snapshot cache slots cannot be negative')
++        if self.moe_q2_adapt_every < 0 or (self.moe_q2_adapt_every and not self.moe_q2_resident_experts):
++            raise ValueError('Online Q2 adaptation requires protected owners and a nonnegative interval')
+         if self.mtp_compact_state and self.mtp_runtime_path is None:
+             raise ValueError('Compact transaction state requires MTP weights')
+         if self.mtp_runtime_path is not None:
+--- a/python/freetoken/engine/engine.py
++++ b/python/freetoken/engine/engine.py
+@@ -344,6 +344,7 @@
+         self.dtype = config.dtype
+         self.config = config  # retained for runtime cache rebuild (rebuild_runtime_cache)
+         self.mtp_runtime = None
++        self.q2_adaptive_owners = None
+         # KV pool family fixed at construction from the model config: its classmethods own the
+         # page-token geometry and cost arithmetic the engine needs BEFORE the pool exists
+         # (num_pages sizing, --moe-cache-auto); the instance owns rebuild/validation after.
+@@ -509,6 +510,8 @@
+         if config.mtp_runtime_path is not None:
+             from freetoken.models.qwen4_exp.mtp_runtime import MtpRuntime
+             self.mtp_runtime = MtpRuntime(self, self.model._mtp_drafter)
++        if config.moe_q2_adapt_every:
++            self.q2_adaptive_owners = self.moe_offload_cache.start_adaptation()
+ 
+     def _init_communication(self, config: EngineConfig) -> torch.distributed.ProcessGroup:
+         if config.tp_info.size == 1 or config.use_pynccl:
+@@ -756,7 +759,8 @@
+             max_slots = method.slot_limit()
+         cache_type = ProtectedQ2Cache if ownership is not None else OffloadMoeCache
+         cache = cache_type(
+-            **({'ownership': ownership, 'decode_overlap': config.moe_q2_decode_overlap}
++            **({'ownership': ownership, 'decode_overlap': config.moe_q2_decode_overlap,
++                'adapt_every': config.moe_q2_adapt_every}
+                if ownership is not None else {}),
+             # Models with leading dense layers (GLM-4) only have experts on the MoE
+             # layers; num_moe_layers == num_layers when first_k_dense_replace == 0.
+@@ -1097,9 +1101,13 @@
+ 
+         if self.mtp_runtime is not None:
+             self.mtp_runtime.prepare_graphs()
++        if self.config.moe_q2_adapt_every:
++            self.q2_adaptive_owners = self.moe_offload_cache.start_adaptation()
+ 
+     def forward_batch(self, batch: Batch, args: BatchSamplingArgs) -> ForwardOutput:
+         assert torch.cuda.current_stream() == self.stream
++        if batch.is_decode and self.q2_adaptive_owners is not None:
++            self.q2_adaptive_owners.step()
+         if batch.mm_gather_plan:
+             self._run_mm_encoder(batch)
+         native_state = self.mtp_runtime.before_native(batch) if self.mtp_runtime is not None else None
+--- a/python/freetoken/models/qwen4_exp/mtp_runtime.py
++++ b/python/freetoken/models/qwen4_exp/mtp_runtime.py
+@@ -183,6 +183,8 @@
+ 
+     def forward(self, batch, manager, token_pool, eos_ids, clip, anchor_id):
+         from freetoken.engine.engine import ForwardOutput
++        if self.engine.q2_adaptive_owners is not None:
++            self.engine.q2_adaptive_owners.step()
+         req = batch.reqs[0]
+         self._ensure_owner(req)
+         position = req.cached_len
+--- a/python/freetoken/moe/q2_residency.py
++++ b/python/freetoken/moe/q2_residency.py
+@@ -1,8 +1,9 @@
+ """Compressed Q2 experts with disjoint protected, dynamic and prefill regions.
+ 
+-Owners are permanent GPU rows or compact pinned host rows. Dynamic cache entries
++Owners are GPU rows or compact pinned host rows. Dynamic cache entries
+ are disposable copies. Keeping those roles separate prevents a GPU-only owner
+ from being evicted or overwritten by prefill, including across graph replay.
++Opt-in online exchange changes the owner set only after all users drain.
+ """
+ from __future__ import annotations
+ 
+@@ -39,7 +40,7 @@
+ 
+ 
+ def protected_ranking(layers, experts, count):
+-    """Use the frozen Strata ranking, never routes from evaluation requests."""
++    """Use the frozen initial ranking; online adaptation may later observe completed routes only."""
+     path = Path(__file__).parent / 'configs/q2_residency/strata_flash_next.json'
+     raw = path.read_bytes()
+     if hashlib.sha256(raw.replace(b'\r\n', b'\n')).hexdigest() != '171adfd563ddf441deb908fd9432b2411bed435ce3e640c54168aae2d88bbfd5':
+@@ -210,11 +211,20 @@
+ 
+ 
+ class ProtectedQ2Cache(OffloadMoeCache):
+-    def __init__(self, *args, ownership: Q2Ownership, decode_overlap=True, **kwargs):
++    def __init__(self, *args, ownership: Q2Ownership, decode_overlap=True, adapt_every=0, **kwargs):
+         """单独持有decode copy流；prefill和decode不共享事件或借用缓冲协议。"""
+         self.protected_payload = ownership
++        self.adapt_every = adapt_every
+         super().__init__(*args, **kwargs)
++        self.collect_decode_freq = bool(adapt_every)
+         self.decode_copy_stream = torch.cuda.Stream(device=self.device) if decode_overlap else None
++
++    def start_adaptation(self):
++        """Drop capture warmup counts and bind current owner tables after all graphs are ready."""
++        if not self.adapt_every:
++            return None
++        from .q2_adaptive import AdaptiveQ2Owners
++        return AdaptiveQ2Owners(self, every=self.adapt_every)
+ 
+     def set_bank_sources(self, sources, layer_residency=None):
+         from freetoken.kernel.pinned import device_ptr
+--- /dev/null
++++ b/python/freetoken/moe/q2_adaptive.py
+@@ -0,0 +1,146 @@
++"""Online Q2 owner exchange: true compressed bytes, fixed banks, graph-stable tables."""
++from collections import deque
++import time
++import numpy as np
++import torch
++import triton
++import triton.language as tl
++
++@triton.jit
++def _exchange(GPU, HOST, FEATS, SLOTS, COUNT, MAX_SWAPS:tl.constexpr, BLOCKS:tl.constexpr,
++              UNITS:tl.constexpr):
++    # No CPU expert readers run here; the caller drained all GPU users before exchanging unique pairs.
++    bank=tl.program_id(0)
++    block=tl.program_id(1)
++    count=tl.load(COUNT)
++    row_units=tl.load(FEATS+bank)//16
++    gpu=tl.load(GPU+bank)
++    lanes=tl.arange(0,UNITS)
++    words=tl.arange(0,4)
++    total=count*row_units
++    for start in range(tl.cdiv(total,BLOCKS*UNITS)):
++        unit=start*(BLOCKS*UNITS)+block*UNITS+lanes
++        valid=unit<total
++        item=unit//row_units
++        slot=tl.load(SLOTS+item,valid,0).to(tl.int64)
++        host=tl.load(HOST+bank*MAX_SWAPS+item,valid,0)
++        column=(unit%row_units)*16
++        gpu_ptr=(gpu+slot*row_units*16+column).to(tl.pointer_type(tl.uint32))
++        host_ptr=(host+column).to(tl.pointer_type(tl.uint32))
++        old=tl.load(gpu_ptr[:,None]+words[None,:],valid[:,None],0)
++        new=tl.load(host_ptr[:,None]+words[None,:],valid[:,None],0)
++        tl.store(gpu_ptr[:,None]+words[None,:],new,valid[:,None])
++        tl.store(host_ptr[:,None]+words[None,:],old,valid[:,None])
++
++
++class AdaptiveQ2Owners:
++    def __init__(self,cache,*,every=32,max_swaps=96,decay=1.0):
++        """Use small GPU command tables and exchange original host rows without full-expert staging."""
++        self.cache=cache
++        self.every=every
++        self.max_swaps=max_swaps
++        self.decay=decay
++        self.calls=0
++        self.rounds=deque(maxlen=256)
++        p=cache.protected_payload
++        self.pointer_tables=[table.cpu().numpy().copy() for table in cache._owner_tables]
++        self.source_ptrs=torch.empty((len(cache.bank_schema),max_swaps),device=cache.device,dtype=torch.int64)
++        self.gpu_slots=torch.empty(max_swaps,device=cache.device,dtype=torch.int32)
++        self.count=torch.zeros(1,device=cache.device,dtype=torch.int64)
++        self.staging_bytes=0
++        self.heat=np.zeros((p.layers,p.experts),dtype=np.float32)
++        self.last_counts=np.zeros((p.layers,p.experts),dtype=np.int64)
++        cache.decode_freq.zero_()
++
++    def candidates(self,freq):
++        """Choose same-layer exchanges from completed routes with Strata's count and gain floors."""
++        p=self.cache.protected_payload
++        choices=[]
++        for layer in range(p.layers):
++            host=np.asarray(p.host_indices[layer])
++            incoming=np.flatnonzero((host>=0)&(freq[layer]>=2))
++            outgoing=np.flatnonzero(host<0)
++            incoming=sorted(incoming,key=lambda e:(-float(freq[layer,e]),int(e)))
++            outgoing=sorted(outgoing,key=lambda e:(float(freq[layer,e]),int(e)))
++            for cold,hot in zip(incoming,outgoing):
++                gain=float(freq[layer,cold])-float(freq[layer,hot])
++                if gain<1.5:break
++                choices.append((gain,layer,int(cold),int(hot)))
++        choices.sort(key=lambda row:(-row[0],row[1:]))
++        return choices[:self.max_swaps]
++
++    def adapt(self):
++        """Drain users, exchange bytes, then publish tables in place so graph addresses remain valid."""
++        start=time.perf_counter()
++        c=self.cache
++        p=c.protected_payload
++        torch.cuda.synchronize(c.device)
++        counts=c.decode_freq.cpu().numpy()
++        self.heat+=counts-self.last_counts
++        self.last_counts=counts.copy()
++        swaps=self.candidates(self.heat)
++        self.heat*=self.decay
++        if not swaps:
++            self.rounds.append(dict(calls=self.calls,swaps=0,wall_ms=(time.perf_counter()-start)*1000))
++            return
++        slot_map=c.slot_for_id.cpu().numpy().copy()
++        reverse=c.id_of_slot.cpu().numpy().copy()
++        usage=c.usage.cpu().numpy().copy()
++        initial=c._protected_initial_map.cpu().numpy().copy()
++        protected_reverse=c._protected_reverse_map.cpu().numpy().copy()
++        staged=[]
++        host_pointers=np.zeros((len(c.bank_schema),self.max_swaps),dtype=np.int64)
++        gpu_slots=np.zeros(self.max_swaps,dtype=np.int32)
++        for i,(gain,layer,cold,hot) in enumerate(swaps):
++            slot=p.protected_slots[(layer,hot)]
++            host_index=p.host_indices[layer][cold]
++            for bank,role in enumerate(c.bank_schema):
++                host_pointers[bank,i]=self.pointer_tables[layer][bank,cold]
++            gpu_slots[i]=slot
++            staged.append((i,layer,cold,hot,slot,host_index))
++        self.source_ptrs.copy_(torch.from_numpy(host_pointers))
++        self.gpu_slots.copy_(torch.from_numpy(gpu_slots))
++        self.count.fill_(len(swaps))
++        _exchange[(len(c.bank_schema),32)](c._copy_dst_ptrs,self.source_ptrs,
++            c._copy_feat_bytes,self.gpu_slots,self.count,self.max_swaps,32,1024,num_warps=8)
++        torch.cuda.synchronize(c.device)
++        touched=set()
++        for i,layer,cold,hot,slot,host_index in staged:
++            for bank,role in enumerate(c.bank_schema):
++                # WDDM needs the device-mapped host address, not the CPU virtual address.
++                old_host=self.pointer_tables[layer][bank,cold]
++                self.pointer_tables[layer][bank,cold]=c.bank_caches[role].data_ptr()+slot*c.bank_caches[role][0].numel()*c.bank_caches[role].element_size()
++                self.pointer_tables[layer][bank,hot]=old_host
++            old_copy=int(slot_map[layer,cold])
++            if old_copy>=0:
++                assert old_copy<p.protected_begin
++                reverse[old_copy]=-1
++                usage[old_copy]=0
++            slot_map[layer,hot]=-1
++            slot_map[layer,cold]=slot
++            reverse[slot]=layer*p.experts+cold
++            initial[layer,hot]=-1
++            initial[layer,cold]=slot
++            protected_reverse[slot]=layer*p.experts+cold
++            del p.protected_slots[(layer,hot)]
++            p.protected_slots[(layer,cold)]=slot
++            p.host_indices[layer][cold]=-1
++            p.host_indices[layer][hot]=host_index
++            touched.add(layer)
++        p.initial_map.copy_(torch.from_numpy(initial))
++        for layer in touched:
++            c._owner_tables[layer].copy_(torch.from_numpy(self.pointer_tables[layer]))
++        c.slot_for_id.copy_(torch.from_numpy(slot_map))
++        c.id_of_slot.copy_(torch.from_numpy(reverse))
++        c.usage.copy_(torch.from_numpy(usage))
++        c._protected_initial_map.copy_(torch.from_numpy(initial))
++        c._protected_reverse_map.copy_(torch.from_numpy(protected_reverse))
++        torch.cuda.synchronize(c.device)
++        self.rounds.append(dict(calls=self.calls,swaps=len(swaps),wall_ms=(time.perf_counter()-start)*1000,
++                               gain_sum=sum(s[0] for s in swaps)))
++
++    def step(self):
++        """Run maintenance inside generation latency, without moving it outside the timed request."""
++        self.calls+=1
++        if self.calls%self.every==0:self.adapt()
++
+--- /dev/null
++++ b/tests/moe/test_q2_adaptive.py
+@@ -0,0 +1,63 @@
++"""Check exchanged owner bytes, captured graph replay and full-layer prefill on CUDA."""
++from pathlib import Path
++import pytest
++import runpy
++import torch
++from freetoken.moe.q2_adaptive import AdaptiveQ2Owners
++
++
++@pytest.mark.skipif(not torch.cuda.is_available(), reason="requires CUDA")
++def test_online_exchange_keeps_all_owner_bytes_and_graphs():
++    """Compare every expert with original bytes after exchanges in both directions."""
++    _make_cache=runpy.run_path(str(Path(__file__).with_name('test_q2_residency.py')))['_make_cache']
++    cache,original=_make_cache(valid_scales=True)
++    controller=AdaptiveQ2Owners(cache,max_swaps=2)
++    payload=cache.protected_payload
++    initial_addresses={r:t.data_ptr() for r,t in cache.bank_caches.items()}
++    ids=torch.tensor([[2,5,0]],device='cuda',dtype=torch.int32)
++    logical=ids.cpu().clone()
++    cache.ensure_experts(1,ids)
++    cache.copy_missing()
++    ids.copy_(logical)
++    graph=torch.cuda.CUDAGraph()
++    with torch.cuda.graph(graph):
++        cache.ensure_experts(1,ids)
++        cache.copy_missing()
++    checks=[]
++    for cycle in range(4):
++        cache.decode_freq.zero_()
++        controller.last_counts.fill(0)
++        controller.heat.fill(0)
++        targets=(2,5) if cycle%2==0 else (0,3)
++        cache.decode_freq[1,targets[0]]=100
++        cache.decode_freq[1,targets[1]]=80
++        controller.adapt()
++        assert all((1,e) in payload.protected_slots for e in targets)
++        for reset in (False,True):
++            if reset:cache.reset()
++            ids.copy_(logical)
++            graph.replay()
++            torch.cuda.synchronize()
++            for role in original:
++                actual=cache.bank_caches[role][ids.long()].cpu()
++                expected=original[role][1][logical.long()]
++                torch.testing.assert_close(actual,expected,rtol=0,atol=0)
++        # Include GPU-only, mixed-owner and host-only layers in the prefill check.
++        cache.begin_prefill()
++        for layer in range(3):
++            cache.prefetch_prefill_layer(layer)
++            views=cache.wait_prefill_layer(layer)
++            for role,view in zip(original,views):
++                torch.testing.assert_close(view.cpu(),original[role][layer],rtol=0,atol=0)
++            cache.release_prefill_layer(layer)
++        checks.append(f'bidirectional_swap_{cycle}_graph_reset_and_prefill_all_expert_bytes')
++    assert initial_addresses=={r:t.data_ptr() for r,t in cache.bank_caches.items()}
++    assert len(payload.protected_slots)==20
++    for layer in range(payload.layers):
++        host=[i for i in payload.host_indices[layer] if i>=0]
++        assert len(set(host))==len(host)
++        assert sorted(host)==list(range(len(host)))
++    graph.reset()
++    assert len(checks)==4
++    assert controller.staging_bytes==0
++    assert sum(row['swaps'] for row in controller.rounds)==8

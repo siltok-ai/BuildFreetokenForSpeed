@@ -17,6 +17,35 @@ from prepare_source import prepare
 
 
 class PythonMaterials(unittest.TestCase):
+    def test_perf3_reuses_all_native_inputs_and_includes_compact_kernels(self):
+        """实际重放31补丁、生成新wheel，核对新模块/RECORD及全部原生复用边界。"""
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / 'derived'
+            base_root = ROOT / 'artifacts/strataq2perf2-cp312-cu130-sm120'
+            derive(ROOT / 'build/profiles/strataq2perf3.json', ROOT / 'build/profiles/strataq2perf2.json',
+                   base_root, output)
+            record = json.loads((output / 'build-record.json').read_text())
+            base = json.loads((base_root / 'build-record.json').read_text())
+            self.assertEqual(record['status'], 'derived_requires_runtime_validation')
+            self.assertNotIn('validation_summary', record)
+            self.assertEqual({n:r for n,r in record['artifacts'].items() if n.endswith('.dll')},
+                             {n:r for n,r in base['artifacts'].items() if n.endswith('.dll')})
+            with zipfile.ZipFile(output/'wheels'/record['wheel_filename']) as wheel:
+                for name in ('freetoken/kernel/triton/gguf_gdn_compact.py','freetoken/moe/q2_adaptive.py'):
+                    self.assertEqual(wheel.read(name),
+                                     (output/'candidate-source/build-source/python'/name).read_bytes())
+                listed = {r[0] for r in csv.reader(io.StringIO(wheel.read(
+                    'freetoken-0.1.3+speed.strataq2perf3.dist-info/RECORD').decode()))}
+                self.assertEqual(listed,set(wheel.namelist()))
+            before, _ = prepare(ROOT/'build/profiles/strataq2perf2.json',Path(directory)/'base')
+            after = output/'candidate-source/build-source'
+            changed = validate_python_only_changes(before,after)
+            self.assertEqual(sorted(changed),record['binary_reuse']['changed_source_files'])
+            altered = after/'python/freetoken/kernel/csrc/jit/gguf_mmvq.cuh'
+            altered.write_bytes(altered.read_bytes()+b'\n// forbidden native change\n')
+            with self.assertRaisesRegex(ValueError,'binary reuse forbidden'):
+                validate_python_only_changes(before,after)
+
     def test_selective_gguf_rebuild_rejects_shared_native_or_unrelated_spec_changes(self):
         """重放真实候选；禁止把其他CUDA、AOT规格或构建行为混入26项复用边界。"""
         with tempfile.TemporaryDirectory() as directory:

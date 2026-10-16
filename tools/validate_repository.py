@@ -249,11 +249,18 @@ def main():
     if (ROOT/'integration/speed/consumer-contract-strataq2perf2.json').exists():
         from verify_performance_consumer import verify as verify_performance
         performance_consumer = verify_performance()
+    performance_revision3 = None
+    if (ROOT/'build/profiles/strataq2perf3.json').exists():
+        from validate_python_revision import validate as validate_python_performance
+        validate_python_performance(ROOT/'build/profiles/strataq2perf3.json',
+            ROOT/'artifacts/strataq2perf3-cp312-cu130-sm120')
+        performance_revision3 = {'verified': True, 'scope': 'offline_source_and_binary_identity_only'}
     print(json.dumps({"official_files": len(original_hashes), "changed_files": len(changed),
                       "patches": len(series["patches"]), "split_equals_historical": True,
                       "wheel_python_matches_prepared_source": True, "aot_count": len(specs),
                       "packaged_acceptance_evidence_verified": True, "strata_research":research,
                       "performance_revision":performance_revision, "performance_consumer":performance_consumer,
+                      "performance_revision3":performance_revision3,
                       "strata_research_dev2":research_dev2,
                       "strata_research_dev3":research_dev3, "strata_research_dev4":research_dev4,
                       "strata_research_dev5":research_dev5,

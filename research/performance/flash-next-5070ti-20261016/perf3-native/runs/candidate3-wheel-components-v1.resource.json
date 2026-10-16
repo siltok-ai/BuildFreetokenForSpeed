@@ -1,0 +1,23 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand3\\Scripts\\python.exe",
+    "-B",
+    "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\test-candidate3-wheel.py"
+  ],
+  "cwd": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016",
+  "started": 1792137544.6476293,
+  "samples": 53,
+  "min_commit_available": 55654100992,
+  "min_ram_available": 56429522944,
+  "min_gpu_free": 15964663808,
+  "max_commit_used": 14664810496,
+  "max_gpu_used": 1130270720,
+  "max_tree_rss": 1636847616,
+  "max_tree_private": 3251449856,
+  "stop_reason": null,
+  "pid": 19252,
+  "returncode": 0,
+  "elapsed_s": 26.75,
+  "remaining_before_cleanup": [],
+  "remaining_descendants": []
+}

@@ -77,6 +77,12 @@ PYTHON_ONLY_CHANGES = {
     'tests/models/qwen4_exp/test_mtp_runtime.py',
     'tests/scheduler/test_hybrid_cache_manager.py',
     'tests/scheduler/test_abort_inflight_prefill.py',
+    # Compact transactions and online ownership exchange are Python/Triton only.
+    'python/freetoken/kernel/triton/gguf_gdn_compact.py',
+    'python/freetoken/moe/q2_adaptive.py',
+    'tests/models/qwen4_exp/test_mtp_compact.py',
+    'tests/moe/test_q2_adaptive.py',
+    'tests/moe/test_q2_q8_tiles.py',
 }
 
 

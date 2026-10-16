@@ -1,0 +1,70 @@
+Flash Next Q2 / RTX 5070 Ti 第三轮候选（2026-10-16）
+
+身份与范围
+独立profile：build/profiles/strataq2perf3.json；31组有序补丁：patches/strataq2perf3-series.json。
+FreeToken 0.1.3+speed.strataq2perf3；wheel SHA256：
+2a075cace8849611ea170de9cf110355755b6b54c890c0c4eda34da7b5684afd。
+材料：artifacts/strataq2perf3-cp312-cu130-sm120。
+从perf2追加4组补丁；3个native模块和全部27个AOT输入/字节保持不变，沿用perf2的r2规格。
+这次没有重新编译原生模块。两份新增模块是Python/Triton，在运行时按真实几何编译。
+默认current-release指针和历史制品不变；Speed仍在继续对接，此记录不代表perf3产品HTTP或安装器已经验收。
+
+实现及边界
+mtp_compact_state显式启用紧凑事务：verify保持live递推矩阵只读，记录每候选行的k/delta/decay；
+按接受前缀统一提交各层，锚点在live推进之前保存。四个事务ID仍拥有卷积/PLE等小状态，不能进入请求free-list。
+FP32递推和运算仍保留；不使用逆更新，不换成FP16状态。单纯事务压缩净省约425MiB；
+浮点次序有微小差异，短质量通过不能推断512输出逐位一致。
+linear_state_cache_slots可显式调整可回收快照余量，保留每请求4槽工作集和padding；默认None沿用旧四槽下限。
+moe_q2_adapt_every为0时沿用固定初始驻留；实测32轮策略按已完成路由同层交换冷/热GPU所有者，
+使用单个双向交换内核保全真实压缩字节，再原地发布所有者/动态映射；无完整专家暂存副本。
+所有GPU引用先排空，图持有的表地址不变；频率分支进入真实CUDA图，捕获预热计数清零；诊断历史有界。
+Q2向量专家输出tile从4行扩大至8行。完整路径微测约快15%—18%，这不是整模型收益。
+更复杂的小窗口专家聚合在本轮未胜过宽tile对照，未纳入候选。
+
+资源准入的实际修正
+固定所有者bank不可在原地改大小，仍须重载；KV/线性状态重建可变。
+固定Q2手动容量已能运行时，旧启动memory_ratio预算可能拒绝其相邻状态池重建。
+保留所有几何/所有者检查；若仅旧总预算拒绝，则在空闲时释放未使用分配器缓存，
+按实际CUDA可用量核算KV/状态池增量，保留512MiB余量；其他模型仍沿用旧策略。
+实际案例：可用量0.22→0.86GiB，增加约0.11GiB状态后图重捕获与算术生成通过，再缩回也通过。
+Windows commit/RAM/VRAM外部监督全部保留；不能把CUDA余量与NVML物理可用量混为一谈。
+
+已完成验证
+新源码32项GPU/池组件、4子测试通过；普通安装wheel同样32项、4子测试通过。
+普通wheel核对458 Python +3 native文件全部字节，确认测试从该环境真实导入，未替换模块方法。
+新源码质量15/20、thinking3/3、无新增失败，全部质量IDs匹配组合原型；实际状态池增大/缩回、图重捕获和cache完整性通过。
+普通wheel开/关整模型质量均15/20、thinking3/3、无新增失败，状态扩缩容与图重捕获均通过。
+完整材料validator退出0；37项工具测试通过。普通wheel正式吞吐和资源验证完成，见下节。
+既有偶发长输出重复/token0风险仍未解决。
+
+原型端到端原生测量（不是Speed HTTP成绩）
+同权重GSQ Q2，固定英/中/代码及短/4K输入，每项3次实际512输出，独立进程。
+两模式均用1024 prefill分块、一槽额外可回收快照、宽tile和32轮在线热点交换。
+关闭MTP：永久5120+动态/借用2048，英92.71、中92.85、代码86.99；短91.45、4K84.50 token/s。
+开启MTP：永久4352+动态/借用2048、独立完整词表MTP，英93.29、中95.92、代码102.33；短94.94、4K96.69。
+对更强的关闭基线，MTP英文约+0.6%、中文+3.3%、代码+17.6%、短+3.8%、4K+14.4%；英文仍未达显著收益目标。
+GPU最小余量约637/683MiB（开启/关闭），commit和RAM监督通过，唯一模型进程树全部退出。
+有效专家容量7168→6400，减少约10.7%，此前FT2配置为5632→4352（约22.7%）。
+Strata同Q2参考为7774→7016（约9.8%）；框架、生成文本、次数不同，仅用于归因。
+prefill分块改变须同时核对TTFT和完整请求时长；尚不把decode改进等同于所有请求端到端都更快。
+
+正式普通wheel阶段检查点（未通过Speed HTTP或安装器）
+同上述组合配置，每项三次实际512输出，统计首末交付间隔；同模式连续请求保留热点学习与前缀缓存。
+关闭MTP：英92.8373、中92.8502、代码85.4254、短91.2923、4K84.4320 token/s。
+开启MTP：英92.9575、中95.6110、代码102.7214、短95.2593、4K96.9217。
+开/关比约+0.13%/+2.97%/+20.25%/+4.35%/+14.79%；英文仍需继续优化。
+两模式全部30次完整输出IDs匹配对应组合原型；不表示与旧perf2或Strata输出一致。
+最小GPU余量关闭683MiB、开启643MiB；剩余commit约12.19/10.89GiB，正常退出且无残留进程。
+4K首请求TTFT为9.55/10.05秒，后两次命中前缀约0.64—0.97秒；不能混用冷/热前缀计算prefill提升。
+关闭模式code第二次TTFT出现12.17秒异常尖峰，原因尚未确认，原始记录保留；不据此声称MTP改善首token。
+证据：research/performance/flash-next-5070ti-20261016/perf3-native/index.json（65份原始报告/日志/工具与SHA）。
+其中包含旧预算拒绝、实际空闲量仍不足、释放未使用缓存后通过的失败前/修复后记录。
+用户要求阶段收益及时本地提交；整体就绪后更新/推送Build main及Speed原整合分支，当前尚未推送。
+
+重建与离线复核
+python -B build/derive_python_materials.py --profile build/profiles/strataq2perf3.json --base-profile build/profiles/strataq2perf2.json --base-materials artifacts/strataq2perf2-cp312-cu130-sm120 --output <全新目录>
+python -B tools/validate_python_revision.py --profile build/profiles/strataq2perf3.json --materials artifacts/strataq2perf3-cp312-cu130-sm120
+python -B tools/validate_repository.py
+python -B -m unittest discover -s tests -v
+离线复核不替代GPU或Speed验收。原始运行位于本机runs/siltok-speed/flash-perf-20261016。
+按用户决定，日常以源码/wheel/GPU/HTTP为主；重要交付节点或安装/服务相关变动再做安装、测试、卸载。

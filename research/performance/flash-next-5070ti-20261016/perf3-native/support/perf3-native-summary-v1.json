@@ -1,0 +1,367 @@
+{
+  "scope": "ordinary_freetoken_wheel_not_speed_http_or_installer",
+  "version": "0.1.3+speed.strataq2perf3",
+  "protocol": "Same full Q2 weights and frozen inputs;3 sequential requests/key,512 delivered tokens. Adaptive experts and prefix cache persist across requests; fresh process per mode. TPS=(N-1)/(last-first delivery); first TTFT and all request times preserved.",
+  "modes": {
+    "off": {
+      "report": "candidate3-wheel-performance-off-v1.json",
+      "resource": {
+        "command": [
+          "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand3\\Scripts\\python.exe",
+          "-B",
+          "probe10.py",
+          "--output",
+          "candidate3-wheel-performance-off-v1.json",
+          "--variant",
+          "base",
+          "--adaptive-owners",
+          "--adapt-every",
+          "32",
+          "--resident",
+          "5120",
+          "--prefill",
+          "1024",
+          "--state-cache-slots",
+          "1",
+          "--suite",
+          "performance",
+          "--keys",
+          "english",
+          "chinese",
+          "code",
+          "70-0",
+          "diverse-4096-0",
+          "--repetitions",
+          "3",
+          "--inventory"
+        ],
+        "cwd": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016",
+        "started": 1792138217.059795,
+        "samples": 337,
+        "min_commit_available": 13085122560,
+        "min_ram_available": 29160300544,
+        "min_gpu_free": 716271616,
+        "max_commit_used": 57233788928,
+        "max_gpu_used": 16378662912,
+        "max_tree_rss": 28969619456,
+        "max_tree_private": 45792448512,
+        "stop_reason": null,
+        "pid": 1892,
+        "returncode": 0,
+        "elapsed_s": 170.125,
+        "remaining_before_cleanup": [],
+        "remaining_descendants": []
+      },
+      "settings": {
+        "resident": 5120,
+        "dynamic": 1024,
+        "prefill": 1024,
+        "state_cache_slots": 1,
+        "mtp": false,
+        "adaptive_owners": true,
+        "adapt_every": 32
+      },
+      "workloads": {
+        "english": {
+          "median_tps": 92.83730235524314,
+          "tps": [
+            88.50845840360165,
+            92.83730235524314,
+            93.67850483083619
+          ],
+          "ttft_ms": [
+            1011.9467999902554,
+            674.0448999917135,
+            643.8457999902312
+          ],
+          "request_seconds": [
+            6.785680099972524,
+            6.178653699986171,
+            6.098930099979043
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "chinese": {
+          "median_tps": 92.85015807000016,
+          "tps": [
+            92.10587077785023,
+            92.85015807000016,
+            93.09458949562766
+          ],
+          "ttft_ms": [
+            975.55669999565,
+            1616.1830000055488,
+            73.25519999722019
+          ],
+          "request_seconds": [
+            6.523818899993785,
+            7.119915499992203,
+            5.562546000001021
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "code": {
+          "median_tps": 85.4254159803263,
+          "tps": [
+            84.82810497538088,
+            85.4254159803263,
+            88.39961135971889
+          ],
+          "ttft_ms": [
+            982.0182000112254,
+            12168.088100006571,
+            91.5839999797754
+          ],
+          "request_seconds": [
+            7.006214299995918,
+            18.15020450000884,
+            5.872429499984719
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "70-0": {
+          "median_tps": 91.29229441610161,
+          "tps": [
+            90.11971690134177,
+            91.29229441610161,
+            91.96508767719891
+          ],
+          "ttft_ms": [
+            670.0726000126451,
+            106.09750001458451,
+            86.28680001129396
+          ],
+          "request_seconds": [
+            6.340592600026866,
+            5.703767300001346,
+            5.643015100009507
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "diverse-4096-0": {
+          "median_tps": 84.43199014784481,
+          "tps": [
+            84.43199014784481,
+            83.45630617347865,
+            85.51696696801106
+          ],
+          "ttft_ms": [
+            9546.579899993958,
+            968.1869999913033,
+            639.5188000169583
+          ],
+          "request_seconds": [
+            15.599038299988024,
+            7.091372399998363,
+            6.6151688000245485
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        }
+      }
+    },
+    "on": {
+      "report": "candidate3-wheel-performance-on-v1.json",
+      "resource": {
+        "command": [
+          "C:\\workspace\\envs\\siltok-speed\\flash-perf-cand3\\Scripts\\python.exe",
+          "-B",
+          "probe10.py",
+          "--output",
+          "candidate3-wheel-performance-on-v1.json",
+          "--variant",
+          "compact-mtp",
+          "--mtp",
+          "--adaptive-owners",
+          "--adapt-every",
+          "32",
+          "--resident",
+          "4352",
+          "--prefill",
+          "1024",
+          "--state-cache-slots",
+          "1",
+          "--suite",
+          "performance",
+          "--keys",
+          "english",
+          "chinese",
+          "code",
+          "70-0",
+          "diverse-4096-0",
+          "--repetitions",
+          "3",
+          "--inventory"
+        ],
+        "cwd": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016",
+        "started": 1792138423.2759671,
+        "samples": 297,
+        "min_commit_available": 11695120384,
+        "min_ram_available": 27918168064,
+        "min_gpu_free": 674328576,
+        "max_commit_used": 58623791104,
+        "max_gpu_used": 16420605952,
+        "max_tree_rss": 30220705792,
+        "max_tree_private": 47149039616,
+        "stop_reason": null,
+        "pid": 1220,
+        "returncode": 0,
+        "elapsed_s": 149.9529999999795,
+        "remaining_before_cleanup": [],
+        "remaining_descendants": []
+      },
+      "settings": {
+        "resident": 4352,
+        "dynamic": 1024,
+        "prefill": 1024,
+        "state_cache_slots": 1,
+        "mtp": true,
+        "adaptive_owners": true,
+        "adapt_every": 32
+      },
+      "workloads": {
+        "english": {
+          "median_tps": 92.95754376119649,
+          "tps": [
+            88.72353091449804,
+            92.95754376119649,
+            96.054218640064
+          ],
+          "ttft_ms": [
+            706.6659999836702,
+            657.9243000014685,
+            659.9586999800522
+          ],
+          "request_seconds": [
+            6.466427000006661,
+            6.1553630999987945,
+            5.980149599985452
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "chinese": {
+          "median_tps": 95.6109986255577,
+          "tps": [
+            92.69931068336209,
+            95.6109986255577,
+            96.54722924198457
+          ],
+          "ttft_ms": [
+            711.521699995501,
+            83.37619999656454,
+            66.24479999300092
+          ],
+          "request_seconds": [
+            6.224236000009114,
+            5.428205499978503,
+            5.359241699974518
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "code": {
+          "median_tps": 102.72136846933361,
+          "tps": [
+            99.30735934813816,
+            102.72136846933361,
+            104.79610983714845
+          ],
+          "ttft_ms": [
+            715.4630000004545,
+            404.47239999775775,
+            89.34160001808777
+          ],
+          "request_seconds": [
+            5.861377699999139,
+            5.379351699986728,
+            4.965727400005562
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "70-0": {
+          "median_tps": 95.25933085156736,
+          "tps": [
+            94.52787212597191,
+            95.25933085156736,
+            95.92918226150653
+          ],
+          "ttft_ms": [
+            673.0457000085153,
+            108.12910000095144,
+            75.96049999119714
+          ],
+          "request_seconds": [
+            6.079119500005618,
+            5.4727023000014015,
+            5.403070500004105
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        },
+        "diverse-4096-0": {
+          "median_tps": 96.92174820608128,
+          "tps": [
+            95.48739288012779,
+            96.92174820608128,
+            97.3394610844225
+          ],
+          "ttft_ms": [
+            10049.91100000916,
+            681.7086999944877,
+            685.8231000078376
+          ],
+          "request_seconds": [
+            15.401653900014935,
+            5.954246600012993,
+            5.935727300005965
+          ],
+          "prototype_ids_equal": [
+            true,
+            true,
+            true
+          ]
+        }
+      }
+    }
+  },
+  "mtp_gain_vs_best_measured_off": {
+    "english": 0.0012951841867749891,
+    "chinese": 0.029734365702168475,
+    "code": 0.20246846082658365,
+    "70-0": 0.043454230839947705,
+    "diverse-4096-0": 0.14792684664149514
+  }
+}
