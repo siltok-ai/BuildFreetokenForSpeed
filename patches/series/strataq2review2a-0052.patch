@@ -1,0 +1,211 @@
+--- a/python/freetoken/engine/sample.py
++++ b/python/freetoken/engine/sample.py
+@@ -66,8 +66,10 @@
+         # Greedy outputs are selected explicitly in sample(); use neutral sampling
+         # parameters for those rows instead of approximating argmax at low temperature.
+         ts = [1.0 if g else max(p.temperature, MIN_T) for p, g in zip(params, is_greedy)]
++        # Keeping at least the full vocabulary is unfiltered sampling. Bound
++        # Python integers before converting them to the device's int32 tensor.
+         top_ks = [
+-            p.top_k if not g and p.top_k >= 1 else self.vocab_size
++            min(p.top_k, self.vocab_size) if not g and p.top_k >= 1 else self.vocab_size
+             for p, g in zip(params, is_greedy)
+         ]
+         top_ps = [
+--- a/python/freetoken/scheduler/scheduler.py
++++ b/python/freetoken/scheduler/scheduler.py
+@@ -1,6 +1,7 @@
+ from __future__ import annotations
+ 
+ import os
++from dataclasses import replace
+ 
+ from typing import TYPE_CHECKING, List, NamedTuple, NoReturn, Set, Tuple, TypeAlias
+ 
+@@ -446,9 +447,7 @@
+         self.send_result(reply)
+ 
+     def _match_stop_str(self, req: Req) -> str | None:
+-        """First stop string present in this request's generated tail, else None. Decodes
+-        only a short suffix (bounded by the longest stop string's char length, so a stop of
+-        N chars spans at most N tokens) to keep the per-step cost small."""
++        """Find the earliest stop in the generated tail, including byte-fallback tokens."""
+         prompt_len = req.max_device_len - req.output_len
+         return _match_stop_tail(self.tokenizer, req.sampling_params.stop_strs,
+                                 req.input_ids, prompt_len)
+@@ -548,7 +547,9 @@
+                 )
+                 return
+             if msg.sampling_params.max_tokens > max_output_len:
+-                msg.sampling_params.max_tokens = max_output_len
++                # Offline batches can share SamplingParams. Clip only this
++                # request, without changing later prompts or caller state.
++                msg = replace(msg, sampling_params=replace(msg.sampling_params, max_tokens=max_output_len))
+                 logger.warning_rank0(
+                     f"Adjust max_tokens to {max_output_len} for request {msg.uid}."
+                 )
+@@ -947,12 +948,19 @@
+     """Use the same output-only suffix for native tokens and speculative bundles."""
+     if len(history) <= prompt_len:
+         return None
+-    max_chars = max(len(value) for value in stop_strs)
+-    suffix = history[max(prompt_len, len(history) - max_chars - 1):]
++    # A Unicode character can span several byte-level tokens. Keep enough bytes,
++    # plus one boundary token, instead of assuming one token per character.
++    max_bytes = max(len(value.encode('utf-8')) for value in stop_strs)
++    suffix = history[max(prompt_len, len(history) - max_bytes - 1):]
+     if isinstance(suffix, torch.Tensor):
+         suffix = suffix.tolist()
+     tail = tokenizer.decode(suffix)
+-    return next((value for value in stop_strs if value in tail), None)
++    matched, first = None, len(tail)
++    for value in stop_strs:
++        position = tail.find(value)
++        if 0 <= position < first:
++            matched, first = value, position
++    return matched
+ 
+ 
+ def _make_mrope_positions(batch: Batch, device: torch.device) -> torch.Tensor:
+--- /dev/null
++++ b/tests/engine/test_sampling_bounds.py
+@@ -0,0 +1,31 @@
++"""Accepted top-k integers must preserve unfiltered and mixed-batch semantics."""
++from types import SimpleNamespace
++
++import pytest
++import torch
++
++from freetoken.core import SamplingParams
++from freetoken.engine.sample import Sampler
++
++
++@pytest.mark.parametrize('top_k', [16, 17, 2**31 - 1, 2**31, 2**80])
++def test_top_k_above_vocabulary_does_not_overflow_device_int32(top_k):
++    """Prepare real device tensors; a full-vocabulary row needs no top-k filter."""
++    sampler = Sampler(torch.device('cuda:0'), vocab_size=16)
++    args = sampler.prepare(SimpleNamespace(reqs=[SimpleNamespace(
++        sampling_params=SamplingParams(temperature=0.7, top_k=top_k),
++    )]))
++    assert args.top_k is None
++    assert args.temperatures.tolist() == pytest.approx([0.7])
++    assert args.greedy_mask is None
++
++
++def test_mixed_top_k_preserves_bounded_filter_and_greedy_row():
++    """Only the large row becomes unfiltered; greedy and bounded rows keep their roles."""
++    sampler = Sampler(torch.device('cuda:0'), vocab_size=16)
++    params = [SamplingParams(temperature=0.7, top_k=2**80),
++              SamplingParams(temperature=0.7, top_k=3),
++              SamplingParams(temperature=0, top_k=2**80)]
++    args = sampler.prepare(SimpleNamespace(reqs=[SimpleNamespace(sampling_params=p) for p in params]))
++    assert args.top_k.tolist() == [16, 3, 16]
++    assert args.greedy_mask.tolist() == [False, False, True]
+--- a/tests/scheduler/test_abort_inflight_prefill.py
++++ b/tests/scheduler/test_abort_inflight_prefill.py
+@@ -33,6 +33,23 @@
+ from freetoken.scheduler.utils import PendingReq
+ 
+ UID = 2
++
++
++def test_context_clipping_does_not_shrink_another_request_with_shared_sampling():
++    """Offline batches can share one SamplingParams; each prompt owns its clipped budget."""
++    from freetoken.message import UserMsg
++
++    _, _, _, _, pm, _, scheduler = _setup()
++    scheduler.engine = SimpleNamespace(max_seq_len=64, encoder_cache=None)
++    shared = SamplingParams(max_tokens=32)
++    long = UserMsg(uid=10, input_ids=torch.arange(56, dtype=torch.int32), sampling_params=shared)
++    short = UserMsg(uid=11, input_ids=torch.arange(8, dtype=torch.int32), sampling_params=shared)
++    Scheduler._process_one_msg(scheduler, long)
++    Scheduler._process_one_msg(scheduler, short)
++    pending = {req.uid: req for req in pm.pending_list}
++    assert pending[10].output_len == 8
++    assert pending[11].output_len == 32
++    assert shared.max_tokens == 32
+ 
+ 
+ def _pool(num_slots=16):
+--- /dev/null
++++ b/tests/scheduler/test_stop_boundaries.py
+@@ -0,0 +1,79 @@
++"""Stop recognition must agree with streamed text and speculative clipping."""
++from types import SimpleNamespace
++
++import pytest
++import torch
++from tokenizers import Tokenizer, decoders, models, pre_tokenizers
++from transformers import PreTrainedTokenizerFast
++
++from freetoken.core import Req, SamplingParams
++from freetoken.message import DetokenizeMsg
++from freetoken.scheduler.scheduler import Scheduler
++from freetoken.tokenizer.detokenize import DetokenizeManager
++
++
++@pytest.fixture
++def tokenizer():
++    """Use a real byte-level decoder with one merged ASCII token."""
++    pieces = sorted(pre_tokenizers.ByteLevel.alphabet())
++    pieces += ['pr', 'pre', 'pref', 'prefi', 'prefix']
++    backend = Tokenizer(models.BPE(
++        vocab={piece: i for i, piece in enumerate(pieces)},
++        merges=[('p', 'r'), ('pr', 'e'), ('pre', 'f'), ('pref', 'i'), ('prefi', 'x')],
++    ))
++    backend.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=False)
++    backend.decoder = decoders.ByteLevel()
++    return PreTrainedTokenizerFast(tokenizer_object=backend)
++
++
++@pytest.mark.parametrize('output,stops,expected', [
++    ('ok 🦄', ['🦄'], 'ok '),
++    ('ok 🦄🦄', ['🦄🦄'], 'ok '),
++    ('ok 𠮷𠮷', ['𠮷𠮷'], 'ok '),
++    ('prefix', ['fix', 'pre'], ''),
++    ('prefix', ['pre', 'prefix'], ''),
++    ('ok STOP', ['STOP'], 'ok '),
++])
++def test_native_stream_and_mtp_clip_at_the_same_stop(tokenizer, output, stops, expected):
++    """Exercise real request history, byte decoding, clipping and stream holdback."""
++    prompt = tokenizer.encode('prompt contains ' + ' '.join(stops), add_special_tokens=False)
++    generated = tokenizer.encode(output, add_special_tokens=False)
++    req = Req(torch.tensor(prompt, dtype=torch.int32), table_idx=0, cached_len=0,
++              output_len=len(generated) + 4, uid=1,
++              sampling_params=SamplingParams(stop_strs=stops), cache_handle=None)
++    scheduler = SimpleNamespace(tokenizer=tokenizer, eos_token_ids=set())
++    assert Scheduler._match_stop_str(scheduler, req) is None
++    limit = Scheduler._mtp_delivery_limit(scheduler, req, generated)
++    assert limit.finished
++    assert req.input_ids.tolist() == prompt
++
++    detokenizer = DetokenizeManager(tokenizer, frozenset())
++    chunks = []
++    for i, token in enumerate(generated):
++        req.complete_one()
++        req.append_host(torch.tensor([token], dtype=torch.int32))
++        stop = Scheduler._match_stop_str(scheduler, req)
++        chunks.extend(detokenizer.detokenize([DetokenizeMsg(
++            uid=1, next_token=token, finished=stop is not None,
++            finish_reason='stop' if stop else None, matched_stop=stop, stop_strs=stops,
++        )]))
++        if stop is not None:
++            assert i + 1 == limit.count
++            break
++    assert ''.join(chunks) == expected
++    assert detokenizer.decode_map == {}
++
++
++def test_partial_unicode_stop_is_released_at_length(tokenizer):
++    """An unfinished stop prefix remains visible when length ends generation."""
++    tokens = tokenizer.encode('ok 🦄', add_special_tokens=False)
++    manager = DetokenizeManager(tokenizer, frozenset())
++    chunks = []
++    for i, token in enumerate(tokens):
++        finished = i == len(tokens) - 1
++        chunks.extend(manager.detokenize([DetokenizeMsg(
++            uid=2, next_token=token, finished=finished,
++            finish_reason='length' if finished else None, stop_strs=['🦄🦄'],
++        )]))
++    assert ''.join(chunks) == 'ok 🦄'
++    assert manager.decode_map == {}

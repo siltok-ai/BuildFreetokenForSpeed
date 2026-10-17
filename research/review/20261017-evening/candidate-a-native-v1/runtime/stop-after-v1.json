@@ -1,0 +1,96 @@
+{
+  "source": "C:\\workspace\\build\\freetoken-mats\\review2-20261017-work\\build-source\\python\\freetoken\\__init__.py",
+  "results": [
+    {
+      "name": "unicode_pair",
+      "stops": [
+        "🦄🦄"
+      ],
+      "output": "🦄🦄",
+      "generated_tokens": [
+        11510,
+        10838,
+        99,
+        226,
+        9008,
+        99,
+        226
+      ],
+      "matched": "🦄🦄",
+      "streamed": "prefix ",
+      "expected": "prefix ",
+      "passed": true
+    },
+    {
+      "name": "unicode_single",
+      "stops": [
+        "🦄"
+      ],
+      "output": "🦄",
+      "generated_tokens": [
+        11510,
+        10838,
+        99,
+        226
+      ],
+      "matched": "🦄",
+      "streamed": "prefix ",
+      "expected": "prefix ",
+      "passed": true
+    },
+    {
+      "name": "unicode_cjk",
+      "stops": [
+        "𠮷𠮷"
+      ],
+      "output": "𠮷𠮷",
+      "generated_tokens": [
+        11510,
+        220,
+        172,
+        254,
+        106,
+        115,
+        172,
+        254,
+        106,
+        115
+      ],
+      "matched": "𠮷𠮷",
+      "streamed": "prefix ",
+      "expected": "prefix ",
+      "passed": true
+    },
+    {
+      "name": "earliest_in_token",
+      "stops": [
+        "fix",
+        "pre"
+      ],
+      "output": "prefix",
+      "generated_tokens": [
+        11510
+      ],
+      "matched": "pre",
+      "streamed": "",
+      "expected": "",
+      "passed": true
+    },
+    {
+      "name": "ordinary_ascii",
+      "stops": [
+        "STOP"
+      ],
+      "output": "STOP",
+      "generated_tokens": [
+        11510,
+        44020
+      ],
+      "matched": "STOP",
+      "streamed": "prefix ",
+      "expected": "prefix ",
+      "passed": true
+    }
+  ],
+  "all_passed": true
+}

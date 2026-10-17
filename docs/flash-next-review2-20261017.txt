@@ -1,0 +1,56 @@
+2026-10-17 evening exploration: request boundaries and lifecycle
+
+Baseline Build main: 35c6bbc6c9109121776d1915b8e0ee0de1ea9fa9.
+Baseline Speed integration: d42d3bae7f307b4651173768f323e250855aec98.
+The user authorized up to five hours of additional exploration on these two branches.
+
+Candidate strataq2review2a appends patches 52 and 53 to the unchanged 51-patch review1 catalog.
+The current-release pointer remains review1 until independent consumer acceptance is complete.
+
+Engine findings and candidate changes:
+1. A Unicode stop character can use multiple byte-level tokens. A character-count tail
+   misses complete stops such as two unicorn emoji or supplementary CJK characters.
+   Bound the output-only decode suffix by UTF-8 bytes instead of code-point count.
+2. Multiple stops within one token previously selected list order. Select the earliest
+   position in decoded output, retaining list order only for a position tie.
+3. A valid large top_k overflows int32 during device sampling preparation. Keeping at
+   least the vocabulary is unfiltered sampling; cap it before constructing device tensors.
+4. Scheduler context clipping mutates shared SamplingParams, shrinking later prompts in
+   offline batches. Create request-local dataclass replacements only when clipping is needed.
+
+Speed-side findings are owned by Speed:
+5. Fixed KV capacity was omitted from prompt preflight, accepting a prompt that leaves no
+   room for any output and loading large weights before the inevitable request rejection.
+6. ASGI 2.3 disconnect cancels an AnyIO scope, which repeatedly cancels cleanup awaits.
+   The prior SSE tests mainly cover the ASGI 2.4 OSError path. Cleanup ownership flags
+   could be set without executing cancellation/unsubscription. Protect the owned cleanup.
+
+Reproduction before fixes:
+- Real Qwen tokenizer: Unicode stop is missed; one prefix token with [fix, pre] leaks pre.
+- Real GPU sampling preparation: top_k 2**31 overflows int32; 2**80 overflows long long.
+- Real CPU Scheduler/PrefillManager: clipping the first budget to 8 also clips the next to 8.
+- Real ASGI task groups: four disconnect cases keep the task RUNNING on the old source;
+  the real Engine ASGI 2.3 case also fails to reach CANCELLED (2.4 control succeeds).
+- Real tokenizer/template preflight: 8192/9000-token prompts pass with a fixed 8192 KV pool.
+
+Initial validation:
+- New targeted boundaries: 24 tests passed, including existing overlap/abort/cache lifecycle.
+- Source and ordinary installed candidate wheel: each 169 tests + 47 subtests passed.
+- Reproducible random Unicode stop oracle: 2500 cases, 33792 token steps, zero differences.
+- Speed SSE/cancellation/observability: 59 tests passed with an external process-only license
+  fixture. Product license code remains byte-identical. A normal test invocation retains
+  the existing license-fixture failures; these are not reported as model/runtime successes.
+- New wheel SHA256: 5c419a20399df60cbbc0d391cb08ca3405c92e690565b1848c1ae871a94594cd.
+- All three native modules and all 27 AOT DLLs are byte-identical to review1. The explicit
+  source-delta validator passed against the adjacent review1 profile, with 462 Python files.
+
+Full-model OFF, paired MTP and full MTP each retain the baseline quality 15/20 and thinking 3/3.
+Each mode's 23 formal quality token-ID sequences match review1 exactly; grow/shrink and graph
+recapture pass. Their raw reports and before/after proofs are frozen in
+research/review/20261017-evening/candidate-a-native-v1/evidence.json.
+
+Additional full-checkpoint boundary probes, Speed HTTP and packaged validation remain separate
+pending stages at this supplier checkpoint. The ordinary candidate is deliberately not promoted
+by current-release; this commit supplies bytes for the subsequent Speed consumer check.
+Local raw evidence: C:/workspace/runs/siltok-speed/explore-20261017-evening.
+No actual-install, clean-OS, universal performance or long-output-token0 fix is claimed here.

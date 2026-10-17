@@ -93,6 +93,10 @@ PYTHON_ONLY_CHANGES = {
     'python/freetoken/models/qwen4_exp/mtp_draft_vocab.py',
     'tests/models/qwen4_exp/test_mtp_draft_policy.py',
     'python/freetoken/checkpoint/gguf_reader.py',
+    # Stop matching, request-local budgets and sampler bounds do not change native/AOT inputs.
+    'python/freetoken/engine/sample.py',
+    'tests/engine/test_sampling_bounds.py',
+    'tests/scheduler/test_stop_boundaries.py',
 }
 
 

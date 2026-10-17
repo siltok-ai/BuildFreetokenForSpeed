@@ -1,0 +1,84 @@
+FFFF....FFFFF                                                            [100%]
+================================== FAILURES ===================================
+_ test_native_stream_and_mtp_clip_at_the_same_stop[ok \U0001f984-stops0-ok ] __
+..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\scheduler\test_stop_boundaries.py:47: in test_native_stream_and_mtp_clip_at_the_same_stop
+    assert limit.finished
+E   assert False
+E    +  where False = DeliveryLimit(count=7, finished=False).finished
+_ test_native_stream_and_mtp_clip_at_the_same_stop[ok \U0001f984\U0001f984-stops1-ok ] _
+..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\scheduler\test_stop_boundaries.py:47: in test_native_stream_and_mtp_clip_at_the_same_stop
+    assert limit.finished
+E   assert False
+E    +  where False = DeliveryLimit(count=11, finished=False).finished
+_ test_native_stream_and_mtp_clip_at_the_same_stop[ok \U00020bb7\U00020bb7-stops2-ok ] _
+..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\scheduler\test_stop_boundaries.py:47: in test_native_stream_and_mtp_clip_at_the_same_stop
+    assert limit.finished
+E   assert False
+E    +  where False = DeliveryLimit(count=11, finished=False).finished
+______ test_native_stream_and_mtp_clip_at_the_same_stop[prefix-stops3-] _______
+..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\scheduler\test_stop_boundaries.py:63: in test_native_stream_and_mtp_clip_at_the_same_stop
+    assert ''.join(chunks) == expected
+E   AssertionError: assert 'pre' == ''
+E     
+E     + pre
+_______ test_top_k_above_vocabulary_does_not_overflow_device_int32[17] ________
+..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\engine\test_sampling_bounds.py:18: in test_top_k_above_vocabulary_does_not_overflow_device_int32
+    assert args.top_k is None
+E   AssertionError: assert tensor([17], device='cuda:0', dtype=torch.int32) is None
+E    +  where tensor([17], device='cuda:0', dtype=torch.int32) = BatchSamplingArgs(temperatures=tensor([0.7000], device='cuda:0'), top_k=tensor([17], device='cuda:0', dtype=torch.int32), top_p=None, greedy_mask=None).top_k
+___ test_top_k_above_vocabulary_does_not_overflow_device_int32[2147483647] ____
+..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\engine\test_sampling_bounds.py:18: in test_top_k_above_vocabulary_does_not_overflow_device_int32
+    assert args.top_k is None
+E   AssertionError: assert tensor([2147483647], device='cuda:0', dtype=torch.int32) is None
+E    +  where tensor([2147483647], device='cuda:0', dtype=torch.int32) = BatchSamplingArgs(temperatures=tensor([0.7000], device='cuda:0'), top_k=tensor([2147483647], device='cuda:0', dtype=torch.int32), top_p=None, greedy_mask=None).top_k
+___ test_top_k_above_vocabulary_does_not_overflow_device_int32[2147483648] ____
+..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\engine\test_sampling_bounds.py:15: in test_top_k_above_vocabulary_does_not_overflow_device_int32
+    args = sampler.prepare(SimpleNamespace(reqs=[SimpleNamespace(
+..\..\..\build\freetoken-mats\review2-20261017-base\build-source\python\freetoken\engine\sample.py:80: in prepare
+    top_k = make_device_tensor(top_ks, torch.int32, self.device)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\build\freetoken-mats\review2-20261017-base\build-source\python\freetoken\engine\sample.py:22: in make_device_tensor
+    return torch.tensor(data, dtype=dtype, pin_memory=True).to(device, non_blocking=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   RuntimeError: value cannot be converted to type int32 without overflow
+_ test_top_k_above_vocabulary_does_not_overflow_device_int32[1208925819614629174706176] _
+..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\engine\test_sampling_bounds.py:15: in test_top_k_above_vocabulary_does_not_overflow_device_int32
+    args = sampler.prepare(SimpleNamespace(reqs=[SimpleNamespace(
+..\..\..\build\freetoken-mats\review2-20261017-base\build-source\python\freetoken\engine\sample.py:80: in prepare
+    top_k = make_device_tensor(top_ks, torch.int32, self.device)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\build\freetoken-mats\review2-20261017-base\build-source\python\freetoken\engine\sample.py:22: in make_device_tensor
+    return torch.tensor(data, dtype=dtype, pin_memory=True).to(device, non_blocking=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: Overflow when unpacking long long
+__________ test_mixed_top_k_preserves_bounded_filter_and_greedy_row ___________
+..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\engine\test_sampling_bounds.py:29: in test_mixed_top_k_preserves_bounded_filter_and_greedy_row
+    args = sampler.prepare(SimpleNamespace(reqs=[SimpleNamespace(sampling_params=p) for p in params]))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\build\freetoken-mats\review2-20261017-base\build-source\python\freetoken\engine\sample.py:80: in prepare
+    top_k = make_device_tensor(top_ks, torch.int32, self.device)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\build\freetoken-mats\review2-20261017-base\build-source\python\freetoken\engine\sample.py:22: in make_device_tensor
+    return torch.tensor(data, dtype=dtype, pin_memory=True).to(device, non_blocking=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: Overflow when unpacking long long
+============================== warnings summary ===============================
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED ..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\scheduler\test_stop_boundaries.py::test_native_stream_and_mtp_clip_at_the_same_stop[ok \U0001f984-stops0-ok ]
+FAILED ..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\scheduler\test_stop_boundaries.py::test_native_stream_and_mtp_clip_at_the_same_stop[ok \U0001f984\U0001f984-stops1-ok ]
+FAILED ..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\scheduler\test_stop_boundaries.py::test_native_stream_and_mtp_clip_at_the_same_stop[ok \U00020bb7\U00020bb7-stops2-ok ]
+FAILED ..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\scheduler\test_stop_boundaries.py::test_native_stream_and_mtp_clip_at_the_same_stop[prefix-stops3-]
+FAILED ..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\engine\test_sampling_bounds.py::test_top_k_above_vocabulary_does_not_overflow_device_int32[17]
+FAILED ..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\engine\test_sampling_bounds.py::test_top_k_above_vocabulary_does_not_overflow_device_int32[2147483647]
+FAILED ..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\engine\test_sampling_bounds.py::test_top_k_above_vocabulary_does_not_overflow_device_int32[2147483648]
+FAILED ..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\engine\test_sampling_bounds.py::test_top_k_above_vocabulary_does_not_overflow_device_int32[1208925819614629174706176]
+FAILED ..\..\..\build\freetoken-mats\review2-20261017-work\build-source\tests\engine\test_sampling_bounds.py::test_mixed_top_k_preserves_bounded_filter_and_greedy_row
+9 failed, 4 passed, 2 warnings in 6.31s
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute
