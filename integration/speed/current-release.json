@@ -2,7 +2,7 @@
   "format": 1,
   "profile": "build/profiles/strataq2perf8.json",
   "materials": "artifacts/strataq2perf8-cp312-cu130-sm120",
-  "consumer_contract": "integration/speed/consumer-contract-strataq2perf8-compiled.json",
+  "consumer_contract": "integration/speed/consumer-contract-strataq2perf8-installed.json",
   "weight_source_lock": "model-weights/qwen3.8-flash-next-strata-q2/source-lock.json",
   "mtp_manifest": "model-weights/qwen3.8-flash-next-strata-q2/mtp-runtime.json",
   "input_sha256": {
@@ -11,10 +11,11 @@
     "model-weights/qwen3.8-flash-next-strata-q2/mtp-runtime.json": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
     "integration/speed/presets/flash-next-sm120-16g-perf8.json": "dafac6a8f5d7c714c6970e9c3d877e4e3fc7bbde725c2ad1a83d481185dfbdb3",
     "integration/speed/consumer-contract-strataq2perf8-compiled.json": "282047da2db392d1395588a7eaeac1065f94dad999ef0d3750e70fa70b564d16",
-    "integration/speed/consumer-contract-strataq2perf8.json": "270bf368f389474525515d3aa91ba12477f60d83ec737143fa8eb255fa124cd3"
+    "integration/speed/consumer-contract-strataq2perf8.json": "270bf368f389474525515d3aa91ba12477f60d83ec737143fa8eb255fa124cd3",
+    "integration/speed/consumer-contract-strataq2perf8-installed.json": "c63d6fe2e61a35604367f14b4774ecee632cb8d984072d16cbc2ff971da26ff8"
   },
   "version": "0.1.3+speed.strataq2perf8",
   "mtp_default_enabled": false,
-  "scope": "RTX5070Ti ordinary wheel, source Speed and protected embedded payload accepted with original full GSQ Q2. Paired full3/CJK2 is explicit; MTP remains default-off. Installer and clean-OS acceptance are separate; unresolved historical long-output issue retained.",
+  "scope": "RTX5070Ti original full GSQ Q2: ordinary wheel, source Speed, isolated protected embedded payload, actual full installer HTTP modes and owned uninstall/cleanup accepted. MTP defaults off; paired policy explicit. Existing OS only; historical long-output known issue retained.",
   "speed_preset": "integration/speed/presets/flash-next-sm120-16g-perf8.json"
 }

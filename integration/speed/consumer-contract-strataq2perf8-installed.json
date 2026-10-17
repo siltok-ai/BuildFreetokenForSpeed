@@ -1,0 +1,23 @@
+{
+  "format": 1,
+  "kind": "flash_next_5070ti_installed_performance_consumer",
+  "runtime_scope": "actual_installed_payload_not_clean_os",
+  "version": "0.1.3+speed.strataq2perf8",
+  "materials": "artifacts/strataq2perf8-cp312-cu130-sm120",
+  "profile": "build/profiles/strataq2perf8.json",
+  "speed_commit": "480c1ae26b170b8b2c7e1359a828dcfb88271844",
+  "known_issues": [
+    "intermittent-long-output-token0: unresolved"
+  ],
+  "compiled_contract": {
+    "path": "integration/speed/consumer-contract-strataq2perf8-compiled.json",
+    "sha256": "282047da2db392d1395588a7eaeac1065f94dad999ef0d3750e70fa70b564d16"
+  },
+  "evidence": {
+    "index": "research/performance/flash-next-5070ti-20261016/perf8-installed-v1/index.json",
+    "sha256": "b3c37a83861c80282b20d60727f9d4604441d7faae837a68b8ae2da47a6d5a9b"
+  },
+  "mtp_default_enabled": false,
+  "actual_install_validated": true,
+  "clean_os_validated": false
+}

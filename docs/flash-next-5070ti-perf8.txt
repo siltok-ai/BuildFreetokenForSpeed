@@ -30,4 +30,8 @@ python -B tools/flash_next_speed_config.py --root <共享权重根> --deployment
 
 离线审核：python -B tools/validate_repository.py；python -B -m unittest discover -s tests -v。
 跨仓库审核：python -B tools/verify_performance8_consumer.py --speed-root <Speed源码>；python -B tools/verify_performance8_delivery.py --speed-root <Speed源码> --payload-root <实际app目录>。
-默认指针绑定上述源码与编译合同、profile、权重锁、MTP清单和preset SHA。暂存编译验收不等于全新操作系统验收；真实安装/清理若执行，另有安装证据，不改写历史合同范围。
+默认指针绑定实装合同及嵌套的源码与编译合同、profile、权重锁、MTP清单和preset SHA。实装证据见下文；历史合同范围不改写，尚未验收全新操作系统。
+
+最终实际安装i07：同一p04完整安装器，包内Python与保护模块、FT8全部464项代码与27DLL逐字节一致；两模式真实HTTP冷采样/取消/重载/3x512吞吐通过，卸载后服务、程序、ProgramData、注册项和测试缓存清场，开发源码/模型/环境/工具均保留。当前指针选择实际安装合同，仍不宣称干净OS。
+实际安装HTTP短/4K中位：{"off": {"70-0": 93.42822227795345, "diverse-4096-0": 92.89037434314793}, "on": {"70-0": 102.99829030895756, "diverse-4096-0": 115.0476390661899}}
+MTP相对本轮OFF增益：{"70-0": 0.10243230361948563, "diverse-4096-0": 0.23853133201068233}

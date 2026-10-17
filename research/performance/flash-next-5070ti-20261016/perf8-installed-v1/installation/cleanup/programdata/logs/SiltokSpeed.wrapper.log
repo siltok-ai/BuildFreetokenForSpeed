@@ -1,0 +1,26 @@
+2026-10-17 13:22:25,126 DEBUG - Starting WinSW in console mode
+2026-10-17 13:22:25,154 FATAL - 指定的服务未安装。
+2026-10-17 13:22:25,523 DEBUG - Starting WinSW in console mode
+2026-10-17 13:22:25,541 INFO  - Uninstalling service 'Siltok Speed (SiltokSpeed)'...
+2026-10-17 13:22:25,546 WARN  - Service 'Siltok Speed (SiltokSpeed)' does not exist.
+2026-10-17 13:22:25,912 DEBUG - Starting WinSW in console mode
+2026-10-17 13:22:25,931 INFO  - Installing service 'Siltok Speed (SiltokSpeed)'...
+2026-10-17 13:22:25,961 INFO  - Service 'Siltok Speed (SiltokSpeed)' was installed successfully.
+2026-10-17 13:22:26,327 DEBUG - Starting WinSW in console mode
+2026-10-17 13:22:26,349 INFO  - Starting service 'Siltok Speed (SiltokSpeed)'...
+2026-10-17 13:22:26,684 DEBUG - Starting WinSW in service mode
+2026-10-17 13:22:26,703 INFO  - Service 'Siltok Speed (SiltokSpeed)' started successfully.
+2026-10-17 13:22:26,776 INFO  - Starting C:\workspace\build\siltok-speed\i07\python\python.exe -X utf8 -B -m silitok_speed.release_profile serve --config-root "C:\ProgramData\Siltok\Speed\config" --runtime-dir "C:\ProgramData\Siltok\Speed\runtime"
+2026-10-17 13:22:26,831 INFO  - Started process 14208
+2026-10-17 13:22:26,839 DEBUG - Forwarding logs of the process System.Diagnostics.Process (python) to WinSW.IgnoreLogAppender
+2026-10-17 13:22:33,104 INFO  - Stopping SiltokSpeed
+2026-10-17 13:22:33,104 DEBUG - ProcessKill 14208
+2026-10-17 13:22:33,111 DEBUG - Stopping process 14208...
+2026-10-17 13:22:33,129 DEBUG - Process 14208 canceled with code -1073741510.
+2026-10-17 13:22:33,132 INFO  - Finished SiltokSpeed
+2026-10-17 13:32:38,994 DEBUG - Starting WinSW in console mode
+2026-10-17 13:32:39,017 INFO  - Stopping service 'Siltok Speed (SiltokSpeed)'...
+2026-10-17 13:32:39,027 INFO  - Service 'Siltok Speed (SiltokSpeed)' has already stopped.
+2026-10-17 13:32:39,410 DEBUG - Starting WinSW in console mode
+2026-10-17 13:32:39,429 INFO  - Uninstalling service 'Siltok Speed (SiltokSpeed)'...
+2026-10-17 13:32:39,433 INFO  - Service 'Siltok Speed (SiltokSpeed)' was uninstalled successfully.

@@ -1,0 +1,10 @@
+{
+  "status": "installed_service_stopped",
+  "observed_utc": "2026-10-17T05:22:33.4417932Z",
+  "install_path": "C:\\workspace\\build\\siltok-speed\\i07",
+  "launcher_admin": true,
+  "session_id": 1,
+  "installer_exitcode": 0,
+  "installer_sha256": "08259eecd8ae09eabe839d57140d8d191b92c0ae63d790c54b5019c8f0fbb5f4",
+  "bundle_sha256": "2b0e5c0e5e13092d84c9ab39313e7733b6770af56335d585dd38531cb6e47930"
+}

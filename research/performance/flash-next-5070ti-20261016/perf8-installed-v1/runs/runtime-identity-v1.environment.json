@@ -1,0 +1,6 @@
+{
+  "PATH": "C:\\workspace\\build\\siltok-speed\\i07\\python\\Scripts;C:\\Windows\\System32;C:\\Windows;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\Program Files\\NVIDIA Corporation\\NVSMI",
+  "FREETOKEN_KERNEL_CACHE_DIR": "C:\\workspace\\build\\siltok-speed\\i07\\runtime\\kernel-cache",
+  "FREETOKEN_DISABLE_JIT": "1",
+  "TRITON_CACHE_DIR": "C:\\workspace\\cache\\triton\\installed-i07\\warmup"
+}

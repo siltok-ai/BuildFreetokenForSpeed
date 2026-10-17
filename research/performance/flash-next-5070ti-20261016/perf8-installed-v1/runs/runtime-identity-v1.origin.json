@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "python": "C:\\workspace\\build\\siltok-speed\\i07\\python\\python.exe",
+  "speed_origin": "C:\\workspace\\build\\siltok-speed\\i07\\python\\Lib\\site-packages\\silitok_speed\\__init__.pyd",
+  "build_commit": "480c1ae26b170b8b2c7e1359a828dcfb88271844",
+  "build_dirty": false,
+  "build_version": "0.1.2.dev0+strataq2perf8.2026101704",
+  "bundle_sha256": "2b0e5c0e5e13092d84c9ab39313e7733b6770af56335d585dd38531cb6e47930",
+  "bundle_cache": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-i07\\tmp\\siltok-speed-assets\\1cb304e2d1568fe3270e0c6ed4a48d4ad3594a2d7bad705b8f13a577e016b5c3",
+  "script": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\consumer-tools\\installed8-runtime-identity.py",
+  "arguments": [
+    "--output",
+    "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-i07\\results-v1\\runtime-identity-v1.json"
+  ],
+  "scope": "actual_installed_payload_not_clean_os",
+  "product_modules": {
+    "silitok_speed": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-i07\\tmp\\siltok-speed-assets\\1cb304e2d1568fe3270e0c6ed4a48d4ad3594a2d7bad705b8f13a577e016b5c3\\__init__.pyd"
+  }
+}
