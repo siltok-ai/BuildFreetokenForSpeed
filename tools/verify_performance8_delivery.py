@@ -1,4 +1,4 @@
-"""核对perf8真实编译载荷验收，严格区分暂存包、安装器与全新系统。"""
+"""核对perf8及同几何后续编译载荷，区分暂存包、安装器与全新系统。"""
 import argparse
 import hashlib
 import json
@@ -77,7 +77,9 @@ def verify(contract_path=DEFAULT,payload_root=None,speed_root=None):
     measured={}
     for mode,resident in [('off',5760),('on',4992)]:
         backend=report('backend-'+mode+'-quality')
-        quality(backend,read(native_root/f'runtime/perf8-wheel-quality-{mode}-v1.json'))
+        native_reports = source.get('native_quality_reports', {
+            value: f'runtime/perf8-wheel-quality-{value}-v1.json' for value in ('off', 'on')})
+        quality(backend,read(contained(native_root,native_reports[mode])))
         identity=backend['identity']
         require(identity['freetoken_version']==contract['version']
             and identity['freetoken_installed_code']['files']==wheel_code

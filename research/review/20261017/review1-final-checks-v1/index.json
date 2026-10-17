@@ -1,0 +1,21 @@
+{
+  "scope": "final_offline_and_actual_payload_identity_checks",
+  "files": {
+    "build-full-validator-final-v1.log": {
+      "bytes": 20443,
+      "sha256": "776d9727029f802c7acddf9561245df0cdfed5ae92f2a3a5e716057bd4c067c5"
+    },
+    "build-tools-tests-final-v1.log": {
+      "bytes": 12605,
+      "sha256": "2c3b93aa157c1b4d60dca87db240d52cb18d8633905f2a61289d74ace9ac72ed"
+    },
+    "review1-compiled-consumer-validator-v1.log": {
+      "bytes": 864,
+      "sha256": "13f1267ec93f08a51a3407ecb63b03f5f624dd1844e2050b5358c8b00d178e8f"
+    },
+    "speed-checkpoint-review1-v1.log": {
+      "bytes": 871,
+      "sha256": "02a0dc48a9a0424c0879d2ea201128305cf073ac0dbc0f7fd71267ea5844fe6e"
+    }
+  }
+}

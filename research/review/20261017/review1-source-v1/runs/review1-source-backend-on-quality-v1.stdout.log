@@ -1,0 +1,26 @@
+{"name": "warmup", "elapsed_s": 0.7321057999797631, "ttft_ms": 675.5389999889303, "output_tokens": 3, "decode_tps": 35.363304916534986, "events": 3, "quality_pass": true}
+{"name": "multiply", "elapsed_s": 0.6041610000247601, "ttft_ms": 559.0724000066984, "output_tokens": 3, "decode_tps": 44.36882024072491, "events": 3, "quality_pass": true, "matches_historical_ids": true}
+{"name": "chain", "elapsed_s": 0.7012491999776103, "ttft_ms": 616.8612999899779, "output_tokens": 3, "decode_tps": 23.71039179073353, "events": 3, "quality_pass": false, "matches_historical_ids": true}
+{"name": "fraction", "elapsed_s": 0.653728700010106, "ttft_ms": 609.3870000040624, "output_tokens": 3, "decode_tps": 45.11352819882893, "events": 3, "quality_pass": false, "matches_historical_ids": true}
+{"name": "long_multiply", "elapsed_s": 0.6941479000088293, "ttft_ms": 608.780000009574, "output_tokens": 5, "decode_tps": 90.75192509052977, "events": 5, "quality_pass": true, "matches_historical_ids": true}
+{"name": "precedence", "elapsed_s": 0.6242539999948349, "ttft_ms": 579.6832999913022, "output_tokens": 2, "decode_tps": 22.459544744529104, "events": 2, "quality_pass": true, "matches_historical_ids": true}
+{"name": "probability", "elapsed_s": 0.6873970000015106, "ttft_ms": 644.3156000168528, "output_tokens": 4, "decode_tps": 69.67216924048691, "events": 4, "quality_pass": true, "matches_historical_ids": true}
+{"name": "python_sum", "elapsed_s": 0.7005050999869127, "ttft_ms": 659.7529999853577, "output_tokens": 2, "decode_tps": 24.557414007997245, "events": 2, "quality_pass": true, "matches_historical_ids": true}
+{"name": "python_slice", "elapsed_s": 0.6990241000021342, "ttft_ms": 657.6163000136148, "output_tokens": 1, "decode_tps": null, "events": 1, "quality_pass": true, "matches_historical_ids": true}
+{"name": "python_list", "elapsed_s": 0.7000970999943092, "ttft_ms": 620.2075000037439, "output_tokens": 6, "decode_tps": 62.61301649978565, "events": 6, "quality_pass": true, "matches_historical_ids": true}
+{"name": "set_sort", "elapsed_s": 0.7116551999934018, "ttft_ms": 598.6586999788415, "output_tokens": 12, "decode_tps": 97.35564370104613, "events": 12, "quality_pass": true, "matches_historical_ids": false}
+{"name": "binary_count", "elapsed_s": 0.6299027999921236, "ttft_ms": 588.5570000100415, "output_tokens": 1, "decode_tps": null, "events": 1, "quality_pass": false, "matches_historical_ids": true}
+{"name": "json_sum", "elapsed_s": 0.6595592999947257, "ttft_ms": 615.1896999799646, "output_tokens": 2, "decode_tps": 22.547609269054927, "events": 2, "quality_pass": true, "matches_historical_ids": true}
+{"name": "group_sum", "elapsed_s": 0.8300061000045389, "ttft_ms": 638.9456000179052, "output_tokens": 18, "decode_tps": 88.9899535672917, "events": 18, "quality_pass": true, "matches_historical_ids": true}
+{"name": "indexing", "elapsed_s": 0.6745720999897458, "ttft_ms": 634.1353000025265, "output_tokens": 1, "decode_tps": null, "events": 1, "quality_pass": true, "matches_historical_ids": true}
+{"name": "ordering", "elapsed_s": 0.712125299993204, "ttft_ms": 588.3702999853995, "output_tokens": 9, "decode_tps": 98.07226700257549, "events": 9, "quality_pass": true, "matches_historical_ids": true}
+{"name": "deduction", "elapsed_s": 0.6967105999938212, "ttft_ms": 657.4609999952372, "output_tokens": 1, "decode_tps": null, "events": 1, "quality_pass": true, "matches_historical_ids": true}
+{"name": "boolean", "elapsed_s": 0.7084385000052862, "ttft_ms": 668.7135999964084, "output_tokens": 1, "decode_tps": null, "events": 1, "quality_pass": true, "matches_historical_ids": true}
+{"name": "multi_turn", "elapsed_s": 0.7627215000102296, "ttft_ms": 718.7547000066843, "output_tokens": 4, "decode_tps": 68.2699484813283, "events": 4, "quality_pass": true, "matches_historical_ids": true}
+{"name": "long_lookup_1", "elapsed_s": 6.620517200004542, "ttft_ms": 6028.407200006768, "output_tokens": 55, "decode_tps": 91.20324440263681, "events": 55, "quality_pass": false, "matches_historical_ids": true}
+{"name": "long_lookup_2", "elapsed_s": 6.3923381000058725, "ttft_ms": 5841.089599998668, "output_tokens": 55, "decode_tps": 105.30751843220692, "events": 55, "quality_pass": false, "matches_historical_ids": true}
+{"name": "thinking-chain", "elapsed_s": 1.4659423000121024, "ttft_ms": 690.1041000091936, "output_tokens": 79, "decode_tps": 105.22548404848898, "events": 79, "quality_pass": true}
+{"name": "thinking-fraction", "elapsed_s": 1.3865933000051882, "ttft_ms": 683.4203999897, "output_tokens": 78, "decode_tps": 114.83482501951924, "events": 78, "quality_pass": true}
+{"name": "thinking-binary_count", "elapsed_s": 1.9124777999822982, "ttft_ms": 657.0725999772549, "output_tokens": 133, "decode_tps": 105.14633143240194, "events": 133, "quality_pass": true}
+{"name": "after_cancel", "elapsed_s": 0.5967500999977347, "ttft_ms": 559.7674000018742, "output_tokens": 3, "decode_tps": 54.1127005259541, "events": 3, "quality_pass": true}
+{"status": "passed", "output": "C:\\workspace\\runs\\siltok-speed\\review-20261017\\review1-source-backend-on-quality-v1.json", "worker_pids_gone": true}

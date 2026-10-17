@@ -1,0 +1,228 @@
+{
+  "off": {
+    "1": {
+      "english": {
+        "median_tps": {
+          "baseline": 100.1812849948206,
+          "review1": 100.18750748870154
+        },
+        "change_percent": 0.0062112338459874294,
+        "id_hashes": {
+          "baseline": [
+            "dac199021b8e",
+            "dac199021b8e",
+            "dac199021b8e"
+          ],
+          "review1": [
+            "dac199021b8e",
+            "dac199021b8e",
+            "dac199021b8e"
+          ]
+        },
+        "ids_match": [
+          true,
+          true,
+          true
+        ]
+      },
+      "chinese": {
+        "median_tps": {
+          "baseline": 99.86125343887969,
+          "review1": 99.8693333872194
+        },
+        "change_percent": 0.008091174566171588,
+        "id_hashes": {
+          "baseline": [
+            "be7a48823859",
+            "d84e94af7b89",
+            "d84e94af7b89"
+          ],
+          "review1": [
+            "be7a48823859",
+            "d84e94af7b89",
+            "d84e94af7b89"
+          ]
+        },
+        "ids_match": [
+          true,
+          true,
+          true
+        ]
+      },
+      "code": {
+        "median_tps": {
+          "baseline": 94.89336993574183,
+          "review1": 94.81624028139467
+        },
+        "change_percent": -0.08128034065961742,
+        "id_hashes": {
+          "baseline": [
+            "9b9af896e227",
+            "2b1839d2a862",
+            "2b1839d2a862"
+          ],
+          "review1": [
+            "9b9af896e227",
+            "2b1839d2a862",
+            "2b1839d2a862"
+          ]
+        },
+        "ids_match": [
+          true,
+          true,
+          true
+        ]
+      }
+    }
+  },
+  "on": {
+    "1": {
+      "english": {
+        "median_tps": {
+          "baseline": 119.05030658262186,
+          "review1": 117.37273872245488
+        },
+        "change_percent": -1.4091251911247493,
+        "id_hashes": {
+          "baseline": [
+            "1b47fff9ffe2",
+            "1b47fff9ffe2",
+            "1b47fff9ffe2"
+          ],
+          "review1": [
+            "d5eb8ecbb64a",
+            "1b47fff9ffe2",
+            "d5eb8ecbb64a"
+          ]
+        },
+        "ids_match": [
+          false,
+          true,
+          false
+        ]
+      },
+      "chinese": {
+        "median_tps": {
+          "baseline": 110.96240604534634,
+          "review1": 110.5859564624467
+        },
+        "change_percent": -0.33925866995512255,
+        "id_hashes": {
+          "baseline": [
+            "b9c9dc114d2d",
+            "8f4034a4a260",
+            "8f4034a4a260"
+          ],
+          "review1": [
+            "b9c9dc114d2d",
+            "8f4034a4a260",
+            "8f4034a4a260"
+          ]
+        },
+        "ids_match": [
+          true,
+          true,
+          true
+        ]
+      },
+      "code": {
+        "median_tps": {
+          "baseline": 117.7111434414126,
+          "review1": 118.12664456974741
+        },
+        "change_percent": 0.35298368207732356,
+        "id_hashes": {
+          "baseline": [
+            "96a11c466249",
+            "70cc6c91290c",
+            "15a69da72953"
+          ],
+          "review1": [
+            "96a11c466249",
+            "34114f2be284",
+            "15a69da72953"
+          ]
+        },
+        "ids_match": [
+          true,
+          false,
+          true
+        ]
+      }
+    },
+    "2": {
+      "english": {
+        "median_tps": {
+          "baseline": 119.01144205383535,
+          "review1": 119.13256663993559
+        },
+        "change_percent": 0.10177558057438141,
+        "id_hashes": {
+          "baseline": [
+            "1b47fff9ffe2",
+            "1b47fff9ffe2",
+            "1b47fff9ffe2"
+          ],
+          "review1": [
+            "1b47fff9ffe2",
+            "1b47fff9ffe2",
+            "1b47fff9ffe2"
+          ]
+        },
+        "ids_match": [
+          true,
+          true,
+          true
+        ]
+      },
+      "chinese": {
+        "median_tps": {
+          "baseline": 111.10035619075306,
+          "review1": 111.04983690634872
+        },
+        "change_percent": -0.045471757370074695,
+        "id_hashes": {
+          "baseline": [
+            "b9c9dc114d2d",
+            "8f4034a4a260",
+            "8f4034a4a260"
+          ],
+          "review1": [
+            "b9c9dc114d2d",
+            "8f4034a4a260",
+            "8f4034a4a260"
+          ]
+        },
+        "ids_match": [
+          true,
+          true,
+          true
+        ]
+      },
+      "code": {
+        "median_tps": {
+          "baseline": 117.64189650119837,
+          "review1": 117.52168522252806
+        },
+        "change_percent": -0.10218407068020019,
+        "id_hashes": {
+          "baseline": [
+            "96a11c466249",
+            "70cc6c91290c",
+            "15a69da72953"
+          ],
+          "review1": [
+            "96a11c466249",
+            "70cc6c91290c",
+            "15a69da72953"
+          ]
+        },
+        "ids_match": [
+          true,
+          true,
+          true
+        ]
+      }
+    }
+  }
+}

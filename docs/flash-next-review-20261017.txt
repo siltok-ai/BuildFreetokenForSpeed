@@ -46,4 +46,43 @@ OFF变化约+0.01%/+0.01%/-0.08%，ON约-1.41%/-0.34%/+0.35%，须结合复测�
 
 验收分层
 本轮新源码/普通wheel、Speed源码和保护编译载荷分别记录；perf8旧实装保留独立证据。既有间歇长输出token0风险仍未解决，不宣称干净OS、长期压力或所有设备通过。
-后续Speed消费与最终性能证据补充于本文件末尾，合同和evidence index为可机器核查身份。
+本轮最终消费、性能与编译范围如下；合同及evidence index可机器核查身份。
+
+最终源侧验收
+供应commit03db12b21e1e82aa78fb6e1b4250642653ede7be；Speed commitd42d3bae7f307b4651173768f323e250855aec98。
+
+
+两个模式的23个正式质量用例，输出IDs逐项与新wheel原生结果一致；真实TCP的同步/SSE、thinking、stop、非greedy、断流取消复用、卸载重载和子进程退出通过。旧35B NVFP4六类文本与历史一致，实际执行生成的阶乘函数验证0/1/5/10，取消复用和退出通过。dense27B不适合16GiB，保留加载前资源拒绝边界。
+
+删除29项仅检查脚本字符串的打包测试；两项容易扫入build/egg-info的静态库存测试改为执行真实collector。模拟旧SOURCES清单后实际构建普通wheel：缓存189→27 DLL，43.98→7.64MB，其他运行资源无丢失；新字段模块和当前release均在包中。
+
+| 同机HTTP decode（token/s） | 改前 | 改后 | 变化 |
+| --- | ---: | ---: | ---: |
+| OFF短输入，3×512 | 97.639 | 97.505 | -0.14% |
+| OFF4K，3×512 | 93.085 | 92.778 | -0.33% |
+| paired ON短输入，全部9×512 | 103.972 | 102.882 | -1.05% |
+| paired ON4K，全部9×512 | 115.654 | 114.552 | -0.95% |
+
+ON保留初轮及独立ABBA所有结果；改后某轮4K中位106.675的偏慢结果也在原始证据内。按耗时选臂和冷热状态有波动，不把九次合并中位写成零变化。
+
+原生ON独立复测英文/中文/代码变化+0.102%/-0.045%/-0.102%，九项IDs全部一致；OFF变化+0.006%/+0.008%/-0.081%。固定full草稿策略的HTTP控制对照用于确认核心执行开销，见下表。
+
+| 固定full ON，3×512 | 改前 | 改后 | 变化 |
+| --- | ---: | ---: | ---: |
+| 短输入 | 96.959 | 96.672 | -0.30% |
+| 4K | 114.583 | 114.377 | -0.18% |
+
+原生核心与固定策略控制未发现持续退化；HTTP paired约1%的合并差异及个别慢轮保留，测量不能保证每次请求零波动。所有输出为实际交付512 tokens，资源监督未触发终止，所有进程退出。
+
+
+保护编译载荷验收
+off: 质量15/20，thinking3/3；HTTP短/4K 97.366/92.828 token/s，全部3x512真实输出。
+on: 质量15/20，thinking3/3；HTTP短/4K 102.406/114.343 token/s，全部3x512真实输出。
+实际embedded Python、隔离PATH及protected loader来源检查通过；两模式23项正式质量IDs逐项匹配原生，HTTP stop/非greedy/取消复用/卸载重载及退出通过。旧35B编译态回归与阶乘审计通过。
+编译集成测试：10 passed, 1 deselected in 45.51s（未启用xollvm，因此明确不选择该可选profile测试）。
+单一保护扩展36172368字节，SHA3ba5e673b7c33d95473b95eaab7191a701b2b62560a99f79732b5521b16c749a；旧perf8为84613792字节。全部历史cache资源排除，外部27项cache逐字节核对。
+完整安装器SiltokSpeed-Setup-0.1.2.dev0+strataq2review1.2026101716.exe，2268385274字节，SHA9451c753960291d88fc2d8c43dfe170767b58dd04c651c310e329f42ab1697c4。本轮只构建，不做实际安装；无新服务/ProgramData安装残留。
+当前选择review1 compiled合同，明确actual_install_validated=false、clean_os_validated=false；原perf8安装记录保持原字节及独立资格。未修复间歇长输出token0，未承诺每请求零波动或所有设备通过。
+证据：research/review/20261017/review1-wheel-v1、review1-source-v1、review1-compiled-v1。源码身份排除build/.artifacts/egg-info；冻结247项Speed文本/代码输入，native/AOT另逐字节验证。
+
+最终检查：匹配实际payload/Speed的compiled consumer、完整仓库validator、48项工具测试与Speed默认checkpoint全部通过。完整日志与SHA位于review1-final-checks-v1。

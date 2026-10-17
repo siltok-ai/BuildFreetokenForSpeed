@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "C:\workspace\tools\bin\validate-speed.py", line 60, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "C:\workspace\tools\bin\validate-speed.py", line 34, in main
+    script = (args.materials / "artifacts/qwen1-cp312-cu130-sm120/validation/run-validation.py").resolve(strict=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1240, in resolve
+    s = self._flavour.realpath(self, strict=strict)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen ntpath>", line 727, in realpath
+FileNotFoundError: [WinError 3] 系统找不到指定的路径。: 'C:\\workspace\\wt\\freetoken-mats\\flash-perf\\artifacts\\qwen1-cp312-cu130-sm120\\validation\\run-validation.py'

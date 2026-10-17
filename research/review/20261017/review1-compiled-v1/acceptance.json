@@ -1,0 +1,24 @@
+{
+  "status": "passed",
+  "scope": "compiled_staged_payload_not_installer",
+  "completed": [
+    "backend-off-quality-v1",
+    "backend-on-quality-v1",
+    "http-off-functional-v1",
+    "http-off-performance-v1",
+    "http-on-functional-v1",
+    "http-on-performance-v1",
+    "qwen36-backend-v1"
+  ],
+  "speed_commit": "d42d3bae7f307b4651173768f323e250855aec98",
+  "app": "C:\\workspace\\build\\siltok-speed\\review1-p01\\app",
+  "bundle_bytes": 36172368,
+  "bundle_sha256": "3ba5e673b7c33d95473b95eaab7191a701b2b62560a99f79732b5521b16c749a",
+  "installer": {
+    "path": "C:\\workspace\\build\\siltok-speed\\review1-p01\\SiltokSpeed-Setup-0.1.2.dev0+strataq2review1.2026101716.exe",
+    "bytes": 2268385274,
+    "sha256": "9451c753960291d88fc2d8c43dfe170767b58dd04c651c310e329f42ab1697c4"
+  },
+  "actual_install_validated": false,
+  "clean_os_validated": false
+}
