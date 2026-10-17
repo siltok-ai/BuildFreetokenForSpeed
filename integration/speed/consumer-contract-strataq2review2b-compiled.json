@@ -1,0 +1,35 @@
+{
+  "format": 1,
+  "kind": "flash_next_5070ti_compiled_performance_consumer",
+  "runtime_scope": "compiled_staged_payload_not_installer",
+  "version": "0.1.3+speed.strataq2review2b",
+  "materials": "artifacts/strataq2review2b-cp312-cu130-sm120",
+  "profile": "build/profiles/strataq2review2b.json",
+  "speed_commit": "1982c4fd242ee007cfee9b127c2a27fd06b8bfd0",
+  "source_contract": {
+    "path": "integration/speed/consumer-contract-strataq2review2b.json",
+    "sha256": "96260b6621a5ab7bfa4c5a018ad688a1050419f643c554151cef57f5dc5d5dd7"
+  },
+  "evidence": {
+    "index": "research/review/20261017-evening/candidate-b-compiled-v1/index.json",
+    "sha256": "2405b2c6d4bbab2edea773c38fe2076eef7fcc008d2fd7c11b545a8aed74f388"
+  },
+  "speed_bundle": {
+    "path": "python/Lib/site-packages/silitok_speed/__init__.pyd",
+    "bytes": 36190289,
+    "sha256": "3b814506dabfc61b4731832d500087eacff2459eb1d5fcafdcfaaaa4c45efa49"
+  },
+  "mtp_default_enabled": false,
+  "actual_install_validated": false,
+  "clean_os_validated": false,
+  "known_issues": [
+    "intermittent-long-output-token0: unresolved"
+  ],
+  "installer_artifact": {
+    "kind": "full_installer_built_not_installed_by_this_evidence",
+    "filename": "SiltokSpeed-Setup-0.1.2.dev0+strataq2review2b.2026101720.exe",
+    "bytes": 2268385757,
+    "sha256": "5e896cfe1ec721dcc8229e84ccf9df9ae6da97f8454bddeee8930acdfd6f9b06",
+    "speed_commit": "1982c4fd242ee007cfee9b127c2a27fd06b8bfd0"
+  }
+}

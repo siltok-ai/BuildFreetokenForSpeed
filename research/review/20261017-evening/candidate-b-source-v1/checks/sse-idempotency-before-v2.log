@@ -1,0 +1,33 @@
+{"source": "C:\\workspace\\wt\\siltok-speed\\flash-perf\\silitok_speed\\__init__.py", "python": "C:\\workspace\\envs\\siltok-speed\\flash-review2b\\Scripts\\python.exe", "process_only_license_fixture": true}
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+______ test_duplicate_stream_cannot_take_cleanup_ownership[False-False] _______
+..\..\..\runs\siltok-speed\explore-20261017-evening\test_sse_idempotency_review2_v2.py:29: in test_duplicate_stream_cannot_take_cleanup_ownership
+    with pytest.raises(IdempotencyConflictError,match='stream'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE IdempotencyConflictError
+_______ test_duplicate_stream_cannot_take_cleanup_ownership[False-True] _______
+..\..\..\runs\siltok-speed\explore-20261017-evening\test_sse_idempotency_review2_v2.py:29: in test_duplicate_stream_cannot_take_cleanup_ownership
+    with pytest.raises(IdempotencyConflictError,match='stream'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE IdempotencyConflictError
+_______ test_duplicate_stream_cannot_take_cleanup_ownership[True-False] _______
+..\..\..\runs\siltok-speed\explore-20261017-evening\test_sse_idempotency_review2_v2.py:36: in test_duplicate_stream_cannot_take_cleanup_ownership
+    with pytest.raises(IdempotencyConflictError,match='stream'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE IdempotencyConflictError
+---------------------------- Captured stdout call -----------------------------
+no balance_serve
+flashinfer not found, use triton for linux
+_______ test_duplicate_stream_cannot_take_cleanup_ownership[True-True] ________
+..\..\..\runs\siltok-speed\explore-20261017-evening\test_sse_idempotency_review2_v2.py:36: in test_duplicate_stream_cannot_take_cleanup_ownership
+    with pytest.raises(IdempotencyConflictError,match='stream'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE IdempotencyConflictError
+============================== warnings summary ===============================
+..\..\..\envs\siltok-speed\flash-review2b\Lib\site-packages\_pytest\config\__init__.py:1345
+  C:\workspace\envs\siltok-speed\flash-review2b\Lib\site-packages\_pytest\config\__init__.py:1345: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; anyio
+    self._mark_plugins_for_rewrite(hook, disable_autoload)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+4 failed, 1 warning in 6.55s

@@ -1,0 +1,296 @@
+{
+  "status": "passed",
+  "transport": "tcp",
+  "original_worker_pids": [
+    6468,
+    11752
+  ],
+  "replacement_worker_pids": [
+    2516,
+    6896
+  ],
+  "disconnect_after_content_chunks": 1,
+  "same_worker_after_cancel": true,
+  "original_exited_before_reload": true,
+  "replacement_exited": true,
+  "before": {
+    "id": "chatcmpl-1792239813249",
+    "object": "chat.completion",
+    "created": 1792239813,
+    "model": "qwen3.8-flash-next.q2_0_strata-freetoken",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "reasoning_content": null,
+          "content": "527"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 24,
+      "completion_tokens": 3,
+      "total_tokens": 27
+    }
+  },
+  "after_cancel": {
+    "id": "chatcmpl-1792239830044",
+    "object": "chat.completion",
+    "created": 1792239830,
+    "model": "qwen3.8-flash-next.q2_0_strata-freetoken",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "reasoning_content": null,
+          "content": "527"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 24,
+      "completion_tokens": 3,
+      "total_tokens": 27
+    }
+  },
+  "after_reload": {
+    "id": "chatcmpl-1792239882459",
+    "object": "chat.completion",
+    "created": 1792239882,
+    "model": "qwen3.8-flash-next.q2_0_strata-freetoken",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "reasoning_content": null,
+          "content": "527"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 24,
+      "completion_tokens": 3,
+      "total_tokens": 27
+    }
+  },
+  "stop_string": {
+    "id": "chatcmpl-1792239814034",
+    "object": "chat.completion",
+    "created": 1792239814,
+    "model": "qwen3.8-flash-next.q2_0_strata-freetoken",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "reasoning_content": null,
+          "content": "5"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 24,
+      "completion_tokens": 2,
+      "total_tokens": 26
+    }
+  },
+  "after_stop": {
+    "id": "chatcmpl-1792239814915",
+    "object": "chat.completion",
+    "created": 1792239814,
+    "model": "qwen3.8-flash-next.q2_0_strata-freetoken",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "reasoning_content": null,
+          "content": "527"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 24,
+      "completion_tokens": 3,
+      "total_tokens": 27
+    }
+  },
+  "non_greedy": {
+    "id": "chatcmpl-1792239815815",
+    "object": "chat.completion",
+    "created": 1792239815,
+    "model": "qwen3.8-flash-next.q2_0_strata-freetoken",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "reasoning_content": null,
+          "content": "527"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 24,
+      "completion_tokens": 3,
+      "total_tokens": 27
+    }
+  },
+  "request_boundaries": [
+    {
+      "name": "unicode",
+      "reference": "🦄🦄",
+      "expected": "",
+      "sync": {
+        "id": "chatcmpl-1792239817987",
+        "object": "chat.completion",
+        "created": 1792239817,
+        "model": "qwen3.8-flash-next.q2_0_strata-freetoken",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "reasoning_content": null,
+              "content": ""
+            },
+            "logprobs": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 32,
+          "completion_tokens": 6,
+          "total_tokens": 38
+        }
+      },
+      "streamed": "",
+      "stream_finish_reason": "stop"
+    },
+    {
+      "name": "overlapping",
+      "reference": "prefix",
+      "expected": "",
+      "sync": {
+        "id": "chatcmpl-1792239820548",
+        "object": "chat.completion",
+        "created": 1792239820,
+        "model": "qwen3.8-flash-next.q2_0_strata-freetoken",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "reasoning_content": null,
+              "content": ""
+            },
+            "logprobs": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 23,
+          "completion_tokens": 1,
+          "total_tokens": 24
+        }
+      },
+      "streamed": "",
+      "stream_finish_reason": "stop"
+    }
+  ],
+  "large_top_k": {
+    "id": "chatcmpl-1792239822137",
+    "object": "chat.completion",
+    "created": 1792239822,
+    "model": "qwen3.8-flash-next.q2_0_strata-freetoken",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "reasoning_content": null,
+          "content": "527"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 24,
+      "completion_tokens": 3,
+      "total_tokens": 27
+    }
+  },
+  "disconnect_states": [
+    {
+      "phase": "content",
+      "state": "cancelled",
+      "settle_ms": 187.9999999946449
+    },
+    {
+      "phase": "role",
+      "state": "cancelled",
+      "settle_ms": 141.00000000325963
+    }
+  ],
+  "idempotent_sse": {
+    "active_retry": {
+      "error": {
+        "code": "idempotency_conflict",
+        "message": "The idempotency key was used for a different request.",
+        "type": "invalid_request_error",
+        "retryable": false
+      }
+    },
+    "completed_retry": {
+      "error": {
+        "code": "idempotency_conflict",
+        "message": "The idempotency key was used for a different request.",
+        "type": "invalid_request_error",
+        "retryable": false
+      }
+    },
+    "original_state": "completed",
+    "original_text": "Building a local inference service is a complex engineering task that involves hardware selection, software environment setup, model management, API design, and performance optimization. Below is a comprehensive, detailed 50-step guide to building a robust local inference service, primarily focused on Large Language Models (LLMs) but applicable to other AI models.\n\n### Phase 1: Hardware & Environment Preparation\n\n1. **Assess Hardware Requirements**: Determine the model size you intend to run (e.g., 7B, 13B, 70B parameters). Calculate required VRAM using the formula: `VRAM ≈ (Model Size in GB) + (Context Length in GB) + Overhead`.\n2. **Select GPU**: Choose a GPU with sufficient VRAM. NVIDIA GPUs are preferred due to CUDA support. For local inference, GPUs like RTX 4090 (24GB), RTX 3090 (24GB), or A100 (40GB/80GB) are ideal.\n3. **Verify CPU and RAM**: Ensure your CPU has enough cores for preprocessing and that system RAM is at least 2x the model size if you plan to use CPU offloading.\n4. **Check Storage Space**: Ensure you have enough disk space for model weights (often 10–50 GB per model) and cache files.\n5. **Install Operating System**: Use Linux (Ubuntu 20.04/22.04) for best compatibility with AI frameworks. Windows is possible but often requires WSL2 or specific drivers.\n6. **Install NVIDIA Drivers**: Install the latest proprietary NVIDIA drivers compatible with your GPU.\n7. **Install CUDA Toolkit**: Install the CUDA version that matches your driver and framework requirements (e.g., CUDA 11.8 or 12.1).\n8. **Install cuDNN**: Install the NVIDIA cuDNN library for optimized deep learning operations.\n9. **Create a Virtual Environment**: Use `venv` or `conda` to isolate dependencies and prevent conflicts with system packages.\n10. **Install Python**: Ensure Python 3.9+ is installed within the virtual environment.\n\n### Phase 2: Software Stack & Framework Selection\n\n11. **Choose an Inference Engine**: Select a framework based on your needs:\n    - **Ollama**: Easy, CLI-based, great for beginners.\n    - **vLLM**: High-performance, optimized",
+    "done_events": 1,
+    "new_executions": 1,
+    "sync_replay": {
+      "id": "chatcmpl-1792239828313",
+      "object": "chat.completion",
+      "created": 1792239828,
+      "model": "qwen3.8-flash-next.q2_0_strata-freetoken",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "reasoning_content": null,
+            "content": "Building a local inference service is a complex engineering task that involves hardware selection, software environment setup, model management, API design, and performance optimization. Below is a comprehensive, detailed 50-step guide to building a robust local inference service, primarily focused on Large Language Models (LLMs) but applicable to other AI models.\n\n### Phase 1: Hardware & Environment Preparation\n\n1. **Assess Hardware Requirements**: Determine the model size you intend to run (e.g., 7B, 13B, 70B parameters). Calculate required VRAM using the formula: `VRAM ≈ (Model Size in GB) + (Context Length in GB) + Overhead`.\n2. **Select GPU**: Choose a GPU with sufficient VRAM. NVIDIA GPUs are preferred due to CUDA support. For local inference, GPUs like RTX 4090 (24GB), RTX 3090 (24GB), or A100 (40GB/80GB) are ideal.\n3. **Verify CPU and RAM**: Ensure your CPU has enough cores for preprocessing and that system RAM is at least 2x the model size if you plan to use CPU offloading.\n4. **Check Storage Space**: Ensure you have enough disk space for model weights (often 10–50 GB per model) and cache files.\n5. **Install Operating System**: Use Linux (Ubuntu 20.04/22.04) for best compatibility with AI frameworks. Windows is possible but often requires WSL2 or specific drivers.\n6. **Install NVIDIA Drivers**: Install the latest proprietary NVIDIA drivers compatible with your GPU.\n7. **Install CUDA Toolkit**: Install the CUDA version that matches your driver and framework requirements (e.g., CUDA 11.8 or 12.1).\n8. **Install cuDNN**: Install the NVIDIA cuDNN library for optimized deep learning operations.\n9. **Create a Virtual Environment**: Use `venv` or `conda` to isolate dependencies and prevent conflicts with system packages.\n10. **Install Python**: Ensure Python 3.9+ is installed within the virtual environment.\n\n### Phase 2: Software Stack & Framework Selection\n\n11. **Choose an Inference Engine**: Select a framework based on your needs:\n    - **Ollama**: Easy, CLI-based, great for beginners.\n    - **vLLM**: High-performance, optimized"
+          },
+          "logprobs": null,
+          "finish_reason": "length"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 29,
+        "completion_tokens": 512,
+        "total_tokens": 541
+      }
+    }
+  }
+}

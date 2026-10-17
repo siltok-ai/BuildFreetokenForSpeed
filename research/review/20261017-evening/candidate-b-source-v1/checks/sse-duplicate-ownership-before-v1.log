@@ -1,0 +1,29 @@
+{"source": "C:\\workspace\\wt\\siltok-speed\\flash-perf\\silitok_speed\\__init__.py", "python": "C:\\workspace\\envs\\siltok-speed\\flash-review2b\\Scripts\\python.exe", "process_only_license_fixture": true}
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_closing_retry_must_not_cancel_original_request _____________
+..\..\..\runs\siltok-speed\explore-20261017-evening\test_sse_duplicate_ownership_before.py:43: in test_closing_retry_must_not_cancel_original_request
+    asyncio.run(scenario())
+..\..\..\tools\python312\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+..\..\..\runs\siltok-speed\explore-20261017-evening\test_sse_duplicate_ownership_before.py:39: in scenario
+    assert engine.task_status(first.id)==TaskState.RUNNING
+E   AssertionError: assert <TaskState.CANCELLING: 'cancelling'> == <TaskState.RUNNING: 'running'>
+E    +  where <TaskState.CANCELLING: 'cancelling'> = task_status('4034d217-0dfd-49fa-83c6-c951408886dd')
+E    +    where task_status = <silitok_speed.engine.engine.Engine object at 0x000001EC77FB2690>.task_status
+E    +    and   '4034d217-0dfd-49fa-83c6-c951408886dd' = Task(id='4034d217-0dfd-49fa-83c6-c951408886dd', pipeline_name='chat', user_params={'model': 'm1', 'messages': [{'role'... config=BackendConfig(device='cuda:0', offload=False, max_batch_size=1, yaml_path=None, extra={}), registration_id=1)}).id
+E    +  and   <TaskState.RUNNING: 'running'> = TaskState.RUNNING
+============================== warnings summary ===============================
+..\..\..\envs\siltok-speed\flash-review2b\Lib\site-packages\_pytest\config\__init__.py:1345
+  C:\workspace\envs\siltok-speed\flash-review2b\Lib\site-packages\_pytest\config\__init__.py:1345: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; anyio
+    self._mark_plugins_for_rewrite(hook, disable_autoload)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 failed, 1 warning in 4.66s

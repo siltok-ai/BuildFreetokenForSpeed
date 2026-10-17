@@ -18,6 +18,7 @@ PRESETS = {
     'sm120-16g-perf6-candidate': 'integration/speed/presets/flash-next-sm120-16g-perf6.json',
     'sm120-16g-perf8-candidate': 'integration/speed/presets/flash-next-sm120-16g-perf8.json',
     'sm120-16g-review1': 'integration/speed/presets/flash-next-sm120-16g-review1.json',
+    'sm120-16g-review2b': 'integration/speed/presets/flash-next-sm120-16g-review2b.json',
 }
 
 

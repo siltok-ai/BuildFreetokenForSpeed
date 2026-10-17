@@ -1,0 +1,78 @@
+{
+  "status": "measured",
+  "scope": "old/new protected payload OFF ABBA;24real512 outputs; all observations retained",
+  "original_low_sample": "staged-review2b/results/http-off-performance-v1.json",
+  "protocol": "Same weights/options/prompts; independent embedded interpreters, isolated PATH; prior warmed task Triton caches; no CPU build/test overlap",
+  "variants": {
+    "baseline": {
+      "app": "C:\\workspace\\build\\siltok-speed\\review1-p01\\app",
+      "commit": "d42d3bae7f307b4651173768f323e250855aec98"
+    },
+    "candidate": {
+      "app": "C:\\workspace\\build\\siltok-speed\\review2b-p01\\app",
+      "commit": "1982c4fd242ee007cfee9b127c2a27fd06b8bfd0"
+    }
+  },
+  "reports": {
+    "baseline": [
+      "baseline-off-abba1-v2.json",
+      "baseline-off-abba4-v2.json"
+    ],
+    "candidate": [
+      "candidate-off-abba2-v2.json",
+      "candidate-off-abba3-v2.json"
+    ]
+  },
+  "summary": {
+    "70-0": {
+      "samples": {
+        "baseline": [
+          91.87118042384293,
+          97.26295941387365,
+          98.12254322788446,
+          93.21220343669638,
+          97.09729258920106,
+          98.04418354459128
+        ],
+        "candidate": [
+          93.13985590965949,
+          97.50603416369843,
+          98.15805921640788,
+          93.11635776332572,
+          97.45932317705427,
+          97.9369251322642
+        ]
+      },
+      "median_tps": {
+        "baseline": 97.18012600153736,
+        "candidate": 97.48267867037634
+      },
+      "change_percent": 0.3113318342828686
+    },
+    "diverse-4096-0": {
+      "samples": {
+        "baseline": [
+          89.78060571681537,
+          93.04968560052674,
+          93.11095206714607,
+          89.9486423178784,
+          92.83593281819506,
+          92.98237454500162
+        ],
+        "candidate": [
+          90.19971452395146,
+          92.87013779641995,
+          92.86458007128829,
+          90.06197638693139,
+          92.8980326649507,
+          92.84654947322119
+        ]
+      },
+      "median_tps": {
+        "baseline": 92.90915368159834,
+        "candidate": 92.85556477225474
+      },
+      "change_percent": -0.05767882627286669
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "branch": "integrate/flash-next-strata-q2-mtp-5070ti",
+  "findings": 8,
+  "speed_tests": 355,
+  "runtime_tested_before_commit": true,
+  "commit": "1982c4fd242ee007cfee9b127c2a27fd06b8bfd0"
+}

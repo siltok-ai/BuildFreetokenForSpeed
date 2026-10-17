@@ -45,7 +45,7 @@ GGUF引擎读取绝对运行路径，来源描述另保留相对位置。搬迁�
 
 ```powershell
 $deployment = 'D:\deploy\flash-next-off'
-& $python -B tools/flash_next_speed_config.py --root $models --deployment-root $deployment --mode off --preset sm120-16g-review1
+& $python -B tools/flash_next_speed_config.py --root $models --deployment-root $deployment --mode off --preset sm120-16g-review2b
 $env:SILITOK_CONFIG = Join-Path $deployment 'speed-config'
 $env:SILITOK_FREETOKEN_KERNEL_CACHE_DIR = Join-Path $materials 'kernel-cache'
 # 在配套Speed仓库或已安装Speed环境运行；正常设备许可证仍然生效。
@@ -72,6 +72,6 @@ python -B tools/validate_repository.py
 python -B -m unittest discover -s tests -v
 ```
 
-普通wheel组件/整模型、Speed源码、编译载荷、实际安装和干净OS分别验收。迭代优先前几层；安装器/服务改动或重要发布检查点再做实际安装与归属清理。性能比较固定权重、输入、实际512输出、模式和资源配置，分别报告TTFT、prefix冷热与decode。完整方法、改前/改后记录及review结论见 [本轮review](flash-next-review-20261017.txt)；历史perf8实装数据见 [原交付](flash-next-5070ti-perf8.txt)。
+普通wheel组件/整模型、Speed源码、编译载荷、实际安装和干净OS分别验收。迭代优先前几层；安装器/服务改动或重要发布检查点再做实际安装与归属清理。性能比较固定权重、输入、实际512输出、模式和资源配置，分别报告TTFT、prefix冷热与decode。完整方法、改前/改后记录及review结论见 [晚间review](flash-next-review2-20261017.txt)及[下午review](flash-next-review-20261017.txt)；历史perf8实装数据见 [原交付](flash-next-5070ti-perf8.txt)。
 
 保留间歇长输出标点/token0已知问题，旧质量门槛15/20、thinking3/3；不宣称已修复、长期压力或干净OS通过。冻结原始报告和逐文件SHA是验收依据，离线验证不会重新运行GPU，也不能把旧安装结果写成新代码通过。

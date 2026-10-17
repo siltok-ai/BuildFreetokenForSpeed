@@ -1,0 +1,154 @@
+{
+  "task": "Second joint review and exploratory optimization",
+  "started_at": "2026-10-17T18:43:59+08:00",
+  "deadline": "2026-10-17T23:43:59+08:00",
+  "budget_hours": 5,
+  "speed_root": "C:/workspace/wt/siltok-speed/flash-perf",
+  "speed_branch": "integrate/flash-next-strata-q2-mtp-5070ti",
+  "speed_base": "d42d3bae7f307b4651173768f323e250855aec98",
+  "build_root": "C:/workspace/wt/freetoken-mats/flash-perf",
+  "build_branch": "main",
+  "build_base": "35c6bbc6c9109121776d1915b8e0ee0de1ea9fa9",
+  "replayed_base": "C:/workspace/build/freetoken-mats/review2-20261017-base/build-source",
+  "status": "final_eight_fix_source_and_packaged_validation",
+  "queue": [
+    "Finish B component/native three-mode quality and full-model boundary checks",
+    "Commit B supplier, bind Speed B/cache/version, run 268 related Speed tests with actual model fixtures",
+    "Run B source quality/TCP functional; use unchanged enhanced HTTP probe and check actual CANCELLED before recovery",
+    "Run corrected fresh ABBA baseline/B (v2 names), then old35B regression, strictly serial GPU",
+    "Build/audit ordinary Speed B wheel in independent release environment; preserve A ordinary-wheel environment",
+    "Commit Speed after source byte audit; build protected B payload/installer and validate isolated embedded runtime",
+    "Freeze consumer contracts/current pointer only at accepted scope; final validators and desktop Chinese report"
+  ],
+  "findings": [
+    {
+      "id": "R2-01",
+      "severity": "medium",
+      "area": "FreeToken stop",
+      "issue": "Unicode characters span multiple tokens; character-count suffix misses complete stops",
+      "before": "stop-before-v2.json",
+      "after": "stop-after-v1.json",
+      "status": "fixed_local_commits; accepted runtime scope in stage markers/contracts"
+    },
+    {
+      "id": "R2-02",
+      "severity": "medium",
+      "area": "FreeToken stop",
+      "issue": "Multiple stops inside one token select list order instead of earliest output position",
+      "before": "stop-before-v2.json",
+      "after": "stop-after-v1.json",
+      "status": "fixed_local_commits; accepted runtime scope in stage markers/contracts"
+    },
+    {
+      "id": "R2-03",
+      "severity": "medium",
+      "area": "FreeToken sampler",
+      "issue": "Accepted large top_k overflows device int32 and kills the inference request",
+      "before": "sampling-before-v1.json",
+      "after": "boundaries-after-v3.log",
+      "status": "fixed_local_commits; accepted runtime scope in stage markers/contracts"
+    },
+    {
+      "id": "R2-04",
+      "severity": "medium",
+      "area": "FreeToken scheduler",
+      "issue": "Clipping one prompt mutates shared SamplingParams and shrinks later offline requests",
+      "before": "shared-budget-before-v1.log",
+      "after": "boundaries-after-v3.log",
+      "status": "fixed_local_commits; accepted runtime scope in stage markers/contracts"
+    },
+    {
+      "id": "R2-05",
+      "severity": "medium",
+      "area": "Speed preflight",
+      "issue": "Fixed KV pool prompts with no generation capacity pass preflight and load weights unnecessarily",
+      "before": "speed-kv-before-v1.log",
+      "after": "speed-related-after-v1.log",
+      "status": "fixed_local_commits; accepted runtime scope in stage markers/contracts"
+    },
+    {
+      "id": "R2-06",
+      "severity": "high",
+      "area": "Speed SSE",
+      "issue": "ASGI 2.3 AnyIO cancellation interrupts cleanup, leaving inference running and subscriptions registered",
+      "before": "sse-real-engine-before-v2.log",
+      "after": "sse-real-engine-after-v2.log",
+      "status": "fixed_local_commits; accepted runtime scope in stage markers/contracts"
+    },
+    {
+      "id": "R2-07",
+      "severity": "medium",
+      "area": "FreeToken offline LLM API",
+      "issue": "Offline generate returns matched stop text even though streaming already trims it",
+      "before": "llm-stop-before-v1.log; candidate-a-model-boundaries-off-v1.json raw stopped.text",
+      "after": "llm-stop-after-v1.log",
+      "status": "fixed_local_commits; accepted runtime scope in stage markers/contracts"
+    },
+    {
+      "id": "R2-08",
+      "severity": "high",
+      "area": "Speed keyed SSE ownership",
+      "issue": "A duplicate key returns an existing task without attaching its sink; closing the retry cancels/unsubscribes the original stream",
+      "before": "sse-idempotency-before-v2.log; sse-duplicate-ownership-before-v1.log",
+      "after": "sse-idempotency-after-v1.log; final TCP v2 probe includes actual active/completed retries",
+      "status": "fixed final local Speed commit"
+    }
+  ],
+  "constraints": [
+    "Only one GPU model process at a time",
+    "Preserve all accepted patches, artifacts, evidence and environments",
+    "No changes to Speed dev/main or official FreeToken",
+    "Historical long-output token0 issue remains unresolved unless directly established otherwise"
+  ],
+  "candidate_version": "0.1.3+speed.strataq2review2b",
+  "candidate_profile": "build/profiles/strataq2review2b.json",
+  "candidate_materials": "C:/workspace/build/freetoken-mats/review2b-materials-01",
+  "candidate_environment": "C:/workspace/envs/siltok-speed/flash-review2b",
+  "speed_baseline_worktree": "C:/workspace/wt/siltok-speed/review2-base-20261017",
+  "verification": {
+    "build_baseline_tools": "48 passed",
+    "boundary_targeted": "24 passed",
+    "speed_freetoken_related": "141 passed, 9 skipped (model fixtures not enabled in initial run)",
+    "sse_related": "59 passed with process-only license fixture; no product license changes",
+    "source_components": "B176 passed +47 subtests",
+    "wheel_components": "B176 passed +47 subtests",
+    "unicode_fuzz": "2500 cases / 33792 token steps / zero differences",
+    "native_quality": "B OFF/paired/full:15/20 plus thinking3/3;23 formal IDs exact to review1; rebuild/recapture passed",
+    "native_rebuild": "All three modes grow/shrink and graph recapture passed",
+    "native_request_boundaries": "OFF/ON full checkpoint: [8190,28] input produces [2,16] output with shared budget16; huge top-k, Unicode and earliest stop pass",
+    "speed_candidate_related": "355 passed; no skips; actual model fixtures; process-only license fixture",
+    "build_after_changes": "Full validate_repository and 48 tools tests passed",
+    "speed_source_off": "B quality and enhanced real TCP passed, including pre-load rejection and actual CANCELLED before reuse",
+    "speed_source_on": "B quality and enhanced real TCP passed with paired MTP",
+    "engine_sse_idempotency": "55 passed, including5new ownership tests",
+    "source_round1": "Seven-fix source quality/TCP,48real512 outputs and old35B passed; preserved at91d6487c",
+    "final_source_round": "v2 quality/TCP and v3 ABBA bind final1982c4fd rather than reusing earlier runtime identity"
+  },
+  "supplier_commit": "705ce5c226ac963e9d7c111585ee18b2d3cc24ab",
+  "current_build_pointer": "review1 (intentionally unchanged until new consumer acceptance)",
+  "current_speed_binding": "review2b; clean final Speed 1982c4fd242ee007cfee9b127c2a27fd06b8bfd0",
+  "active_gpu_queue": "source v2 quality/TCP -> final ABBA v3 -> old35B v2 -> release wheel -> protected build -> embedded acceptance",
+  "last_checkpoint": "2026-10-17T20:43:44.990002+08:00",
+  "active_build_checks": "full validator v3 and49tools tests; final current-pointer validation follows consumer freeze",
+  "preserved_candidate_a": {
+    "supplier_commit": "4afb786757d77916ad846e69c3ffbb2b6b695712",
+    "status": "Six fixes fully validated through source TCP OFF/ON; not promoted or packaged",
+    "performance_note": "baseline-http-off-abba1-v1.json has 6 valid x512 outputs and clean exit; orchestrator mistakenly expected passed instead of measured and stopped. Preserve original scripts/logs. B script corrects this status check and uses new v2 output names.",
+    "http_off_cancel_ms": [
+      188,
+      141
+    ],
+    "current_pointer": "review1 unchanged"
+  },
+  "stage_markers": {
+    "build-checks-v3-complete.json": true,
+    "candidate-b-source-functional-complete-v2.json": true,
+    "candidate-b-source-performance-complete-v2.json": true,
+    "candidate-b-source-all-complete-v2.json": true,
+    "candidate-b-release-env-ready-v2.json": true,
+    "compiled-build-ready.json": false,
+    "compiled-acceptance-complete.json": false
+  },
+  "speed_commit": "1982c4fd242ee007cfee9b127c2a27fd06b8bfd0",
+  "round1_performance_scope_note": "All first-round ABBA v2 observations retained. Small CPU repro probes overlapped part of that exploratory round. Final primary comparison is fresh ABBA v3, without CPU build/test overlap."
+}

@@ -1,0 +1,115 @@
+{"source": "C:\\workspace\\wt\\siltok-speed\\review2-base-20261017\\silitok_speed\\__init__.py", "python": "C:\\workspace\\envs\\siltok-speed\\flash-review1-release\\Scripts\\python.exe", "process_only_license_fixture": true}
+FFFFF.                                                                   [100%]
+================================== FAILURES ===================================
+_ test_receive_disconnect_finishes_cleanup_inside_anyio_cancel_scope[http.response.start-2.0] _
+tests\unit\test_chat_sse_lifecycle.py:97: in test_receive_disconnect_finishes_cleanup_inside_anyio_cancel_scope
+    _run(scenario())
+tests\unit\test_chat_sse_lifecycle.py:53: in _run
+    return asyncio.run(coro)
+           ^^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\unit\test_chat_sse_lifecycle.py:93: in scenario
+    assert engine.state == TaskState.CANCELLED
+E   AssertionError: assert <TaskState.RUNNING: 'running'> == <TaskState.CANCELLED: 'cancelled'>
+E    +  where <TaskState.RUNNING: 'running'> = <test_chat_sse_lifecycle._LifecycleEngine object at 0x00000280A49EE630>.state
+E    +  and   <TaskState.CANCELLED: 'cancelled'> = TaskState.CANCELLED
+_ test_receive_disconnect_finishes_cleanup_inside_anyio_cancel_scope[http.response.start-2.3] _
+tests\unit\test_chat_sse_lifecycle.py:97: in test_receive_disconnect_finishes_cleanup_inside_anyio_cancel_scope
+    _run(scenario())
+tests\unit\test_chat_sse_lifecycle.py:53: in _run
+    return asyncio.run(coro)
+           ^^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\unit\test_chat_sse_lifecycle.py:93: in scenario
+    assert engine.state == TaskState.CANCELLED
+E   AssertionError: assert <TaskState.RUNNING: 'running'> == <TaskState.CANCELLED: 'cancelled'>
+E    +  where <TaskState.RUNNING: 'running'> = <test_chat_sse_lifecycle._LifecycleEngine object at 0x00000280A50137A0>.state
+E    +  and   <TaskState.CANCELLED: 'cancelled'> = TaskState.CANCELLED
+_ test_receive_disconnect_finishes_cleanup_inside_anyio_cancel_scope[http.response.body-2.0] _
+tests\unit\test_chat_sse_lifecycle.py:97: in test_receive_disconnect_finishes_cleanup_inside_anyio_cancel_scope
+    _run(scenario())
+tests\unit\test_chat_sse_lifecycle.py:53: in _run
+    return asyncio.run(coro)
+           ^^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\unit\test_chat_sse_lifecycle.py:93: in scenario
+    assert engine.state == TaskState.CANCELLED
+E   AssertionError: assert <TaskState.RUNNING: 'running'> == <TaskState.CANCELLED: 'cancelled'>
+E    +  where <TaskState.RUNNING: 'running'> = <test_chat_sse_lifecycle._LifecycleEngine object at 0x00000280A50120C0>.state
+E    +  and   <TaskState.CANCELLED: 'cancelled'> = TaskState.CANCELLED
+_ test_receive_disconnect_finishes_cleanup_inside_anyio_cancel_scope[http.response.body-2.3] _
+tests\unit\test_chat_sse_lifecycle.py:97: in test_receive_disconnect_finishes_cleanup_inside_anyio_cancel_scope
+    _run(scenario())
+tests\unit\test_chat_sse_lifecycle.py:53: in _run
+    return asyncio.run(coro)
+           ^^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\unit\test_chat_sse_lifecycle.py:93: in scenario
+    assert engine.state == TaskState.CANCELLED
+E   AssertionError: assert <TaskState.RUNNING: 'running'> == <TaskState.CANCELLED: 'cancelled'>
+E    +  where <TaskState.RUNNING: 'running'> = <test_chat_sse_lifecycle._LifecycleEngine object at 0x00000280A4FFECF0>.state
+E    +  and   <TaskState.CANCELLED: 'cancelled'> = TaskState.CANCELLED
+_ test_response_start_failure_real_engine_reaches_terminal_and_recovers[2.3] __
+tests\unit\test_chat_sse_lifecycle.py:294: in test_response_start_failure_real_engine_reaches_terminal_and_recovers
+    _run(scenario())
+tests\unit\test_chat_sse_lifecycle.py:53: in _run
+    return asyncio.run(coro)
+           ^^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\tools\python312\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\unit\test_chat_sse_lifecycle.py:271: in scenario
+    await wait_for(leaked_task.id, TaskState.CANCELLED)
+tests\unit\test_chat_sse_lifecycle.py:245: in wait_for
+    assert engine.task_status(task_id) == expected
+E   AssertionError: assert <TaskState.RUNNING: 'running'> == <TaskState.CANCELLED: 'cancelled'>
+E    +  where <TaskState.RUNNING: 'running'> = task_status('ee1f3869-5248-4a68-acd7-b9756f2e56a3')
+E    +    where task_status = <silitok_speed.engine.engine.Engine object at 0x00000280A4B8D340>.task_status
+---------------------------- Captured stdout call -----------------------------
+no balance_serve
+flashinfer not found, use triton for linux
+============================== warnings summary ===============================
+..\..\..\envs\siltok-speed\flash-review1-release\Lib\site-packages\_pytest\config\__init__.py:1345
+  C:\workspace\envs\siltok-speed\flash-review1-release\Lib\site-packages\_pytest\config\__init__.py:1345: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; anyio
+    self._mark_plugins_for_rewrite(hook, disable_autoload)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+5 failed, 1 passed, 16 deselected, 1 warning in 7.20s

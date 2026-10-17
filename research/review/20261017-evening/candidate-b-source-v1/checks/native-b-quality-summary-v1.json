@@ -1,0 +1,157 @@
+{
+  "off": {
+    "status": "passed",
+    "formal_ids": {
+      "multiply": true,
+      "chain": true,
+      "fraction": true,
+      "long_multiply": true,
+      "precedence": true,
+      "probability": true,
+      "python_sum": true,
+      "python_slice": true,
+      "python_list": true,
+      "set_sort": true,
+      "binary_count": true,
+      "json_sum": true,
+      "group_sum": true,
+      "indexing": true,
+      "ordering": true,
+      "deduction": true,
+      "boolean": true,
+      "multi_turn": true,
+      "long_lookup_1": true,
+      "long_lookup_2": true,
+      "thinking-chain": true,
+      "thinking-fraction": true,
+      "thinking-binary_count": true
+    },
+    "score": 15,
+    "thinking": 3,
+    "rebuild_steps": [
+      {
+        "usable": 6,
+        "logical_slots": 7,
+        "recurrent_slots": 7,
+        "reserved": []
+      },
+      {
+        "usable": 5,
+        "logical_slots": 6,
+        "recurrent_slots": 6,
+        "reserved": []
+      }
+    ],
+    "shutdown_complete": true
+  },
+  "on": {
+    "status": "passed",
+    "formal_ids": {
+      "multiply": true,
+      "chain": true,
+      "fraction": true,
+      "long_multiply": true,
+      "precedence": true,
+      "probability": true,
+      "python_sum": true,
+      "python_slice": true,
+      "python_list": true,
+      "set_sort": true,
+      "binary_count": true,
+      "json_sum": true,
+      "group_sum": true,
+      "indexing": true,
+      "ordering": true,
+      "deduction": true,
+      "boolean": true,
+      "multi_turn": true,
+      "long_lookup_1": true,
+      "long_lookup_2": true,
+      "thinking-chain": true,
+      "thinking-fraction": true,
+      "thinking-binary_count": true
+    },
+    "score": 15,
+    "thinking": 3,
+    "rebuild_steps": [
+      {
+        "usable": 10,
+        "logical_slots": 11,
+        "recurrent_slots": 7,
+        "reserved": [
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      {
+        "usable": 9,
+        "logical_slots": 10,
+        "recurrent_slots": 6,
+        "reserved": [
+          6,
+          7,
+          8,
+          9
+        ]
+      }
+    ],
+    "shutdown_complete": true
+  },
+  "on-full": {
+    "status": "passed",
+    "formal_ids": {
+      "multiply": true,
+      "chain": true,
+      "fraction": true,
+      "long_multiply": true,
+      "precedence": true,
+      "probability": true,
+      "python_sum": true,
+      "python_slice": true,
+      "python_list": true,
+      "set_sort": true,
+      "binary_count": true,
+      "json_sum": true,
+      "group_sum": true,
+      "indexing": true,
+      "ordering": true,
+      "deduction": true,
+      "boolean": true,
+      "multi_turn": true,
+      "long_lookup_1": true,
+      "long_lookup_2": true,
+      "thinking-chain": true,
+      "thinking-fraction": true,
+      "thinking-binary_count": true
+    },
+    "score": 15,
+    "thinking": 3,
+    "rebuild_steps": [
+      {
+        "usable": 10,
+        "logical_slots": 11,
+        "recurrent_slots": 7,
+        "reserved": [
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      {
+        "usable": 9,
+        "logical_slots": 10,
+        "recurrent_slots": 6,
+        "reserved": [
+          6,
+          7,
+          8,
+          9
+        ]
+      }
+    ],
+    "shutdown_complete": true
+  }
+}

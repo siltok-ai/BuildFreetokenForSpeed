@@ -76,3 +76,52 @@ The first A throughput orchestration stopped after incorrectly requiring status=
 the benchmark's actual successful status is measured. Its6x512 outputs and clean resource
 exit are retained. B uses the correct status and freshv2 ABBA output names. This was a
 task orchestration correction, not a model failure or a discarded slow measurement.
+
+Final consumer checkpoint: eight findings accepted at separate runtime layers.
+Speed clean final commit: 1982c4fd242ee007cfee9b127c2a27fd06b8bfd0.
+Supplier remains705ce5c226ac963e9d7c111585ee18b2d3cc24ab; native/AOT bytes unchanged.
+Finding8 (Speed): repeated keyed SSE returned an existing task without a new sink.
+Closing that response cancelled/unsubscribed the original request. Reject this stream
+retry before response start with409/idempotency_conflict; sync result retrieval remains.
+Five ownership tests and the real active/completed TCP retries pass in OFF/ON source
+and protected embedded runtime; original stream completes and sync replay is exact.
+Final Speed355 related tests pass with zero skips and actual model fixtures; Build49
+tools tests pass. Product license code unchanged; model HTTP uses an external process-only
+license fixture, not a product bypass. Source quality remains15/20 plus thinking3/3.
+Final ABBA v3: six real512 outputs per input/variant/mode; all48 observations retained.
+Pooled medians, baseline -> candidate tokens/s (change):
+  off/70-0: 97.374 -> 97.339 (-0.036%).
+  off/diverse-4096-0: 92.771 -> 92.835 (+0.069%).
+  on/70-0: 102.715 -> 103.084 (+0.359%).
+  on/diverse-4096-0: 113.708 -> 111.769 (-1.706%).
+Intermediate seven-fix ABBA v2 and its small concurrent CPU reproduction probes are preserved.
+Final v3 has no CPU build/test overlap; it is the primary comparison.
+One final paired-MTP candidate run took217.718s overall, with warmupTTFT167.385s.
+This startup delay remains unexplained; keep it visible rather than claiming stable startup.
+Baseline/candidate output-text hash sets match for both prompts in both modes; individual
+cold/hot trajectories differ. No32-consecutive-bang text run was seen in these48outputs;
+this does not resolve the historical intermittent token0 issue.
+Ordinary Speed wheel contains exactly27 selected B DLLs; no non-cache resources lost,
+and every packaged Python file matches the final source. Protected payload uses its
+own embedded interpreter and protected loader, with exact wheel/AOT and clean commit.
+Source and protected old35B quality/code execution/cancel/exit regressions pass.
+Full installer built, not installed. No clean-OS, long-term load or token0 fix is claimed.
+Final source evidence: research/review/20261017-evening/candidate-b-source-v1/index.json.
+Final compiled evidence: research/review/20261017-evening/candidate-b-compiled-v1/index.json.
+All20 final source/ABBA/compiled process runs pass sampled resource floors and owned cleanup.
+Current pointer selects review2b compiled scope; older installed acceptance remains separate.
+
+Supplemental protected OFF ABBA comparison after a low primary short sample:
+Old/new actual embedded payloads, same1024prefill/5760resident/weights/prompts/options,
+four sequential rounds ABBA,24real512 outputs, no concurrent CPU build/tests.
+The original primary compiled short median91.694tps is retained in its frozen contract.
+Supplementary pooled medians (six per input/variant), old -> new:
+  70-0: 97.180 -> 97.483 (+0.311%).
+  diverse-4096-0: 92.909 -> 92.856 (-0.058%).
+All four runs use their own accepted embedded interpreter/protected loader/bundle SHA;
+all measured512 counts, sampled resource guards and natural owned process exits pass.
+The first supervisor launch used an unsuitable host interpreter and exited before producing
+an embedded run; its driver/config are preserved. Freshv2 uses the candidate task interpreter.
+This supplemental measurement adds no actual-install or clean-OS qualification.
+research/review/20261017-evening/candidate-b-compiled-off-abba-v1/index.json
+IndexSHA256: a83897ddcb0c7fb6e531897419efad58e0816d7634bcf41ab390c4b8d2be9cbe

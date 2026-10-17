@@ -1,0 +1,25 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+______ test_preflight_rejects_prompt_that_cannot_fit_fixed_kv_pool[8192] ______
+tests\unit\test_qwen36_backend.py:1047: in test_preflight_rejects_prompt_that_cannot_fit_fixed_kv_pool
+    with pytest.raises(BackendInputError) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE BackendInputError
+______ test_preflight_rejects_prompt_that_cannot_fit_fixed_kv_pool[9000] ______
+tests\unit\test_qwen36_backend.py:1047: in test_preflight_rejects_prompt_that_cannot_fit_fixed_kv_pool
+    with pytest.raises(BackendInputError) as captured:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE BackendInputError
+============================== warnings summary ===============================
+tests/unit/test_qwen36_backend.py::test_preflight_rejects_prompt_that_cannot_fit_fixed_kv_pool[8192]
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+tests/unit/test_qwen36_backend.py::test_preflight_rejects_prompt_that_cannot_fit_fixed_kv_pool[8192]
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/unit/test_qwen36_backend.py::test_preflight_rejects_prompt_that_cannot_fit_fixed_kv_pool[8192]
+FAILED tests/unit/test_qwen36_backend.py::test_preflight_rejects_prompt_that_cannot_fit_fixed_kv_pool[9000]
+2 failed, 88 deselected, 2 warnings in 6.95s
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

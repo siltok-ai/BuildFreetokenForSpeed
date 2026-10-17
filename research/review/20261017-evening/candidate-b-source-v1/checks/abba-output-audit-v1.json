@@ -1,0 +1,501 @@
+{
+  "scope": "final48 HTTP outputs; text identity diagnostics, separate from frozen formal quality IDs",
+  "modes": {
+    "off": {
+      "outputs": {
+        "70-0": {
+          "baseline": [
+            {
+              "report": "baseline-http-off-abba1-v3.json",
+              "label": "70-0-0",
+              "output_sha256": "336696fe5c983af39da51fc017252de22c9991e1136aa7f5215bfc35b781b88a",
+              "output_tokens": 512,
+              "decode_tps": 93.39344288828126,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-off-abba1-v3.json",
+              "label": "70-0-1",
+              "output_sha256": "5cb87b8993b52748f56147aa0e3d521ac5ba6d24f8faf89d8d7f657f94f19040",
+              "output_tokens": 512,
+              "decode_tps": 97.42558701328191,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-off-abba1-v3.json",
+              "label": "70-0-2",
+              "output_sha256": "5cb87b8993b52748f56147aa0e3d521ac5ba6d24f8faf89d8d7f657f94f19040",
+              "output_tokens": 512,
+              "decode_tps": 98.05118379254978,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-off-abba4-v3.json",
+              "label": "70-0-0",
+              "output_sha256": "336696fe5c983af39da51fc017252de22c9991e1136aa7f5215bfc35b781b88a",
+              "output_tokens": 512,
+              "decode_tps": 92.95024420726179,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-off-abba4-v3.json",
+              "label": "70-0-1",
+              "output_sha256": "5cb87b8993b52748f56147aa0e3d521ac5ba6d24f8faf89d8d7f657f94f19040",
+              "output_tokens": 512,
+              "decode_tps": 97.32194203185996,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-off-abba4-v3.json",
+              "label": "70-0-2",
+              "output_sha256": "5cb87b8993b52748f56147aa0e3d521ac5ba6d24f8faf89d8d7f657f94f19040",
+              "output_tokens": 512,
+              "decode_tps": 97.8748590820819,
+              "repeated_bang32_text": false
+            }
+          ],
+          "candidate": [
+            {
+              "report": "candidate-http-off-abba2-v3.json",
+              "label": "70-0-0",
+              "output_sha256": "336696fe5c983af39da51fc017252de22c9991e1136aa7f5215bfc35b781b88a",
+              "output_tokens": 512,
+              "decode_tps": 93.3501175994004,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-off-abba2-v3.json",
+              "label": "70-0-1",
+              "output_sha256": "5cb87b8993b52748f56147aa0e3d521ac5ba6d24f8faf89d8d7f657f94f19040",
+              "output_tokens": 512,
+              "decode_tps": 97.42459512729613,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-off-abba2-v3.json",
+              "label": "70-0-2",
+              "output_sha256": "5cb87b8993b52748f56147aa0e3d521ac5ba6d24f8faf89d8d7f657f94f19040",
+              "output_tokens": 512,
+              "decode_tps": 97.9512583804719,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-off-abba3-v3.json",
+              "label": "70-0-0",
+              "output_sha256": "336696fe5c983af39da51fc017252de22c9991e1136aa7f5215bfc35b781b88a",
+              "output_tokens": 512,
+              "decode_tps": 93.23413391761035,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-off-abba3-v3.json",
+              "label": "70-0-1",
+              "output_sha256": "5cb87b8993b52748f56147aa0e3d521ac5ba6d24f8faf89d8d7f657f94f19040",
+              "output_tokens": 512,
+              "decode_tps": 97.25332256172867,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-off-abba3-v3.json",
+              "label": "70-0-2",
+              "output_sha256": "5cb87b8993b52748f56147aa0e3d521ac5ba6d24f8faf89d8d7f657f94f19040",
+              "output_tokens": 512,
+              "decode_tps": 97.94746017743296,
+              "repeated_bang32_text": false
+            }
+          ]
+        },
+        "diverse-4096-0": {
+          "baseline": [
+            {
+              "report": "baseline-http-off-abba1-v3.json",
+              "label": "diverse-4096-0-0",
+              "output_sha256": "6a5ee600a66e09402ef97ca65a9d1416807dbedd24fb32ca062582c204ebc6a0",
+              "output_tokens": 512,
+              "decode_tps": 89.929904479032,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-off-abba1-v3.json",
+              "label": "diverse-4096-0-1",
+              "output_sha256": "6a5ee600a66e09402ef97ca65a9d1416807dbedd24fb32ca062582c204ebc6a0",
+              "output_tokens": 512,
+              "decode_tps": 92.74978219702038,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-off-abba1-v3.json",
+              "label": "diverse-4096-0-2",
+              "output_sha256": "6a5ee600a66e09402ef97ca65a9d1416807dbedd24fb32ca062582c204ebc6a0",
+              "output_tokens": 512,
+              "decode_tps": 92.81583799251001,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-off-abba4-v3.json",
+              "label": "diverse-4096-0-0",
+              "output_sha256": "6a5ee600a66e09402ef97ca65a9d1416807dbedd24fb32ca062582c204ebc6a0",
+              "output_tokens": 512,
+              "decode_tps": 90.17791184361745,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-off-abba4-v3.json",
+              "label": "diverse-4096-0-1",
+              "output_sha256": "6a5ee600a66e09402ef97ca65a9d1416807dbedd24fb32ca062582c204ebc6a0",
+              "output_tokens": 512,
+              "decode_tps": 92.80901241999723,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-off-abba4-v3.json",
+              "label": "diverse-4096-0-2",
+              "output_sha256": "6a5ee600a66e09402ef97ca65a9d1416807dbedd24fb32ca062582c204ebc6a0",
+              "output_tokens": 512,
+              "decode_tps": 92.79319558199472,
+              "repeated_bang32_text": false
+            }
+          ],
+          "candidate": [
+            {
+              "report": "candidate-http-off-abba2-v3.json",
+              "label": "diverse-4096-0-0",
+              "output_sha256": "6a5ee600a66e09402ef97ca65a9d1416807dbedd24fb32ca062582c204ebc6a0",
+              "output_tokens": 512,
+              "decode_tps": 90.13395175232912,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-off-abba2-v3.json",
+              "label": "diverse-4096-0-1",
+              "output_sha256": "6a5ee600a66e09402ef97ca65a9d1416807dbedd24fb32ca062582c204ebc6a0",
+              "output_tokens": 512,
+              "decode_tps": 92.83044832889568,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-off-abba2-v3.json",
+              "label": "diverse-4096-0-2",
+              "output_sha256": "6a5ee600a66e09402ef97ca65a9d1416807dbedd24fb32ca062582c204ebc6a0",
+              "output_tokens": 512,
+              "decode_tps": 92.97042941786687,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-off-abba3-v3.json",
+              "label": "diverse-4096-0-0",
+              "output_sha256": "6a5ee600a66e09402ef97ca65a9d1416807dbedd24fb32ca062582c204ebc6a0",
+              "output_tokens": 512,
+              "decode_tps": 89.89891403709066,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-off-abba3-v3.json",
+              "label": "diverse-4096-0-1",
+              "output_sha256": "6a5ee600a66e09402ef97ca65a9d1416807dbedd24fb32ca062582c204ebc6a0",
+              "output_tokens": 512,
+              "decode_tps": 92.974551755383,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-off-abba3-v3.json",
+              "label": "diverse-4096-0-2",
+              "output_sha256": "6a5ee600a66e09402ef97ca65a9d1416807dbedd24fb32ca062582c204ebc6a0",
+              "output_tokens": 512,
+              "decode_tps": 92.83970420193681,
+              "repeated_bang32_text": false
+            }
+          ]
+        }
+      },
+      "identities": {
+        "70-0": {
+          "baseline": [
+            "336696fe5c983af39da51fc017252de22c9991e1136aa7f5215bfc35b781b88a",
+            "5cb87b8993b52748f56147aa0e3d521ac5ba6d24f8faf89d8d7f657f94f19040"
+          ],
+          "candidate": [
+            "336696fe5c983af39da51fc017252de22c9991e1136aa7f5215bfc35b781b88a",
+            "5cb87b8993b52748f56147aa0e3d521ac5ba6d24f8faf89d8d7f657f94f19040"
+          ]
+        },
+        "diverse-4096-0": {
+          "baseline": [
+            "6a5ee600a66e09402ef97ca65a9d1416807dbedd24fb32ca062582c204ebc6a0"
+          ],
+          "candidate": [
+            "6a5ee600a66e09402ef97ca65a9d1416807dbedd24fb32ca062582c204ebc6a0"
+          ]
+        }
+      },
+      "total_run_elapsed": [
+        {
+          "report": "baseline-http-off-abba1-v3.json",
+          "elapsed_s": 122.23499999998603
+        },
+        {
+          "report": "baseline-http-off-abba4-v3.json",
+          "elapsed_s": 104.56200000000536
+        },
+        {
+          "report": "candidate-http-off-abba2-v3.json",
+          "elapsed_s": 104.06299999999464
+        },
+        {
+          "report": "candidate-http-off-abba3-v3.json",
+          "elapsed_s": 103.04700000002049
+        }
+      ]
+    },
+    "on": {
+      "outputs": {
+        "70-0": {
+          "baseline": [
+            {
+              "report": "baseline-http-on-abba1-v3.json",
+              "label": "70-0-0",
+              "output_sha256": "fca2e05f9c7619aa247d00ee1a63ac0f1c94cf720ca61b996dea3acbec1fd501",
+              "output_tokens": 512,
+              "decode_tps": 102.59625752574408,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-on-abba1-v3.json",
+              "label": "70-0-1",
+              "output_sha256": "75b82cdc6cdab3dccbadddab5fb32f466de71fbb207e1451602b3a8995a1f8d1",
+              "output_tokens": 512,
+              "decode_tps": 102.1728731020032,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-on-abba1-v3.json",
+              "label": "70-0-2",
+              "output_sha256": "d5a94d4e54adc33081297af6b11f5b7208c8f07dc40573dbc2b7ba8d1931b2fb",
+              "output_tokens": 512,
+              "decode_tps": 109.3568058550052,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-on-abba4-v3.json",
+              "label": "70-0-0",
+              "output_sha256": "fca2e05f9c7619aa247d00ee1a63ac0f1c94cf720ca61b996dea3acbec1fd501",
+              "output_tokens": 512,
+              "decode_tps": 102.8340583502818,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-on-abba4-v3.json",
+              "label": "70-0-1",
+              "output_sha256": "d5a94d4e54adc33081297af6b11f5b7208c8f07dc40573dbc2b7ba8d1931b2fb",
+              "output_tokens": 512,
+              "decode_tps": 98.43671705750533,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-on-abba4-v3.json",
+              "label": "70-0-2",
+              "output_sha256": "d5a94d4e54adc33081297af6b11f5b7208c8f07dc40573dbc2b7ba8d1931b2fb",
+              "output_tokens": 512,
+              "decode_tps": 109.28656256279463,
+              "repeated_bang32_text": false
+            }
+          ],
+          "candidate": [
+            {
+              "report": "candidate-http-on-abba2-v3.json",
+              "label": "70-0-0",
+              "output_sha256": "fca2e05f9c7619aa247d00ee1a63ac0f1c94cf720ca61b996dea3acbec1fd501",
+              "output_tokens": 512,
+              "decode_tps": 102.7201687711142,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-on-abba2-v3.json",
+              "label": "70-0-1",
+              "output_sha256": "75b82cdc6cdab3dccbadddab5fb32f466de71fbb207e1451602b3a8995a1f8d1",
+              "output_tokens": 512,
+              "decode_tps": 102.16475724577884,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-on-abba2-v3.json",
+              "label": "70-0-2",
+              "output_sha256": "d5a94d4e54adc33081297af6b11f5b7208c8f07dc40573dbc2b7ba8d1931b2fb",
+              "output_tokens": 512,
+              "decode_tps": 108.6576894717862,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-on-abba3-v3.json",
+              "label": "70-0-0",
+              "output_sha256": "fca2e05f9c7619aa247d00ee1a63ac0f1c94cf720ca61b996dea3acbec1fd501",
+              "output_tokens": 512,
+              "decode_tps": 103.44836102785361,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-on-abba3-v3.json",
+              "label": "70-0-1",
+              "output_sha256": "75b82cdc6cdab3dccbadddab5fb32f466de71fbb207e1451602b3a8995a1f8d1",
+              "output_tokens": 512,
+              "decode_tps": 100.56064428722398,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-on-abba3-v3.json",
+              "label": "70-0-2",
+              "output_sha256": "d5a94d4e54adc33081297af6b11f5b7208c8f07dc40573dbc2b7ba8d1931b2fb",
+              "output_tokens": 512,
+              "decode_tps": 106.8253116615291,
+              "repeated_bang32_text": false
+            }
+          ]
+        },
+        "diverse-4096-0": {
+          "baseline": [
+            {
+              "report": "baseline-http-on-abba1-v3.json",
+              "label": "diverse-4096-0-0",
+              "output_sha256": "ad7d1aaf3ba28b03292efb978df2c27b8485330b08fae20a7890508e06eebd8a",
+              "output_tokens": 512,
+              "decode_tps": 109.19022965815482,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-on-abba1-v3.json",
+              "label": "diverse-4096-0-1",
+              "output_sha256": "6d1dc3c8f2edb22a9e349363a475428b9fadc19211d07ff5d61f5396abc43e8c",
+              "output_tokens": 512,
+              "decode_tps": 114.84818979713734,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-on-abba1-v3.json",
+              "label": "diverse-4096-0-2",
+              "output_sha256": "ad7d1aaf3ba28b03292efb978df2c27b8485330b08fae20a7890508e06eebd8a",
+              "output_tokens": 512,
+              "decode_tps": 119.3960912986797,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-on-abba4-v3.json",
+              "label": "diverse-4096-0-0",
+              "output_sha256": "6d1dc3c8f2edb22a9e349363a475428b9fadc19211d07ff5d61f5396abc43e8c",
+              "output_tokens": 512,
+              "decode_tps": 102.09146248272039,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-on-abba4-v3.json",
+              "label": "diverse-4096-0-1",
+              "output_sha256": "ad7d1aaf3ba28b03292efb978df2c27b8485330b08fae20a7890508e06eebd8a",
+              "output_tokens": 512,
+              "decode_tps": 112.56872061537227,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "baseline-http-on-abba4-v3.json",
+              "label": "diverse-4096-0-2",
+              "output_sha256": "ad7d1aaf3ba28b03292efb978df2c27b8485330b08fae20a7890508e06eebd8a",
+              "output_tokens": 512,
+              "decode_tps": 119.41926156016956,
+              "repeated_bang32_text": false
+            }
+          ],
+          "candidate": [
+            {
+              "report": "candidate-http-on-abba2-v3.json",
+              "label": "diverse-4096-0-0",
+              "output_sha256": "ad7d1aaf3ba28b03292efb978df2c27b8485330b08fae20a7890508e06eebd8a",
+              "output_tokens": 512,
+              "decode_tps": 109.37838998036383,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-on-abba2-v3.json",
+              "label": "diverse-4096-0-1",
+              "output_sha256": "6d1dc3c8f2edb22a9e349363a475428b9fadc19211d07ff5d61f5396abc43e8c",
+              "output_tokens": 512,
+              "decode_tps": 114.15877304929222,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-on-abba2-v3.json",
+              "label": "diverse-4096-0-2",
+              "output_sha256": "ad7d1aaf3ba28b03292efb978df2c27b8485330b08fae20a7890508e06eebd8a",
+              "output_tokens": 512,
+              "decode_tps": 119.3000156792164,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-on-abba3-v3.json",
+              "label": "diverse-4096-0-0",
+              "output_sha256": "ad7d1aaf3ba28b03292efb978df2c27b8485330b08fae20a7890508e06eebd8a",
+              "output_tokens": 512,
+              "decode_tps": 103.81965514127256,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-on-abba3-v3.json",
+              "label": "diverse-4096-0-1",
+              "output_sha256": "6d1dc3c8f2edb22a9e349363a475428b9fadc19211d07ff5d61f5396abc43e8c",
+              "output_tokens": 512,
+              "decode_tps": 103.00709146364076,
+              "repeated_bang32_text": false
+            },
+            {
+              "report": "candidate-http-on-abba3-v3.json",
+              "label": "diverse-4096-0-2",
+              "output_sha256": "ad7d1aaf3ba28b03292efb978df2c27b8485330b08fae20a7890508e06eebd8a",
+              "output_tokens": 512,
+              "decode_tps": 119.19195783232476,
+              "repeated_bang32_text": false
+            }
+          ]
+        }
+      },
+      "identities": {
+        "70-0": {
+          "baseline": [
+            "75b82cdc6cdab3dccbadddab5fb32f466de71fbb207e1451602b3a8995a1f8d1",
+            "d5a94d4e54adc33081297af6b11f5b7208c8f07dc40573dbc2b7ba8d1931b2fb",
+            "fca2e05f9c7619aa247d00ee1a63ac0f1c94cf720ca61b996dea3acbec1fd501"
+          ],
+          "candidate": [
+            "75b82cdc6cdab3dccbadddab5fb32f466de71fbb207e1451602b3a8995a1f8d1",
+            "d5a94d4e54adc33081297af6b11f5b7208c8f07dc40573dbc2b7ba8d1931b2fb",
+            "fca2e05f9c7619aa247d00ee1a63ac0f1c94cf720ca61b996dea3acbec1fd501"
+          ]
+        },
+        "diverse-4096-0": {
+          "baseline": [
+            "6d1dc3c8f2edb22a9e349363a475428b9fadc19211d07ff5d61f5396abc43e8c",
+            "ad7d1aaf3ba28b03292efb978df2c27b8485330b08fae20a7890508e06eebd8a"
+          ],
+          "candidate": [
+            "6d1dc3c8f2edb22a9e349363a475428b9fadc19211d07ff5d61f5396abc43e8c",
+            "ad7d1aaf3ba28b03292efb978df2c27b8485330b08fae20a7890508e06eebd8a"
+          ]
+        }
+      },
+      "total_run_elapsed": [
+        {
+          "report": "baseline-http-on-abba1-v3.json",
+          "elapsed_s": 103.04699999999139
+        },
+        {
+          "report": "baseline-http-on-abba4-v3.json",
+          "elapsed_s": 104.56200000000536
+        },
+        {
+          "report": "candidate-http-on-abba2-v3.json",
+          "elapsed_s": 104.06200000000536
+        },
+        {
+          "report": "candidate-http-on-abba3-v3.json",
+          "elapsed_s": 217.71799999999348
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "status": "repaired_without_evidence_loss",
+  "cause": "B script inherited a generic output sidecar name; immutable A copy was already frozen",
+  "a_restored_from": "C:\\workspace\\wt\\freetoken-mats\\flash-perf\\research\\review\\20261017-evening\\candidate-a-native-v1\\runtime\\native-probe-provenance.json",
+  "b_preserved_as": "C:\\workspace\\runs\\siltok-speed\\explore-20261017-evening\\native-b-probe-provenance.json"
+}

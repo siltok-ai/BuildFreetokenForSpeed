@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "repository_validator_exit_code": 0,
+  "tools_exit_code": 0,
+  "tools_tests": 48,
+  "scope": "source/material/repository only; no GPU implication"
+}

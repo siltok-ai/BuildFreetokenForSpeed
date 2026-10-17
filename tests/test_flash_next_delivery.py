@@ -178,6 +178,26 @@ class DeliveryBoundaries(unittest.TestCase):
                 self.assertIn('mtp',on['artifacts']);self.assertNotIn('mtp',off['artifacts'])
                 self.assertFalse(root.exists());self.assertFalse(deployment.exists())
 
+    def test_review2b_cli_rejects_old_material_and_keeps_measured_geometry(self):
+        """新材料通过真实CLI显式选择，旧preset和材料不会被悄悄混用。"""
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)/'missing-weights'
+            command=[sys.executable,'-B',str(ROOT/'tools/flash_next_speed_config.py'),
+                '--root',str(root),'--preset','sm120-16g-review2b','--dry-run']
+            rejected=subprocess.run(command+['--profile','build/profiles/strataq2review1.json'],
+                                    capture_output=True,text=True)
+            self.assertNotEqual(rejected.returncode,0)
+            old=read(ROOT/'integration/speed/presets/flash-next-sm120-16g-review1.json')
+            for mode in ('off','on','off-matched'):
+                result=subprocess.run(command+['--profile','build/profiles/strataq2review2b.json',
+                    '--mode',mode],check=True,capture_output=True,text=True)
+                value=json.loads(result.stdout)
+                self.assertEqual(value['freetoken_version'],'0.1.3+speed.strataq2review2b')
+                expected,resource=configuration(mode,old)
+                self.assertEqual(value['manifest'],expected)
+                self.assertEqual(value['config'],resource)
+            self.assertFalse(root.exists())
+
     def test_shared_checkpoint_entry_reads_original_bytes_and_refuses_replacement(self):
         """实际目录共享必须读取源文件，并拒绝覆盖已有入口。"""
         with tempfile.TemporaryDirectory() as directory:

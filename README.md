@@ -4,7 +4,7 @@
 
 当前版本由 [current-release.json](integration/speed/current-release.json) 唯一选择，包含 profile、有序补丁、材料目录、preset 与验收合同。不要按文件名排序选择版本，也不要把 `consumer-contract.json` 当作当前合同。Speed 分支为 `integrate/flash-next-strata-q2-mtp-5070ti`，应用的 `qwen36/release.json` 另锁定 wheel SHA、配套缓存和供应提交。
 
-本轮 [综合 review](docs/flash-next-review-20261017.txt) 在 perf8 的48组补丁之后追加3组，生成独立 `0.1.3+speed.strataq2review1`。修复MTP读取校验竞态，共享GGUF解析和停止条件，整理事务/策略/热点缓存代码，保留原有数值内核。新版本普通wheel、Speed源码、保护编译载荷已独立验收，完整安装器已构建；本修订未实装、未验干净OS。精确范围由自己的合同声明；perf8的真实安装证据仍在 [历史交付](docs/flash-next-5070ti-perf8.txt)，不能替代新代码的验收。
+晚间 [探索review](docs/flash-next-review2-20261017.txt) 在下午review1之后继续确认8项请求边界及生命周期问题，生成独立 `0.1.3+speed.strataq2review2b`（55组补丁）。修复Unicode/最早stop、超大top-k、共享输出预算、离线stop文本，以及Speed固定KV预检、ASGI取消清理和幂等流所有权。3个native模块与27个AOT保持原字节。最终普通wheel、Speed源码和隔离embedded保护载荷已独立验收，完整安装器已构建；本修订未实装、未验干净OS。MTP默认关闭，使用配套 `sm120-16g-review2b`。下午[综合review](docs/flash-next-review-20261017.txt)与[历史perf8实装](docs/flash-next-5070ti-perf8.txt)保留各自范围。
 
 | 运行输入 | 合同 |
 | --- | --- |
