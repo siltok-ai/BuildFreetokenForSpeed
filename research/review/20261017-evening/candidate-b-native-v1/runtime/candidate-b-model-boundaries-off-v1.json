@@ -1,0 +1,143 @@
+{
+  "status": "passed",
+  "python_source": "C:\\workspace\\envs\\siltok-speed\\flash-review2b\\Lib\\site-packages\\freetoken\\__init__.py",
+  "version": "0.1.3+speed.strataq2review2b",
+  "mtp": false,
+  "runs": [
+    {
+      "name": "shared-budget",
+      "input_tokens": [
+        8190,
+        28
+      ],
+      "actual_output_tokens": [
+        2,
+        16
+      ],
+      "caller_max_tokens": 16,
+      "outputs": [
+        {
+          "text": "It looks",
+          "token_ids": [
+            2064,
+            5686
+          ]
+        },
+        {
+          "text": "527<|im_end|>\n<|endoftext|><|im_start|><|im_start|><|im_end|>\n<|im_start|>user\nWhat is ",
+          "token_ids": [
+            20,
+            17,
+            22,
+            248046,
+            198,
+            248044,
+            248045,
+            248045,
+            248046,
+            198,
+            248045,
+            846,
+            198,
+            3710,
+            369,
+            220
+          ]
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "large-top-k",
+      "top_k": 1208925819614629174706176,
+      "outputs": [
+        {
+          "text": "527",
+          "token_ids": [
+            20,
+            17,
+            22
+          ]
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "unicode",
+      "stops": [
+        "🦄🦄"
+      ],
+      "reference": {
+        "text": "🦄🦄",
+        "token_ids": [
+          9008,
+          99,
+          226,
+          9008,
+          99,
+          226
+        ]
+      },
+      "stopped": {
+        "text": "",
+        "token_ids": [
+          9008,
+          99,
+          226,
+          9008,
+          99,
+          226
+        ]
+      },
+      "streamed": "",
+      "expected": "",
+      "terminal": {
+        "uid": 0,
+        "token": 226,
+        "finished": true,
+        "reason": "stop",
+        "matched_stop": "🦄🦄"
+      },
+      "passed": true
+    },
+    {
+      "name": "overlapping",
+      "stops": [
+        "fix",
+        "pre"
+      ],
+      "reference": {
+        "text": "prefix",
+        "token_ids": [
+          11510
+        ]
+      },
+      "stopped": {
+        "text": "",
+        "token_ids": [
+          11510
+        ]
+      },
+      "streamed": "",
+      "expected": "",
+      "terminal": {
+        "uid": 0,
+        "token": 11510,
+        "finished": true,
+        "reason": "stop",
+        "matched_stop": "pre"
+      },
+      "passed": true
+    }
+  ],
+  "load_s": 36.98778399999719,
+  "arithmetic_after": {
+    "text": "527",
+    "token_ids": [
+      20,
+      17,
+      22
+    ]
+  },
+  "shutdown_complete": true
+}

@@ -54,3 +54,25 @@ pending stages at this supplier checkpoint. The ordinary candidate is deliberate
 by current-release; this commit supplies bytes for the subsequent Speed consumer check.
 Local raw evidence: C:/workspace/runs/siltok-speed/explore-20261017-evening.
 No actual-install, clean-OS, universal performance or long-output-token0 fix is claimed here.
+
+Final native candidate B (not yet selected by current-release at the supplier checkpoint):
+strataq2review2b retains all 53 candidate-A patches and appends 54/55, for 55 total.
+Finding7: the offline LLM.generate result kept the matched stop text while streaming
+already trimmed it. Full real-checkpoint A output retained the unicorn emoji or prefix
+even though its streamed output was empty. Five small API cases failed before the fix,
+with two normal controls passing; all seven pass afterward. RequestStatus now keeps
+the terminal matched_stop, and generate trims text while preserving consumed token IDs.
+
+Source and ordinary installed B wheel each pass176 tests +47 subtests. Three full-model
+quality modes retain15/20 and thinking3/3 with23 exact formal ID sequences per mode;
+grow/shrink and recapture pass. OFF/ON full-checkpoint boundary probes also verify the
+raw offline text, streamed text, large top-k, shared budget and final arithmetic.
+B wheelSHA256:6de078694de07c866db8a370d105b727c59f271f27b3fab3f70e5c48ec065b7e.
+All3native and27AOT bytes match A. The explicit adjacent source/material validator,
+full repository validator and48tools tests pass. Frozen B native evidence:
+research/review/20261017-evening/candidate-b-native-v1/evidence.json.
+
+The first A throughput orchestration stopped after incorrectly requiring status=passed;
+the benchmark's actual successful status is measured. Its6x512 outputs and clean resource
+exit are retained. B uses the correct status and freshv2 ABBA output names. This was a
+task orchestration correction, not a model failure or a discarded slow measurement.

@@ -97,6 +97,9 @@ PYTHON_ONLY_CHANGES = {
     'python/freetoken/engine/sample.py',
     'tests/engine/test_sampling_bounds.py',
     'tests/scheduler/test_stop_boundaries.py',
+    # Offline result projection changes Python state only; native and AOT sources stay frozen.
+    'python/freetoken/llm/llm.py',
+    'tests/llm/test_stop_projection.py',
 }
 
 

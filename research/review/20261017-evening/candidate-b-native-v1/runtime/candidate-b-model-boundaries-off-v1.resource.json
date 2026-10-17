@@ -1,0 +1,25 @@
+{
+  "command": [
+    "C:\\workspace\\envs\\siltok-speed\\flash-review2b\\Scripts\\python.exe",
+    "-B",
+    "C:\\workspace\\runs\\siltok-speed\\explore-20261017-evening\\probe-model-boundaries-b.py",
+    "--output",
+    "C:\\workspace\\runs\\siltok-speed\\explore-20261017-evening\\candidate-b-model-boundaries-off-v1.json"
+  ],
+  "cwd": "C:\\workspace\\runs\\siltok-speed\\explore-20261017-evening",
+  "started": 1792237172.3118787,
+  "samples": 175,
+  "min_commit_available": 13074710528,
+  "min_ram_available": 28899753984,
+  "min_gpu_free": 494546944,
+  "max_commit_used": 57244200960,
+  "max_gpu_used": 16600387584,
+  "max_tree_rss": 28450500608,
+  "max_tree_private": 45457690624,
+  "stop_reason": null,
+  "pid": 13404,
+  "returncode": 0,
+  "elapsed_s": 88.40700000000652,
+  "remaining_before_cleanup": [],
+  "remaining_descendants": []
+}
