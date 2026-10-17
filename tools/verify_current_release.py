@@ -22,6 +22,7 @@ def verify():
     subprocess.run([sys.executable,'-B',str(ROOT/'tools/verify_materials.py'),str(ROOT/current['materials'])],check=True)
     installed=None
     compiled=None
+    source=None
     if consumer.get('kind')=='flash_next_5070ti_installed_consumer':
         from verify_flash_next_5070ti_consumer import verify as verify_installed
         installed=verify_installed(ROOT/current['consumer_contract'])
@@ -31,9 +32,14 @@ def verify():
     elif consumer.get('kind')=='flash_next_5070ti_installed_performance_consumer':
         from verify_performance8_installed import verify as verify_installed8
         installed=verify_installed8(ROOT/current['consumer_contract'])
+    elif consumer.get('kind')=='flash_next_5070ti_source_performance_consumer':
+        from verify_performance8_consumer import verify as verify_source
+        source=verify_source(ROOT/current['consumer_contract'])
+    else:
+        raise ValueError('Unsupported current consumer kind: '+str(consumer.get('kind')))
     return dict(status='verified',version=current['version'],profile=current['profile'],
                 consumer_contract=current['consumer_contract'],mtp_default_enabled=False,
-                installed_5070ti=installed,compiled_5070ti=compiled)
+                installed_5070ti=installed,compiled_5070ti=compiled,source_5070ti=source)
 
 
 if __name__=='__main__':

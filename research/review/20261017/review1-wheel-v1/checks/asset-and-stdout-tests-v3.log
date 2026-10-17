@@ -1,0 +1,17 @@
+Explicit compiler test dependency: C:\workspace\envs\siltok-speed\build\Lib\site-packages\Cython\__init__.py
+..                                                                       [100%]
+============================== warnings summary ===============================
+tests\unit\test_windows_packaging.py:21
+  C:\workspace\wt\siltok-speed\flash-perf\tests\unit\test_windows_packaging.py:21: SyntaxWarning: invalid escape sequence '\S'
+    '--config-root "%ProgramData%\\Siltok\Speed\\config" '
+
+tests\unit\test_windows_packaging.py:22
+  C:\workspace\wt\siltok-speed\flash-perf\tests\unit\test_windows_packaging.py:22: SyntaxWarning: invalid escape sequence '\S'
+    '--runtime-dir "%ProgramData%\\Siltok\Speed\\runtime"'
+
+tests\unit\test_windows_packaging.py:161
+  C:\workspace\wt\siltok-speed\flash-perf\tests\unit\test_windows_packaging.py:161: SyntaxWarning: invalid escape sequence '\S'
+    assert "ExpandConstant('{commonappdata}\\Siltok\Speed\\models')" in script
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2 passed, 3 warnings in 0.51s

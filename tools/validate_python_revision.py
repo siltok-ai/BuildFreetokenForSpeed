@@ -11,7 +11,7 @@ import zipfile
 from prepare_source import ROOT, load_profile, prepare, sha256
 
 
-def validate(profile_path, materials):
+def validate(profile_path, materials, base_profile_path=None):
     """核对新版本冻结输入和实际材料，以防旧 binary 或 Python 文件被混入。"""
     profile, series = load_profile(profile_path)
     for patch in series['patches']:
@@ -28,6 +28,14 @@ def validate(profile_path, materials):
     wheel = materials / 'wheels' / profile['wheel_filename']
     with tempfile.TemporaryDirectory(prefix='q2opt-source-replay-') as directory:
         source, _ = prepare(profile_path, Path(directory) / 'source')
+        if base_profile_path is not None:
+            # 新复用修订直接证明相邻来源差异，无需为每个版本复制一套验证器。
+            sys.path.insert(0, str(ROOT / 'build'))
+            from derive_python_materials import validate_python_only_changes
+            base_source, base_profile = prepare(base_profile_path, Path(directory) / 'base')
+            changed = validate_python_only_changes(base_source, source)
+            if sorted(changed) != record['binary_reuse']['changed_source_files']:
+                raise ValueError('Python-only source delta differs from reuse receipt')
         expected = {p.relative_to(source / 'python').as_posix(): p.read_bytes()
                     for p in (source / 'python/freetoken').rglob('*.py')}
         with zipfile.ZipFile(wheel) as archive:
@@ -45,6 +53,10 @@ def validate(profile_path, materials):
     if sha256(base_record) != record['binary_reuse']['base_build_record_sha256']:
         raise ValueError('base binary provenance changed')
     baseline = json.loads(base_record.read_text(encoding='utf-8'))
+    if base_profile_path is not None:
+        for key in ('custom_version', 'input_sha256', 'wheel_filename'):
+            if baseline[key] != base_profile[key]:
+                raise ValueError('Binary reuse base differs from its explicit profile: '+key)
     with zipfile.ZipFile(base_record.parent / 'wheels' / baseline['wheel_filename']) as archive:
         if native != {name: hashlib.sha256(archive.read(name)).hexdigest() for name in native}:
             raise ValueError('native modules differ from accepted base wheel')
@@ -71,8 +83,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--profile', type=Path, default=ROOT / 'build/profiles/q2opt1.json')
     parser.add_argument('--materials', type=Path, default=ROOT / 'artifacts/q2opt1-cp312-cu130-sm120')
+    parser.add_argument('--base-profile', type=Path,
+                        help='Recompute the Python-only source delta against this frozen base')
     args = parser.parse_args()
-    validate(args.profile, args.materials)
+    validate(args.profile, args.materials, args.base_profile)
 
 
 if __name__ == '__main__':

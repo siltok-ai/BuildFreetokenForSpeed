@@ -1,4 +1,4 @@
-"""核对perf8源码Speed消费证据；此检查点不宣称安装器已经验收。"""
+"""核对perf8及同几何后续修订的源码消费证据；不授予安装器验收状态。"""
 import argparse
 import hashlib
 import json
@@ -8,6 +8,7 @@ import zipfile
 
 from prepare_source import load_profile
 from validate_performance8_revision import validate as validate_materials
+from validate_python_revision import validate as validate_reused_materials
 from verify_performance_consumer import contained, performance, read, require, sha
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -58,15 +59,19 @@ def verify(contract_path=DEFAULT,speed_root=None):
     profile=contained(ROOT,contract['profile'])
     require(sha(profile)==contract['profile_sha256'],'Profile changed')
     data,_=load_profile(profile)
-    require(data['custom_version']==contract['version']=='0.1.3+speed.strataq2perf8','Wrong material version')
+    require(data['custom_version']==contract['version'],'Wrong material version')
     materials=contained(ROOT,contract['materials'])
-    validate_materials(profile,materials)
+    if 'base_profile' in contract:
+        base_profile = contained(ROOT, contract['base_profile'])
+        require(sha(base_profile) == contract['base_profile_sha256'], 'Base profile changed')
+        validate_reused_materials(profile, materials, base_profile)
+    else:
+        validate_materials(profile,materials)
     wheel=contained(materials,contract['wheel']['path'])
     require(sha(wheel)==contract['wheel']['sha256'],'Wheel changed')
     with zipfile.ZipFile(wheel) as archive:
         code={name:hashlib.sha256(archive.read(name)).hexdigest() for name in archive.namelist()
               if name.startswith('freetoken/') and name.endswith(('.py','.pyd'))}
-    require(len(code)==464,'Unexpected wheel inventory')
     aot={p.relative_to(materials/'kernel-cache').as_posix():sha(p)
          for p in (materials/'kernel-cache').rglob('*.dll')}
     require(len(aot)==27,'Incomplete native cache')
@@ -93,7 +98,9 @@ def verify(contract_path=DEFAULT,speed_root=None):
     measured={}
     for mode,resident in [('off',5760),('on',4992)]:
         backend=report('backend-'+mode+'-quality')
-        native=read(native_root/f'runtime/perf8-wheel-quality-{mode}-v1.json')
+        native_reports = contract.get('native_quality_reports', {
+            value: f'runtime/perf8-wheel-quality-{value}-v1.json' for value in ('off', 'on')})
+        native=read(contained(native_root, native_reports[mode]))
         if mode=='on':
             checks=native['indexed_head_checks']
             require(len(checks['exact_full_subset'])==64 and all(checks['exact_full_subset'])

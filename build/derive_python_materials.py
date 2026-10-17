@@ -92,6 +92,7 @@ PYTHON_ONLY_CHANGES = {
     'python/freetoken/models/qwen4_exp/mtp_draft_policy.py',
     'python/freetoken/models/qwen4_exp/mtp_draft_vocab.py',
     'tests/models/qwen4_exp/test_mtp_draft_policy.py',
+    'python/freetoken/checkpoint/gguf_reader.py',
 }
 
 
@@ -100,10 +101,15 @@ def tree_hashes(root):
     return {p.relative_to(root).as_posix(): sha256(p) for p in root.rglob('*') if p.is_file()}
 
 
+def source_changes(before, after):
+    """为每个复用边界使用同一份逐文件差异计算。"""
+    old, new = tree_hashes(before), tree_hashes(after)
+    return {name for name in old.keys() | new.keys() if old.get(name) != new.get(name)}
+
+
 def validate_python_only_changes(base_source, source):
     """仅允许明确列出的 Python 算子/来源读取修订，原生或 AOT 输入差异立即拒绝。"""
-    old, new = tree_hashes(base_source), tree_hashes(source)
-    changed = {name for name in old.keys() | new.keys() if old.get(name) != new.get(name)}
+    changed = source_changes(base_source, source)
     if not changed <= PYTHON_ONLY_CHANGES:
         raise ValueError(f'binary reuse forbidden for source changes: {sorted(changed - PYTHON_ONLY_CHANGES)}')
     return changed
@@ -116,70 +122,65 @@ GGUF_OLD = 'freetoken__gguf_mmvq_r1'
 GGUF_NEW = 'freetoken__gguf_mmvq_r2'
 ROW_STORE_CPP = 'python/freetoken/kernel/csrc/row_store/row_store_ext.cpp'
 PINNED_TENSOR_CPP = 'python/freetoken/kernel/csrc/pinned_tensor.cpp'
+_EXTENSION_SOURCES = {'_row_store': ROW_STORE_CPP, '_pinned_tensor': PINNED_TENSOR_CPP}
 
 
 def validate_row_store_changes(base_source, source):
     """单独重编行存储时只开放该C++入口，其他原生/AOT输入仍逐字节保持。"""
-    old, new = tree_hashes(base_source), tree_hashes(source)
-    changed = {name for name in old.keys() | new.keys() if old.get(name) != new.get(name)}
-    if ROW_STORE_CPP not in changed or not changed <= PYTHON_ONLY_CHANGES | {ROW_STORE_CPP}:
-        raise ValueError(f'row-store selective rebuild source boundary differs: {sorted(changed - PYTHON_ONLY_CHANGES)}')
-    return changed
+    return _validate_extension_changes(base_source, source, '_row_store')
 
 
 def rebuild_row_store(source, output, torch_version):
     """实际编译一个CPU扩展；旧的另外两个扩展及27项AOT不进入此编译过程。"""
-    destination = output / 'rebuilt-row-store'
-    command = [sys.executable, '-B', str(ROOT/'build/compile_row_store.py'),
-               '--source', str(source/ROW_STORE_CPP), '--output', str(destination), '--torch', torch_version]
-    log = output/'row-store-build.log'
-    with log.open('wb') as stream:
-        subprocess.run(command, cwd=source, stdout=stream, stderr=subprocess.STDOUT, check=True)
-    receipt_path = destination/'build-receipt.json'
-    receipt = json.loads(receipt_path.read_text(encoding='utf-8'))
-    if receipt['source_sha256'] != sha256(source/ROW_STORE_CPP):
-        raise ValueError('Row-store compiler receipt belongs to different source')
-    binary = (destination/receipt['artifact']['path']).resolve(strict=True)
-    if not binary.is_relative_to(destination.resolve()) or sha256(binary) != receipt['artifact']['sha256']:
-        raise ValueError('Row-store compiler output differs from its receipt')
-    return binary, dict(module='_row_store', source=ROW_STORE_CPP, command=command,
-        receipt=receipt, receipt_path=receipt_path.relative_to(output).as_posix(),
-        receipt_sha256=sha256(receipt_path), log_sha256=sha256(log))
+    return _rebuild_extension(source, output, torch_version, '_row_store')
 
 
 def validate_pinned_tensor_changes(base_source, source):
     """工作区原生改动只开放pinned扩展入口；其他扩展和AOT输入必须保持。"""
-    old, new = tree_hashes(base_source), tree_hashes(source)
-    changed = {name for name in old.keys() | new.keys() if old.get(name) != new.get(name)}
-    if PINNED_TENSOR_CPP not in changed or not changed <= PYTHON_ONLY_CHANGES | {PINNED_TENSOR_CPP}:
-        raise ValueError(f'pinned-tensor selective rebuild source boundary differs: {sorted(changed - PYTHON_ONLY_CHANGES)}')
-    return changed
+    return _validate_extension_changes(base_source, source, '_pinned_tensor')
 
 
 def rebuild_pinned_tensor(source, output, torch_version):
     """实际重编CUDA主存扩展并保存回执，不触碰其余两个扩展和27项AOT。"""
-    destination = output/'rebuilt-pinned-tensor'
-    command = [sys.executable, '-B', str(ROOT/'build/compile_pinned_tensor.py'),
-               '--source', str(source/PINNED_TENSOR_CPP), '--output', str(destination), '--torch', torch_version]
-    log = output/'pinned-tensor-build.log'
+    return _rebuild_extension(source, output, torch_version, '_pinned_tensor')
+
+
+def _validate_extension_changes(base_source, source, module):
+    """每次只开放指定扩展的真实源码变化，不扩大原生复用边界。"""
+    changed = source_changes(base_source, source)
+    native_source = _EXTENSION_SOURCES[module]
+    if native_source not in changed or not changed <= PYTHON_ONLY_CHANGES | {native_source}:
+        label = module.removeprefix('_').replace('_', '-')
+        raise ValueError(f'{label} selective rebuild source boundary differs: {sorted(changed - PYTHON_ONLY_CHANGES)}')
+    return changed
+
+
+def _rebuild_extension(source, output, torch_version, module):
+    """执行独立编译器，核对源码、产物与回执；保留两个扩展原有目录和记录格式。"""
+    name = module.removeprefix('_')
+    label = name.replace('_', '-')
+    native_source = _EXTENSION_SOURCES[module]
+    destination = output / f'rebuilt-{label}'
+    command = [sys.executable, '-B', str(ROOT/f'build/compile_{name}.py'),
+               '--source', str(source/native_source), '--output', str(destination), '--torch', torch_version]
+    log = output / f'{label}-build.log'
     with log.open('wb') as stream:
         subprocess.run(command, cwd=source, stdout=stream, stderr=subprocess.STDOUT, check=True)
     receipt_path = destination/'build-receipt.json'
     receipt = json.loads(receipt_path.read_text(encoding='utf-8'))
-    if receipt['source_sha256'] != sha256(source/PINNED_TENSOR_CPP):
-        raise ValueError('Pinned-tensor compiler receipt belongs to different source')
+    if receipt['source_sha256'] != sha256(source/native_source):
+        raise ValueError(f'{label} compiler receipt belongs to different source')
     binary = (destination/receipt['artifact']['path']).resolve(strict=True)
     if not binary.is_relative_to(destination.resolve()) or sha256(binary) != receipt['artifact']['sha256']:
-        raise ValueError('Pinned-tensor compiler output differs from its receipt')
-    return binary, dict(module='_pinned_tensor', source=PINNED_TENSOR_CPP, command=command,
+        raise ValueError(f'{label} compiler output differs from its receipt')
+    return binary, dict(module=module, source=native_source, command=command,
         receipt=receipt, receipt_path=receipt_path.relative_to(output).as_posix(),
         receipt_sha256=sha256(receipt_path), log_sha256=sha256(log))
 
 
 def validate_gguf_rebuild_changes(base_source, source, old_spec=GGUF_OLD, new_spec=GGUF_NEW):
     """只允许GGUF独立头文件及其命名/路径引号改变，其他原生输入仍须相同。"""
-    old, new = tree_hashes(base_source), tree_hashes(source)
-    changed = {name for name in old.keys() | new.keys() if old.get(name) != new.get(name)}
+    changed = source_changes(base_source, source)
     native = {GGUF_HEADER, GGUF_AOT, WINDOWS_BUILDER}
     if not changed <= PYTHON_ONLY_CHANGES | native or not {GGUF_HEADER, GGUF_AOT} <= changed:
         raise ValueError(f'GGUF selective rebuild source boundary differs: {sorted(changed - PYTHON_ONLY_CHANGES)}')

@@ -1,0 +1,49 @@
+2026-10-17 两仓库综合review：供应侧记录
+
+目标与基线
+Speed integrate/flash-next-strata-q2-mtp-5070ti基线480c1ae26b170b8b2c7e1359a828dcfb88271844。
+Build main基线50537f5e1956601a4d65634ae76466a853826813。
+任务预算10小时，本机RTX5070Ti16GB/Ryzen9700X/64GB/Windows。
+新运行时0.1.3+speed.strataq2review1：51组补丁，保留历史48组原字节；新wheel462份Python+3个native，27项AOT。
+
+review范围
+阅读所选patch目录与重放后的最终运行源码，按以下设计链路核对，而非只看Speed adapter：
+1. Windows IO、扩展/ABI与启动，GGUF整模型/专家映射及量化布局；
+2. protected Q2永久/动态所有权、热度交换、prefill借用、workspace与重建；
+3. MTP drafter、full/compact事务、anchor/commit/rollback、quarantine、paired策略；
+4. overlap/interleaved/字节置换路径、mapped embedding、PLE行缓存、indexed Q5；
+5. 调度、停止/EOS/长度、abort、KV/linear状态与graph重捕获；
+6. Speed配置→IPC→worker、stdout协议、释放/超时、HTTP、运行缓存和产品打包。
+重点是Flash Next新增/修改的代码；未把庞大无关模型与UI逐行review写成已完成。
+
+实际问题与处理
+高：MTP每份tensor先file_digest再read_bytes，路径变化时校验字节与加载字节可不同。改为读取一次、对实际buffer作SHA后构造tensor。真实31份小tensor回归在旧源码稳定失败，在新源码通过；完整真实MTP质量也回归。
+中：GGUF完整/专家读取器各维护一套metadata/string/value和类型几何。提取checkpoint/gguf_reader，避免kernel反向依赖model；忽略字符串数组不再构造无用list。实际二进制fixture验证两读取器一致。
+中：MTP分支大段重复；抽取草稿选择，共用state-copy/commit逻辑。保留quarantine优先、anchor在compact live commit前等所有权顺序。
+中：paired策略与Q2 adaptive类密集分号难读。策略拆出rate计算，adaptive格式化前后AST一致，GPU kernel不改；记录WDDM缓存不做频繁staging的原因。
+中：停止tail逻辑在native/MTP两处重复，统一匹配；真实tokenizer/CacheManager验证跨边界stop、EOS、ignore EOS、长度与资源释放，prompt内stop不误停。
+中：Speed backend和worker重复列字段/校验同版本私有IPC。共享显式字段映射，预算只解析一次；保留外部配置和权重/ABI/内存边界检查。保留初始化/循环依赖必要的lazy import，普通import归位。
+中：普通Speed wheel打包7份历史缓存，保护bundle也扫描并加密全部cache。普通wheel仅带所选27项，保护bundle排除所有kernel_cache，继续使用外部runtime/kernel-cache。真实collector资源选择测试替换字符串源码测试。
+中：供应侧row-store/pinned选择性构建复制相同控制流程。共用边界检查/编译调度，保留两个wrapper和独立回执；两种native实际重编测试成功，输出不冒充本轮交付二进制。
+中：current-release对未知合同kind曾可能继续返回成功。改为明确拒绝；用真实临时profile/materials校验未知kind失败。
+低：自增checks计数、固定0断言、未使用result列表和手抄字段getter测试不能代表设计。删除，补事务策略探索/换优/重探、读取竞态、真实配置构造、Windows原生stdout隔离与资源释放用例。
+文档：修正全GGUF曾被写成BF16主干、旧MTP schema、过期17/26 DLL数量、当前版本仍指mtp2/win1、旧候选未验收状态冒充当前等。当前入口只读current-release/release；历史原文放docs/history，不修改原材料。
+
+不做无依据删改
+原生内存别名、checkpoint/manifest身份、外部配置、quarantine和事务所有权校验有实际风险边界，保留。历史version补丁是来源记录，不是每token开销。大型编码词表是固定数据。无需把测试中用于控制时序、实际执行scheduler行为的mock一概删去。
+
+已完成供应验证
+源码154 passed +47 subtests；普通安装wheel155 passed +47 subtests，无跳过；来源断言确认所有freetoken模块来自新环境site-packages。
+Build工具48 tests passed；完整仓库validator另留本轮日志。
+普通wheel OFF/full MTP/paired MTP三模式：每模式质量15/20、thinking3/3，无新增失败；各27项输出IDs与对应perf8全部一致；grow/shrink/graph重捕获通过。
+3个native与27个AOT逐字节复用perf8；新wheelSHA796a61b497df99c0c1956654a908cc8d3c6213b5eeef3758d20de4dc03dd6a86。
+
+性能原始初轮，English/Chinese/code，3x512实际输出tokens
+OFF改前100.1813/99.8613/94.8934，改后100.1875/99.8693/94.8162 tps。
+paired ON改前119.0503/110.9624/117.7111，改后117.3727/110.5860/118.1266 tps。
+OFF变化约+0.01%/+0.01%/-0.08%，ON约-1.41%/-0.34%/+0.35%，须结合复测和HTTP数据，不能凭单次波动断言下降。
+全部3x512输出和逐token IDs保留；ON长文部分ID轨迹变化，旧baseline本身也有冷/热差异，不能把长文ID全部相同写成通过。质量集IDs相同与长文行为是不同结论。
+
+验收分层
+本轮新源码/普通wheel、Speed源码和保护编译载荷分别记录；perf8旧实装保留独立证据。既有间歇长输出token0风险仍未解决，不宣称干净OS、长期压力或所有设备通过。
+后续Speed消费与最终性能证据补充于本文件末尾，合同和evidence index为可机器核查身份。

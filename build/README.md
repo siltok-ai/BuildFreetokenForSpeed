@@ -1,20 +1,20 @@
 # 构建当前 FreeToken Windows 材料
 
-当前入口是 [current-release.json](../integration/speed/current-release.json)，profile 为 [strataq2mtp2](profiles/strataq2mtp2.json)，版本 `0.1.3+speed.strataq2mtp2`。Python 和 PowerShell 构建入口使用同一默认值：冻结上游归档、20组有序补丁、3个native模块、27个AOT DLL。旧profile仍可显式选择，历史材料不覆盖。
+当前入口是 [current-release.json](../integration/speed/current-release.json)，具体profile、版本及规格读取该指针和profile。Python 和 PowerShell 构建入口使用同一默认值：冻结上游归档、所选有序补丁、3个native模块、27个AOT DLL。旧profile仍可显式选择，历史材料不覆盖。
 
 ## 环境合同
 
 | 项目 | 当前已验证组合 |
 | --- | --- |
 | 平台 / ABI | Windows x64 / CPython 3.12，历史解释器3.12.13 |
-| C++ | VS2022 toolset14.44，cl19.44.35228 |
-| CUDA | Toolkit13.0，nvcc13.0.48 |
+| C++ | 历史完整构建VS2022 toolset14.44；本机选择性编译MSVC14.50 |
+| CUDA | 历史完整构建Toolkit13.0；本机选择性编译Toolkit13.2；详见对应build-record |
 | Torch | 2.11.0+cu130 |
 | TVM FFI | apache-tvm-ffi0.1.13.post3 |
 | Triton | triton-windows3.6.0.post26 |
-| GPU | SM120；实测RTX5090 D v2 24GB |
+| GPU | SM120；历史RTX5090 D v2 24GB；本轮RTX5070 Ti 16GB |
 | 依赖 | [requirements.lock.txt](requirements.lock.txt)，71项冻结版本 |
-| AOT规格 | [speed-strataq2dev4-sm120.txt](specs/speed-strataq2dev4-sm120.txt)，当前复用27项规格 |
+| AOT规格 | [speed-strataq2dev4-sm120.txt](specs/speed-strataq2dev4-sm120.txt)，历史27项规格；当前具体spec读取profile |
 
 依赖锁属于FreeToken构建闭包，不是Speed完整运行环境或离线wheelhouse。其他Python、CUDA、编译器、GPU组合需要新的profile与实际验收；不能仅改文件名沿用当前身份。
 
@@ -68,7 +68,7 @@ python -B -m unittest discover -s tests -v
 
 `verify_materials`核对库存；`validate_python_revision.py`可进一步将wheel Python与指定profile完整重放结果比较。仓库验证保留历史win1等价证明及后续版本各自的证据，不将旧验收转移给新候选。离线检查不能代替模型/GPU验收。
 
-复用已验收材料时，整体使用`artifacts/strataq2mtp2-cp312-cu130-sm120/`，安装其中wheel并显式指向配套kernel-cache。Speed同时锁定wheel实际SHA；跨机器重编译可能产生不同二进制，必须另存、验收并更新Speed消费身份，不能覆盖原材料或仅复用版本号。源码不变的本次供应工具完善继续使用原FT2 wheel/AOT。
+复用已验收材料时，整体使用当前指针的 `materials` 目录，安装其中wheel并显式指向配套kernel-cache。Speed同时锁定wheel实际SHA；跨机器重编译可能产生不同二进制，必须另存、验收并更新Speed消费身份，不能覆盖原材料或仅复用版本号。review1使用perf8相邻Python修订的显式复用路径，3个native/27个AOT不重编，验证两份源码及允许边界。
 
 完整权重、MTP可复现转换、搬迁回执和Speed配置见 [当前交付流程](../docs/flash-next-current-delivery.md)。MTP默认关闭。Speed编译包、安装器和干净机验收仍须在Speed侧完成。
 
