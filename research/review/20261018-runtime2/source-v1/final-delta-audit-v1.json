@@ -1,0 +1,11 @@
+{
+  "before": "26b62095f8ad7f24b397bdf2599ffbd577f08336",
+  "after": "d7ed82cfdbd4a31e482e2ee7f6a8beda7fe64cff",
+  "changed_files": [
+    "silitok_speed/manifest_schema.py",
+    "silitok_speed/pyproject.toml",
+    "tests/unit/test_freetoken_mtp.py"
+  ],
+  "inference_transport_request_runtime_code_identical": true,
+  "note": "Manifest alias predicate plus product version and regression parameter; original72-output ABBA belongs to prior runtime-identical candidate26b62095 and remains separately labelled."
+}

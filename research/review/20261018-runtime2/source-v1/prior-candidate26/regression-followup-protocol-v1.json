@@ -1,0 +1,14 @@
+{
+  "reason": "Initial ON 4K median -3.30%, including one unusually slow after block; confirm independently before build/push",
+  "initial_report": "wrapper-performance-v2.json",
+  "sequence": [
+    "before",
+    "after",
+    "after",
+    "before"
+  ],
+  "same_prompts": true,
+  "tokens": 512,
+  "repetitions": 3,
+  "keep_all_initial_and_followup_samples": true
+}

@@ -1,0 +1,38 @@
+{
+  "status": "passed",
+  "python": "C:\\workspace\\build\\siltok-speed\\runtime2 moved-test\\app\\python\\python.exe",
+  "speed_origin": "C:\\workspace\\build\\siltok-speed\\runtime2 moved-test\\app\\python\\Lib\\site-packages\\silitok_speed\\__init__.pyd",
+  "build_commit": "d7ed82cfdbd4a31e482e2ee7f6a8beda7fe64cff",
+  "build_dirty": false,
+  "build_version": "0.2.0+strataq2runtime2.2026101819",
+  "bundle_sha256": "9644665353b99e5bf18059a17733e318a77351c05036cf1f566b0629bfcb9924",
+  "bundle_cache": "C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31",
+  "script": "C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\portability-probe-v1.py",
+  "arguments": [
+    "--app",
+    "C:\\workspace\\build\\siltok-speed\\runtime2 moved-test\\app",
+    "--output",
+    "C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\results\\portability-v1.json"
+  ],
+  "scope": "compiled_staged_payload_not_installer",
+  "product_modules": {
+    "silitok_speed": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\__init__.pyd",
+    "silitok_speed.backends": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\backends\\__init__.pyd",
+    "silitok_speed.backends.base": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\backends\\base.pyd",
+    "silitok_speed.backends.freetoken": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\backends\\freetoken.pyd",
+    "silitok_speed.backends.freetoken_qwen36": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\backends\\freetoken_qwen36.pyd",
+    "silitok_speed.backends.qwen36": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\backends\\qwen36.pyd",
+    "silitok_speed.config": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\config.pyd",
+    "silitok_speed.qwen36": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\qwen36\\__init__.pyd",
+    "silitok_speed.qwen36.freetoken_wire": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\qwen36\\freetoken_wire.pyd",
+    "silitok_speed.runtimes": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\runtimes\\__init__.pyd",
+    "silitok_speed.runtimes.freetoken": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\runtimes\\freetoken\\__init__.pyd",
+    "silitok_speed.runtimes.freetoken.checkpoint": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\runtimes\\freetoken\\checkpoint.pyd",
+    "silitok_speed.runtimes.freetoken.mtp": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\runtimes\\freetoken\\mtp.pyd",
+    "silitok_speed.runtimes.freetoken.options": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\runtimes\\freetoken\\options.pyd",
+    "silitok_speed.runtimes.freetoken.protocol": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\runtimes\\freetoken\\protocol.pyd",
+    "silitok_speed.runtimes.freetoken.runtime": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\runtimes\\freetoken\\runtime.pyd",
+    "silitok_speed.runtimes.freetoken.session": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\runtimes\\freetoken\\session.pyd",
+    "silitok_speed.types": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\runtime2-20261018\\staged-runtime2-relocated\\tmp\\siltok-speed-assets\\a2e58524e429a389ae692334b20c74f10e73d400f92846c52527c93193bf4f31\\types.pyd"
+  }
+}

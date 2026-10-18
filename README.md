@@ -2,7 +2,9 @@
 
 为 [Silitok Speed](https://github.com/siltok-ai/siltok-speed) 提供 FreeToken 的冻结补丁、Windows wheel/AOT、权重准备工具与消费证据。官方浏览源码 `upstream/FreeToken/` 保持原貌；应用 backend、worker 与 HTTP 在 Speed 仓库。
 
-当前版本由 [current-release.json](integration/speed/current-release.json) 唯一选择，包含 profile、有序补丁、材料目录、preset 与验收合同。不要按文件名排序选择版本，也不要把 `consumer-contract.json` 当作当前合同。Speed 分支为 `integrate/flash-next-strata-q2-mtp-5070ti`，应用的 `qwen36/release.json` 另锁定 wheel SHA、配套缓存和供应提交。
+当前版本由 [current-release.json](integration/speed/current-release.json) 唯一选择，包含 profile、有序补丁、材料目录、preset 与验收合同。不要按文件名排序选择版本，也不要把 `consumer-contract.json` 当作当前合同。Speed 分支为 `integrate/flash-next-dev-20261018`，应用的 `qwen36/release.json` 另锁定 wheel SHA、配套缓存和供应提交。
+
+本轮 [runtime2包装层重构](docs/flash-next-runtime2-20261018.txt) 基于最新dev，保留公共模型ID与旧入口，统一HTTP/direct SDK准入，并修复新backend别名的MTP manifest验收。FT2b材料原字节不变；新源码、普通wheel及迁移目录保护包独立验收，完整安装器已构建，本修订未实装、未验干净OS。MTP的观测性能下降和策略分叉如实保留。
 
 晚间 [探索review](docs/flash-next-review2-20261017.txt) 在下午review1之后继续确认8项请求边界及生命周期问题，生成独立 `0.1.3+speed.strataq2review2b`（55组补丁）。修复Unicode/最早stop、超大top-k、共享输出预算、离线stop文本，以及Speed固定KV预检、ASGI取消清理和幂等流所有权。3个native模块与27个AOT保持原字节。最终普通wheel、Speed源码和隔离embedded保护载荷已独立验收，完整安装器已构建；本修订未实装、未验干净OS。MTP默认关闭，使用配套 `sm120-16g-review2b`。下午[综合review](docs/flash-next-review-20261017.txt)与[历史perf8实装](docs/flash-next-5070ti-perf8.txt)保留各自范围。
 

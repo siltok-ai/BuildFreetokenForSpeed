@@ -1,0 +1,50 @@
+$ErrorActionPreference = 'Stop'
+. C:\workspace\tools\bin\enter-speed.ps1 -Profile build -Native -Task runtime2
+$SourceRoot = 'C:\workspace\wt\siltok-speed\runtime2 relocated'
+$ReleaseVenv = 'C:\workspace\envs\siltok-speed\flash-runtime2-release'
+$ReleasePython = Join-Path $ReleaseVenv 'Scripts\python.exe'
+$PayloadRoot = 'C:\workspace\build\siltok-speed\runtime2 moved-p01'
+$ResolvedPayload = [IO.Path]::GetFullPath($PayloadRoot)
+if (-not $ResolvedPayload.StartsWith('C:\workspace\build\siltok-speed\', [StringComparison]::OrdinalIgnoreCase)) { throw 'Output escaped build root' }
+if (Test-Path -LiteralPath $ResolvedPayload) { throw 'Fresh output required' }
+$MaterialsRepo = 'C:\workspace\wt\freetoken-mats\flash-perf'
+$Selected = Get-Content (Join-Path $MaterialsRepo 'integration\speed\current-release.json') -Raw | ConvertFrom-Json
+$Release = Get-Content (Join-Path $SourceRoot 'silitok_speed\qwen36\release.json') -Raw | ConvertFrom-Json
+if ($Selected.version -ne $Release.version) { throw 'Material version differs' }
+$Materials = Join-Path $MaterialsRepo $Selected.materials
+$Wheel = Join-Path $Materials $Release.wheel.path
+$CacheSource = Join-Path $Materials 'kernel-cache'
+$PreflightCache = 'C:\workspace\runs\siltok-speed\runtime2-20261018\packaging-preflight-cache-v1'
+if (Test-Path -LiteralPath $PreflightCache) { throw 'Fresh preflight cache required' }
+Copy-Item -LiteralPath $CacheSource -Destination $PreflightCache -Recurse
+foreach ($Pattern in @('cpuinfer_ext*.pyd','KTransformersOps*.pyd','vLLMMarlin*.pyd')) {
+    $Files=Get-ChildItem -LiteralPath C:\workspace\mats\siltok-speed\kt -Filter $Pattern -File
+    if (-not $Files) { throw "Missing extension $Pattern" }
+    $Files | Get-FileHash -Algorithm SHA256 | Format-List
+}
+$TorchCuda=(& $ReleasePython -I -B -c 'import torch;print(torch.version.cuda)').Trim()
+$NvccText=(& "$env:CUDA_PATH\bin\nvcc.exe" --version | Out-String)
+$ToolkitMajor=[regex]::Match($NvccText,'release\s+(\d+)\.').Groups[1].Value
+if ($ToolkitMajor -ne $TorchCuda.Split('.')[0]) { throw 'CUDA major differs' }
+Write-Host "torch CUDA=$TorchCuda; nvcc major=$ToolkitMajor; xollvm disabled"
+& $ReleasePython -I -B -m silitok_speed.qwen36.freetoken_release verify-wheel --wheel $Wheel --pyproject (Join-Path $SourceRoot 'silitok_speed\pyproject.toml')
+if ($LASTEXITCODE) { throw 'Wheel preflight failed' }
+& $ReleasePython -I -B -m silitok_speed.qwen36.freetoken_release generate-manifest --kernel-cache $PreflightCache
+if ($LASTEXITCODE) { throw 'AOT preflight failed' }
+& $ReleasePython -I -B -m silitok_speed.qwen36.freetoken_release self-check --kernel-cache $PreflightCache --pip-check --constraint-policy (Join-Path $SourceRoot 'packaging\windows\runtime-requirements.toml')
+if ($LASTEXITCODE) { throw 'Runtime preflight failed' }
+
+& "$SourceRoot\packaging\windows\build.ps1" `
+  -PythonEmbedZip 'C:\workspace\tools\setup\python-3.12.10-embed-amd64.zip' `
+  -SourceVenv $ReleaseVenv `
+  -BuildVenv 'C:\workspace\envs\siltok-speed\flash-review2b' `
+  -PythonDevRoot 'C:\workspace\tools\python312' `
+  -WinSWExe 'C:\workspace\tools\WinSW-x64.exe' `
+  -VcRedist 'C:\workspace\tools\setup\vc_redist.x64.exe' `
+  -FreetokenWheel $Wheel `
+  -KernelCacheDir $CacheSource `
+  -PydDir 'C:\workspace\mats\siltok-speed\kt' `
+  -H3PrebuiltDir 'C:\workspace\mats\siltok-speed\h3' `
+  -VcpkgRoot 'C:\workspace\tools\vcpkg' `
+  -OutDir $ResolvedPayload
+if ($LASTEXITCODE) { throw "Protected build failed $LASTEXITCODE" }

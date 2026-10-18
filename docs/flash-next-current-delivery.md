@@ -1,6 +1,8 @@
 # 当前 Flash Next 全 GGUF / MTP 交付
 
-唯一选择是 [current-release.json](../integration/speed/current-release.json)：它绑定版本、profile、有序补丁、材料、消费合同与推荐preset。配套 Speed 分支是 `integrate/flash-next-strata-q2-mtp-5070ti`，Speed的 `silitok_speed/qwen36/release.json` 固定实际 wheel SHA 与供应提交。旧 perf8 的真实安装证据保留，新review修订的范围由自己的合同声明，不能继承旧包的安装资格。
+唯一选择是 [current-release.json](../integration/speed/current-release.json)：它绑定版本、profile、有序补丁、材料、消费合同与推荐preset。配套 Speed 分支是 `integrate/flash-next-dev-20261018`，Speed的 `silitok_speed/qwen36/release.json` 固定实际 wheel SHA 与供应提交。旧 perf8 的真实安装证据保留，新review修订的范围由自己的合同声明，不能继承旧包的安装资格。
+
+当前包装层、MTP别名兼容及迁移打包验证见 [runtime2说明](flash-next-runtime2-20261018.txt)。公共`models[].id`和旧`Qwen36Backend`继续有效，`FreeTokenBackend`是等价新入口。
 
 ## 环境与匹配材料
 

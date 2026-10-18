@@ -1,0 +1,40 @@
+FreeToken runtime2包装层重构与manifest兼容修复（2026-10-18）
+
+Speed分支 integrate/flash-next-dev-20261018：d7ed82cfdbd4a31e482e2ee7f6a8beda7fe64cff，基于dev c89720fe，领先15笔。
+第14笔26b62095整理通用FreeTokenBackend与runtimes/freetoken，分离传输、worker控制及引擎桥接，并统一HTTP/direct SDK准入。
+第15笔d7ed82cf修复MTP制品家族验收表漏认FreeTokenBackend别名；该遗漏由真实编译包的Generic+MTP测试发现，修复前候选保留。
+仅采用历史8e6db580的合适目的，没有整笔cherry-pick，也未移植过时材料、重复显存扣除、旧KV窗口或deadline幂等缺陷。
+
+兼容：旧Qwen36Backend manifest、旧显式Python导入及worker入口保留；新增FreeTokenBackend等价入口。
+公共models[].id保持不变；它是Bonnet等客户端请求的model名称。status.backend_class反映实现类名，会显示FreeTokenBackend。
+Generic与旧入口都接受Flash Next MTP artifact；普通及MTP的真实TCP/SSE、取消、重试、卸载重载都重新验证。
+SDK现与HTTP一致拒绝不支持response_format、frequency_penalty、seed。保留当前GGUF/MTP、NVML、输出裁剪及SSE所有权逻辑。
+
+Speed0.2.0+strataq2runtime2；FreeToken仍为0.1.3+speed.strataq2review2b，供应705ce5c，55组原补丁及3native/27AOT原字节。
+Build本次只新增消费合同/证据和当前指针，不重建引擎材料。旧profile、patch、材料与历史验收合同保持不可变。
+
+最终验证：核心479+上游组合274通过，13项环境跳过；新增双backend MTP schema回归30通过。
+新普通wheel库存完整、只带选中的27 DLL；最终源码与普通wheel开关两模式质量/取消复用通过，最终源码真实TCP两模式及12份512-token输出完成。
+新保护包再次从带空格的独立checkout构建，搬迁到另一目录，清理开发/CUDA工具链PATH和变量，使用独立空Triton缓存与离线HF。
+embedded解释器、依赖来源、worker入口及旧新别名验证；完整模型两模式、真实TCP两入口、吞吐和旧35B通过；16棵主要验收进程树自然退出。
+可复用打包代码和生成部署配置扫描无本机workspace/用户目录依赖。host-command-records/*.txt是实际命令来源记录，不是默认打包脚本。
+完整安装器已构建，本修订未实装、未测试另一台机器或干净OS；Bonnet无可用checkout，未做真实跨仓联测。
+质量保持冻结门槛15/20、thinking3/3；长输出token0已知问题未解决。
+
+性能：原26候选的48-output ABBA与独立24-output ON复查全部保留。OFF变化-0.0817%/+0.1452%；ON合并变化-2.9470%/-2.7352%。
+这是实际观测下降，不能写成无劣化。相同输入下部分热请求选择不同full-3/cjk-2策略、输出文本和验证周期数不同；不是同一计算工作量。
+交叉父/子进程与请求完成后的策略快照已保存，尚不能把差异归因于某个目录拆分的固定开销。策略时序敏感性是推送后性能任务的首项。
+最终d7仅相对26修改manifest别名验收、产品版本和测试，所有推理、传输、请求执行代码完全相同；最终检查点另有以下新测量：
+  source off 70-0: 97.4627 tok/s (3 repetitions)
+  source off diverse-4096-0: 92.7898 tok/s (3 repetitions)
+  source on 70-0: 102.9114 tok/s (3 repetitions)
+  source on diverse-4096-0: 114.6008 tok/s (3 repetitions)
+  relocated compiled off 70-0: 97.5640 tok/s (3 repetitions)
+  relocated compiled off diverse-4096-0: 92.8096 tok/s (3 repetitions)
+  relocated compiled on 70-0: 106.1185 tok/s (3 repetitions)
+  relocated compiled on diverse-4096-0: 115.9001 tok/s (3 repetitions)
+最终单轮测量与前述ABBA分开，不能把新一轮替换旧的慢样本。
+证据：research/review/20261018-runtime2/source-v1及compiled-v1；其中prior-candidate26明确隔离早期基准与诊断。
+
+安装器：SiltokSpeed-Setup-0.2.0+strataq2runtime2.2026101819.exe
+SHA256：3c372bdc61a407fa74022c95abbbb480222ad98c494c312b51115fecac643ace

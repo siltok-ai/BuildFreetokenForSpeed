@@ -1,0 +1,4 @@
+START policy-diagnostic-before-v2
+PASS policy-diagnostic-before-v2
+START policy-diagnostic-after-v2
+PASS policy-diagnostic-after-v2

@@ -1,0 +1,32 @@
+{
+  "status": "validated_with_observed_optional_mtp_loss",
+  "build_allowed": true,
+  "source_commit": "26b62095f8ad7f24b397bdf2599ffbd577f08336",
+  "off_changes_percent": [
+    -0.08167828525781351,
+    0.14522217587897845
+  ],
+  "on_observed_changes_percent": {
+    "70-0": {
+      "followup": -2.8195224353560366,
+      "pooled": -2.947045645789903
+    },
+    "diverse-4096-0": {
+      "followup": -3.1007986534043575,
+      "pooled": -2.7352251718312903
+    }
+  },
+  "findings": [
+    "Independent ON repeat preserves about3% lower cohort medians; do not claim zero regression.",
+    "Cold/third-repeat common-output strata largely overlap; second hot repeat often takes a different exact text path.",
+    "Post-request snapshots show different full-3/cjk-2 choices and verification cycle counts; time-driven policy changes the amount of work.",
+    "New-parent/old-worker and old-parent/new-worker diagnostic controls both ran; cannot attribute a fixed cost to a split module.",
+    "All pure source/ordinary-wheel quality, compatibility, cancellation and unload tests pass; FT3native/27AOT/code unchanged.",
+    "Proceed with explicitly scoped refactor delivery; optional MTP observed loss remains documented and prioritized for subsequent performance goal."
+  ],
+  "qualification": "Functional acceptance plus retained performance observations, NOT a no-regression certificate",
+  "diagnostic_scopes": [
+    "mixed layers are diagnostic only",
+    "policy snapshots are instrumented diagnostic only"
+  ]
+}

@@ -2,7 +2,7 @@
   "format": 1,
   "profile": "build/profiles/strataq2review2b.json",
   "materials": "artifacts/strataq2review2b-cp312-cu130-sm120",
-  "consumer_contract": "integration/speed/consumer-contract-strataq2review2b-compiled.json",
+  "consumer_contract": "integration/speed/consumer-contract-strataq2review2b-runtime2-compiled.json",
   "weight_source_lock": "model-weights/qwen3.8-flash-next-strata-q2/source-lock.json",
   "mtp_manifest": "model-weights/qwen3.8-flash-next-strata-q2/mtp-runtime.json",
   "input_sha256": {
@@ -10,11 +10,11 @@
     "model-weights/qwen3.8-flash-next-strata-q2/source-lock.json": "a9c445bbeb1103938656137ce94dd31a69d3b835bfd4bf555e1e6c0a56d5ab49",
     "model-weights/qwen3.8-flash-next-strata-q2/mtp-runtime.json": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
     "integration/speed/presets/flash-next-sm120-16g-review2b.json": "00c1f84edc83f8d035c1073c672249386943f2a0a9185f62f13d4b4d1aaf801c",
-    "integration/speed/consumer-contract-strataq2review2b-compiled.json": "e6d0868f19bf8ad3f1cb19d63ea975856126da7bfed48f0f0574a3578fc6b4c8",
-    "integration/speed/consumer-contract-strataq2review2b.json": "96260b6621a5ab7bfa4c5a018ad688a1050419f643c554151cef57f5dc5d5dd7"
+    "integration/speed/consumer-contract-strataq2review2b-runtime2-compiled.json": "fa80863ae5bcc9f09f5a457ce017484bc69cae41beca8287df2e6f259d500b95",
+    "integration/speed/consumer-contract-strataq2review2b-runtime2.json": "2ebc3d27e725ab206b0a22aa093daba59766f7b721bcc2c2dcc5b776101ae783"
   },
   "version": "0.1.3+speed.strataq2review2b",
   "mtp_default_enabled": false,
-  "scope": "RTX5070Ti original full GSQ Q2: reviewed ordinary wheel, Speed source and isolated protected embedded payload accepted. Full installer built, not installed by this revision. Historical perf8 installed qualification remains separate. MTP defaults off; explicit paired policy. Known long-output issue retained; no clean-OS claim.",
+  "scope": "Runtime2 Speed d7ed82cf: safe generic wrapper refactor and MTP manifest alias fix; source/ordinary/full-model/TCP/current throughput and relocated protected embedded acceptance. Unchanged FT2b3native27AOT. Installer built, not installed; no clean-OS claim. Prior optional MTP cohort loss retained as performance limitation; old public model IDs/backend aliases preserved.",
   "speed_preset": "integration/speed/presets/flash-next-sm120-16g-review2b.json"
 }

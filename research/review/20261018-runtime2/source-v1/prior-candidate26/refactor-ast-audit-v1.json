@@ -1,0 +1,137 @@
+{
+  "silitok_speed.backends.freetoken_qwen36": {
+    "identical_definitions": [
+      "_RuntimeOptions",
+      "_TransportClosed",
+      "_WorkerTransport",
+      "FreeTokenQwen36Backend",
+      "PipelineCancellation",
+      "_raise_cancelled",
+      "_checkpoint_for",
+      "_runtime_options",
+      "_runtime_budgets",
+      "_validate_inputs",
+      "_sampling_values",
+      "_normalize_output_budget",
+      "_request_float",
+      "_normalize_stop",
+      "_load_tokenizer",
+      "_load_tokenizer_worker",
+      "_apply_chat_template",
+      "_validate_total_budget",
+      "_require_request_message",
+      "_text_field",
+      "_non_negative_int",
+      "_bool_field",
+      "_final_projection",
+      "_request_error_message",
+      "_validate_legacy_noop_options",
+      "_process_tree_contains_pid",
+      "_worker_cuda_visibility",
+      "_terminate_owned_process",
+      "_check_cancel_event",
+      "_check_cancel_callback",
+      "_checked_int",
+      "_int_option",
+      "_bool_option",
+      "_float_option"
+    ],
+    "changed_definitions": [
+      "_worker_command"
+    ],
+    "missing": []
+  },
+  "silitok_speed.qwen36.freetoken_contract": {
+    "identical_definitions": [
+      "_ProfileSpec",
+      "_hybrid_layer_types",
+      "FreeTokenCheckpointError",
+      "FreeTokenCheckpoint",
+      "inspect_freetoken_checkpoint",
+      "_inspect_cached",
+      "_checkpoint_fingerprint",
+      "_inspect_strata_gguf_checkpoint",
+      "_validate_q2_expert_source",
+      "_detect_quant_format",
+      "_is_flash_next_nvfp4",
+      "_is_qwen38_modelopt_nvfp4",
+      "_profile_for_config",
+      "_validate_model_shape",
+      "_generation_defaults",
+      "_read_object"
+    ],
+    "changed_definitions": [],
+    "missing": []
+  },
+  "silitok_speed.qwen36.freetoken_kernel_cache": {
+    "identical_definitions": [
+      "KernelCacheError",
+      "runtime_directory",
+      "activate_runtime",
+      "runtime_version",
+      "kernel_cache_directory",
+      "KernelCacheIdentity",
+      "verify_kernel_cache",
+      "generate_kernel_manifest",
+      "verify_runtime_identity",
+      "verify_runtime_abi"
+    ],
+    "changed_definitions": [],
+    "missing": []
+  },
+  "silitok_speed.qwen36.freetoken_wire": {
+    "identical_definitions": [
+      "WireProtocolError",
+      "FrameWriter",
+      "read_frame",
+      "_reject_json_constant",
+      "_write_all",
+      "_read_exact"
+    ],
+    "changed_definitions": [],
+    "missing": []
+  },
+  "silitok_speed.qwen36.freetoken_worker": {
+    "identical_definitions": [
+      "_RequestControl",
+      "_WorkerState",
+      "_EngineReplyFailure",
+      "_WorkerShutdown",
+      "_startup_log",
+      "_redirect_stdout_to_protocol",
+      "_command_reader",
+      "_build_streaming_llm_class",
+      "_worker_options",
+      "_llm_kwargs",
+      "_build_llm",
+      "_prompt_tokens",
+      "_sampling_params",
+      "_runtime_main",
+      "_expert_storage",
+      "main"
+    ],
+    "changed_definitions": [
+      "_bootstrap_package_path"
+    ],
+    "missing": []
+  },
+  "silitok_speed.qwen36.freetoken_options": {
+    "identical_definitions": [
+      "worker_options_payload"
+    ],
+    "changed_definitions": [],
+    "missing": []
+  },
+  "silitok_speed.qwen36.freetoken_mtp": {
+    "identical_definitions": [
+      "_verify_payloads",
+      "inspect_mtp_runtime",
+      "expected_mtp_ready",
+      "actual_mtp_ready"
+    ],
+    "changed_definitions": [],
+    "missing": []
+  },
+  "release_sha256": "c1811b0bc78fda160bca51d8050e22d84e2cb6ea1311c5c19f19d8376928ecb4",
+  "baseline": "cf70c86934d2bab554797527f5b0eae6c3c0d40c"
+}

@@ -1,0 +1,15 @@
+Process 16948: "C:\workspace\tools\python312\python.exe" -I -B -X utf8 -u -c "import sys; sys.path.insert(0, sys.argv.pop(1)); runtime=sys.argv.pop(1); sys.path.insert(0, runtime) if runtime else None; from silitok_speed.runtimes.freetoken.worker import main; raise SystemExit(main())" C:\workspace\wt\siltok-speed\rebase-dev-20261018 ""
+Python v3.12.10 (C:\workspace\tools\python312\python.exe)
+
+Thread 4616 (idle): "MainThread"
+    iter_q2_expert_pieces (freetoken\models\qwen4_exp\q2_source.py:120)
+    load_compact_banks (freetoken\moe\q2_residency.py:178)
+    _init_offload_moe_cache (freetoken\engine\engine.py:722)
+    __init__ (freetoken\engine\engine.py:403)
+    __init__ (freetoken\scheduler\scheduler.py:69)
+    __init__ (freetoken\llm\llm.py:40)
+    __init__ (silitok_speed\runtimes\freetoken\engine_bridge.py:59)
+    _build_llm (silitok_speed\runtimes\freetoken\engine_bridge.py:405)
+    _runtime_main (silitok_speed\runtimes\freetoken\worker.py:156)
+    main (silitok_speed\runtimes\freetoken\worker.py:243)
+    <module> (<string>:1)

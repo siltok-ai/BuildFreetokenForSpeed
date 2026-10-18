@@ -1,0 +1,341 @@
+{
+  "scope": "Descriptive grouping by same input/repetition and exact output text; all original samples retained",
+  "runs": [
+    {
+      "report": "wrapper-after-http-on-abba2-v2.json",
+      "variant": "after",
+      "label": "70-0-0",
+      "tps": 102.52640511306087,
+      "sha": "8dd3721c794b14d1199fd8a1bc41f8bc505cb3659981b2d99d5e322c981ba7fa"
+    },
+    {
+      "report": "wrapper-after-http-on-abba2-v2.json",
+      "variant": "after",
+      "label": "70-0-1",
+      "tps": 102.29678708195257,
+      "sha": "8c6848e3a604687a180a6c46bcfe496981d05a8b78e673750129d8e67921e6ed"
+    },
+    {
+      "report": "wrapper-after-http-on-abba2-v2.json",
+      "variant": "after",
+      "label": "70-0-2",
+      "tps": 110.17173358472382,
+      "sha": "9d7e8371ddd0fa6d7e8a7f10c0d10294233bd54c294586a3fac142c28f6ef663"
+    },
+    {
+      "report": "wrapper-after-http-on-abba2-v2.json",
+      "variant": "after",
+      "label": "diverse-4096-0-0",
+      "tps": 109.31415188772492,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-after-http-on-abba2-v2.json",
+      "variant": "after",
+      "label": "diverse-4096-0-1",
+      "tps": 114.2046490988431,
+      "sha": "202d8d66f0f91de2224ac4d2b8735ec31ee8f902f470e280aae9524fd9c1902a"
+    },
+    {
+      "report": "wrapper-after-http-on-abba2-v2.json",
+      "variant": "after",
+      "label": "diverse-4096-0-2",
+      "tps": 118.53067244497942,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-after-http-on-abba3-v2.json",
+      "variant": "after",
+      "label": "70-0-0",
+      "tps": 102.69720647084401,
+      "sha": "8dd3721c794b14d1199fd8a1bc41f8bc505cb3659981b2d99d5e322c981ba7fa"
+    },
+    {
+      "report": "wrapper-after-http-on-abba3-v2.json",
+      "variant": "after",
+      "label": "70-0-1",
+      "tps": 85.10669765055941,
+      "sha": "8c6848e3a604687a180a6c46bcfe496981d05a8b78e673750129d8e67921e6ed"
+    },
+    {
+      "report": "wrapper-after-http-on-abba3-v2.json",
+      "variant": "after",
+      "label": "70-0-2",
+      "tps": 104.34417896772854,
+      "sha": "9d7e8371ddd0fa6d7e8a7f10c0d10294233bd54c294586a3fac142c28f6ef663"
+    },
+    {
+      "report": "wrapper-after-http-on-abba3-v2.json",
+      "variant": "after",
+      "label": "diverse-4096-0-0",
+      "tps": 85.37126316744582,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-after-http-on-abba3-v2.json",
+      "variant": "after",
+      "label": "diverse-4096-0-1",
+      "tps": 99.39667772701864,
+      "sha": "202d8d66f0f91de2224ac4d2b8735ec31ee8f902f470e280aae9524fd9c1902a"
+    },
+    {
+      "report": "wrapper-after-http-on-abba3-v2.json",
+      "variant": "after",
+      "label": "diverse-4096-0-2",
+      "tps": 119.32008938041454,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-before-http-on-abba1-v2.json",
+      "variant": "before",
+      "label": "70-0-0",
+      "tps": 102.59503602992888,
+      "sha": "8dd3721c794b14d1199fd8a1bc41f8bc505cb3659981b2d99d5e322c981ba7fa"
+    },
+    {
+      "report": "wrapper-before-http-on-abba1-v2.json",
+      "variant": "before",
+      "label": "70-0-1",
+      "tps": 106.07072438826806,
+      "sha": "9d7e8371ddd0fa6d7e8a7f10c0d10294233bd54c294586a3fac142c28f6ef663"
+    },
+    {
+      "report": "wrapper-before-http-on-abba1-v2.json",
+      "variant": "before",
+      "label": "70-0-2",
+      "tps": 109.7662820239505,
+      "sha": "9d7e8371ddd0fa6d7e8a7f10c0d10294233bd54c294586a3fac142c28f6ef663"
+    },
+    {
+      "report": "wrapper-before-http-on-abba1-v2.json",
+      "variant": "before",
+      "label": "diverse-4096-0-0",
+      "tps": 108.97721450625018,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-before-http-on-abba1-v2.json",
+      "variant": "before",
+      "label": "diverse-4096-0-1",
+      "tps": 116.41092409093818,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-before-http-on-abba1-v2.json",
+      "variant": "before",
+      "label": "diverse-4096-0-2",
+      "tps": 119.0723605998855,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-before-http-on-abba4-v2.json",
+      "variant": "before",
+      "label": "70-0-0",
+      "tps": 103.1169572308893,
+      "sha": "8dd3721c794b14d1199fd8a1bc41f8bc505cb3659981b2d99d5e322c981ba7fa"
+    },
+    {
+      "report": "wrapper-before-http-on-abba4-v2.json",
+      "variant": "before",
+      "label": "70-0-1",
+      "tps": 102.00632670802243,
+      "sha": "8c6848e3a604687a180a6c46bcfe496981d05a8b78e673750129d8e67921e6ed"
+    },
+    {
+      "report": "wrapper-before-http-on-abba4-v2.json",
+      "variant": "before",
+      "label": "70-0-2",
+      "tps": 109.7426449074274,
+      "sha": "9d7e8371ddd0fa6d7e8a7f10c0d10294233bd54c294586a3fac142c28f6ef663"
+    },
+    {
+      "report": "wrapper-before-http-on-abba4-v2.json",
+      "variant": "before",
+      "label": "diverse-4096-0-0",
+      "tps": 109.57927199343781,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-before-http-on-abba4-v2.json",
+      "variant": "before",
+      "label": "diverse-4096-0-1",
+      "tps": 114.73742497574212,
+      "sha": "202d8d66f0f91de2224ac4d2b8735ec31ee8f902f470e280aae9524fd9c1902a"
+    },
+    {
+      "report": "wrapper-before-http-on-abba4-v2.json",
+      "variant": "before",
+      "label": "diverse-4096-0-2",
+      "tps": 118.37920566143814,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-on-followup-after-abba2-v1.json",
+      "variant": "after",
+      "label": "70-0-0",
+      "tps": 102.9669451735124,
+      "sha": "8dd3721c794b14d1199fd8a1bc41f8bc505cb3659981b2d99d5e322c981ba7fa"
+    },
+    {
+      "report": "wrapper-on-followup-after-abba2-v1.json",
+      "variant": "after",
+      "label": "70-0-1",
+      "tps": 101.98200734022926,
+      "sha": "8c6848e3a604687a180a6c46bcfe496981d05a8b78e673750129d8e67921e6ed"
+    },
+    {
+      "report": "wrapper-on-followup-after-abba2-v1.json",
+      "variant": "after",
+      "label": "70-0-2",
+      "tps": 110.2952476432097,
+      "sha": "9d7e8371ddd0fa6d7e8a7f10c0d10294233bd54c294586a3fac142c28f6ef663"
+    },
+    {
+      "report": "wrapper-on-followup-after-abba2-v1.json",
+      "variant": "after",
+      "label": "diverse-4096-0-0",
+      "tps": 109.36852731276478,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-on-followup-after-abba2-v1.json",
+      "variant": "after",
+      "label": "diverse-4096-0-1",
+      "tps": 114.35833326509402,
+      "sha": "202d8d66f0f91de2224ac4d2b8735ec31ee8f902f470e280aae9524fd9c1902a"
+    },
+    {
+      "report": "wrapper-on-followup-after-abba2-v1.json",
+      "variant": "after",
+      "label": "diverse-4096-0-2",
+      "tps": 118.53116734105326,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-on-followup-after-abba3-v1.json",
+      "variant": "after",
+      "label": "70-0-0",
+      "tps": 102.59042633395235,
+      "sha": "8dd3721c794b14d1199fd8a1bc41f8bc505cb3659981b2d99d5e322c981ba7fa"
+    },
+    {
+      "report": "wrapper-on-followup-after-abba3-v1.json",
+      "variant": "after",
+      "label": "70-0-1",
+      "tps": 102.04147652523841,
+      "sha": "8c6848e3a604687a180a6c46bcfe496981d05a8b78e673750129d8e67921e6ed"
+    },
+    {
+      "report": "wrapper-on-followup-after-abba3-v1.json",
+      "variant": "after",
+      "label": "70-0-2",
+      "tps": 110.09258592476529,
+      "sha": "9d7e8371ddd0fa6d7e8a7f10c0d10294233bd54c294586a3fac142c28f6ef663"
+    },
+    {
+      "report": "wrapper-on-followup-after-abba3-v1.json",
+      "variant": "after",
+      "label": "diverse-4096-0-0",
+      "tps": 108.24653221879501,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-on-followup-after-abba3-v1.json",
+      "variant": "after",
+      "label": "diverse-4096-0-1",
+      "tps": 113.10606451415494,
+      "sha": "202d8d66f0f91de2224ac4d2b8735ec31ee8f902f470e280aae9524fd9c1902a"
+    },
+    {
+      "report": "wrapper-on-followup-after-abba3-v1.json",
+      "variant": "after",
+      "label": "diverse-4096-0-2",
+      "tps": 117.71586711497,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-on-followup-before-abba1-v1.json",
+      "variant": "before",
+      "label": "70-0-0",
+      "tps": 102.33980026134404,
+      "sha": "8dd3721c794b14d1199fd8a1bc41f8bc505cb3659981b2d99d5e322c981ba7fa"
+    },
+    {
+      "report": "wrapper-on-followup-before-abba1-v1.json",
+      "variant": "before",
+      "label": "70-0-1",
+      "tps": 105.61588601895163,
+      "sha": "9d7e8371ddd0fa6d7e8a7f10c0d10294233bd54c294586a3fac142c28f6ef663"
+    },
+    {
+      "report": "wrapper-on-followup-before-abba1-v1.json",
+      "variant": "before",
+      "label": "70-0-2",
+      "tps": 112.69469579915813,
+      "sha": "9d7e8371ddd0fa6d7e8a7f10c0d10294233bd54c294586a3fac142c28f6ef663"
+    },
+    {
+      "report": "wrapper-on-followup-before-abba1-v1.json",
+      "variant": "before",
+      "label": "diverse-4096-0-0",
+      "tps": 108.58248729064904,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-on-followup-before-abba1-v1.json",
+      "variant": "before",
+      "label": "diverse-4096-0-1",
+      "tps": 117.4512220597434,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-on-followup-before-abba1-v1.json",
+      "variant": "before",
+      "label": "diverse-4096-0-2",
+      "tps": 118.7937666972918,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-on-followup-before-abba4-v1.json",
+      "variant": "before",
+      "label": "70-0-0",
+      "tps": 102.44809650631456,
+      "sha": "8dd3721c794b14d1199fd8a1bc41f8bc505cb3659981b2d99d5e322c981ba7fa"
+    },
+    {
+      "report": "wrapper-on-followup-before-abba4-v1.json",
+      "variant": "before",
+      "label": "70-0-1",
+      "tps": 105.90537489554535,
+      "sha": "9d7e8371ddd0fa6d7e8a7f10c0d10294233bd54c294586a3fac142c28f6ef663"
+    },
+    {
+      "report": "wrapper-on-followup-before-abba4-v1.json",
+      "variant": "before",
+      "label": "70-0-2",
+      "tps": 111.86457092795354,
+      "sha": "9d7e8371ddd0fa6d7e8a7f10c0d10294233bd54c294586a3fac142c28f6ef663"
+    },
+    {
+      "report": "wrapper-on-followup-before-abba4-v1.json",
+      "variant": "before",
+      "label": "diverse-4096-0-0",
+      "tps": 108.81375671680975,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-on-followup-before-abba4-v1.json",
+      "variant": "before",
+      "label": "diverse-4096-0-1",
+      "tps": 117.2920932805336,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    },
+    {
+      "report": "wrapper-on-followup-before-abba4-v1.json",
+      "variant": "before",
+      "label": "diverse-4096-0-2",
+      "tps": 119.15634602060716,
+      "sha": "5ecd8e6b971ae53a87a3cca130e737df034c6334141ea800d666a7bbfa8ec6fe"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "original": [
+    "C:\\workspace\\envs\\siltok-speed\\flash-review2b\\Scripts\\python.exe",
+    "-I",
+    "-B",
+    "-X",
+    "utf8",
+    "-u",
+    "-c",
+    "import sys; sys.path.insert(0, sys.argv.pop(1)); runtime=sys.argv.pop(1); sys.path.insert(0, runtime) if runtime else None; from silitok_speed.runtimes.freetoken.worker import main; raise SystemExit(main())",
+    "C:\\workspace\\wt\\siltok-speed\\rebase-dev-20261018",
+    ""
+  ]
+}
