@@ -2,7 +2,7 @@
 
 唯一选择是 [current-release.json](../integration/speed/current-release.json)：它绑定版本、profile、有序补丁、材料、消费合同与推荐preset。配套 Speed 分支是 `integrate/flash-next-dev-20261018`，Speed的 `silitok_speed/qwen36/release.json` 固定实际 wheel SHA 与供应提交。旧 perf8 的真实安装证据保留，新review修订的范围由自己的合同声明，不能继承旧包的安装资格。
 
-当前包装层、MTP别名兼容及迁移打包验证见 [runtime2说明](flash-next-runtime2-20261018.txt)。公共`models[].id`和旧`Qwen36Backend`继续有效，`FreeTokenBackend`是等价新入口。
+当前性能改动、配套材料及迁移打包验证见 [perf9说明](flash-next-perf9-20261018.txt)；此前包装层和MTP别名兼容记录见 [runtime2说明](flash-next-runtime2-20261018.txt)。公共`models[].id`和旧`Qwen36Backend`继续有效，`FreeTokenBackend`是等价新入口。
 
 ## 环境与匹配材料
 
@@ -47,7 +47,7 @@ GGUF引擎读取绝对运行路径，来源描述另保留相对位置。搬迁�
 
 ```powershell
 $deployment = 'D:\deploy\flash-next-off'
-& $python -B tools/flash_next_speed_config.py --root $models --deployment-root $deployment --mode off --preset sm120-16g-review2b
+& $python -B tools/flash_next_speed_config.py --root $models --deployment-root $deployment --mode off --preset sm120-16g-perf9
 $env:SILITOK_CONFIG = Join-Path $deployment 'speed-config'
 $env:SILITOK_FREETOKEN_KERNEL_CACHE_DIR = Join-Path $materials 'kernel-cache'
 # 在配套Speed仓库或已安装Speed环境运行；正常设备许可证仍然生效。

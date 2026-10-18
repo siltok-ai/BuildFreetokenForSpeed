@@ -1,20 +1,20 @@
 {
   "format": 1,
-  "profile": "build/profiles/strataq2review2b.json",
-  "materials": "artifacts/strataq2review2b-cp312-cu130-sm120",
-  "consumer_contract": "integration/speed/consumer-contract-strataq2review2b-runtime2-compiled.json",
+  "profile": "build/profiles/strataq2perf9.json",
+  "materials": "artifacts/strataq2perf9-cp312-cu130-sm120",
+  "consumer_contract": "integration/speed/consumer-contract-strataq2perf9-compiled.json",
   "weight_source_lock": "model-weights/qwen3.8-flash-next-strata-q2/source-lock.json",
   "mtp_manifest": "model-weights/qwen3.8-flash-next-strata-q2/mtp-runtime.json",
   "input_sha256": {
-    "build/profiles/strataq2review2b.json": "79134c2d1af8d995925089ef5bade85324fd96415f20439bd3ab1dda8ef1e7ba",
+    "build/profiles/strataq2perf9.json": "3a089467f4fb1e452ee195baf30adace71e380d95072c29fbcb228e603cb2fef",
     "model-weights/qwen3.8-flash-next-strata-q2/source-lock.json": "a9c445bbeb1103938656137ce94dd31a69d3b835bfd4bf555e1e6c0a56d5ab49",
     "model-weights/qwen3.8-flash-next-strata-q2/mtp-runtime.json": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
-    "integration/speed/presets/flash-next-sm120-16g-review2b.json": "00c1f84edc83f8d035c1073c672249386943f2a0a9185f62f13d4b4d1aaf801c",
-    "integration/speed/consumer-contract-strataq2review2b-runtime2-compiled.json": "fa80863ae5bcc9f09f5a457ce017484bc69cae41beca8287df2e6f259d500b95",
-    "integration/speed/consumer-contract-strataq2review2b-runtime2.json": "2ebc3d27e725ab206b0a22aa093daba59766f7b721bcc2c2dcc5b776101ae783"
+    "integration/speed/presets/flash-next-sm120-16g-perf9.json": "491ad553af8e5e986af30ab0985c8ecefce13c11e96e9447e21ac3de24f5e36d",
+    "integration/speed/consumer-contract-strataq2perf9-compiled.json": "f11e0345b05c7a34be41cc3f67c8c74bcea049f35ba0b15e8458552f589828b9",
+    "integration/speed/consumer-contract-strataq2perf9.json": "66cc4dfc50847b79d9a2824aab04d12de9eb109d0f987d193ee0b500c6df1bf9"
   },
-  "version": "0.1.3+speed.strataq2review2b",
+  "version": "0.1.3+speed.strataq2perf9",
   "mtp_default_enabled": false,
-  "scope": "Runtime2 Speed d7ed82cf: safe generic wrapper refactor and MTP manifest alias fix; source/ordinary/full-model/TCP/current throughput and relocated protected embedded acceptance. Unchanged FT2b3native27AOT. Installer built, not installed; no clean-OS claim. Prior optional MTP cohort loss retained as performance limitation; old public model IDs/backend aliases preserved.",
-  "speed_preset": "integration/speed/presets/flash-next-sm120-16g-review2b.json"
+  "scope": "FT9 startup/CPU optimization on Speed84538603: source/ordinary/relocated protected real models and HTTP accepted; unchanged3native27AOT; old public IDs/backend aliases. Installer built, not installed; no cleanOS/realBonnet claim. Prior optional-MTP cohort loss and long-output issue retained.",
+  "speed_preset": "integration/speed/presets/flash-next-sm120-16g-perf9.json"
 }

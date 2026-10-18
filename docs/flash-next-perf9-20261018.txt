@@ -1,0 +1,50 @@
+Speed / FreeToken / Strata 性能探索及review（2026-10-18）
+
+Speed分支 integrate/flash-next-dev-20261018，84538603ab71fde4d0921310f725a9d511270891；基于dev c89720fe，领先16笔。
+第16笔是本轮性能优化；此前第14笔26b62095是包装层重构，第15笔d7ed82cf修复MTP manifest新别名验收。
+昨晚主要探索修复对应重放后的764d9d06，额外SSE幂等流所有权修复是3329971a；历史原提交分别91d6487c、1982c4fd。
+
+FreeToken 0.1.3+speed.strataq2perf9，供应6ccffb23b564156bc9352422a374b47ab77aec80；57组patch，只新增连续host拷贝和独立版本。
+复用原3native/27AOT逐字节；普通wheel SHA62e1375eff978807e4392c8285e958dc023b1291d0ef496a06641be906489fae。
+Speed0.2.0+strataq2perf9；旧公共models[].id、Qwen36Backend、显式Python别名与worker入口继续有效。
+
+性能分析使用Nsight Systems、py-spy、cProfile、CUDA event、NVML/进程监督，固定完整原始Q2权重。
+连续host区间拷贝原生ABBA：加载30.797->29.504秒，-4.197%；24份真实512输出逐token一致，OFF吞吐-0.0877%/-0.0259%。
+等待策略原生48-output ABBA：CPU时间约218->34-38秒，降低约84%；加载墙钟增加约0.5-0.6秒。
+OFF吞吐+0.472%/-0.027%，ON+0.005%/+0.770%。ON输出和策略会分叉，所有数据保留；不宣称固定工作量的统一加速。
+该默认值只用于Windows Q2 worker，保留用户OMP_WAIT_POLICY、KMP_BLOCKTIME、KMP_LIBRARY；线程数不变。
+两项单独实验的收益不能相加当成组合后实测。后面的当前源码/编译包检查点独立记录。
+
+单线程加载、64MiB读取块、NumPy打包均未更快，未纳入补丁；增加owner-gather并行度收益有限，未改kernel。
+Nsight OFF GPU union/span9.187/10.003ms每步；ON17.573/20.066ms每窗口，owner gather约3.516ms。同步等待不能与GPU时间重复相加。
+Strata固定6674a006原二进制，匹配70/4096输入和512实际输出：OFF95.651/92.429、ON117.959/124.869 tok/s。
+其resident/CPU/PCIe、KV和draft深度不同，不将差异解释为孤立kernel或API胜负。新跑前拒绝了错误的instrumented build hash。
+Strata热4K仅重算7token，FreeToken重算64token，是后续TTFT重点；本轮不冒险改变GDN快照、QSA分组和COW边界。
+
+正确性/风格核对参考冻结官方FreeToken及vLLM/SGLang原代码：请求ID、取消ack、流所有权、图重建和owner发布顺序均保留。
+未移植旧8e6db580中已过时的材料约束、重复显存扣除或deadline幂等问题，也未扩大至无证据的调度/数学重写。
+
+验证：FT源码/普通wheel各176测试+47子测试；两模式各23冻结质量IDs与review2b完全一致，质量15/20、thinking3/3。
+Speed核心484+组合274通过，13环境跳过；新5用例运行真实wire子进程。源码/普通wheel两模式整模型、取消复用与真实TCP完成。
+保护包从含空格的新checkout构建、搬迁到新路径；清理开发/CUDA工具链环境，独立空Triton缓存、离线HF，测试完整模型两模式/两alias/TCP/旧35B。
+16棵主要验收进程树自然退出，未靠强制回收通过；编译包10项集成检查通过，MSVC构建不授予xollvm混淆资格。
+源码旧MTP shim行尾与Git规则不一致，已按Git blob统一LF并重新生成普通wheel、重新跑最终候选；之前3份模型记录标为superseded并保留。
+新preset sm120-16g-perf9配套生成器已加入，旧preset名字保留；显式候选配置开/关dry-run成功。
+
+当前HTTP512检查点（每输入3次，中位数）：
+  source off 70-0: 97.2402 tok/s
+  source off diverse-4096-0: 92.8234 tok/s
+  source on 70-0: 103.1886 tok/s
+  source on diverse-4096-0: 115.2921 tok/s
+  relocated compiled off 70-0: 97.4020 tok/s
+  relocated compiled off diverse-4096-0: 92.7897 tok/s
+  relocated compiled on 70-0: 106.1369 tok/s
+  relocated compiled on diverse-4096-0: 116.2647 tok/s
+
+早期包装层paired-MTP合并ABBA观测下降2.947%/2.735%仍保留，新一轮不能替代旧慢样本；时序策略分叉原因尚未全部消除。
+长输出token0未解决；按用户要求构建并直接测试Speed，不进行Bonnet跨仓联测；完整安装器已构建，本修订未实装/未验另一台机器或干净OS。
+来源与完整原始证据：research/review/20261018-perf9/{native-v1,exploration-v1,source-v1,compiled-v1}。
+本机命令以host-command-records/*.txt保存，作为来源记录，不是产品默认打包脚本；可复用脚本/生成部署配置扫描无workspace或用户名路径依赖。
+
+安装器：SiltokSpeed-Setup-0.2.0+strataq2perf9.2026101821.exe
+SHA256：49080ed9e2ad4ebd28a26811a1591fc51be62090a0b2a6791281dd7856a21f8f

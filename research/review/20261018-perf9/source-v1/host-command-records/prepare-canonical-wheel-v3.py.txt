@@ -1,0 +1,71 @@
+"""Finish the in-flight probe, normalize the LF shim, and restart acceptance cleanly."""
+from pathlib import Path
+import ast
+import hashlib
+import json
+import shutil
+import subprocess
+import time
+import zipfile
+import psutil
+
+R=Path(__file__).parent
+S=Path(r'C:\workspace\wt\siltok-speed\rebase-dev-20261018')
+C=Path(r'C:\workspace\wt\siltok-speed\perf9 relocated')
+BASE=Path(r'C:\workspace\envs\siltok-speed\flash-perf9')
+TARGET=BASE.with_name('flash-perf9b-release')
+deadline=time.monotonic()+900
+while not (R/'ordinary-quality-off-v1.resource.json').exists():
+    if time.monotonic()>deadline:raise TimeoutError('Prior probe has not naturally exited')
+    time.sleep(2)
+resource=json.loads((R/'ordinary-quality-off-v1.resource.json').read_text())
+assert not resource['returncode'] and not resource['stop_reason'] and not resource['remaining_before_cleanup']
+paused=json.loads((R/'paused-model-queue-v1.json').read_text())
+for pid in reversed(paused['pids']):
+    try:
+        process=psutil.Process(pid)
+        assert str(R/'run-models-v1.py') in process.cmdline()
+        process.terminate()
+    except psutil.NoSuchProcess:pass
+psutil.wait_procs([psutil.Process(pid) for pid in paused['pids'] if psutil.pid_exists(pid)],timeout=10)
+name='silitok_speed/qwen36/freetoken_mtp.py'
+canonical=subprocess.check_output(['git','show','HEAD:'+name],cwd=S)
+assert b'\r\n' not in canonical
+for root in (S,C):
+    before=(root/name).read_bytes()
+    assert before.replace(b'\r\n',b'\n')==canonical
+    assert ast.dump(ast.parse(before))==ast.dump(ast.parse(canonical))
+    (root/name).write_bytes(canonical)
+    subprocess.run(['git','add','--',name],cwd=root,check=True)
+    assert not subprocess.check_output(['git','status','--porcelain'],cwd=root,text=True).strip()
+names=subprocess.check_output(['git','ls-files'],cwd=S,text=True).splitlines()
+assert all((S/n).read_bytes()==(C/n).read_bytes() for n in names if n.endswith('.py'))
+(R/'canonical-checkout-v3.json').write_text(json.dumps(dict(status='passed',changed_eol_only=[name],
+    ast_unchanged=True,git_clean=True,canonical_from_head_blob=True,prior_v1_probes='Source OFF/ON and ordinary OFF before canonical LF; retained, superseded'),indent=2)+'\n')
+staging=Path(r'C:\workspace\build\siltok-speed\perf9c-wheel-src')
+wheels=R/'ordinary-wheels-v3'
+assert not staging.exists() and not wheels.exists()
+shutil.copytree(S/'silitok_speed',staging,ignore=shutil.ignore_patterns('build','.artifacts','__pycache__','.pytest_cache','*.egg-info'))
+subprocess.run([str(BASE/'Scripts/python.exe'),'-B','-m','pip','wheel','--no-deps','--no-build-isolation','--wheel-dir',str(wheels),str(staging)],check=True)
+wheel,=wheels.glob('*.whl')
+with zipfile.ZipFile(wheel) as archive:
+    files={n:hashlib.sha256(archive.read(n)).hexdigest() for n in archive.namelist()}
+    dlls=[n for n in files if '/qwen36/kernel_cache' in n and n.endswith('.dll')]
+    assert len(dlls)==27 and all('kernel_cache_strataq2perf9/' in n for n in dlls)
+    for n in files:
+        if n.startswith('silitok_speed/') and n.endswith('.py'):assert archive.read(n)==(S/n).read_bytes(),n
+subprocess.run([str(TARGET/'Scripts/python.exe'),'-B','-m','pip','install','--no-index','--no-deps','--force-reinstall',str(wheel)],check=True)
+report=dict(status='passed',wheel=str(wheel),wheel_sha256=hashlib.sha256(wheel.read_bytes()).hexdigest(),runtime=str(TARGET),source=str(S),
+    selected_dlls=len(dlls),lost_assets=[],files=files,qualification='canonical checkout ordinary candidate inventory; full GPU/protected acceptance pending')
+(R/'ordinary-wheel-inventory-v3.json').write_text(json.dumps(report,indent=2)+'\n')
+text=(R/'run-models-v1.py').read_text(encoding='utf-8')
+text=text.replace('ordinary-wheel-inventory-v2.json','ordinary-wheel-inventory-v3.json').replace("tools=R/'ordinary-tools-v1'","tools=R/'ordinary-tools-v2'")
+for old,new in [("stem=f'{kind}-quality-{mode}-v1'","stem=f'{kind}-quality-{mode}-v2'"),
+    ("stem=f'source-tcp-{mode}-v1'","stem=f'source-tcp-{mode}-v2'"),
+    ("stem=f'source-http-{mode}-performance-v1'","stem=f'source-http-{mode}-performance-v2'")]:
+    assert old in text,old
+    text=text.replace(old,new)
+(R/'run-models-v2.py').write_text(text,encoding='utf-8')
+(R/'build-source-byte-audit-v2.json').write_text(json.dumps(dict(status='passed',source=str(S),checkout=str(C),
+    speed_commit='84538603ab71fde4d0921310f725a9d511270891',all_tracked_python_equal=True,canonical_lf_shim=True,git_clean=True),indent=2)+'\n')
+print(json.dumps({k:v for k,v in report.items() if k!='files'}),flush=True)

@@ -1,0 +1,166 @@
+{
+  "status": "passed",
+  "accepted_trees": 16,
+  "records": {
+    "source-quality-off-v2.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 663732224,
+      "min_ram_available": 28473933824,
+      "min_commit_available": 12659773440,
+      "elapsed_s": 81.34399999998277
+    },
+    "source-quality-on-v2.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 657440768,
+      "min_ram_available": 27234676736,
+      "min_commit_available": 11363880960,
+      "elapsed_s": 83.375
+    },
+    "ordinary-quality-off-v2.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 663732224,
+      "min_ram_available": 28478488576,
+      "min_commit_available": 12672172032,
+      "elapsed_s": 91.98399999999674
+    },
+    "ordinary-quality-on-v2.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 657440768,
+      "min_ram_available": 27252383744,
+      "min_commit_available": 11378520064,
+      "elapsed_s": 153.96900000004098
+    },
+    "source-tcp-off-v2.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 686800896,
+      "min_ram_available": 27826741248,
+      "min_commit_available": 11144830976,
+      "elapsed_s": 156.59400000004098
+    },
+    "source-tcp-on-v2.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 636469248,
+      "min_ram_available": 26535682048,
+      "min_commit_available": 9746255872,
+      "elapsed_s": 146.0
+    },
+    "source-http-off-performance-v2.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 747618304,
+      "min_ram_available": 27774230528,
+      "min_commit_available": 11160502272,
+      "elapsed_s": 102.53099999995902
+    },
+    "source-http-on-performance-v2.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 684703744,
+      "min_ram_available": 26528124928,
+      "min_commit_available": 9802944512,
+      "elapsed_s": 101.01500000001397
+    },
+    "staged-perf9-relocated/results/backend-off-quality-v1.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 663732224,
+      "min_ram_available": 28083359744,
+      "min_commit_available": 12436283392,
+      "elapsed_s": 147.03100000001723
+    },
+    "staged-perf9-relocated/results/backend-on-quality-v1.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 657440768,
+      "min_ram_available": 27016364032,
+      "min_commit_available": 11265748992,
+      "elapsed_s": 116.70299999997951
+    },
+    "staged-perf9-relocated/results/http-off-functional-v1.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 418365440,
+      "min_ram_available": 27702874112,
+      "min_commit_available": 10815188992,
+      "elapsed_s": 178.31199999997625
+    },
+    "staged-perf9-relocated/results/http-off-performance-v1.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 747618304,
+      "min_ram_available": 27807789056,
+      "min_commit_available": 11243610112,
+      "elapsed_s": 108.57800000003772
+    },
+    "staged-perf9-relocated/results/http-on-functional-v1.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 636469248,
+      "min_ram_available": 26620432384,
+      "min_commit_available": 9891569664,
+      "elapsed_s": 148.01600000000326
+    },
+    "staged-perf9-relocated/results/http-on-performance-v1.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 684703744,
+      "min_ram_available": 26592239616,
+      "min_commit_available": 9894420480,
+      "elapsed_s": 101.53100000001723
+    },
+    "staged-perf9-relocated/results/portability-v1.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 16385134592,
+      "min_ram_available": 53176762368,
+      "min_commit_available": 56023117824,
+      "elapsed_s": 21.75
+    },
+    "staged-perf9-relocated/results/qwen36-backend-v1.resource.json": {
+      "returncode": 0,
+      "stop_reason": null,
+      "remaining_before_cleanup": [],
+      "remaining_descendants": [],
+      "min_gpu_free": 3205480448,
+      "min_ram_available": 28008280064,
+      "min_commit_available": 11774918656,
+      "elapsed_s": 103.53200000000652
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "exit_code": 0,
+  "source": "C:\\workspace\\wt\\siltok-speed\\rebase-dev-20261018\\silitok_speed\\__init__.py",
+  "python": "C:\\workspace\\envs\\siltok-speed\\flash-perf9\\Scripts\\python.exe",
+  "process_only_license_fixture": true,
+  "tests": [
+    "tests/unit/test_qwen36_backend.py",
+    "-k",
+    "worker_q2_wait_policy",
+    "-q",
+    "--tb=short",
+    "-p",
+    "no:cacheprovider"
+  ]
+}

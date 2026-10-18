@@ -1,0 +1,54 @@
+"""Retest the final MTP alias fix with source, ordinary wheel and current throughput."""
+from pathlib import Path
+import json
+import os
+import runpy
+import shutil
+import time
+
+R=Path(__file__).parent
+P=R.with_name('profile-review-20261018')
+m=runpy.run_path(str(P/'run-wrapper-models-v2.py'))
+m['run'].__globals__['RUN']=R
+for key,value in dict(PY=Path(r'C:\workspace\envs\siltok-speed\flash-perf9\Scripts\python.exe'),CACHE=Path(r'C:\workspace\wt\siltok-speed\rebase-dev-20261018\silitok_speed\qwen36\kernel_cache_strataq2perf9')).items():
+    m[key]=value;m['run'].__globals__[key]=value
+deadline=time.monotonic()+1200
+while not all((R/name).exists() for name in ('wrapper-cpu-complete-v2.json','ordinary-wheel-inventory-v3.json')):
+    if time.monotonic()>deadline:raise TimeoutError('CPU or wheel preparation incomplete')
+    time.sleep(2)
+source=m['SOURCE'];tools=R/'ordinary-tools-v2'
+shutil.copytree(source/'tools',tools/'tools',ignore=shutil.ignore_patterns('__pycache__'))
+os.environ.update(PYTHONUTF8='1',PYTHONDONTWRITEBYTECODE='1',FREETOKEN_DISABLE_JIT='1',
+    FREETOKEN_KERNEL_CACHE_DIR=str(m['CACHE']),SILITOK_FREETOKEN_KERNEL_CACHE_DIR=str(m['CACHE']),
+    TRITON_CACHE_DIR=r'C:\workspace\cache\triton\flash-review2b')
+os.environ.pop('PYTHONPATH',None)
+wheel_py=Path(r'C:\workspace\envs\siltok-speed\flash-perf9b-release\Scripts\python.exe')
+for kind,python,root,script in [
+    ('source',m['PY'],source,m['TOOLS']/'backend8-probe.py'),
+    ('ordinary',wheel_py,tools,R/'backend8-ordinary-probe-v1.py')]:
+    for mode,resident in [('off',5760),('on',4992)]:
+        stem=f'{kind}-quality-{mode}-v2'
+        args=[python,'-B',script,'--source',root,'--model',m['MODEL']/'flash-next-strata-q2',
+            '--resident',resident,'--vram-gib',15,'--host-gib',31,'--suite','quality','--output',R/f'{stem}.json']
+        if mode=='on':args+=['--mtp-runtime',m['MODEL']/'flash-next-mtp','--compact-mtp','--mtp-draft-policy','paired_cjk']
+        m['run'](stem,args)
+        data=json.loads((R/f'{stem}.json').read_text(encoding='utf-8'))
+        expected=source if kind=='source' else wheel_py.parents[1]
+        assert Path(data['speed_origin']).resolve().is_relative_to(expected.resolve()),data['speed_origin']
+for mode,resident in [('off',5760),('on',4992)]:
+    stem=f'source-tcp-{mode}-v2'
+    m['run'](stem,[m['PY'],'-B',R/'run-http-compiled-alias-v1.py','--mode','http','--tcp',
+        '--backend-name','FreeTokenBackend' if mode=='on' else 'Qwen36Backend',
+        '--lifecycle-output',R/f'{stem}.lifecycle.json',*m['shared'](source,mode,resident),
+        '--profile','flash-next','--quant','q2_0_strata','--gpu-resource-probe','nvml',
+        '--startup-timeout',600,'--output',R/f'{stem}.json'])
+    stem=f'source-http-{mode}-performance-v2'
+    m['run'](stem,[m['PY'],'-B',m['TOOLS']/'run-http-performance.py',*m['shared'](source,mode,resident),
+        '--prompts-json',m['TOOLS']/'frozen-prompts.json','--tokens',512,'--repetitions',3,
+        '--output',R/f'{stem}.json'])
+    report=json.loads((R/f'{stem}.json').read_text(encoding='utf-8'))
+    assert len(report['runs'])==6 and all(row['output_tokens']==512 for row in report['runs'])
+(R/'models-complete-v1.json').write_text(json.dumps(dict(status='passed',
+    speed_commit='84538603ab71fde4d0921310f725a9d511270891',qualified_model_trees=8,
+    final_throughput_outputs=12,prior_72_output_abba_reference=str(P/'wrapper-regression-followup-v1.json'),
+    note='FT9 contiguous host copies plus scoped Windows Q2 passive wait default; new source and ordinary consumer qualification, previous refactor ABBA remains separate.'))+'\n')
