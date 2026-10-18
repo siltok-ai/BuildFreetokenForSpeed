@@ -1,0 +1,24 @@
+{"status": "running", "python": "C:\\workspace\\build\\siltok-speed\\perf9 moved-test\\app\\python\\python.exe", "speed_origin": "C:\\workspace\\build\\siltok-speed\\perf9 moved-test\\app\\python\\Lib\\site-packages\\silitok_speed\\__init__.pyd", "build_commit": "84538603ab71fde4d0921310f725a9d511270891", "build_dirty": false, "build_version": "0.2.0+strataq2perf9.2026101821", "bundle_sha256": "eb7928fbb3c4b645440f219ef07e8a24af4a88507d42a8143ece01ff0ea9d93c", "bundle_cache": "C:\\Users\\UserPC\\AppData\\Local\\Temp\\siltok-speed-assets\\f1ae2243fc6b02cf71e1921e915951487327a77c44bb85b09042258b0f2f4bc6", "script": "C:\\workspace\\runs\\siltok-speed\\blast-final-20261018\\sampling-boundary-compiled-probe-v1.py", "arguments": ["--output", "C:\\workspace\\runs\\siltok-speed\\blast-final-20261018\\compiled-boundary-before.json"], "scope": "compiled_staged_payload_not_installer"}
+C:\workspace\build\siltok-speed\perf9 moved-test\app\python\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+Traceback (most recent call last):
+  File "C:\workspace\runs\siltok-speed\review-20261017\consumer-tools\run-staged-probe.py", line 68, in <module>
+    main()
+  File "C:\workspace\runs\siltok-speed\review-20261017\consumer-tools\run-staged-probe.py", line 49, in main
+    runpy.run_path(str(args.script),run_name='__main__')
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\workspace\runs\siltok-speed\blast-final-20261018\sampling-boundary-compiled-probe-v1.py", line 25, in <module>
+    engine=Engine(EngineConfig(models_dir='',result_store_dir=str(Path(temporary)/'results'),gpu_resource_probe='nvml'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ".artifacts/compiled-build/generated/engine/engine.py", line 99, in silitok_speed.engine.engine.Engine.__init__
+  File ".artifacts/compiled-build/generated/config.py", line 227, in silitok_speed.config.get_config
+  File "C:\workspace\build\siltok-speed\perf9 moved-test\app\python\Lib\site-packages\pydantic_settings\main.py", line 247, in __init__
+    super().__init__(**__pydantic_self__.__class__._settings_build_values(sources, init_kwargs))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\workspace\build\siltok-speed\perf9 moved-test\app\python\Lib\site-packages\pydantic_settings\main.py", line 470, in _settings_build_values
+    source_state = source()
+                   ^^^^^^^^
+  File ".artifacts/compiled-build/generated/config.py", line 253, in silitok_speed.config._FlatteningYamlSource.__call__
+FileNotFoundError: SILITOK_CONFIG is set ('C:\\workspace\\runs\\siltok-speed\\blast-final-20261018\\boundary-before-config') but config.yaml is missing: 'C:\\workspace\\runs\\siltok-speed\\blast-final-20261018\\boundary-before-config\\config.yaml'. Unset SILITOK_CONFIG to run on schema defaults, or provide the file.

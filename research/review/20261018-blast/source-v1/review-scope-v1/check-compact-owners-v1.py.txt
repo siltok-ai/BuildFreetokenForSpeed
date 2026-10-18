@@ -1,0 +1,68 @@
+"""以小型真实字节验证FT9所有权拷贝；不提供GPU、pinning或性能验收。"""
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
+import hashlib
+import importlib.metadata
+import json
+import random
+
+import torch
+import freetoken.kernel.pinned as pinned
+import freetoken.moe.expert_pieces as pieces_module
+from freetoken.layers.quantization import QuantKind
+from freetoken.moe import q2_residency as runtime
+
+R=Path(__file__).parent
+assert importlib.metadata.version('freetoken')=='0.1.3+speed.strataq2perf9'
+torch.set_num_threads(1)
+rng=random.Random(20261018)
+roles=('gate_up','down')
+layout={name:SimpleNamespace(shape=shape,dtype=torch.uint8,resident=False)
+        for name,shape in zip(roles,((3,5),(7,)))}
+
+class Method:
+    kind=QuantKind.Q2_0
+    kernel=SimpleNamespace(name='ownership-test-only')
+
+    def layout(self):return layout
+
+    def pack(self, piece, out):
+        for role in roles:out[role].copy_(piece[role])
+        return {}
+
+results=[]
+for case in range(96):
+    layers=1+case%4;experts=1+case%13
+    generator=torch.Generator().manual_seed(case)
+    expected={name:torch.randint(0,256,(layers,experts,*spec.shape),dtype=torch.uint8,generator=generator)
+              for name,spec in layout.items()}
+    protected=tuple((layer,expert) for layer in range(layers) for expert in range(experts)
+                    if (case%3==0 or (case%3==1 and rng.randrange(2))))
+    pieces=[]
+    for layer in range(layers):
+        start=0
+        while start<experts:
+            end=min(experts,start+1+rng.randrange(5))
+            pieces.append((layer,start,end,{role:expected[role][layer,start:end] for role in roles}))
+            start=end
+    rng.shuffle(pieces)
+    with patch.object(pinned,'alloc_pinned_tensor',lambda *shape,**kwargs:torch.empty(*shape,**kwargs)), \
+         patch.object(pieces_module,'iter_expert_pieces',lambda *args,**kwargs:iter(pieces)), \
+         patch.object(torch.cuda,'synchronize',lambda *args,**kwargs:None):
+        banks,owners=runtime.load_compact_banks('synthetic-input',SimpleNamespace(num_moe_layers=layers,num_experts=experts),
+            protected=protected,dynamic=case%6,method=Method(),device='cpu',dtype=torch.uint8)
+    for layer in range(layers):
+        for expert in range(experts):
+            slot=owners.protected_slots.get((layer,expert))
+            for role in roles:
+                actual=(owners.caches[role][slot] if slot is not None
+                        else banks.sources[role][layer][owners.host_indices[layer][expert]])
+                assert torch.equal(actual,expected[role][layer,expert]),(case,role,layer,expert)
+            assert owners.initial_map[layer,expert].item()==(-1 if slot is None else slot)
+    results.append(dict(case=case,layers=layers,experts=experts,protected=len(protected),pieces=len(pieces)))
+path=Path(runtime.__file__)
+report=dict(status='passed',cases=results,module=str(path),module_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+    scope='Actual FT9 load_compact_banks and real Torch byte copies; synthetic pieces, CPU allocations and synchronize stub. No GPU/pinning/quantization numerical or throughput qualification.')
+(R/'compact-owners-property-v1.json').write_text(json.dumps(report,indent=2)+'\n')
+print(json.dumps(dict(status='passed',cases=len(results),module=str(path))))

@@ -1,0 +1,24 @@
+"""等待Windows venv启动器跟随已结束的派发器退出，再关闭剩余父队列。"""
+from pathlib import Path
+import json
+import time
+import psutil
+R=Path(__file__).parent
+data=json.loads((R/'paused-candidate-dispatchers-v2.json').read_text())
+for pid in data['dispatchers']:
+    try:process=psutil.Process(pid)
+    except psutil.NoSuchProcess:continue
+    assert any(str(R/name).lower() in [str(p).lower() for p in process.cmdline()]
+               for name in ('run-models-v2.py','run-validation-pipeline-v1.py'))
+    deadline=time.monotonic()+15
+    while process.children(recursive=True):
+        if time.monotonic()>deadline:raise TimeoutError('Launcher child is still alive')
+        time.sleep(.1)
+    process.terminate()
+    process.wait(timeout=10)
+resource=json.loads((R/'source-quality-on-v2.resource.json').read_text())
+assert not resource['returncode'] and not resource['stop_reason'] and not resource['remaining_descendants']
+(R/'candidate-quiescent-v1.json').write_text(json.dumps(dict(status='passed',candidate='9d871c87',
+    current_model_natural_exit=True,dispatchers_stopped_after_child_completion=True,
+    reason='Additional public backend numeric-overflow fix; provisional qualification superseded; models not force-terminated.'))+'\n')
+print('Quiescent: both model probes exited naturally; dispatchers stopped.')

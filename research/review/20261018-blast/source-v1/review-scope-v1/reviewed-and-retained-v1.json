@@ -1,0 +1,40 @@
+{
+  "scope": "Read-only purpose/module review. These observations did not justify additional product changes or new GPU qualification claims.",
+  "checks": [
+    {
+      "subject": "Two SSE cleanup owners and nested AnyIO shields",
+      "paths": ["silitok_speed/api/routes/chat.py"],
+      "reason": "An unstarted async generator has a no-op aclose; the response must still own cleanup. cancel_once also has a timeout caller outside close. Both paths are needed."
+    },
+    {
+      "subject": "Legacy qwen36 resources and compatibility modules",
+      "paths": ["silitok_speed/qwen36/release.json", "silitok_speed/qwen36", "silitok_speed/backends/freetoken_qwen36.py"],
+      "reason": "Old imports, selected cache/resource identities and manifests are compatibility boundaries. Generic runtime code does not require a public model-ID migration."
+    },
+    {
+      "subject": "Alias recognition in both discovery and manifest validation",
+      "paths": ["silitok_speed/discovery.py", "silitok_speed/manifest_schema.py"],
+      "reason": "Registration and artifact-role validation are separate callers. Both must accept the new FreeTokenBackend alias, including MTP. The earlier missing role recognition was fixed by d7ed82cf and real alias tests are retained."
+    },
+    {
+      "subject": "Separate ordinary-wheel and protected collector cache exclusions",
+      "paths": ["silitok_speed/pyproject.toml", "silitok_speed/setup_compile.py"],
+      "reason": "They are separate asset collection paths. Historical caches remain immutable in Git but only the selected cache belongs in the ordinary wheel and the external protected runtime."
+    },
+    {
+      "subject": "top_p=0 in the low-level sampler",
+      "paths": ["python/freetoken/engine/sample.py"],
+      "reason": "Sampler.prepare already bounds top_p to MIN_P=1e-6 before probability sampling. The suspected zero-cutoff path is not passed through as zero; no change made."
+    },
+    {
+      "subject": "Low-level SamplingParams",
+      "paths": ["python/freetoken/core.py", "silitok_speed/chat_contract.py", "silitok_speed/backends/freetoken.py"],
+      "reason": "Fix exposed Speed input boundaries; do not append defensive validation to every trusted same-version internal structure. The exact FreeToken9 wheel remains unchanged."
+    },
+    {
+      "subject": "Historical intermittent long-output token0",
+      "reference": "C:/workspace/runs/siltok-speed/flash-accept-20261015/long-investigation-final-v1.json",
+      "reason": "The prior bounded investigation already included graph synchronization, finite extreme-input checks and3227 sampled steps without a nonfinite/token0 reproduction. Root cause remained unresolved; the prior instruction was to retain the risk without unproductive repeated investigation. This phase does not claim a fix."
+    }
+  ]
+}

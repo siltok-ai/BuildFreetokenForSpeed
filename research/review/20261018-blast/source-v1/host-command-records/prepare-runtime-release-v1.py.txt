@@ -1,0 +1,57 @@
+"""Build in a clean staging tree and audit an independent ordinary-wheel runtime."""
+from pathlib import Path
+import hashlib
+import json
+import shutil
+import subprocess
+import zipfile
+
+RUN = Path(__file__).parent
+SOURCE = Path(r'C:\workspace\wt\siltok-speed\rebase-dev-20261018')
+BASE = Path(r'C:\workspace\envs\siltok-speed\flash-perf9')
+TARGET = BASE.with_name('flash-blast-final-release')
+STAGING = Path(r'C:\workspace\build\siltok-speed\blast-final-wheel-src')
+WHEELS = RUN / 'ordinary-wheels-v1'
+OLD_WHEEL, = Path(r'C:\workspace\runs\siltok-speed\explore-20261017-evening\speed-ordinary-wheel-v1').glob('*.whl')
+
+for path in (TARGET, STAGING, WHEELS):
+    if path.exists():
+        raise FileExistsError(path)
+shutil.copytree(SOURCE/'silitok_speed', STAGING,
+    ignore=shutil.ignore_patterns('build', '.artifacts', '__pycache__', '.pytest_cache', '*.egg-info'))
+subprocess.run([str(BASE/'Scripts/python.exe'), '-B', '-m', 'pip', 'wheel', '--no-deps',
+    '--no-build-isolation', '--wheel-dir', str(WHEELS), str(STAGING)], check=True)
+wheel, = WHEELS.glob('*.whl')
+with zipfile.ZipFile(wheel) as archive, zipfile.ZipFile(OLD_WHEEL) as old:
+    names = set(archive.namelist())
+    dlls = [n for n in names if '/qwen36/kernel_cache' in n and n.endswith('.dll')]
+    assert len(dlls) == 27 and all('kernel_cache_strataq2perf9/' in n for n in dlls)
+    def assets(items):
+        return {n for n in items if n.startswith('silitok_speed/') and
+                not n.endswith(('.py', '/')) and '/qwen36/kernel_cache' not in n}
+    lost = sorted(assets(old.namelist()) - assets(names))
+    assert not lost, lost
+    for name in names:
+        if name.startswith('silitok_speed/') and name.endswith('.py'):
+            assert archive.read(name) == (SOURCE/name).read_bytes(), name
+    required = ['backends/freetoken.py', 'backends/freetoken_qwen36.py', 'chat_contract.py',
+        'api/_chat_contract.py', 'runtimes/freetoken/session.py', 'runtimes/freetoken/engine_bridge.py',
+        'runtimes/freetoken/worker.py', 'qwen36/freetoken_worker.py']
+    assert all('silitok_speed/'+n in names for n in required)
+    assert archive.read('silitok_speed/qwen36/release.json') == (SOURCE/'silitok_speed/qwen36/release.json').read_bytes()
+    inventory = {n: hashlib.sha256(archive.read(n)).hexdigest() for n in sorted(names)}
+subprocess.run([r'C:\workspace\tools\python312\python.exe', '-m', 'venv', str(TARGET)], check=True)
+shutil.copytree(BASE/'Lib/site-packages', TARGET/'Lib/site-packages', dirs_exist_ok=True)
+shutil.copy2(BASE/'Scripts/ninja.exe', TARGET/'Scripts/ninja.exe')
+subprocess.run([str(TARGET/'Scripts/python.exe'), '-B', '-m', 'pip', 'install', '--no-index',
+    '--no-deps', '--force-reinstall', str(wheel)], check=True)
+subprocess.run([str(TARGET/'Scripts/python.exe'), '-I', '-B', '-c',
+    'import silitok_speed as s;from silitok_speed.backends.freetoken import FreeTokenBackend as B;'
+    'from silitok_speed.backends.freetoken_qwen36 import FreeTokenQwen36Backend as Q;'
+    'from silitok_speed.runtimes.freetoken.worker import main;assert B is Q;print(s.__file__)'],
+    check=True, cwd=RUN)
+report = dict(status='passed', wheel=str(wheel), wheel_sha256=hashlib.sha256(wheel.read_bytes()).hexdigest(),
+    runtime=str(TARGET), source=str(SOURCE), selected_dlls=len(dlls), lost_assets=lost, files=inventory,
+    qualification='ordinary-wheel inventory/import only; GPU and protected package are separate')
+(RUN/'ordinary-wheel-inventory-v3.json').write_text(json.dumps(report, indent=2)+'\n')
+print(json.dumps({k:v for k,v in report.items() if k!='files'}), flush=True)

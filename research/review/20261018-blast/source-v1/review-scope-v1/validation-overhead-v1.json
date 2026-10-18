@@ -1,0 +1,107 @@
+{
+  "status": "measured",
+  "sequence": [
+    "before",
+    "after",
+    "after",
+    "before"
+  ],
+  "samples": [
+    {
+      "arm": "before",
+      "us_per_request": 1.731168000260368
+    },
+    {
+      "arm": "before",
+      "us_per_request": 1.7440509999869391
+    },
+    {
+      "arm": "before",
+      "us_per_request": 1.7790389998117462
+    },
+    {
+      "arm": "before",
+      "us_per_request": 1.7848429997684434
+    },
+    {
+      "arm": "before",
+      "us_per_request": 1.777830999926664
+    },
+    {
+      "arm": "after",
+      "us_per_request": 2.0852539996849373
+    },
+    {
+      "arm": "after",
+      "us_per_request": 2.04773599980399
+    },
+    {
+      "arm": "after",
+      "us_per_request": 2.0840790000511333
+    },
+    {
+      "arm": "after",
+      "us_per_request": 2.0561669999733567
+    },
+    {
+      "arm": "after",
+      "us_per_request": 2.080003999872133
+    },
+    {
+      "arm": "after",
+      "us_per_request": 2.1052369999233633
+    },
+    {
+      "arm": "after",
+      "us_per_request": 2.0742109999991953
+    },
+    {
+      "arm": "after",
+      "us_per_request": 2.037756000063382
+    },
+    {
+      "arm": "after",
+      "us_per_request": 2.0249880000483245
+    },
+    {
+      "arm": "after",
+      "us_per_request": 2.043563000042923
+    },
+    {
+      "arm": "before",
+      "us_per_request": 1.7119550000643358
+    },
+    {
+      "arm": "before",
+      "us_per_request": 1.7183280002791435
+    },
+    {
+      "arm": "before",
+      "us_per_request": 1.7271529999561608
+    },
+    {
+      "arm": "before",
+      "us_per_request": 1.7182009998941794
+    },
+    {
+      "arm": "before",
+      "us_per_request": 1.7272290005348623
+    }
+  ],
+  "median_us": {
+    "before": 1.7291985003976151,
+    "after": 2.065188999986276
+  },
+  "added_us": 0.3359904995886609,
+  "source": {
+    "before": {
+      "path": "C:\\workspace\\wt\\siltok-speed\\perf9 relocated\\silitok_speed\\chat_contract.py",
+      "sha256": "c76c82847d106616dc82ac95f5fb2845fd1d718fe36c87f0bce817977b9429aa"
+    },
+    "after": {
+      "path": "C:\\workspace\\wt\\siltok-speed\\rebase-dev-20261018\\silitok_speed\\chat_contract.py",
+      "sha256": "3687702eb7e7bb984ec19b3d8ad3c0ef779d1a3560029accec3e24d29a7d5004"
+    }
+  },
+  "scope": "Same-host serial CPU microbenchmark of shared validation; no product decode/TTFT or universal zero-regression claim."
+}

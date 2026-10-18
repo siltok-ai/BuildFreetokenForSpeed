@@ -1,0 +1,59 @@
+"""验证真实保护包的HTTP/SDK准入及Cython数值边界；不改产品许可证逻辑。"""
+from pathlib import Path
+import argparse
+import json
+import tempfile
+
+import silitok_speed
+from silitok_speed import Engine, EngineConfig
+from silitok_speed.api import create_app
+from silitok_speed.backends.base import BackendInputError
+from silitok_speed.backends.freetoken import _request_float
+from silitok_speed.sdk import Client, SilitokError
+from fastapi.testclient import TestClient
+
+p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);a=p.parse_args()
+assert not a.output.exists()
+assert Path(silitok_speed.__spec__.origin).suffix=='.pyd'
+# 仅当前测试进程允许无设备许可证执行实际准入；产品源码、载荷及正式服务不变。
+Engine.require_license=lambda self:None
+Engine.is_licensed=property(lambda self:True)
+catalog=[dict(id='numeric-boundary',supports_tool_calls=False,supports_multimodal=False,
+    supported_request_fields=['presence_penalty','frequency_penalty','min_p'],unsupported_request_fields=[])]
+rows=[]
+with tempfile.TemporaryDirectory(prefix='speed-input-boundary-') as temporary:
+    engine=Engine(EngineConfig(models_dir='',result_store_dir=str(Path(temporary)/'results'),gpu_resource_probe='nvml'))
+    engine.start()
+    app=create_app(engine,manage_engine_lifecycle=False);app.state.model_catalog=catalog
+    http=TestClient(app);direct=Client(engine=engine,model_catalog=catalog)
+    try:
+        finite=[('temperature',-0.1),('temperature',2.1),('top_p',1.1),('top_p',10**400),
+                ('presence_penalty',10**400),('frequency_penalty',10**400),('min_p',10**400)]
+        for field,value in finite:
+            payload=dict(model='numeric-boundary',messages=[dict(role='user',content='hello')]);payload[field]=value
+            response=http.post('/v1/chat/completions',json=payload)
+            assert response.status_code in (400,422),(field,response.status_code,response.text)
+            param=response.json()['error']['param']
+            assert param in (field,'body.'+field),response.text
+            rows.append(dict(entry='http',field=field,param=param,status=response.status_code))
+        for field,value in finite+[('temperature',float('nan')),('top_p',float('inf'))]:
+            payload=dict(model='numeric-boundary',messages=[dict(role='user',content='hello')]);payload[field]=value
+            try:direct.chat.completions.create(**payload)
+            except SilitokError as exc:
+                assert exc.code=='invalid_request' and exc.param==field,(exc.code,exc.param)
+            else:raise AssertionError(('SDK accepted invalid input',field))
+            rows.append(dict(entry='sdk',field=field,status='invalid_request'))
+        for field in ('temperature','top_p','repetition_penalty'):
+            for value in (10**400,-10**400):
+                try:_request_float({field:value},field,1.0)
+                except BackendInputError as exc:assert exc.code=='invalid_request' and exc.param==field
+                else:raise AssertionError(('backend accepted unrepresentable input',field))
+                rows.append(dict(entry='backend',field=field,status='invalid_request'))
+        assert engine.task_queue.all_tasks()==[]
+    finally:
+        http.close();engine.shutdown()
+report=dict(status='passed',speed_origin=silitok_speed.__spec__.origin,checks=rows,
+    queue_remained_empty=True,process_only_license_fixture=True,
+    scope='Actual compiled HTTP/SDK/Engine queue plus backend numeric projection; no model computation for rejected inputs')
+a.output.write_text(json.dumps(report,indent=2)+'\n')
+print(json.dumps(dict(status='passed',checks=len(rows),queue_remained_empty=True)),flush=True)

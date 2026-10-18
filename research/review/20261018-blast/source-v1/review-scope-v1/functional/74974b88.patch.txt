@@ -1,0 +1,181 @@
+commit 74974b889506fa6429d86e9aa40c8739a377ab9b
+Author:     boqi <liboqi@siltok-ai.com>
+AuthorDate: Sun Oct 18 21:40:41 2026 +0800
+Commit:     boqi <liboqi@siltok-ai.com>
+CommitDate: Sun Oct 18 21:40:41 2026 +0800
+
+    fix(chat): validate direct sampling before queueing and avoid numeric overflow
+
+diff --git a/silitok_speed/chat_contract.py b/silitok_speed/chat_contract.py
+index fe18b0bf..9430c76d 100644
+--- a/silitok_speed/chat_contract.py
++++ b/silitok_speed/chat_contract.py
+@@ -4,7 +4,6 @@ from __future__ import annotations
+ 
+ from collections.abc import Mapping
+ from typing import Any
+-import math
+ 
+ 
+ MAX_CHAT_COMPLETION_TOKENS = 131_072
+@@ -67,7 +66,12 @@ _EXTENDED_REQUEST_FIELDS = {
+ 
+ 
+ def validate_model_fields(values: dict, capability: dict | None) -> None:
+-    """按 discovery catalog 拒绝模型首版明确延期的请求能力。"""
++    """校验共享采样范围，并按 discovery catalog 拒绝不支持的请求能力。"""
++    # SDK 不经过 HTTP schema；在提交任务前校验两种入口共有的采样范围。
++    for field, upper in (("temperature", 2), ("top_p", 1)):
++        value = values.get(field)
++        if value is not None:
++            _validate_number_field(values.get("model"), field, value, 0, upper)
+     messages = values.get("messages")
+     if (
+         not isinstance(messages, list)
+@@ -187,6 +191,7 @@ def validate_model_fields(values: dict, capability: dict | None) -> None:
+ 
+ 
+ def _invalid_deferred_field(model_id: str, field: str, message: str) -> None:
++    """抛出带稳定字段名称的准入错误。"""
+     raise ChatContractError(
+         f"Model {model_id!r} request field {field!r} {message}.",
+         code="invalid_request",
+@@ -194,29 +199,29 @@ def _invalid_deferred_field(model_id: str, field: str, message: str) -> None:
+     )
+ 
+ 
++def _validate_number_field(
++    model_id: str, field: str, value: Any, lower: int, upper: int,
++) -> None:
++    """直接比较有界数值；同时拒绝NaN、无穷和超大整数，避免float转换溢出。"""
++    if (
++        isinstance(value, bool)
++        or not isinstance(value, (int, float))
++        or not lower <= value <= upper
++    ):
++        _invalid_deferred_field(
++            model_id, field, f"must be finite and within [{lower}, {upper}]"
++        )
++
++
+ def _validate_model_deferred_field(model_id: str, field: str, value: Any) -> None:
+     """只在 backend 明确声明支持后校验其模型专属字段。"""
+     if field == "top_k":
+         if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+             _invalid_deferred_field(model_id, field, "must be an integer >= 0")
+     elif field in {"presence_penalty", "frequency_penalty"}:
+-        if (
+-            isinstance(value, bool)
+-            or not isinstance(value, (int, float))
+-            or (not math.isfinite(float(value)))
+-            or (not -2.0 <= float(value) <= 2.0)
+-        ):
+-            _invalid_deferred_field(
+-                model_id, field, "must be finite and within [-2, 2]"
+-            )
++        _validate_number_field(model_id, field, value, -2, 2)
+     elif field == "min_p":
+-        if (
+-            isinstance(value, bool)
+-            or not isinstance(value, (int, float))
+-            or (not math.isfinite(float(value)))
+-            or (not 0.0 <= float(value) <= 1.0)
+-        ):
+-            _invalid_deferred_field(model_id, field, "must be finite and within [0, 1]")
++        _validate_number_field(model_id, field, value, 0, 1)
+     elif field == "seed":
+         if (
+             isinstance(value, bool)
+diff --git a/silitok_speed/pyproject.toml b/silitok_speed/pyproject.toml
+index a8cf6cde..833c4264 100644
+--- a/silitok_speed/pyproject.toml
++++ b/silitok_speed/pyproject.toml
+@@ -25,7 +25,7 @@ build-backend = "setuptools.build_meta"
+ 
+ [project]
+ name = "siltok-speed"
+-version = "0.2.0+strataq2perf9"
++version = "0.2.0+strataq2perf9.review1"
+ description = "Siltok Speed — 本地 AI 一体机的统一推理引擎 (Engine + HTTP API + SDK)"
+ requires-python = ">=3.10"
+ license = {text = "Apache-2.0"}
+diff --git a/tests/contract/test_qwen36_chat_contract.py b/tests/contract/test_qwen36_chat_contract.py
+index 7ca7792c..a65ff458 100644
+--- a/tests/contract/test_qwen36_chat_contract.py
++++ b/tests/contract/test_qwen36_chat_contract.py
+@@ -462,3 +462,75 @@ def test_direct_sdk_rejects_malformed_messages_before_submission(qwen36_client,
+     assert failure.value.code == "invalid_request"
+     assert failure.value.param.startswith("messages")
+     assert not engine._captured_chat_params
++
++
++@pytest.mark.parametrize("catalogued", [False, True])
++@pytest.mark.parametrize(
++    "field,value",
++    [
++        ("temperature", -0.1), ("temperature", 2.1),
++        ("temperature", float("nan")), ("temperature", float("inf")),
++        ("temperature", 10**400), ("temperature", True),
++        ("top_p", -0.1), ("top_p", 1.1),
++        ("top_p", float("nan")), ("top_p", float("-inf")),
++        ("top_p", 10**400), ("top_p", "0.5"),
++    ],
++)
++def test_direct_sdk_rejects_invalid_sampling_before_submission(
++    qwen36_client, catalogued, field, value,
++):
++    """基础采样边界也适用于SDK；非法值不能排队、占用模型或产生500。"""
++    from silitok_speed.sdk import Client, SilitokError
++
++    _, engine = qwen36_client
++    catalog = _qwen36_catalog() if catalogued else None
++    direct = Client(engine=engine, model_catalog=catalog)
++    with pytest.raises(SilitokError) as failure:
++        direct.chat.completions.create(
++            model="m1", messages=[{"role": "user", "content": "hello"}],
++            **{field: value},
++        )
++    assert failure.value.code == "invalid_request"
++    assert failure.value.param == field
++    assert engine.task_queue.all_tasks() == []
++    assert not engine._captured_chat_params
++
++
++@pytest.mark.parametrize("field,value", [
++    ("temperature", 0), ("temperature", 2), ("top_p", 0), ("top_p", 1),
++])
++def test_direct_sdk_preserves_valid_sampling_boundaries(qwen36_client, field, value):
++    """经实际队列和流水线完成合法边界请求，避免用全部拒绝掩盖准入错误。"""
++    from silitok_speed.sdk import Client
++
++    _, engine = qwen36_client
++    direct = Client(engine=engine, model_catalog=_qwen36_catalog())
++    result = direct.chat.completions.create(
++        model="m1", messages=[{"role": "user", "content": "hello"}],
++        **{field: value},
++    )
++    assert result["choices"][0]["message"]["content"]
++    assert engine._captured_chat_params[field] == value
++
++
++@pytest.mark.parametrize("field", ["presence_penalty", "frequency_penalty", "min_p"])
++def test_supported_deferred_numeric_overflow_is_an_input_error(qwen36_client, field):
++    """允许某字段的catalog仍须拒绝超大整数，不能在float转换时崩溃。"""
++    from silitok_speed.sdk import Client, SilitokError
++
++    http, engine = qwen36_client
++    catalog = _qwen36_catalog()
++    catalog[0]["supported_request_fields"].append(field)
++    catalog[0]["unsupported_request_fields"].remove(field)
++    http.app.state.model_catalog = catalog
++    payload = {"model": "m1", "messages": [{"role": "user", "content": "hello"}],
++               field: 10**400}
++    response = http.post("/v1/chat/completions", json=payload)
++    assert response.status_code == 400
++    assert response.json()["error"]["code"] == "invalid_request"
++    assert response.json()["error"]["param"] == field
++    with pytest.raises(SilitokError) as failure:
++        Client(engine=engine, model_catalog=catalog).chat.completions.create(**payload)
++    assert failure.value.code == "invalid_request"
++    assert failure.value.param == field
++    assert engine.task_queue.all_tasks() == []

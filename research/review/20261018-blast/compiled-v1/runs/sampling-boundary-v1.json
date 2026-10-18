@@ -1,0 +1,126 @@
+{
+  "status": "passed",
+  "speed_origin": "C:\\workspace\\build\\siltok-speed\\blast final-test\\app\\python\\Lib\\site-packages\\silitok_speed\\__init__.pyd",
+  "checks": [
+    {
+      "entry": "http",
+      "field": "temperature",
+      "param": "body.temperature",
+      "status": 400
+    },
+    {
+      "entry": "http",
+      "field": "temperature",
+      "param": "body.temperature",
+      "status": 400
+    },
+    {
+      "entry": "http",
+      "field": "top_p",
+      "param": "body.top_p",
+      "status": 400
+    },
+    {
+      "entry": "http",
+      "field": "top_p",
+      "param": "body.top_p",
+      "status": 400
+    },
+    {
+      "entry": "http",
+      "field": "presence_penalty",
+      "param": "presence_penalty",
+      "status": 400
+    },
+    {
+      "entry": "http",
+      "field": "frequency_penalty",
+      "param": "frequency_penalty",
+      "status": 400
+    },
+    {
+      "entry": "http",
+      "field": "min_p",
+      "param": "min_p",
+      "status": 400
+    },
+    {
+      "entry": "sdk",
+      "field": "temperature",
+      "status": "invalid_request"
+    },
+    {
+      "entry": "sdk",
+      "field": "temperature",
+      "status": "invalid_request"
+    },
+    {
+      "entry": "sdk",
+      "field": "top_p",
+      "status": "invalid_request"
+    },
+    {
+      "entry": "sdk",
+      "field": "top_p",
+      "status": "invalid_request"
+    },
+    {
+      "entry": "sdk",
+      "field": "presence_penalty",
+      "status": "invalid_request"
+    },
+    {
+      "entry": "sdk",
+      "field": "frequency_penalty",
+      "status": "invalid_request"
+    },
+    {
+      "entry": "sdk",
+      "field": "min_p",
+      "status": "invalid_request"
+    },
+    {
+      "entry": "sdk",
+      "field": "temperature",
+      "status": "invalid_request"
+    },
+    {
+      "entry": "sdk",
+      "field": "top_p",
+      "status": "invalid_request"
+    },
+    {
+      "entry": "backend",
+      "field": "temperature",
+      "status": "invalid_request"
+    },
+    {
+      "entry": "backend",
+      "field": "temperature",
+      "status": "invalid_request"
+    },
+    {
+      "entry": "backend",
+      "field": "top_p",
+      "status": "invalid_request"
+    },
+    {
+      "entry": "backend",
+      "field": "top_p",
+      "status": "invalid_request"
+    },
+    {
+      "entry": "backend",
+      "field": "repetition_penalty",
+      "status": "invalid_request"
+    },
+    {
+      "entry": "backend",
+      "field": "repetition_penalty",
+      "status": "invalid_request"
+    }
+  ],
+  "queue_remained_empty": true,
+  "process_only_license_fixture": true,
+  "scope": "Actual compiled HTTP/SDK/Engine queue plus backend numeric projection; no model computation for rejected inputs"
+}

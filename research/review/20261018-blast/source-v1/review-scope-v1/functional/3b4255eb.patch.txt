@@ -1,0 +1,99 @@
+commit 3b4255eb4fc409f8a4ef77bfc1df7da00527a0ef
+Author:     boqi <liboqi@siltok-ai.com>
+AuthorDate: Sat Oct 17 02:13:47 2026 +0800
+Commit:     boqi <liboqi@siltok-ai.com>
+CommitDate: Sun Oct 18 16:28:06 2026 +0800
+
+    fix: isolate native worker output from the protocol pipe
+
+diff --git a/silitok_speed/qwen36/freetoken_worker.py b/silitok_speed/qwen36/freetoken_worker.py
+index fe527c19..e577b1ea 100644
+--- a/silitok_speed/qwen36/freetoken_worker.py
++++ b/silitok_speed/qwen36/freetoken_worker.py
+@@ -97,10 +97,24 @@ def _bootstrap_package_path() -> None:
+ 
+ 
+ def _redirect_stdout_to_protocol():
+-    """复制原 stdout 给协议，并把后续第三方输出统一送到 stderr。"""
++    """保留私有协议句柄，将Python、原生库及后代进程的stdout统一送到stderr。"""
+ 
+-    protocol = os.fdopen(os.dup(sys.stdout.fileno()), "wb", buffering=0)
++    stdout_fd, stderr_fd = sys.stdout.fileno(), sys.stderr.fileno()
++    protocol = os.fdopen(os.dup(stdout_fd), "wb", buffering=0)
++    os.set_inheritable(protocol.fileno(), False)
+     sys.stdout.flush()
++    os.dup2(stderr_fd, stdout_fd)
++    if os.name == 'nt':
++        import ctypes
++        import msvcrt
++        from ctypes import wintypes
++
++        # CRT描述符和Win32标准句柄独立；只改Python对象不能隔离JIT及子进程输出。
++        set_stdout = ctypes.WinDLL('kernel32', use_last_error=True).SetStdHandle
++        set_stdout.argtypes = [wintypes.DWORD, wintypes.HANDLE]
++        set_stdout.restype = wintypes.BOOL
++        if not set_stdout(-11, msvcrt.get_osfhandle(stderr_fd)):
++            raise ctypes.WinError(ctypes.get_last_error())
+     sys.stdout = sys.stderr
+     return protocol
+ 
+diff --git a/tests/unit/test_freetoken_worker.py b/tests/unit/test_freetoken_worker.py
+index 0ff12989..cf6343b3 100644
+--- a/tests/unit/test_freetoken_worker.py
++++ b/tests/unit/test_freetoken_worker.py
+@@ -21,6 +21,55 @@ class _Writer:
+         self.messages.append(message)
+ 
+ 
++def test_protocol_isolates_native_and_child_stdout(tmp_path):
++    """在真实子进程中验证CRT描述符、Win32句柄和后代日志都不污染协议。"""
++    import io
++    import os
++    from pathlib import Path
++    import subprocess
++    import textwrap
++
++    from silitok_speed.qwen36.freetoken_wire import read_frame
++
++    package_root = Path(worker_module.__file__).resolve().parents[2]
++    child_code = "import os; os.write(1, b'child-stdout-marker\\n')"
++    script = '\n'.join([
++        'import os, sys, subprocess',
++        f'sys.path.insert(0, {str(package_root)!r})',
++        'from silitok_speed.qwen36.freetoken_worker import _redirect_stdout_to_protocol',
++        'from silitok_speed.qwen36.freetoken_wire import FrameWriter',
++        'protocol = _redirect_stdout_to_protocol()',
++        "print('python-stdout-marker', flush=True)",
++        "os.write(1, b'__TR_NATIVE_STDOUT_MARKER__\\n')",
++        f"subprocess.run([sys.executable, '-I', '-c', {child_code!r}], check=True)",
++    ])
++    if os.name == 'nt':
++        script += '\n' + textwrap.dedent('''
++            import ctypes
++            kernel = ctypes.WinDLL('kernel32', use_last_error=True)
++            kernel.GetStdHandle.argtypes = [ctypes.c_ulong]
++            kernel.GetStdHandle.restype = ctypes.c_void_p
++            kernel.WriteFile.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_ulong,
++                                        ctypes.POINTER(ctypes.c_ulong), ctypes.c_void_p]
++            kernel.WriteFile.restype = ctypes.c_int
++            payload = b'win32-stdout-marker\\n'
++            written = ctypes.c_ulong()
++            if not kernel.WriteFile(kernel.GetStdHandle(-11), payload, len(payload), ctypes.byref(written), None):
++                raise ctypes.WinError(ctypes.get_last_error())
++        ''')
++    script += "\nFrameWriter(protocol).send({'ok': True, 'private_protocol': not os.get_inheritable(protocol.fileno())})\n"
++    result = subprocess.run([sys.executable, '-I', '-c', script], cwd=tmp_path,
++                            capture_output=True, check=True, timeout=30)
++    stream = io.BytesIO(result.stdout)
++    frame = read_frame(stream)
++    assert frame['ok'] and frame['private_protocol']
++    assert read_frame(stream) is None
++    for marker in (b'python-stdout-marker', b'__TR_NATIVE_STDOUT_MARKER__', b'child-stdout-marker'):
++        assert marker in result.stderr
++    if os.name == 'nt':
++        assert b'win32-stdout-marker' in result.stderr
++
++
+ def _install_fake_freetoken(monkeypatch):
+     """安装只覆盖 Speed wrapper 行为所需的最小 FreeToken 协议面。"""
+ 

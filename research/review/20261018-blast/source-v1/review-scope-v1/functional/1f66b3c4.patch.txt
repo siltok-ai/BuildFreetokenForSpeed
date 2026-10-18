@@ -1,0 +1,271 @@
+commit 1f66b3c416f42356bab8d0841b8c73ce4e0b8053
+Author:     boqi <liboqi@siltok-ai.com>
+AuthorDate: Sat Oct 17 01:46:32 2026 +0800
+Commit:     boqi <liboqi@siltok-ai.com>
+CommitDate: Sun Oct 18 16:28:05 2026 +0800
+
+    perf: bind scoped prefill workspace and larger Q2 expert caches
+
+diff --git a/.gitattributes b/.gitattributes
+index e37cfbb2..f28f7331 100644
+--- a/.gitattributes
++++ b/.gitattributes
+@@ -229,3 +229,4 @@ silitok_speed/qwen36/kernel_cache_strataq2perf1/** -text
+ silitok_speed/qwen36/kernel_cache_strataq2perf2/** -text
+ silitok_speed/qwen36/kernel_cache_strataq2perf3/** -text
+ silitok_speed/qwen36/kernel_cache_strataq2perf5/** -text
++silitok_speed/qwen36/kernel_cache_strataq2perf6/** -text
+diff --git a/silitok_speed/backends/freetoken_qwen36.py b/silitok_speed/backends/freetoken_qwen36.py
+index 07c2980f..d488a8f1 100644
+--- a/silitok_speed/backends/freetoken_qwen36.py
++++ b/silitok_speed/backends/freetoken_qwen36.py
+@@ -118,6 +118,8 @@ _RUNTIME_EXTRA_KEYS = frozenset(
+         "moe_q2_adapt_decay",
+         "gguf_embedding_host",
+         "ple_row_cache_rows",
++        "moe_q2_prefill_workspace",
++        "fixed_q2_rebuild_reserve_mib",
+         "linear_state_cache_slots",
+         "mtp_compact_state",
+         "mtp_enabled",
+@@ -173,6 +175,8 @@ class _RuntimeOptions:
+     moe_q2_adapt_decay: float = 1.0
+     gguf_embedding_host: bool = False
+     ple_row_cache_rows: int = 0
++    moe_q2_prefill_workspace: bool = False
++    fixed_q2_rebuild_reserve_mib: int = 512
+ 
+ 
+ @dataclass(frozen=True)
+@@ -1101,6 +1105,14 @@ def _runtime_options(
+         raise ValueError('gguf_embedding_host must be a boolean')
+     if embedding_host and not strata_q2:
+         raise ValueError('Mapped input embedding requires the complete Strata GGUF checkpoint')
++    workspace = extra.get('moe_q2_prefill_workspace', False)
++    if not isinstance(workspace, bool):
++        raise ValueError('moe_q2_prefill_workspace must be a boolean')
++    if workspace and not (strata_q2 and resident and dynamic == 1024):
++        raise ValueError('Prefill workspace requires protected Strata Q2 and 1024 dynamic rows')
++    rebuild_reserve = _int_option(extra, 'fixed_q2_rebuild_reserve_mib', 512, 0, 512)
++    if rebuild_reserve != 512 and not (strata_q2 and resident):
++        raise ValueError('A custom fixed rebuild reserve requires protected Strata Q2')
+     row_cache_rows = _int_option(extra, 'ple_row_cache_rows', 0, 0, 1 << 24)
+     if row_cache_rows and (row_cache_rows < 8 or not flash_next):
+         raise ValueError('PLE row caching requires Flash Next and at least8 rows')
+@@ -1320,6 +1332,8 @@ def _runtime_options(
+         moe_q2_adapt_decay=adapt_decay,
+         gguf_embedding_host=embedding_host,
+         ple_row_cache_rows=row_cache_rows,
++        moe_q2_prefill_workspace=workspace,
++        fixed_q2_rebuild_reserve_mib=rebuild_reserve,
+     )
+ 
+ 
+@@ -1351,6 +1365,8 @@ def _worker_option_payload(options: _RuntimeOptions) -> dict[str, Any]:
+         "moe_q2_adapt_decay": options.moe_q2_adapt_decay,
+         "gguf_embedding_host": options.gguf_embedding_host,
+         "ple_row_cache_rows": options.ple_row_cache_rows,
++        "moe_q2_prefill_workspace": options.moe_q2_prefill_workspace,
++        "fixed_q2_rebuild_reserve_mib": options.fixed_q2_rebuild_reserve_mib,
+     }
+ 
+ 
+diff --git a/silitok_speed/pyproject.toml b/silitok_speed/pyproject.toml
+index 171cfb65..e49a62b8 100644
+--- a/silitok_speed/pyproject.toml
++++ b/silitok_speed/pyproject.toml
+@@ -25,7 +25,7 @@ build-backend = "setuptools.build_meta"
+ 
+ [project]
+ name = "siltok-speed"
+-version = "0.2.0+strataq2perf5"
++version = "0.2.0+strataq2perf6"
+ description = "Siltok Speed — 本地 AI 一体机的统一推理引擎 (Engine + HTTP API + SDK)"
+ requires-python = ">=3.10"
+ license = {text = "Apache-2.0"}
+@@ -244,6 +244,8 @@ packages = [
+     "kernel_cache_strataq2perf3/*/*.dll",
+     "kernel_cache_strataq2perf5/*.json",
+     "kernel_cache_strataq2perf5/*/*.dll",
++    "kernel_cache_strataq2perf6/*.json",
++    "kernel_cache_strataq2perf6/*/*.dll",
+ ]
+ 
+ # ============================================================
+diff --git a/silitok_speed/qwen36/freetoken_worker.py b/silitok_speed/qwen36/freetoken_worker.py
+index fdb294e9..fe527c19 100644
+--- a/silitok_speed/qwen36/freetoken_worker.py
++++ b/silitok_speed/qwen36/freetoken_worker.py
+@@ -465,6 +465,8 @@ def _worker_options(command: dict[str, Any]) -> dict[str, Any]:
+         "moe_q2_adapt_decay",
+         "gguf_embedding_host",
+         "ple_row_cache_rows",
++        "moe_q2_prefill_workspace",
++        "fixed_q2_rebuild_reserve_mib",
+     }
+     if set(options) != required:
+         raise ValueError("worker load options do not match the protocol contract")
+@@ -519,6 +521,8 @@ def _llm_kwargs(options: dict[str, Any]) -> dict[str, Any]:
+         moe_q2_adapt_decay=options['moe_q2_adapt_decay'],
+         gguf_embedding_host=options['gguf_embedding_host'],
+         ple_row_cache_rows=options['ple_row_cache_rows'],
++        moe_q2_prefill_workspace=options['moe_q2_prefill_workspace'],
++        fixed_q2_rebuild_reserve_mib=options['fixed_q2_rebuild_reserve_mib'],
+     )
+ 
+ 
+diff --git a/silitok_speed/qwen36/release.json b/silitok_speed/qwen36/release.json
+index c8f34508..a68878b5 100644
+--- a/silitok_speed/qwen36/release.json
++++ b/silitok_speed/qwen36/release.json
+@@ -1,6 +1,6 @@
+ {
+   "format": 1,
+-  "version": "0.1.3+speed.strataq2perf5",
++  "version": "0.1.3+speed.strataq2perf6",
+   "upstream_commit": "078132480ea4a0424f677a27eb22085624d331e6",
+   "python_minor": [
+     3,
+@@ -12,8 +12,8 @@
+   "apache_tvm_ffi": "0.1.13.post3",
+   "sm": "120",
+   "wheel": {
+-    "path": "wheels/freetoken-0.1.3+speed.strataq2perf5-cp312-cp312-win_amd64.whl",
+-    "sha256": "f311e65730b48c4d62642583203578a33413e8241741327f2317f7e9499b7e17",
++    "path": "wheels/freetoken-0.1.3+speed.strataq2perf6-cp312-cp312-win_amd64.whl",
++    "sha256": "fcd0d54792f9a4541cdb9ffcd7a2ca3f4a686fe3dfb1a78baac295ae1038f634",
+     "native_modules": [
+       "freetoken/kernel/_cpu_moe.cp312-win_amd64.pyd",
+       "freetoken/kernel/_pinned_tensor.cp312-win_amd64.pyd",
+@@ -22,7 +22,7 @@
+   },
+   "kernel_cache": {
+     "path": "kernel-cache",
+-    "package_path": "kernel_cache_strataq2perf5",
++    "package_path": "kernel_cache_strataq2perf6",
+     "dll_count": 27,
+     "manifest": "kernel-cache/speed-kernel-manifest.json",
+     "specs": "build/specs/speed-strataq2perf2-sm120.txt"
+@@ -168,7 +168,7 @@
+       "sha256": "c41553189b68adc1aa562b18dd5af177e1369bd19277f00116b818ff13e1b659"
+     }
+   },
+-  "producer_commit": "10954aa0c275fe9ef8ca354d43bbc2a9fa88756c",
++  "producer_commit": "ec5a736216425cf4bbd8e0ec524a8210e342fc47",
+   "mtp_runtime": {
+     "manifest_sha256": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
+     "source_repository": "Qwen/Qwen3.8-Flash-Next",
+@@ -190,5 +190,5 @@
+       "compact_update_bytes": 7105824
+     }
+   },
+-  "consumer_verifier": "tools/verify_performance5_consumer.py"
++  "consumer_verifier": "tools/verify_performance6_consumer.py"
+ }
+diff --git a/tests/unit/test_freetoken_strata_q2.py b/tests/unit/test_freetoken_strata_q2.py
+index 515c406c..b1adc48b 100644
+--- a/tests/unit/test_freetoken_strata_q2.py
++++ b/tests/unit/test_freetoken_strata_q2.py
+@@ -4,7 +4,7 @@ import hashlib
+ import json
+ from pathlib import Path
+ import struct
+-from argparse import Namespace
++from argparse import Namespace, ArgumentParser
+ 
+ import pytest
+ from silitok_speed.backends.base import BackendConfig
+@@ -12,7 +12,7 @@ from silitok_speed.backends.freetoken_qwen36 import _runtime_options, _worker_op
+ from silitok_speed.manifest_schema import Layout, read_precision
+ from silitok_speed.qwen36 import freetoken_contract as contract
+ from silitok_speed.qwen36 import freetoken_worker as worker
+-from tools.smoke.freetoken_qwen36 import _manifest
++from tools.smoke.freetoken_qwen36 import _manifest, _add_q2_tuning_args
+ 
+ 
+ def _checkpoint(tmp_path, monkeypatch):
+@@ -88,8 +88,17 @@ def test_custom_residency_reaches_native_config_with_explicit_budgets(tmp_path,
+     args = Namespace(profile='flash-next', model=tmp_path, quant='q2_0_strata',
+         protected_experts=resident, moe_q2_dynamic_slots=dynamic,
+         gguf_embedding_host=True, ple_row_cache_rows=1048576, moe_q2_adapt_decay=0.7,
++        moe_q2_prefill_workspace=dynamic == 1024,
++        fixed_q2_rebuild_reserve_mib=0 if dynamic == 1024 else 512,
+         startup_timeout=300, request_timeout=1800, shutdown_timeout=20,
+         vram_estimate_gib=14, host_commit_estimate_gib=36)
++    parser = ArgumentParser()
++    _add_q2_tuning_args(parser)
++    parsed = parser.parse_args([
++        '--moe-q2-prefill-workspace' if dynamic == 1024 else '--no-moe-q2-prefill-workspace',
++        '--fixed-q2-rebuild-reserve-mib', '0' if dynamic == 1024 else '512'])
++    args.moe_q2_prefill_workspace = parsed.moe_q2_prefill_workspace
++    args.fixed_q2_rebuild_reserve_mib = parsed.fixed_q2_rebuild_reserve_mib
+     manifest = _manifest(args, 'custom-flash-next')
+     options = _runtime_options(checkpoint, BackendConfig(extra=manifest['models'][0]['engine']['extra']))
+     payload = _worker_option_payload(options)
+@@ -101,6 +110,8 @@ def test_custom_residency_reaches_native_config_with_explicit_budgets(tmp_path,
+     assert native.moe_cache_size == resident + dynamic + 1024
+     assert native.gguf_embedding_host and native.ple_row_cache_rows == 1048576
+     assert native.moe_q2_adapt_decay == 0.7
++    assert native.moe_q2_prefill_workspace == (dynamic == 1024)
++    assert native.fixed_q2_rebuild_reserve_mib == (0 if dynamic == 1024 else 512)
+     for missing in budgets:
+         with pytest.raises(ValueError, match='explicit.*budget'):
+             _runtime_options(checkpoint, BackendConfig(extra=geometry | {k:v for k,v in budgets.items() if k != missing}))
+@@ -116,6 +127,12 @@ def test_custom_residency_reaches_native_config_with_explicit_budgets(tmp_path,
+     {'ple_row_cache_rows': True}, {'ple_row_cache_rows': 1 << 25},
+     {'ple_row_cache_rows': 8, 'ple_backend': 'pinned'},
+     {'moe_q2_dynamic_slots': -1},
++    {'moe_q2_prefill_workspace': 'true'},
++    {'moe_q2_prefill_workspace': True, 'moe_q2_dynamic_slots': 512},
++    {'moe_q2_prefill_workspace': True, 'moe_q2_resident_experts': 0},
++    {'fixed_q2_rebuild_reserve_mib': True},
++    {'fixed_q2_rebuild_reserve_mib': -1}, {'fixed_q2_rebuild_reserve_mib': 513},
++    {'fixed_q2_rebuild_reserve_mib': 0, 'moe_q2_resident_experts': 0},
+ ])
+ def test_invalid_execution_options_fail_before_worker(tmp_path, monkeypatch, extra):
+     """在启动worker之前拒绝非法的缓存、映射和衰减参数。"""
+diff --git a/tests/unit/test_freetoken_worker.py b/tests/unit/test_freetoken_worker.py
+index 9425a7bb..0ff12989 100644
+--- a/tests/unit/test_freetoken_worker.py
++++ b/tests/unit/test_freetoken_worker.py
+@@ -395,6 +395,7 @@ def test_worker_load_contract_accepts_only_owned_moe_backends(moe_backend):
+         "moe_q2_adapt_decay": 1.0,
+         "gguf_embedding_host": False,
+         "ple_row_cache_rows": 0,
++        "moe_q2_prefill_workspace": False, "fixed_q2_rebuild_reserve_mib": 512,
+     }
+ 
+     assert worker_module._worker_options({"options": options}) is options
+@@ -422,7 +423,8 @@ def test_worker_options_construct_real_freetoken_scheduler_without_cuda(tmp_path
+                "moe_q2_resident_experts": 0, "moe_q2_dynamic_slots": 1024,
+                "mtp_runtime_path": None, "mtp_runtime_manifest_sha256": None,
+                "mtp_compact_state": False, "linear_state_cache_slots": None, "moe_q2_adapt_every": 0,
+-               "moe_q2_adapt_decay": 1.0, "gguf_embedding_host": False, "ple_row_cache_rows": 0}
++               "moe_q2_adapt_decay": 1.0, "gguf_embedding_host": False, "ple_row_cache_rows": 0,
++               "moe_q2_prefill_workspace": False, "fixed_q2_rebuild_reserve_mib": 512}
+     was_initialized = torch.cuda.is_initialized()
+     scheduler = SchedulerConfig(model_path=str(tmp_path), tp_info=DistributedInfo(0, 1),
+                                 offline_mode=True, **worker_module._llm_kwargs(options))
+diff --git a/tools/smoke/freetoken_qwen36.py b/tools/smoke/freetoken_qwen36.py
+index cb93fe90..2d99af8c 100644
+--- a/tools/smoke/freetoken_qwen36.py
++++ b/tools/smoke/freetoken_qwen36.py
+@@ -155,6 +155,8 @@ def _add_q2_tuning_args(parser: argparse.ArgumentParser) -> None:
+     parser.add_argument('--moe-q2-adapt-decay', type=float)
+     parser.add_argument('--gguf-embedding-host', action=argparse.BooleanOptionalAction, default=None)
+     parser.add_argument('--ple-row-cache-rows', type=int)
++    parser.add_argument('--moe-q2-prefill-workspace', action=argparse.BooleanOptionalAction, default=None)
++    parser.add_argument('--fixed-q2-rebuild-reserve-mib', type=int)
+     parser.add_argument('--moe-q2-dynamic-slots', type=int)
+     parser.add_argument('--mtp-compact-state', action='store_true')
+ 
+@@ -198,7 +200,8 @@ def _manifest(args: argparse.Namespace, model_id: str) -> dict[str, Any]:
+     if args.host_commit_estimate_gib is not None:
+         extra["host_commit_estimate_bytes"] = _gib(args.host_commit_estimate_gib)
+     for key in ('max_prefill_length', 'linear_state_cache_slots', 'moe_q2_adapt_every',
+-                'moe_q2_adapt_decay', 'gguf_embedding_host', 'ple_row_cache_rows'):
++                'moe_q2_adapt_decay', 'gguf_embedding_host', 'ple_row_cache_rows',
++                'moe_q2_prefill_workspace', 'fixed_q2_rebuild_reserve_mib'):
+         value = getattr(args, key, None)
+         if value is not None:
+             extra[key] = value

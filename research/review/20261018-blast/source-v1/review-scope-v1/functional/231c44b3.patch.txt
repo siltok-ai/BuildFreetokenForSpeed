@@ -1,0 +1,357 @@
+commit 231c44b3556256f3285758928df6833e184c413d
+Author:     boqi <liboqi@siltok-ai.com>
+AuthorDate: Fri Oct 16 23:27:41 2026 +0800
+Commit:     boqi <liboqi@siltok-ai.com>
+CommitDate: Sun Oct 18 16:28:05 2026 +0800
+
+    perf: bind validated Q2 and PLE cache materials with 16GB tuning options
+
+diff --git a/.gitattributes b/.gitattributes
+index 6b5a26f1..e37cfbb2 100644
+--- a/.gitattributes
++++ b/.gitattributes
+@@ -228,3 +228,4 @@ silitok_speed/qwen36/kernel_cache_strataq2mtp2/**/*.dll -text
+ silitok_speed/qwen36/kernel_cache_strataq2perf1/** -text
+ silitok_speed/qwen36/kernel_cache_strataq2perf2/** -text
+ silitok_speed/qwen36/kernel_cache_strataq2perf3/** -text
++silitok_speed/qwen36/kernel_cache_strataq2perf5/** -text
+diff --git a/silitok_speed/backends/freetoken_qwen36.py b/silitok_speed/backends/freetoken_qwen36.py
+index 6711664d..07c2980f 100644
+--- a/silitok_speed/backends/freetoken_qwen36.py
++++ b/silitok_speed/backends/freetoken_qwen36.py
+@@ -115,6 +115,9 @@ _RUNTIME_EXTRA_KEYS = frozenset(
+         "moe_q2_resident_experts",
+         "moe_q2_dynamic_slots",
+         "moe_q2_adapt_every",
++        "moe_q2_adapt_decay",
++        "gguf_embedding_host",
++        "ple_row_cache_rows",
+         "linear_state_cache_slots",
+         "mtp_compact_state",
+         "mtp_enabled",
+@@ -167,6 +170,9 @@ class _RuntimeOptions:
+     mtp_compact_state: bool = False
+     linear_state_cache_slots: int | None = None
+     moe_q2_adapt_every: int = 0
++    moe_q2_adapt_decay: float = 1.0
++    gguf_embedding_host: bool = False
++    ple_row_cache_rows: int = 0
+ 
+ 
+ @dataclass(frozen=True)
+@@ -1073,7 +1079,7 @@ def _runtime_options(
+         mtp_root, mtp_digest = inspect_mtp_runtime(mtp_path)
+     resident_default = (7168 if mtp_enabled else 9216) if strata_q2 else 0
+     resident = _int_option(extra, 'moe_q2_resident_experts', resident_default, 0, 9216)
+-    dynamic = _int_option(extra, 'moe_q2_dynamic_slots', 1024, 512, 1024)
++    dynamic = _int_option(extra, 'moe_q2_dynamic_slots', 1024, 0, 1024)
+     if not strata_q2 and ('moe_q2_resident_experts' in extra or 'moe_q2_dynamic_slots' in extra):
+         raise ValueError('Protected Q2 options require the complete Strata GGUF checkpoint')
+     if mtp_enabled and not resident:
+@@ -1087,12 +1093,21 @@ def _runtime_options(
+     if state_cache_slots is not None:
+         state_cache_slots = _checked_int('linear_state_cache_slots', state_cache_slots, 0, 65536)
+     adapt_every = _int_option(extra, 'moe_q2_adapt_every', 0, 0, 1_000_000)
++    adapt_decay = _float_option(extra, 'moe_q2_adapt_decay', 1.0, 0.0, 1.0)
++    if adapt_decay == 0:
++        raise ValueError('moe_q2_adapt_decay must be in (0, 1]')
++    embedding_host = extra.get('gguf_embedding_host', False)
++    if not isinstance(embedding_host, bool):
++        raise ValueError('gguf_embedding_host must be a boolean')
++    if embedding_host and not strata_q2:
++        raise ValueError('Mapped input embedding requires the complete Strata GGUF checkpoint')
++    row_cache_rows = _int_option(extra, 'ple_row_cache_rows', 0, 0, 1 << 24)
++    if row_cache_rows and (row_cache_rows < 8 or not flash_next):
++        raise ValueError('PLE row caching requires Flash Next and at least8 rows')
+     if (state_cache_slots is not None or adapt_every) and not (strata_q2 and resident):
+         raise ValueError('Linear-state tuning and adaptive owners require protected Strata Q2')
+     allowed_resident = {7168} if mtp_enabled else {7168, 9216}
+-    if resident and dynamic != 1024:
+-        raise ValueError('Protected Q2 requires dynamic1024')
+-    if resident and resident not in allowed_resident:
++    if resident and (resident not in allowed_resident or dynamic != 1024):
+         # 原两档绑定24GiB验收预算；其他机器可显式选择原生引擎已有的小池，不能继承旧预算。
+         budget_fields = {'vram_estimate_bytes', 'host_commit_estimate_bytes'}
+         if not budget_fields <= extra.keys():
+@@ -1100,7 +1115,7 @@ def _runtime_options(
+         geometry = checkpoint.expert_geometry
+         per_expert = geometry['expert_bytes'] // (geometry['layers'] * geometry['experts_per_layer'])
+         minimums = {
+-            'vram_estimate_bytes': (resident + 2048) * per_expert,
++            'vram_estimate_bytes': (resident + dynamic + 1024) * per_expert,
+             'host_commit_estimate_bytes': geometry['expert_bytes'] - resident * per_expert,
+         }
+         for field, minimum in minimums.items():
+@@ -1128,6 +1143,8 @@ def _runtime_options(
+     ple_backend = extra.get("ple_backend", "disk")
+     if ple_backend not in {"disk", "pinned"}:
+         raise ValueError("ple_backend must be 'disk' or 'pinned'")
++    if row_cache_rows and ple_backend != 'disk':
++        raise ValueError('PLE row caching requires ple_backend=disk')
+     if not flash_next and "ple_backend" in extra:
+         raise ValueError("ple_backend applies only to Flash Next")
+     cache_type = extra.get("cache_type", "radix")
+@@ -1181,7 +1198,7 @@ def _runtime_options(
+         and not has_explicit_cache_size
+         and not has_explicit_cache_auto
+     ):
+-        moe_cache_size_raw = resident + 2048 if resident else (1024 if flash_next else _DEFAULT_NVFP4_MOE_CACHE_SIZE)
++        moe_cache_size_raw = resident + dynamic + 1024 if resident else (1024 if flash_next else _DEFAULT_NVFP4_MOE_CACHE_SIZE)
+     else:
+         moe_cache_size_raw = extra.get(
+             "moe_cache_size",
+@@ -1232,9 +1249,9 @@ def _runtime_options(
+     if checkpoint.is_moe and moe_cache_auto and kv_cache_tokens is not None:
+         raise ValueError("kv_cache_tokens cannot be combined with moe_cache_auto=true")
+     if resident:
+-        # 固定池必须与引擎的重建预算一致；未验证的几何需另建候选，不能自动挤满资源。
++        # 固定池由常驻区、动态区和两个512槽预填充缓冲区组成，预算按实际几何检查。
+         kv_cache_tokens = 8192 if kv_cache_tokens is None else kv_cache_tokens
+-        required_cache = resident + 2048
++        required_cache = resident + dynamic + 1024
+         if (moe_cache_size != required_cache or moe_cache_auto or kv_cache_tokens != 8192
+                 or cuda_graph_max_bs > 1 or max_prefill_length > 4096
+                 or ple_backend != 'disk' or memory_ratio < .9):
+@@ -1300,6 +1317,9 @@ def _runtime_options(
+         mtp_compact_state=compact_state,
+         linear_state_cache_slots=state_cache_slots,
+         moe_q2_adapt_every=adapt_every,
++        moe_q2_adapt_decay=adapt_decay,
++        gguf_embedding_host=embedding_host,
++        ple_row_cache_rows=row_cache_rows,
+     )
+ 
+ 
+@@ -1328,6 +1348,9 @@ def _worker_option_payload(options: _RuntimeOptions) -> dict[str, Any]:
+         "mtp_compact_state": options.mtp_compact_state,
+         "linear_state_cache_slots": options.linear_state_cache_slots,
+         "moe_q2_adapt_every": options.moe_q2_adapt_every,
++        "moe_q2_adapt_decay": options.moe_q2_adapt_decay,
++        "gguf_embedding_host": options.gguf_embedding_host,
++        "ple_row_cache_rows": options.ple_row_cache_rows,
+     }
+ 
+ 
+diff --git a/silitok_speed/pyproject.toml b/silitok_speed/pyproject.toml
+index c23374d7..171cfb65 100644
+--- a/silitok_speed/pyproject.toml
++++ b/silitok_speed/pyproject.toml
+@@ -25,7 +25,7 @@ build-backend = "setuptools.build_meta"
+ 
+ [project]
+ name = "siltok-speed"
+-version = "0.2.0+strataq2perf3"
++version = "0.2.0+strataq2perf5"
+ description = "Siltok Speed — 本地 AI 一体机的统一推理引擎 (Engine + HTTP API + SDK)"
+ requires-python = ">=3.10"
+ license = {text = "Apache-2.0"}
+@@ -242,6 +242,8 @@ packages = [
+     "kernel_cache_strataq2perf2/*/*.dll",
+     "kernel_cache_strataq2perf3/*.json",
+     "kernel_cache_strataq2perf3/*/*.dll",
++    "kernel_cache_strataq2perf5/*.json",
++    "kernel_cache_strataq2perf5/*/*.dll",
+ ]
+ 
+ # ============================================================
+diff --git a/silitok_speed/qwen36/freetoken_worker.py b/silitok_speed/qwen36/freetoken_worker.py
+index db04da07..fdb294e9 100644
+--- a/silitok_speed/qwen36/freetoken_worker.py
++++ b/silitok_speed/qwen36/freetoken_worker.py
+@@ -462,6 +462,9 @@ def _worker_options(command: dict[str, Any]) -> dict[str, Any]:
+         "mtp_compact_state",
+         "linear_state_cache_slots",
+         "moe_q2_adapt_every",
++        "moe_q2_adapt_decay",
++        "gguf_embedding_host",
++        "ple_row_cache_rows",
+     }
+     if set(options) != required:
+         raise ValueError("worker load options do not match the protocol contract")
+@@ -513,6 +516,9 @@ def _llm_kwargs(options: dict[str, Any]) -> dict[str, Any]:
+         mtp_compact_state=options['mtp_compact_state'],
+         linear_state_cache_slots=options['linear_state_cache_slots'],
+         moe_q2_adapt_every=options['moe_q2_adapt_every'],
++        moe_q2_adapt_decay=options['moe_q2_adapt_decay'],
++        gguf_embedding_host=options['gguf_embedding_host'],
++        ple_row_cache_rows=options['ple_row_cache_rows'],
+     )
+ 
+ 
+diff --git a/silitok_speed/qwen36/release.json b/silitok_speed/qwen36/release.json
+index 4a6474e0..c8f34508 100644
+--- a/silitok_speed/qwen36/release.json
++++ b/silitok_speed/qwen36/release.json
+@@ -1,6 +1,6 @@
+ {
+   "format": 1,
+-  "version": "0.1.3+speed.strataq2perf3",
++  "version": "0.1.3+speed.strataq2perf5",
+   "upstream_commit": "078132480ea4a0424f677a27eb22085624d331e6",
+   "python_minor": [
+     3,
+@@ -12,8 +12,8 @@
+   "apache_tvm_ffi": "0.1.13.post3",
+   "sm": "120",
+   "wheel": {
+-    "path": "wheels/freetoken-0.1.3+speed.strataq2perf3-cp312-cp312-win_amd64.whl",
+-    "sha256": "2a075cace8849611ea170de9cf110355755b6b54c890c0c4eda34da7b5684afd",
++    "path": "wheels/freetoken-0.1.3+speed.strataq2perf5-cp312-cp312-win_amd64.whl",
++    "sha256": "f311e65730b48c4d62642583203578a33413e8241741327f2317f7e9499b7e17",
+     "native_modules": [
+       "freetoken/kernel/_cpu_moe.cp312-win_amd64.pyd",
+       "freetoken/kernel/_pinned_tensor.cp312-win_amd64.pyd",
+@@ -22,7 +22,7 @@
+   },
+   "kernel_cache": {
+     "path": "kernel-cache",
+-    "package_path": "kernel_cache_strataq2perf3",
++    "package_path": "kernel_cache_strataq2perf5",
+     "dll_count": 27,
+     "manifest": "kernel-cache/speed-kernel-manifest.json",
+     "specs": "build/specs/speed-strataq2perf2-sm120.txt"
+@@ -168,7 +168,7 @@
+       "sha256": "c41553189b68adc1aa562b18dd5af177e1369bd19277f00116b818ff13e1b659"
+     }
+   },
+-  "producer_commit": "24522de30265a2f0e8a0cae37cc3124ae5e248f3",
++  "producer_commit": "10954aa0c275fe9ef8ca354d43bbc2a9fa88756c",
+   "mtp_runtime": {
+     "manifest_sha256": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
+     "source_repository": "Qwen/Qwen3.8-Flash-Next",
+@@ -190,5 +190,5 @@
+       "compact_update_bytes": 7105824
+     }
+   },
+-  "consumer_verifier": "tools/verify_performance3_consumer.py"
++  "consumer_verifier": "tools/verify_performance5_consumer.py"
+ }
+diff --git a/tests/unit/test_freetoken_strata_q2.py b/tests/unit/test_freetoken_strata_q2.py
+index ce23d479..515c406c 100644
+--- a/tests/unit/test_freetoken_strata_q2.py
++++ b/tests/unit/test_freetoken_strata_q2.py
+@@ -73,19 +73,22 @@ def test_public_smoke_manifest_preserves_complete_q2_residency(tmp_path, monkeyp
+     assert options.moe_cache_size == 2*512 + options.moe_q2_dynamic_slots + options.moe_q2_resident_experts
+ 
+ 
+-@pytest.mark.parametrize('resident', [512, 1024, 2048])
+-def test_custom_residency_reaches_native_config_with_explicit_budgets(tmp_path, monkeypatch, resident):
++@pytest.mark.parametrize('resident,dynamic', [(512, 1024), (1024, 512), (2048, 0)])
++def test_custom_residency_reaches_native_config_with_explicit_budgets(tmp_path, monkeypatch, resident, dynamic):
+     """小显存几何必须传到真实引擎配置，同时要求调用者提供独立资源预算。"""
+     from freetoken.distributed import DistributedInfo
+     from freetoken.scheduler.config import SchedulerConfig
+     _checkpoint(tmp_path, monkeypatch)
+     checkpoint = contract.inspect_freetoken_checkpoint(tmp_path)
+-    geometry = dict(moe_q2_resident_experts=resident, moe_cache_size=resident + 2048)
++    geometry = dict(moe_q2_resident_experts=resident, moe_q2_dynamic_slots=dynamic,
++                    moe_cache_size=resident + dynamic + 1024)
+     budgets = dict(vram_estimate_bytes=14 * 1024**3, host_commit_estimate_bytes=36 * 1024**3)
+     with pytest.raises(ValueError, match='explicit.*budget'):
+         _runtime_options(checkpoint, BackendConfig(extra=geometry))
+     args = Namespace(profile='flash-next', model=tmp_path, quant='q2_0_strata',
+-        protected_experts=resident, startup_timeout=300, request_timeout=1800, shutdown_timeout=20,
++        protected_experts=resident, moe_q2_dynamic_slots=dynamic,
++        gguf_embedding_host=True, ple_row_cache_rows=1048576, moe_q2_adapt_decay=0.7,
++        startup_timeout=300, request_timeout=1800, shutdown_timeout=20,
+         vram_estimate_gib=14, host_commit_estimate_gib=36)
+     manifest = _manifest(args, 'custom-flash-next')
+     options = _runtime_options(checkpoint, BackendConfig(extra=manifest['models'][0]['engine']['extra']))
+@@ -94,7 +97,10 @@ def test_custom_residency_reaches_native_config_with_explicit_budgets(tmp_path,
+     native = SchedulerConfig(model_path='configuration-only', tp_info=DistributedInfo(0, 1),
+                              **worker._llm_kwargs(payload))
+     assert native.moe_q2_resident_experts == resident
+-    assert native.moe_cache_size == resident + 2048
++    assert native.moe_q2_dynamic_slots == dynamic
++    assert native.moe_cache_size == resident + dynamic + 1024
++    assert native.gguf_embedding_host and native.ple_row_cache_rows == 1048576
++    assert native.moe_q2_adapt_decay == 0.7
+     for missing in budgets:
+         with pytest.raises(ValueError, match='explicit.*budget'):
+             _runtime_options(checkpoint, BackendConfig(extra=geometry | {k:v for k,v in budgets.items() if k != missing}))
+@@ -103,6 +109,22 @@ def test_custom_residency_reaches_native_config_with_explicit_budgets(tmp_path,
+             _runtime_options(checkpoint, BackendConfig(extra=geometry | budgets | {too_small: 1}))
+ 
+ 
++@pytest.mark.parametrize('extra', [
++    {'moe_q2_adapt_decay': 0}, {'moe_q2_adapt_decay': True},
++    {'moe_q2_adapt_decay': float('nan')}, {'moe_q2_adapt_decay': 1.01},
++    {'gguf_embedding_host': 'true'}, {'ple_row_cache_rows': 7},
++    {'ple_row_cache_rows': True}, {'ple_row_cache_rows': 1 << 25},
++    {'ple_row_cache_rows': 8, 'ple_backend': 'pinned'},
++    {'moe_q2_dynamic_slots': -1},
++])
++def test_invalid_execution_options_fail_before_worker(tmp_path, monkeypatch, extra):
++    """在启动worker之前拒绝非法的缓存、映射和衰减参数。"""
++    _checkpoint(tmp_path, monkeypatch)
++    checkpoint = contract.inspect_freetoken_checkpoint(tmp_path)
++    with pytest.raises(ValueError):
++        _runtime_options(checkpoint, BackendConfig(extra=extra))
++
++
+ @pytest.mark.parametrize('mutation', ['missing_second', 'duplicate', 'revision', 'expert_path', 'header', 'changed_after_cached'])
+ def test_source_errors_reject_before_worker_launch(tmp_path, monkeypatch, mutation):
+     config = _checkpoint(tmp_path, monkeypatch)
+diff --git a/tests/unit/test_freetoken_worker.py b/tests/unit/test_freetoken_worker.py
+index 5e844d15..9425a7bb 100644
+--- a/tests/unit/test_freetoken_worker.py
++++ b/tests/unit/test_freetoken_worker.py
+@@ -392,6 +392,9 @@ def test_worker_load_contract_accepts_only_owned_moe_backends(moe_backend):
+         "mtp_compact_state": False,
+         "linear_state_cache_slots": None,
+         "moe_q2_adapt_every": 0,
++        "moe_q2_adapt_decay": 1.0,
++        "gguf_embedding_host": False,
++        "ple_row_cache_rows": 0,
+     }
+ 
+     assert worker_module._worker_options({"options": options}) is options
+@@ -418,7 +421,8 @@ def test_worker_options_construct_real_freetoken_scheduler_without_cuda(tmp_path
+                "moe_cache_size": 1024, "moe_cache_auto": False,
+                "moe_q2_resident_experts": 0, "moe_q2_dynamic_slots": 1024,
+                "mtp_runtime_path": None, "mtp_runtime_manifest_sha256": None,
+-               "mtp_compact_state": False, "linear_state_cache_slots": None, "moe_q2_adapt_every": 0}
++               "mtp_compact_state": False, "linear_state_cache_slots": None, "moe_q2_adapt_every": 0,
++               "moe_q2_adapt_decay": 1.0, "gguf_embedding_host": False, "ple_row_cache_rows": 0}
+     was_initialized = torch.cuda.is_initialized()
+     scheduler = SchedulerConfig(model_path=str(tmp_path), tp_info=DistributedInfo(0, 1),
+                                 offline_mode=True, **worker_module._llm_kwargs(options))
+diff --git a/tools/smoke/freetoken_qwen36.py b/tools/smoke/freetoken_qwen36.py
+index 82c2c9f6..cb93fe90 100644
+--- a/tools/smoke/freetoken_qwen36.py
++++ b/tools/smoke/freetoken_qwen36.py
+@@ -152,6 +152,10 @@ def _add_q2_tuning_args(parser: argparse.ArgumentParser) -> None:
+     parser.add_argument('--max-prefill-length', type=int)
+     parser.add_argument('--linear-state-cache-slots', type=int)
+     parser.add_argument('--moe-q2-adapt-every', type=int)
++    parser.add_argument('--moe-q2-adapt-decay', type=float)
++    parser.add_argument('--gguf-embedding-host', action=argparse.BooleanOptionalAction, default=None)
++    parser.add_argument('--ple-row-cache-rows', type=int)
++    parser.add_argument('--moe-q2-dynamic-slots', type=int)
+     parser.add_argument('--mtp-compact-state', action='store_true')
+ 
+ 
+@@ -178,8 +182,11 @@ def _manifest(args: argparse.Namespace, model_id: str) -> dict[str, Any]:
+             resident = getattr(args, 'protected_experts', None)
+             if resident is None:
+                 resident = 7168 if mtp_path is not None else 9216
+-            extra.update(moe_cache_size=resident+2048 if resident else 1024, moe_q2_resident_experts=resident,
+-                         moe_q2_dynamic_slots=1024, memory_ratio=.9, max_prefill_length=4096)
++            dynamic = getattr(args, 'moe_q2_dynamic_slots', None)
++            if dynamic is None:
++                dynamic = 1024
++            extra.update(moe_cache_size=resident+dynamic+1024 if resident else 1024, moe_q2_resident_experts=resident,
++                         moe_q2_dynamic_slots=dynamic, memory_ratio=.9, max_prefill_length=4096)
+             if mtp_path is not None:
+                 extra.update(mtp_enabled=True)
+         else:
+@@ -190,7 +197,8 @@ def _manifest(args: argparse.Namespace, model_id: str) -> dict[str, Any]:
+         extra["vram_estimate_bytes"] = _gib(args.vram_estimate_gib)
+     if args.host_commit_estimate_gib is not None:
+         extra["host_commit_estimate_bytes"] = _gib(args.host_commit_estimate_gib)
+-    for key in ('max_prefill_length', 'linear_state_cache_slots', 'moe_q2_adapt_every'):
++    for key in ('max_prefill_length', 'linear_state_cache_slots', 'moe_q2_adapt_every',
++                'moe_q2_adapt_decay', 'gguf_embedding_host', 'ple_row_cache_rows'):
+         value = getattr(args, key, None)
+         if value is not None:
+             extra[key] = value

@@ -1,0 +1,1 @@
+{"status": "passed", "candidate": "9d871c87", "current_model_natural_exit": true, "dispatchers_stopped_after_child_completion": true, "reason": "Additional public backend numeric-overflow fix; provisional qualification superseded; models not force-terminated."}

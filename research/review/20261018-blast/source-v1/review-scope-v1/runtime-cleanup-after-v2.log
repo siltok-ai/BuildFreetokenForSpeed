@@ -1,0 +1,1357 @@
+.......................FFFFFFF.FFFFF.....FFFFFF........FFFFFF........... [ 69%]
+...............................                                          [100%]
+================================== FAILURES ===================================
+______________ test_real_worker_process_streams_and_unloads[fp8] ______________
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:569: in test_real_worker_process_streams_and_unloads
+    backend, _ = _load_backend(
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_real_worker_process_strea0\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x00004478 (most recent call first):
+  <no Python frame>
+_____________ test_real_worker_process_streams_and_unloads[nvfp4] _____________
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:569: in test_real_worker_process_streams_and_unloads
+    backend, _ = _load_backend(
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_real_worker_process_strea1\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x00003700 (most recent call first):
+  <no Python frame>
+________ test_cancel_ack_keeps_same_worker_available_for_next_request _________
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:614: in test_cancel_ack_keeps_same_worker_available_for_next_request
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_cancel_ack_keeps_same_wor0\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x00001170 (most recent call first):
+  <no Python frame>
+__________ test_request_deadline_invalidates_and_reaps_silent_worker __________
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:657: in test_request_deadline_invalidates_and_reaps_silent_worker
+    backend, _ = _load_backend(
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_request_deadline_invalida0\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x00004670 (most recent call first):
+  <no Python frame>
+_____ test_concurrent_callers_are_serialized_on_the_single_response_pipe ______
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:688: in test_concurrent_callers_are_serialized_on_the_single_response_pipe
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_concurrent_callers_are_se0\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x00000dac (most recent call first):
+  <no Python frame>
+_____ test_generator_close_drains_terminal_frame_without_poisoning_worker _____
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:742: in test_generator_close_drains_terminal_frame_without_poisoning_worker
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_generator_close_drains_te0\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x00004150 (most recent call first):
+  <no Python frame>
+________ test_crashed_worker_fails_request_then_restarts_before_reuse _________
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:770: in test_crashed_worker_fails_request_then_restarts_before_reuse
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_crashed_worker_fails_requ0\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x0000215c (most recent call first):
+  <no Python frame>
+_________ test_request_error_is_sanitized_and_does_not_restart_worker _________
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:827: in test_request_error_is_sanitized_and_does_not_restart_worker
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_request_error_is_sanitize0\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x0000208c (most recent call first):
+  <no Python frame>
+____ test_unknown_worker_request_error_is_fatal_and_never_exposes_its_code ____
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:849: in test_unknown_worker_request_error_is_fatal_and_never_exposes_its_code
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_unknown_worker_request_er0\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x000013a8 (most recent call first):
+  <no Python frame>
+_______________ test_wrong_request_identity_invalidates_worker ________________
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:869: in test_wrong_request_identity_invalidates_worker
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_wrong_request_identity_in0\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x000007c4 (most recent call first):
+  <no Python frame>
+___________ test_non_boolean_token_terminal_flag_invalidates_worker ___________
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:888: in test_non_boolean_token_terminal_flag_invalidates_worker
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_non_boolean_token_termina0\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x0000359c (most recent call first):
+  <no Python frame>
+_________________ test_forced_unload_reaps_worker_descendant __________________
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:907: in test_forced_unload_reaps_worker_descendant
+    backend, checkpoint = _load_backend(
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_forced_unload_reaps_worke0\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x0000107c (most recent call first):
+  <no Python frame>
+__ test_freetoken_rejects_sampling_fields_it_cannot_honor[presence_penalty] ___
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:1046: in test_freetoken_rejects_sampling_fields_it_cannot_honor
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_freetoken_rejects_samplin0\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x0000484c (most recent call first):
+  <no Python frame>
+________ test_freetoken_rejects_sampling_fields_it_cannot_honor[seed] _________
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:1046: in test_freetoken_rejects_sampling_fields_it_cannot_honor
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_freetoken_rejects_samplin1\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x00004ca8 (most recent call first):
+  <no Python frame>
+_______ test_freetoken_rejects_invalid_sampling_values[temperature-nan] _______
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:1077: in test_freetoken_rejects_invalid_sampling_values
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_freetoken_rejects_invalid0\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x00003f4c (most recent call first):
+  <no Python frame>
+________ test_freetoken_rejects_invalid_sampling_values[top_p-invalid] ________
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:1077: in test_freetoken_rejects_invalid_sampling_values
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_freetoken_rejects_invalid1\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x00003ba4 (most recent call first):
+  <no Python frame>
+_______ test_freetoken_rejects_invalid_sampling_values[do_sample-false] _______
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:1077: in test_freetoken_rejects_invalid_sampling_values
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_freetoken_rejects_invalid2\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x00003f5c (most recent call first):
+  <no Python frame>
+__ test_freetoken_rejects_invalid_sampling_values[no_repeat_ngram_size-1.5] ___
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:1077: in test_freetoken_rejects_invalid_sampling_values
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_freetoken_rejects_invalid3\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x00003e14 (most recent call first):
+  <no Python frame>
+_____ test_worker_start_passes_resolved_parent_cuda_visibility_to_process _____
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:1151: in test_worker_start_passes_resolved_parent_cuda_visibility_to_process
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_worker_start_passes_resol0\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x00002d48 (most recent call first):
+  <no Python frame>
+_____ test_worker_q2_wait_policy_keeps_user_settings[fp8-inherited0-None] _____
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:1193: in test_worker_q2_wait_policy_keeps_user_settings
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_worker_q2_wait_policy_kee0\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x00002670 (most recent call first):
+  <no Python frame>
+___ test_worker_q2_wait_policy_keeps_user_settings[q2_0-inherited1-PASSIVE] ___
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:1193: in test_worker_q2_wait_policy_keeps_user_settings
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_worker_q2_wait_policy_kee1\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x000012f4 (most recent call first):
+  <no Python frame>
+___ test_worker_q2_wait_policy_keeps_user_settings[q2_0-inherited2-ACTIVE] ____
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:1193: in test_worker_q2_wait_policy_keeps_user_settings
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_worker_q2_wait_policy_kee2\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x00001af4 (most recent call first):
+  <no Python frame>
+____ test_worker_q2_wait_policy_keeps_user_settings[q2_0-inherited3-None] _____
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:1193: in test_worker_q2_wait_policy_keeps_user_settings
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_worker_q2_wait_policy_kee3\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x0000061c (most recent call first):
+  <no Python frame>
+____ test_worker_q2_wait_policy_keeps_user_settings[q2_0-inherited4-None] _____
+silitok_speed\backends\freetoken.py:796: in _wait_startup_message
+    message = transport.receive(min(0.1, remaining))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+silitok_speed\runtimes\freetoken\session.py:69: in receive
+    raise ConnectionError("FreeToken worker response pipe closed")
+E   ConnectionError: FreeToken worker response pipe closed
+
+The above exception was the direct cause of the following exception:
+tests\unit\test_qwen36_backend.py:1193: in test_worker_q2_wait_policy_keeps_user_settings
+    backend, _ = _load_backend(tmp_path, monkeypatch, certified_versions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\unit\test_qwen36_backend.py:278: in _load_backend
+    backend.load(
+silitok_speed\backends\freetoken.py:396: in load
+    self._start_worker(cancel_event=cancel_event)
+silitok_speed\backends\freetoken.py:694: in _start_worker
+    ready = self._wait_startup_message(
+silitok_speed\backends\freetoken.py:804: in _wait_startup_message
+    raise ModelCorruptError(
+E   silitok_speed.backends.base.ModelCorruptError: FreeToken worker failed during startup
+------------------------------ Captured log call ------------------------------
+ERROR    silitok_speed.backends.freetoken:freetoken.py:931 FreeToken worker startup failure tail:
+Traceback (most recent call last):
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 197, in <module>
+
+    raise SystemExit(main())
+
+                     ^^^^^^
+
+  File "C:\workspace\wt\siltok-speed\rebase-dev-20261018\tests\support\fake_freetoken_worker.py", line 158, in main
+
+    "kernel_artifacts": len(json.loads((Path(load['kernel_cache']) / 'speed-kernel-manifest.json').read_text())['artifacts']),
+
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1027, in read_text
+
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\workspace\tools\python312\Lib\pathlib.py", line 1013, in open
+
+    return io.open(self, mode, buffering, encoding, errors, newline)
+
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\UserPC\\AppData\\Local\\Temp\\pytest-of-userpc\\pytest-87\\test_worker_q2_wait_policy_kee4\\cache\\speed-kernel-manifest.json'
+
+Fatal Python error: _enter_buffered_busy: could not acquire lock for <_io.BufferedReader name='<stdin>'> at interpreter shutdown, possibly due to daemon threads
+Python runtime state: finalizing (tstate=0x00007ffc0f063d50)
+
+Current thread 0x0000472c (most recent call first):
+  <no Python frame>
+============================== warnings summary ===============================
+..\..\..\envs\siltok-speed\flash-perf9\Lib\site-packages\_pytest\config\__init__.py:1345
+  C:\workspace\envs\siltok-speed\flash-perf9\Lib\site-packages\_pytest\config\__init__.py:1345: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; anyio
+    self._mark_plugins_for_rewrite(hook, disable_autoload)
+
+tests/unit/test_qwen36_backend.py::test_tokenizer_cache_reloads_after_same_directory_asset_replacement
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+tests/unit/test_qwen36_backend.py::test_tokenizer_cache_reloads_after_same_directory_asset_replacement
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+24 failed, 79 passed, 3 warnings in 45.07s
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

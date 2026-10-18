@@ -1,0 +1,70 @@
+"""验收新保护编译载荷；使用其embedded Python及隔离PATH，不授予真实安装资格。"""
+from pathlib import Path
+import hashlib
+import json
+import os
+import subprocess
+import time
+import shutil
+R=Path(__file__).parent
+T=R.parent/'review-20261017/consumer-tools'
+S=Path(r'C:\workspace\wt\siltok-speed\rebase-dev-20261018')
+P=Path(r'C:\workspace\envs\siltok-speed\flash-perf9\Scripts\python.exe')
+M=Path(r'C:\workspace\models\siltok-speed\flash-next\checkpoints')
+BUILD=Path(r'C:\workspace\build\siltok-speed\blast final-p01')
+APP=Path(r'C:\workspace\build\siltok-speed\blast final-test\app')
+E=R/'staged-blast-final'
+def main():
+    deadline=time.monotonic()+10800
+    while not (R/'protected-build-ready-v1.json').exists():
+        if time.monotonic()>deadline:raise TimeoutError('Protected build unfinished')
+        time.sleep(2)
+    receipt=json.loads((R/'protected-build-ready-v1.json').read_text())
+    commit=receipt['speed_commit'];cache=APP/'runtime/kernel-cache'
+    assert Path(receipt['payload'])==BUILD/'app'
+    if APP.parent.exists():raise FileExistsError(APP.parent)
+    shutil.copytree(BUILD/'app',APP)
+    for name in ('tmp','config','results'): (E/name).mkdir(parents=True,exist_ok=False)
+    (E/'config/config.yaml').write_text('{"resource":{"gpu_probe":"nvml"}}',encoding='utf-8')
+    results=E/'results'
+    env={k:v for k,v in os.environ.items() if not k.startswith(('SILITOK_','FREETOKEN_','CUDA_','TORCH_')) and k not in ('VIRTUAL_ENV','PYTHONPATH','PYTHONHOME','CUDA_PATH','CUDA_HOME','INCLUDE','LIB','LIBPATH','CUDACXX','CMAKE_PREFIX_PATH','CC','CXX','NVCC')}
+    env.update(PATH=';'.join([str(APP/'python/Scripts'),r'C:\Windows\System32',r'C:\Windows',r'C:\Windows\System32\Wbem',r'C:\Windows\System32\WindowsPowerShell\v1.0',r'C:\Program Files\NVIDIA Corporation\NVSMI']),TEMP=str(E/'tmp'),TMP=str(E/'tmp'),PYTHONUTF8='1',PYTHONDONTWRITEBYTECODE='1',SILITOK_CONFIG=str(E/'config'),SILITOK_FREETOKEN_KERNEL_CACHE_DIR=str(cache),FREETOKEN_KERNEL_CACHE_DIR=str(cache),FREETOKEN_DISABLE_JIT='1',TRITON_CACHE_DIR=str(E/'triton-cache'),HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',TORCH_EXTENSIONS_DIR=str(E/'extensions'),HF_HOME=r'C:\workspace\cache\hf')
+    (results/'environment.json').write_text(json.dumps({k:env[k] for k in ('PATH','TEMP','SILITOK_CONFIG','FREETOKEN_KERNEL_CACHE_DIR','TRITON_CACHE_DIR','TORCH_EXTENSIONS_DIR')},indent=2)+'\n')
+    completed=[]
+    def run(name,script,args):
+        print('START',name,flush=True)
+        cmd=[P,'-B',T/'supervise-v2.py','--prefix',results/name,'--cwd',APP,'--timeout',1800,'--',APP/'python/python.exe','-I','-X','utf8','-u','-B',T/'run-staged-probe.py','--install-root',APP,'--expected-commit',commit,'--origin-report',results/(name+'.origin.json'),'--script',script,*args]
+        subprocess.run(list(map(str,cmd)),env=env,cwd=APP,check=True,creationflags=subprocess.CREATE_NO_WINDOW)
+        resource=json.loads((results/(name+'.resource.json')).read_text());origin=json.loads((results/(name+'.origin.json')).read_text())
+        assert resource['returncode']==0 and resource['stop_reason'] is None and not resource['remaining_descendants'],resource
+        assert origin['status']=='passed' and origin['scope']=='compiled_staged_payload_not_installer' and origin['build_commit']==commit,origin
+        completed.append(name)
+        (E/'progress.json').write_text(json.dumps({'status':'running','completed':completed,'commit':commit},indent=2)+'\n')
+    run('portability-v1',R/'portability-probe-v1.py',['--app',APP,'--output',results/'portability-v1.json'])
+    run('sampling-boundary-v1',R/'sampling-boundary-compiled-probe-v2.py',['--output',results/'sampling-boundary-v1.json'])
+    for mode,resident in [('off',5760),('on',4992)]:
+        name=f'backend-{mode}-quality-v1'
+        args=['--source',S,'--model',M/'flash-next-strata-q2','--resident',resident,'--vram-gib',15,'--host-gib',31,'--suite','quality','--output',results/(name+'.json')]
+        if mode=='on':args+=['--mtp-runtime',M/'flash-next-mtp','--compact-mtp','--mtp-draft-policy','paired_cjk']
+        run(name,T/'backend8-compiled-probe.py',args)
+    for mode,resident in [('off',5760),('on',4992)]:
+        shared=['--source',S,'--model',M/'flash-next-strata-q2','--kernel-cache',cache,'--protected-experts',resident,'--vram-estimate-gib',15,'--host-commit-estimate-gib',31,'--max-prefill-length',1024,'--linear-state-cache-slots',1,'--moe-q2-adapt-every',32,'--moe-q2-adapt-decay','.7','--gguf-embedding-host','--ple-row-cache-rows',1048576,'--moe-q2-prefill-workspace','--fixed-q2-rebuild-reserve-mib',0,'--vram-safety-gib','.25','--commit-safety-gib',4]
+        if mode=='on':shared+=['--mtp-runtime',M/'flash-next-mtp','--mtp-compact-state','--mtp-draft-policy','paired_cjk']
+        name=f'http-{mode}-functional-v1'
+        run(name,R/'run-http-compiled-alias-v1.py',['--mode','http','--packaged','--tcp','--backend-name',('FreeTokenBackend' if mode=='on' else 'Qwen36Backend'),'--lifecycle-output',results/(name+'.lifecycle.json'),*shared,'--profile','flash-next','--quant','q2_0_strata','--gpu-resource-probe','nvml','--startup-timeout',600,'--output',results/(name+'.json')])
+        name=f'http-{mode}-performance-v1'
+        run(name,T/'run-http-performance.py',['--compiled',*shared,'--prompts-json',T/'frozen-prompts.json','--tokens',512,'--repetitions',3,'--output',results/(name+'.json')])
+    name='qwen36-backend-v1'
+    run(name,T/'qwen36-legacy-probe.py',['--mode','backend','--packaged','--source',S,'--model',r'C:\workspace\models\siltok-speed\languages\qwen3.6-35b-a3b.nvfp4-modelscope','--profile','qwen36','--quant','nvfp4','--kernel-cache',cache,'--repeats',1,'--long-repeats',1,'--tokens',64,'--long-prompt-tokens',256,'--long-output-tokens',16,'--quality','--output',results/(name+'.json')])
+    subprocess.run([str(P),'-B',str(T/'audit-qwen-regression.py'),'--report',str(results/(name+'.json')),'--baseline',str(T/'qwen36-ft2-backend-v1.json'),'--output',str(results/'qwen36-audit-v1.json')],check=True)
+    env['SILITOK_COMPILED_PACKAGE']=str(APP/'python/Lib/site-packages/silitok_speed')
+    with (results/'compiled-integration-tests-v1.log').open('w',encoding='utf-8') as log:
+        subprocess.run([str(P),'-B','-m','pytest','-q','--tb=short','-p','no:cacheprovider',str(S/'tests/integration/test_compiled_package.py'),'-k','not native_obfuscation'],cwd=S,env=env,stdout=log,stderr=subprocess.STDOUT,check=True)
+    manifest=subprocess.check_output([str(APP/'python/python.exe'),'-I','-B','-c','import json,silitok_speed as s;print(json.dumps(s._sp_manifest))'],cwd=APP,env=env,text=True,encoding='utf-8')
+    (results/'public-manifest.json').write_text(manifest,encoding='utf-8')
+    bundle=APP/'python/Lib/site-packages/silitok_speed/__init__.pyd'
+    installers=list(BUILD.glob('SiltokSpeed-Setup-*.exe'));installer,=installers
+    result=dict(status='passed',scope='compiled_staged_payload_not_installer',completed=completed,speed_commit=commit,app=str(APP),bundle_bytes=bundle.stat().st_size,bundle_sha256=hashlib.sha256(bundle.read_bytes()).hexdigest(),installer=dict(path=str(installer),bytes=installer.stat().st_size,sha256=hashlib.file_digest(installer.open('rb'),'sha256').hexdigest()),actual_install_validated=False,clean_os_validated=False)
+    (E/'acceptance.json').write_text(json.dumps(result,indent=2)+'\n')
+    (R/'protected-acceptance-complete-v1.json').write_text(json.dumps(result,indent=2)+'\n')
+if __name__=='__main__':main()

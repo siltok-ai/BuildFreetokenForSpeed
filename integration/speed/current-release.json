@@ -2,7 +2,7 @@
   "format": 1,
   "profile": "build/profiles/strataq2perf9.json",
   "materials": "artifacts/strataq2perf9-cp312-cu130-sm120",
-  "consumer_contract": "integration/speed/consumer-contract-strataq2perf9-compiled.json",
+  "consumer_contract": "integration/speed/consumer-contract-strataq2perf9-blast-compiled.json",
   "weight_source_lock": "model-weights/qwen3.8-flash-next-strata-q2/source-lock.json",
   "mtp_manifest": "model-weights/qwen3.8-flash-next-strata-q2/mtp-runtime.json",
   "input_sha256": {
@@ -10,11 +10,11 @@
     "model-weights/qwen3.8-flash-next-strata-q2/source-lock.json": "a9c445bbeb1103938656137ce94dd31a69d3b835bfd4bf555e1e6c0a56d5ab49",
     "model-weights/qwen3.8-flash-next-strata-q2/mtp-runtime.json": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
     "integration/speed/presets/flash-next-sm120-16g-perf9.json": "491ad553af8e5e986af30ab0985c8ecefce13c11e96e9447e21ac3de24f5e36d",
-    "integration/speed/consumer-contract-strataq2perf9-compiled.json": "f11e0345b05c7a34be41cc3f67c8c74bcea049f35ba0b15e8458552f589828b9",
-    "integration/speed/consumer-contract-strataq2perf9.json": "66cc4dfc50847b79d9a2824aab04d12de9eb109d0f987d193ee0b500c6df1bf9"
+    "integration/speed/consumer-contract-strataq2perf9-blast-compiled.json": "3099e9a228b050e550f216c5642d33fc085a0e4407cc0772006f10073a9a70d0",
+    "integration/speed/consumer-contract-strataq2perf9-blast.json": "516fe9cd63304c6c672b5faa94f4cfdf406dcf404fe9cde65bfd28a88484f71a"
   },
   "version": "0.1.3+speed.strataq2perf9",
   "mtp_default_enabled": false,
-  "scope": "FT9 startup/CPU optimization on Speed84538603: source/ordinary/relocated protected real models and HTTP accepted; unchanged3native27AOT; old public IDs/backend aliases. Installer built, not installed; no cleanOS/realBonnet claim. Prior optional-MTP cohort loss and long-output issue retained.",
+  "scope": "Speed4de92726 input-boundary fixes and purpose/module review; FT9 unchanged. Fresh source/ordinary/relocated compiled acceptance, including real HTTP/SDK invalid-input queue checks. Built installer, not installed; previous optional-MTP loss and long-output issue retained. Bonnet testing excluded at explicit user request.",
   "speed_preset": "integration/speed/presets/flash-next-sm120-16g-perf9.json"
 }

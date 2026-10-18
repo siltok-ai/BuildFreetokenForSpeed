@@ -1,0 +1,135 @@
+commit cf70c86934d2bab554797527f5b0eae6c3c0d40c
+Author:     boqi <liboqi@siltok-ai.com>
+AuthorDate: Sun Oct 18 16:54:31 2026 +0800
+Commit:     boqi <liboqi@siltok-ai.com>
+CommitDate: Sun Oct 18 16:54:31 2026 +0800
+
+    Fix inherited Qwen manifest examples and readable discovery fixtures
+    
+    Port the manifest v1 correction and real registration guard from 545c1c48e8906d1510b0eecb18ba779ef1078f43 to the reviewed README. Remove its stale xfail predecessor.
+    
+    Use the existing minimal safetensors writer for discovery fixtures. The four precision-read failures reproduce on the unchanged rebase baseline; the full group now passes 19 tests.
+    
+    Validation: missing-name failure retained before; real schema/disk/Engine registration passed after without global license fixture; discovery group 19 passed with process-only fixture. Runtime code and frozen release materials are unchanged.
+
+diff --git a/tests/unit/test_discovery.py b/tests/unit/test_discovery.py
+index bc864d85..99ec4504 100644
+--- a/tests/unit/test_discovery.py
++++ b/tests/unit/test_discovery.py
+@@ -35,7 +35,7 @@ def _write_hf_model_dir(dir_path: Path, config: dict | None = None) -> None:
+         json.dumps(config or {}), encoding="utf-8",
+     )
+     (dir_path / "tokenizer.json").write_text("{}", encoding="utf-8")
+-    (dir_path / "model.safetensors").write_bytes(b"")
++    _write_safetensors(dir_path / "model.safetensors")
+ 
+ 
+ def _write_gguf(path: Path, file_type: int) -> None:
+@@ -450,42 +450,6 @@ def test_discovery_qwen38_uses_the_same_native_freetoken_backend(tmp_path):
+     assert catalog[0]["supports_multimodal"] is False
+ 
+ 
+-@pytest.mark.xfail(
+-    strict=True,
+-    reason=(
+-        "silitok_speed/qwen36/README.md 的 manifest 示例仍是旧格式 "
+-        "(无 schema 声明, engine.backend=FreeTokenQwen36Backend), 而 v1 "
+-        "词汇只认 Qwen36Backend。README 归属在途的 qwen36 工作, 待其更新 "
+-        "到 silitok.models/1 后去掉本标记恢复守卫。"
+-    ),
+-)
+-def test_qwen36_readme_manifest_registers_the_model(tmp_path):
+-    readme = (
+-        Path(__file__).resolve().parents[2]
+-        / "silitok_speed"
+-        / "qwen36"
+-        / "README.md"
+-    ).read_text(encoding="utf-8")
+-    manifest_block = readme.split("```json", 1)[1].split("```", 1)[0]
+-    manifest = json.loads(manifest_block)
+-    model_entry = manifest["models"][0]
+-    model_dir = tmp_path / model_entry["artifacts"]["model_dir"]["path"]
+-    model_dir.mkdir(parents=True)
+-    (tmp_path / "manifest.json").write_text(
+-        json.dumps(manifest),
+-        encoding="utf-8",
+-    )
+-    engine = _engine(tmp_path)
+-
+-    count, catalog = discover_and_register(engine, str(tmp_path))
+-
+-    assert count == 1
+-    assert catalog is not None and catalog[0]["id"] == model_entry["id"]
+-    registered = engine.model_mgr.resolve(model_entry["id"])
+-    assert registered is not None
+-    assert registered.config.extra == {}
+-
+-
+ def test_discovery_qwen36_rejects_offload(tmp_path):
+     weights_dir = tmp_path / "qwen36"
+     _write_hf_model_dir(weights_dir)
+diff --git a/tests/unit/test_qwen_manifest_documentation.py b/tests/unit/test_qwen_manifest_documentation.py
+new file mode 100644
+index 00000000..50201b19
+--- /dev/null
++++ b/tests/unit/test_qwen_manifest_documentation.py
+@@ -0,0 +1,59 @@
++"""执行文档中的 manifest，防止可复制示例与真实发现合同再次脱节。"""
++from __future__ import annotations
++
++import json
++from pathlib import Path
++
++from silitok_speed import Engine, EngineConfig
++from silitok_speed.discovery import discover_and_register
++from silitok_speed.manifest_schema import load_bytes
++from tests.support.mocks import make_mock_hw
++
++
++def test_qwen36_readme_manifest_registers_the_model(tmp_path, monkeypatch):
++    """用真实解析器、磁盘检查与 Engine 注册文档示例，不加载模型或触碰 GPU。"""
++    import silitok_speed
++    import silitok_speed.license as license_module
++    from silitok_speed.backends.freetoken_qwen36 import FreeTokenQwen36Backend
++
++    readme = (
++        Path(__file__).resolve().parents[2] / "silitok_speed" / "qwen36" / "README.md"
++    ).read_text(encoding="utf-8")
++    manifest_block = readme.split("```json", 1)[1].split("```", 1)[0]
++    manifest = load_bytes(manifest_block.encode("utf-8"))
++    entry = manifest.models[0]
++    model_dir = tmp_path / entry.artifacts["weights"].path
++    model_dir.mkdir(parents=True)
++    (model_dir / "config.json").write_text(
++        json.dumps({"quantization_config": {"quant_method": "modelopt"}}),
++        encoding="utf-8",
++    )
++    (model_dir / "tokenizer.json").write_text("{}", encoding="utf-8")
++    (model_dir / "model.safetensors").write_bytes(b"test-weight-placeholder")
++    (tmp_path / "manifest.json").write_text(manifest_block, encoding="utf-8")
++
++    # 原生授权边界只在本测试内替换；发现及注册调用链保持真实。
++    token = b"qwen-manifest-test".ljust(32, b"0")
++    monkeypatch.setattr(license_module, "_native", None)
++    monkeypatch.setattr(silitok_speed, "_license_verify", lambda path: (token, b"12345678"), raising=False)
++    monkeypatch.setattr(silitok_speed, "_license_check", lambda value: value == token, raising=False)
++    monkeypatch.setattr(silitok_speed, "_license_id", lambda: "qwen-manifest-test", raising=False)
++    grant = license_module.verify("test-fixture").grant
++    engine = Engine(
++        EngineConfig(models_dir=str(tmp_path), result_store_dir=str(tmp_path / "results")),
++        hw=make_mock_hw(),
++        grant_provider=lambda: grant,
++    )
++
++    count, catalog = discover_and_register(engine, str(tmp_path))
++
++    assert count == 1
++    assert catalog[0]["id"] == entry.id
++    assert catalog[0]["max_output_tokens"] == 4096
++    assert catalog[0]["supports_multimodal"] is False
++    registered = engine.model_mgr.resolve(entry.id)
++    assert registered.backend_cls is FreeTokenQwen36Backend
++    assert Path(registered.spec.weights_path) == model_dir
++    assert registered.spec.quantization == "modelopt"
++    assert registered.config.offload is False
++    assert registered.config.extra == {}

@@ -1,0 +1,17 @@
+{
+  "status": "failed",
+  "python": "C:\\workspace\\build\\siltok-speed\\perf9 moved-test\\app\\python\\python.exe",
+  "speed_origin": "C:\\workspace\\build\\siltok-speed\\perf9 moved-test\\app\\python\\Lib\\site-packages\\silitok_speed\\__init__.pyd",
+  "build_commit": "84538603ab71fde4d0921310f725a9d511270891",
+  "build_dirty": false,
+  "build_version": "0.2.0+strataq2perf9.2026101821",
+  "bundle_sha256": "eb7928fbb3c4b645440f219ef07e8a24af4a88507d42a8143ece01ff0ea9d93c",
+  "bundle_cache": "C:\\Users\\UserPC\\AppData\\Local\\Temp\\siltok-speed-assets\\f1ae2243fc6b02cf71e1921e915951487327a77c44bb85b09042258b0f2f4bc6",
+  "script": "C:\\workspace\\runs\\siltok-speed\\blast-final-20261018\\sampling-boundary-compiled-probe-v1.py",
+  "arguments": [
+    "--output",
+    "C:\\workspace\\runs\\siltok-speed\\blast-final-20261018\\compiled-boundary-before-v2.json"
+  ],
+  "scope": "compiled_staged_payload_not_installer",
+  "error": "AssertionError('{\"error\":{\"code\":\"invalid_request\",\"message\":\"body.temperature: Input should be greater than or equal to 0\",\"type\":\"invalid_request_error\",\"retryable\":false,\"param\":\"body.temperature\"}}')"
+}

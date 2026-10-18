@@ -1,0 +1,96 @@
+"""为独立review提交创建新构建、普通wheel和整模型验收队列。"""
+from pathlib import Path
+import ast
+import hashlib
+import json
+import subprocess
+
+R = Path(__file__).parent
+OLD = R.with_name('perf9-20261018')
+S = Path(r'C:\workspace\wt\siltok-speed\rebase-dev-20261018')
+C = Path(r'C:\workspace\wt\siltok-speed\blast relocated')
+commit = '9d871c87031d9d6de4946cb76af1abf66ab18df5'
+assert subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=S, text=True).strip() == commit
+assert not subprocess.check_output(['git', 'status', '--porcelain'], cwd=S, text=True).strip()
+subprocess.run(['git', 'worktree', 'add', '--detach', str(C), commit], cwd=S, check=True)
+subprocess.run(['git', 'submodule', 'update', '--init', '--recursive', 'third_party/TSS.MSR'], cwd=C, check=True)
+names = subprocess.check_output(['git', 'ls-files'], cwd=S, text=True).splitlines()
+normalized = []
+for name in names:
+    if not name.endswith('.py'):
+        continue
+    canonical = subprocess.check_output(['git', 'show', 'HEAD:'+name], cwd=S)
+    for root in (S, C):
+        before = (root/name).read_bytes()
+        if before != canonical:
+            assert before.replace(b'\r\n', b'\n') == canonical, name
+            assert ast.dump(ast.parse(before)) == ast.dump(ast.parse(canonical)), name
+            (root/name).write_bytes(canonical)
+            normalized.append([str(root), name])
+for root in (S, C):
+    subprocess.run(['git', 'update-index', '--refresh'], cwd=root, check=True)
+    assert not subprocess.check_output(['git', 'status', '--porcelain'], cwd=root, text=True).strip()
+assert all((S/n).read_bytes() == (C/n).read_bytes() for n in names if n.endswith('.py'))
+for name, data in [
+    ('canonical-checkout-v3.json', dict(status='passed', canonical_from_head_blob=True, normalized=normalized)),
+    ('build-source-byte-audit-v2.json', dict(status='passed', source=str(S), checkout=str(C), speed_commit=commit,
+        all_tracked_python_equal=True, git_clean=True)),
+]:
+    (R/name).write_text(json.dumps(data, indent=2)+'\n')
+
+def transform(source, target=None, replacements=()):
+    text = (OLD/source).read_text(encoding='utf-8')
+    for old, new in replacements:
+        assert old in text, (source, old)
+        text = text.replace(old, new)
+    (R/(target or source)).write_text(text, encoding='utf-8')
+
+for name in ('run-eval-tests.py', 'run-wrapper-cpu-v2.py', 'backend8-ordinary-probe-v1.py',
+             'run-http-compiled-alias-v1.py', 'portability-probe-v1.py', 'audit-portability-v1.ps1'):
+    transform(name)
+transform('prepare-runtime-release-v2.py', 'prepare-runtime-release-v1.py', [
+    ("BASE.with_name('flash-perf9b-release')", "BASE.with_name('flash-blast-release')"),
+    ('perf9b-wheel-src', 'blast-wheel-src'), ('ordinary-wheels-v2', 'ordinary-wheels-v1'),
+    ('ordinary-wheel-inventory-v2.json', 'ordinary-wheel-inventory-v3.json'),
+])
+transform('run-models-v2.py', replacements=[
+    ('flash-perf9b-release', 'flash-blast-release'),
+    ('84538603ab71fde4d0921310f725a9d511270891', commit),
+    ('FT9 contiguous host copies plus scoped Windows Q2 passive wait default; new source and ordinary consumer qualification, previous refactor ABBA remains separate.',
+     'Independent Speed sampling-admission fix and obsolete metadata cleanup. FreeToken9/native/AOT/model geometry unchanged; prior performance cohorts remain separate.'),
+])
+transform('build-perf9-p01.ps1', 'build-blast-p01.ps1', [
+    ('-Task perf9', '-Task blast'), ('perf9 relocated', 'blast relocated'),
+    ('flash-perf9b-release', 'flash-blast-release'), ('perf9 moved-p01', 'blast moved-p01'),
+    ('runs\\siltok-speed\\perf9-20261018', 'runs\\siltok-speed\\blast-review-20261018'),
+])
+transform('run-protected-build-v1.py', replacements=[
+    ('perf9 relocated', 'blast relocated'), ('perf9 moved-p01', 'blast moved-p01'),
+    ('84538603ab71fde4d0921310f725a9d511270891', commit),
+    ('build-perf9-p01', 'build-blast-p01'),
+])
+transform('run-protected-acceptance-v1.py', replacements=[
+    ('perf9 moved-p01', 'blast moved-p01'), ('perf9 moved-test', 'blast moved-test'),
+    ('staged-perf9-relocated', 'staged-blast-relocated'),
+])
+pipeline = '''from pathlib import Path
+import json
+import subprocess
+R=Path(__file__).parent
+PY=r'C:\\workspace\\envs\\siltok-speed\\flash-perf9\\Scripts\\python.exe'
+for name in ('run-wrapper-cpu-v2.py','prepare-runtime-release-v1.py','run-models-v2.py',
+             'run-protected-build-v1.py','run-protected-acceptance-v1.py'):
+    print('START',name,flush=True)
+    with (R/(Path(name).stem+'.driver.log')).open('w',encoding='utf-8') as log:
+        result=subprocess.run([PY,'-B',str(R/name)],stdout=log,stderr=subprocess.STDOUT)
+    if result.returncode:
+        (R/'validation-pipeline-failed-v1.json').write_text(json.dumps(dict(step=name,returncode=result.returncode))+'\\n')
+        raise SystemExit(result.returncode)
+    print('PASS',name,flush=True)
+(R/'validation-pipeline-complete-v1.json').write_text(json.dumps(dict(status='passed'))+'\\n')
+'''
+(R/'run-validation-pipeline-v1.py').write_text(pipeline, encoding='utf-8')
+(R/'candidate-v1.json').write_text(json.dumps(dict(speed_commit=commit,
+    speed_version='0.2.0+strataq2perf9.review1', ordinary_runtime=r'C:\workspace\envs\siltok-speed\flash-blast-release',
+    source=str(S), checkout=str(C), freetoken_unchanged='0.1.3+speed.strataq2perf9'), indent=2)+'\n')
+print('Prepared independent review candidate', commit)

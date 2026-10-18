@@ -4,7 +4,9 @@
 
 当前版本由 [current-release.json](integration/speed/current-release.json) 唯一选择，包含 profile、有序补丁、材料目录、preset 与验收合同。不要按文件名排序选择版本，也不要把 `consumer-contract.json` 当作当前合同。Speed 分支为 `integrate/flash-next-dev-20261018`，应用的 `qwen36/release.json` 另锁定 wheel SHA、配套缓存和供应提交。
 
-本轮 [性能探索与review](docs/flash-next-perf9-20261018.txt) 采用连续Q2主存加载和Windows Q2等待策略优化，使用独立perf9版本、同字节3native/27AOT；源码/普通wheel/迁移保护包重新验证。完整安装器未实装，旧MTP观测下降及长输出问题保留。
+当前 [整体diff review](docs/flash-next-blast-review-20261018.txt) 分开审查重构与功能变更，修复SDK/backend数值边界并移除过时测试耦合；沿用相同FT9材料，新Speed源码/普通wheel/迁移保护包独立验收。
+
+此前 [性能探索与review](docs/flash-next-perf9-20261018.txt) 采用连续Q2主存加载和Windows Q2等待策略优化，使用独立perf9版本、同字节3native/27AOT；源码/普通wheel/迁移保护包重新验证。完整安装器未实装，旧MTP观测下降及长输出问题保留。
 
 此前 [runtime2包装层重构](docs/flash-next-runtime2-20261018.txt) 基于最新dev，保留公共模型ID与旧入口，统一HTTP/direct SDK准入，并修复新backend别名的MTP manifest验收。FT2b材料原字节不变；新源码、普通wheel及迁移目录保护包独立验收，完整安装器已构建，本修订未实装、未验干净OS。MTP的观测性能下降和策略分叉如实保留。
 

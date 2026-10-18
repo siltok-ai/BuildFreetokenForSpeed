@@ -1,0 +1,56 @@
+commit 4de927269439c59640578efcd46a10c001b65f72
+Author:     boqi <liboqi@siltok-ai.com>
+AuthorDate: Sun Oct 18 21:55:41 2026 +0800
+Commit:     boqi <liboqi@siltok-ai.com>
+CommitDate: Sun Oct 18 21:55:41 2026 +0800
+
+    fix(freetoken): reject unrepresentable sampling inputs before conversion
+
+diff --git a/silitok_speed/backends/freetoken.py b/silitok_speed/backends/freetoken.py
+index 1cd7dbcd..253db123 100644
+--- a/silitok_speed/backends/freetoken.py
++++ b/silitok_speed/backends/freetoken.py
+@@ -1524,11 +1524,12 @@ def _request_float(
+     name: str,
+     default: float,
+ ) -> float:
++    """在转换前校验可表示的有限数值，保持独立backend入口的输入错误语义。"""
+     value = values.get(name, default)
+     if (
+         isinstance(value, bool)
+         or not isinstance(value, (int, float))
+-        or not math.isfinite(float(value))
++        or not -sys.float_info.max <= value <= sys.float_info.max
+     ):
+         raise BackendInputError(
+             f"{name} must be a finite number",
+diff --git a/silitok_speed/pyproject.toml b/silitok_speed/pyproject.toml
+index 833c4264..0fb264a0 100644
+--- a/silitok_speed/pyproject.toml
++++ b/silitok_speed/pyproject.toml
+@@ -25,7 +25,7 @@ build-backend = "setuptools.build_meta"
+ 
+ [project]
+ name = "siltok-speed"
+-version = "0.2.0+strataq2perf9.review1"
++version = "0.2.0+strataq2perf9.review2"
+ description = "Siltok Speed — 本地 AI 一体机的统一推理引擎 (Engine + HTTP API + SDK)"
+ requires-python = ">=3.10"
+ license = {text = "Apache-2.0"}
+diff --git a/tests/unit/test_qwen36_backend.py b/tests/unit/test_qwen36_backend.py
+index 85f23eb3..b2e9e067 100644
+--- a/tests/unit/test_qwen36_backend.py
++++ b/tests/unit/test_qwen36_backend.py
+@@ -1063,6 +1063,12 @@ def test_freetoken_rejects_sampling_fields_it_cannot_honor(
+     [
+         ("temperature", float("nan")),
+         ("top_p", "invalid"),
++        ("temperature", 10**400),
++        ("temperature", -(10**400)),
++        ("top_p", 10**400),
++        ("top_p", -(10**400)),
++        ("repetition_penalty", 10**400),
++        ("repetition_penalty", -(10**400)),
+         ("do_sample", "false"),
+         ("no_repeat_ngram_size", 1.5),
+     ],

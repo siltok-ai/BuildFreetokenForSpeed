@@ -1,0 +1,1231 @@
+commit 2a704f8bd9f2c55bfddbdc99afb6bea4e80d544c
+Author:     boqi <liboqi@siltok-ai.com>
+AuthorDate: Sat Oct 17 16:52:13 2026 +0800
+Commit:     boqi <liboqi@siltok-ai.com>
+CommitDate: Sun Oct 18 16:28:06 2026 +0800
+
+    refactor(freetoken): centralize options and ship only the active kernel cache
+    
+    Share the backend/worker option projection and parse custom budgets once.
+    Keep external configuration and mutable-weight checks; remove redundant
+    same-version IPC field/enum validation and move ordinary imports to their
+    normal blocks. Bind the reviewed FreeToken wheel and paired27-DLL cache to
+    supplier03db12b without modifying historical materials.
+    
+    Exclude all external FreeToken caches from the protected collector and use
+    explicit wheel data so stale SOURCES cannot restore historical caches.
+    Replace29 source-string packaging tests and fragile inventory scans with
+    real collector checks. Add native stdout isolation and actual FreeToken
+    scheduler configuration coverage. Correct current GGUF/MTP/schema/performance
+    documentation and archive previous prose.
+    
+    Validation:265 related tests and3 final packaging/config tests; native
+    three-mode quality;23 source quality IDs equal native per mode; real TCP
+    functional/cancel/reload and3x512 OFF plus9x512 paired ON before/after.
+    Fixed-full control and raw variability are recorded in the review report.
+    Old35B quality/cancellation passes; ordinary wheel189->27 DLLs,43.98->7.64MB,
+    with no other runtime assets lost. Protected payload acceptance is separate.
+
+diff --git a/.gitattributes b/.gitattributes
+index 38195b6c..dcc62342 100644
+--- a/.gitattributes
++++ b/.gitattributes
+@@ -231,3 +231,6 @@ silitok_speed/qwen36/kernel_cache_strataq2perf3/** -text
+ silitok_speed/qwen36/kernel_cache_strataq2perf5/** -text
+ silitok_speed/qwen36/kernel_cache_strataq2perf6/** -text
+ silitok_speed/qwen36/kernel_cache_strataq2perf8/** -text
++silitok_speed/qwen36/kernel_cache_strataq2review1/** -text
++silitok_speed/qwen36/freetoken_options.py text eol=crlf
++docs/history/*-before-review-20261017.txt -text
+diff --git a/silitok_speed/backends/freetoken_qwen36.py b/silitok_speed/backends/freetoken_qwen36.py
+index 1a73dc4d..3a9a031b 100644
+--- a/silitok_speed/backends/freetoken_qwen36.py
++++ b/silitok_speed/backends/freetoken_qwen36.py
+@@ -55,6 +55,7 @@ from silitok_speed.qwen36.freetoken_wire import (
+     read_frame,
+ )
+ from silitok_speed.qwen36.freetoken_mtp import inspect_mtp_runtime, expected_mtp_ready
++from silitok_speed.qwen36.freetoken_options import worker_options_payload as _worker_option_payload
+ from silitok_speed.types import HardwareInfo, ModelSpec
+ 
+ 
+@@ -1071,9 +1072,7 @@ def _runtime_options(
+     )
+     flash_next = checkpoint.profile == "qwen3.8-flash-next"
+     strata_q2 = checkpoint.weight_layout == 'gguf_strata'
+-    mtp_enabled = extra.get('mtp_enabled', False)
+-    if not isinstance(mtp_enabled, bool):
+-        raise ValueError('mtp_enabled must be a boolean')
++    mtp_enabled = _bool_option(extra, 'mtp_enabled')
+     mtp_path = extra.get('mtp_runtime_path')
+     if mtp_path is not None and (not isinstance(mtp_path, str) or not mtp_path.strip()):
+         raise ValueError('mtp_runtime_path must be a non-empty path string')
+@@ -1091,9 +1090,7 @@ def _runtime_options(
+         raise ValueError('Protected Q2 options require the complete Strata GGUF checkpoint')
+     if mtp_enabled and not resident:
+         raise ValueError('MTP requires protected compressed Q2 experts')
+-    compact_state = extra.get('mtp_compact_state', False)
+-    if not isinstance(compact_state, bool):
+-        raise ValueError('mtp_compact_state must be a boolean')
++    compact_state = _bool_option(extra, 'mtp_compact_state')
+     if compact_state and not mtp_enabled:
+         raise ValueError('mtp_compact_state requires enabled MTP')
+     draft_policy = extra.get('mtp_draft_policy', 'full')
+@@ -1108,14 +1105,10 @@ def _runtime_options(
+     adapt_decay = _float_option(extra, 'moe_q2_adapt_decay', 1.0, 0.0, 1.0)
+     if adapt_decay == 0:
+         raise ValueError('moe_q2_adapt_decay must be in (0, 1]')
+-    embedding_host = extra.get('gguf_embedding_host', False)
+-    if not isinstance(embedding_host, bool):
+-        raise ValueError('gguf_embedding_host must be a boolean')
++    embedding_host = _bool_option(extra, 'gguf_embedding_host')
+     if embedding_host and not strata_q2:
+         raise ValueError('Mapped input embedding requires the complete Strata GGUF checkpoint')
+-    workspace = extra.get('moe_q2_prefill_workspace', False)
+-    if not isinstance(workspace, bool):
+-        raise ValueError('moe_q2_prefill_workspace must be a boolean')
++    workspace = _bool_option(extra, 'moe_q2_prefill_workspace')
+     if workspace and not (strata_q2 and resident and dynamic == 1024):
+         raise ValueError('Prefill workspace requires protected Strata Q2 and 1024 dynamic rows')
+     rebuild_reserve = _int_option(extra, 'fixed_q2_rebuild_reserve_mib', 512, 0, 512)
+@@ -1126,21 +1119,6 @@ def _runtime_options(
+         raise ValueError('PLE row caching requires Flash Next and at least8 rows')
+     if (state_cache_slots is not None or adapt_every) and not (strata_q2 and resident):
+         raise ValueError('Linear-state tuning and adaptive owners require protected Strata Q2')
+-    allowed_resident = {7168} if mtp_enabled else {7168, 9216}
+-    if resident and (resident not in allowed_resident or dynamic != 1024):
+-        # 原两档绑定24GiB验收预算；其他机器可显式选择原生引擎已有的小池，不能继承旧预算。
+-        budget_fields = {'vram_estimate_bytes', 'host_commit_estimate_bytes'}
+-        if not budget_fields <= extra.keys():
+-            raise ValueError('Custom protected Q2 capacity requires explicit GPU and host budgets')
+-        geometry = checkpoint.expert_geometry
+-        per_expert = geometry['expert_bytes'] // (geometry['layers'] * geometry['experts_per_layer'])
+-        minimums = {
+-            'vram_estimate_bytes': (resident + dynamic + 1024) * per_expert,
+-            'host_commit_estimate_bytes': geometry['expert_bytes'] - resident * per_expert,
+-        }
+-        for field, minimum in minimums.items():
+-            if _checked_int(field, extra[field], 1, 1024 * 1024**3) < minimum:
+-                raise ValueError(f'{field} is smaller than its compressed expert ownership bytes')
+     if flash_next and checkpoint.quant_format not in {"nvfp4", "q2_0"}:
+         raise ValueError("Flash Next currently requires the verified RadixArk NVFP4 layout")
+     memory_default = (
+@@ -1280,6 +1258,10 @@ def _runtime_options(
+     if mtp_enabled and (cache_type != 'radix' or cuda_graph_max_bs != 1):
+         raise ValueError('MTP requires radix cache and graph1')
+     _validate_legacy_noop_options(extra)
++    vram_bytes, host_bytes = _runtime_budgets(
++        checkpoint, extra, resident=resident, dynamic=dynamic,
++        mtp_enabled=mtp_enabled, ple_backend=ple_backend,
++    )
+     return _RuntimeOptions(
+         gpu_index=int(match.group(1)),
+         quant_format=checkpoint.quant_format,
+@@ -1318,20 +1300,8 @@ def _runtime_options(
+         shutdown_timeout_s=_float_option(
+             extra, "shutdown_timeout_seconds", 15.0, 0.1, 60.0
+         ),
+-        vram_estimate_bytes=_int_option(
+-            extra,
+-            "vram_estimate_bytes",
+-            (22 if mtp_enabled else (21 if resident == 7168 else 23)) * 1024**3 if resident else _DEFAULT_VRAM_BYTES[(checkpoint.profile, checkpoint.quant_format)],
+-            1,
+-            128 * 1024**3,
+-        ),
+-        host_commit_estimate_bytes=_int_option(
+-            extra,
+-            "host_commit_estimate_bytes",
+-            ((27 if resident == 7168 else 25) * 1024**3 if resident else _DEFAULT_HOST_BYTES[(checkpoint.profile, checkpoint.quant_format)]) + (48 * 1024**3 if flash_next and ple_backend == "pinned" else 0),
+-            1,
+-            1024 * 1024**3,
+-        ),
++        vram_estimate_bytes=vram_bytes,
++        host_commit_estimate_bytes=host_bytes,
+         mtp_runtime_path=mtp_root,
+         mtp_manifest_sha256=mtp_digest,
+         mtp_compact_state=compact_state,
+@@ -1346,38 +1316,31 @@ def _runtime_options(
+     )
+ 
+ 
+-def _worker_option_payload(options: _RuntimeOptions) -> dict[str, Any]:
+-    """传递显式 MTP 身份；关闭时不向引擎提交预测层目录。"""
+-    return {
+-        "attention_backend": options.attention_backend,
+-        "ple_backend": options.ple_backend,
+-        "memory_ratio": options.memory_ratio,
+-        "cache_type": options.cache_type,
+-        "max_seq_len": options.max_seq_len,
+-        "max_prefill_length": options.max_prefill_length,
+-        "kv_reserve_tokens": options.kv_reserve_tokens,
+-        "kv_cache_tokens": options.kv_cache_tokens,
+-        "cuda_graph_max_bs": options.cuda_graph_max_bs,
+-        "decode_log_interval": options.decode_log_interval,
+-        "moe_backend": options.moe_backend,
+-        "expert_load": options.expert_load,
+-        "nvfp4_backend": options.nvfp4_backend,
+-        "moe_cache_size": options.moe_cache_size,
+-        "moe_cache_auto": options.moe_cache_auto,
+-        "moe_q2_resident_experts": options.moe_q2_resident_experts,
+-        "moe_q2_dynamic_slots": options.moe_q2_dynamic_slots,
+-        "mtp_runtime_path": str(options.mtp_runtime_path) if options.mtp_runtime_path is not None else None,
+-        "mtp_runtime_manifest_sha256": options.mtp_manifest_sha256,
+-        "mtp_compact_state": options.mtp_compact_state,
+-        "mtp_draft_policy": options.mtp_draft_policy,
+-        "linear_state_cache_slots": options.linear_state_cache_slots,
+-        "moe_q2_adapt_every": options.moe_q2_adapt_every,
+-        "moe_q2_adapt_decay": options.moe_q2_adapt_decay,
+-        "gguf_embedding_host": options.gguf_embedding_host,
+-        "ple_row_cache_rows": options.ple_row_cache_rows,
+-        "moe_q2_prefill_workspace": options.moe_q2_prefill_workspace,
+-        "fixed_q2_rebuild_reserve_mib": options.fixed_q2_rebuild_reserve_mib,
+-    }
++def _runtime_budgets(checkpoint, extra, *, resident, dynamic, mtp_enabled, ple_backend):
++    """只解析一次预算；自定义驻留几何必须覆盖真实压缩专家的GPU和host所有权。"""
++    identity = (checkpoint.profile, checkpoint.quant_format)
++    if resident:
++        gpu_default = (22 if mtp_enabled else (21 if resident == 7168 else 23)) * 1024**3
++        host_default = (27 if resident == 7168 else 25) * 1024**3
++    else:
++        gpu_default, host_default = _DEFAULT_VRAM_BYTES[identity], _DEFAULT_HOST_BYTES[identity]
++    if checkpoint.profile == "qwen3.8-flash-next" and ple_backend == "pinned":
++        host_default += 48 * 1024**3
++    allowed_resident = {7168} if mtp_enabled else {7168, 9216}
++    custom_capacity = resident and (resident not in allowed_resident or dynamic != 1024)
++    if custom_capacity and not {'vram_estimate_bytes', 'host_commit_estimate_bytes'} <= extra.keys():
++        raise ValueError('Custom protected Q2 capacity requires explicit GPU and host budgets')
++    gpu = _int_option(extra, 'vram_estimate_bytes', gpu_default, 1, 128 * 1024**3)
++    host = _int_option(extra, 'host_commit_estimate_bytes', host_default, 1, 1024 * 1024**3)
++    if custom_capacity:
++        # 原两档绑定24GiB验收预算；其他几何不能继承旧机器的容量假设。
++        geometry = checkpoint.expert_geometry
++        per_expert = geometry['expert_bytes'] // (geometry['layers'] * geometry['experts_per_layer'])
++        if gpu < (resident + dynamic + 1024) * per_expert:
++            raise ValueError('vram_estimate_bytes is smaller than its compressed expert ownership bytes')
++        if host < geometry['expert_bytes'] - resident * per_expert:
++            raise ValueError('host_commit_estimate_bytes is smaller than its compressed expert ownership bytes')
++    return gpu, host
+ 
+ 
+ def _worker_command() -> list[str]:
+@@ -1918,6 +1881,14 @@ def _int_option(
+     return _checked_int(name, extra.get(name, default), minimum, maximum)
+ 
+ 
++def _bool_option(extra: dict[str, Any], name: str) -> bool:
++    """在公开配置入口保持严格布尔语义，避免字符串false被当成启用。"""
++    value = extra.get(name, False)
++    if not isinstance(value, bool):
++        raise ValueError(f'{name} must be a boolean')
++    return value
++
++
+ def _float_option(
+     extra: dict[str, Any],
+     name: str,
+diff --git a/silitok_speed/pyproject.toml b/silitok_speed/pyproject.toml
+index cf9a08ba..e503e87a 100644
+--- a/silitok_speed/pyproject.toml
++++ b/silitok_speed/pyproject.toml
+@@ -25,7 +25,7 @@ build-backend = "setuptools.build_meta"
+ 
+ [project]
+ name = "siltok-speed"
+-version = "0.2.0+strataq2perf8"
++version = "0.2.0+strataq2review1"
+ description = "Siltok Speed — 本地 AI 一体机的统一推理引擎 (Engine + HTTP API + SDK)"
+ requires-python = ">=3.10"
+ license = {text = "Apache-2.0"}
+@@ -185,7 +185,8 @@ siltok-speed = "silitok_speed.cli:main"
+ # ============================================================
+ 
+ [tool.setuptools]
+-include-package-data = true
++# 只采用下方显式资源清单，避免旧egg-info或SCM清单把历史缓存重新带入wheel。
++include-package-data = false
+ # 显式 packages 列表 (不用 find), 避免 find + package-dir 组合在 flat layout 下的歧义
+ packages = [
+     "silitok_speed",
+@@ -231,23 +232,13 @@ packages = [
+ "silitok_speed.models.seedvr2" = ["LICENSE", "pos_emb.pt"]
+ "silitok_speed.qwen36" = [
+     "README.md",
++    "FLASH-NEXT.md",
++    "FLASH-NEXT-PERFORMANCE.md",
+     "STRATA-Q2.md",
+     "MTP.md",
+     "release.json",
+-    "kernel_cache_strataq2mtp2/*.json",
+-    "kernel_cache_strataq2mtp2/*/*.dll",
+-    "kernel_cache_strataq2perf1/*.json",
+-    "kernel_cache_strataq2perf1/*/*.dll",
+-    "kernel_cache_strataq2perf2/*.json",
+-    "kernel_cache_strataq2perf2/*/*.dll",
+-    "kernel_cache_strataq2perf3/*.json",
+-    "kernel_cache_strataq2perf3/*/*.dll",
+-    "kernel_cache_strataq2perf5/*.json",
+-    "kernel_cache_strataq2perf5/*/*.dll",
+-    "kernel_cache_strataq2perf6/*.json",
+-    "kernel_cache_strataq2perf6/*/*.dll",
+-    "kernel_cache_strataq2perf8/*.json",
+-    "kernel_cache_strataq2perf8/*/*.dll",
++    "kernel_cache_strataq2review1/*.json",
++    "kernel_cache_strataq2review1/*/*.dll",
+ ]
+ 
+ # ============================================================
+diff --git a/silitok_speed/qwen36/freetoken_kernel_cache.py b/silitok_speed/qwen36/freetoken_kernel_cache.py
+index 7683bf55..5fa73764 100644
+--- a/silitok_speed/qwen36/freetoken_kernel_cache.py
++++ b/silitok_speed/qwen36/freetoken_kernel_cache.py
+@@ -4,6 +4,7 @@ from __future__ import annotations
+ 
+ import sys
+ import hashlib
++import json
+ from dataclasses import dataclass
+ from importlib.metadata import PackageNotFoundError, distributions, version
+ from pathlib import Path
+@@ -110,8 +111,6 @@ def generate_kernel_manifest(root: str | Path) -> Path:
+                 raise KernelCacheError(f"FreeToken kernel artifact changed: {artifact}")
+         artifacts.append({"path": relative, "size": approved["size"]})
+     manifest = cache / "speed-kernel-manifest.json"
+-    import json
+-
+     manifest.write_text(json.dumps({
+         "schema_version": 1,
+         "freetoken_version": FREETOKEN_VERSION,
+diff --git a/silitok_speed/qwen36/freetoken_options.py b/silitok_speed/qwen36/freetoken_options.py
+new file mode 100644
+index 00000000..d81773f4
+--- /dev/null
++++ b/silitok_speed/qwen36/freetoken_options.py
+@@ -0,0 +1,47 @@
++"""父进程和 worker 共用的引擎字段映射；不导入 Torch 或 FreeToken。"""
++
++# 只在此处维护同名字段，避免新调优项在 IPC 或 LLM 构造时漏传。
++LLM_OPTION_NAMES = {
++    name: name
++    for name in (
++        "attention_backend",
++        "ple_backend",
++        "memory_ratio",
++        "cache_type",
++        "kv_reserve_tokens",
++        "cuda_graph_max_bs",
++        "decode_log_interval",
++        "expert_load",
++        "moe_cache_size",
++        "moe_cache_auto",
++        "moe_q2_resident_experts",
++        "moe_q2_dynamic_slots",
++        "mtp_runtime_path",
++        "mtp_compact_state",
++        "mtp_draft_policy",
++        "linear_state_cache_slots",
++        "moe_q2_adapt_every",
++        "moe_q2_adapt_decay",
++        "gguf_embedding_host",
++        "ple_row_cache_rows",
++        "moe_q2_prefill_workspace",
++        "fixed_q2_rebuild_reserve_mib",
++    )
++}
++LLM_OPTION_NAMES.update(
++    moe_backend="moe_strategy",
++    kv_cache_tokens="num_token_override",
++    max_seq_len="max_seq_len_override",
++    max_prefill_length="max_extend_tokens",
++)
++
++
++def worker_options_payload(options) -> dict:
++    """序列化已在 backend 入口校验的配置，单独携带预测层字节身份。"""
++    payload = {name: getattr(options, name) for name in LLM_OPTION_NAMES}
++    payload["mtp_runtime_path"] = (
++        str(options.mtp_runtime_path) if options.mtp_runtime_path is not None else None
++    )
++    payload["mtp_runtime_manifest_sha256"] = options.mtp_manifest_sha256
++    payload["nvfp4_backend"] = options.nvfp4_backend
++    return payload
+diff --git a/silitok_speed/qwen36/freetoken_worker.py b/silitok_speed/qwen36/freetoken_worker.py
+index 5b15a458..0dc91679 100644
+--- a/silitok_speed/qwen36/freetoken_worker.py
++++ b/silitok_speed/qwen36/freetoken_worker.py
+@@ -16,6 +16,8 @@ from dataclasses import dataclass
+ from pathlib import Path
+ from typing import Any
+ 
++from silitok_speed.qwen36.freetoken_options import LLM_OPTION_NAMES
++
+ 
+ @dataclass
+ class _RequestControl:
+@@ -449,44 +451,8 @@ def _build_streaming_llm_class(writer):
+ 
+ 
+ def _worker_options(command: dict[str, Any]) -> dict[str, Any]:
+-    """在 GPU 加载前复核 IPC 字段与可选预测层身份，不回退其他权重。"""
+-    options = command.get("options")
+-    if not isinstance(options, dict):
+-        raise ValueError("worker load command has no options object")
+-    required = {
+-        "attention_backend",
+-        "ple_backend",
+-        "memory_ratio",
+-        "cache_type",
+-        "max_seq_len",
+-        "max_prefill_length",
+-        "kv_cache_tokens",
+-        "kv_reserve_tokens",
+-        "cuda_graph_max_bs",
+-        "decode_log_interval",
+-        "moe_backend",
+-        "expert_load",
+-        "nvfp4_backend",
+-        "moe_cache_size",
+-        "moe_cache_auto",
+-        "moe_q2_resident_experts",
+-        "moe_q2_dynamic_slots",
+-        "mtp_runtime_path",
+-        "mtp_runtime_manifest_sha256",
+-        "mtp_compact_state",
+-        "mtp_draft_policy",
+-        "linear_state_cache_slots",
+-        "moe_q2_adapt_every",
+-        "moe_q2_adapt_decay",
+-        "gguf_embedding_host",
+-        "ple_row_cache_rows",
+-        "moe_q2_prefill_workspace",
+-        "fixed_q2_rebuild_reserve_mib",
+-    }
+-    if set(options) != required:
+-        raise ValueError("worker load options do not match the protocol contract")
+-    if options["moe_backend"] not in {"fused", "offload"}:
+-        raise ValueError("worker load command has invalid moe_backend")
++    """私有管道接收同版本 backend 已校验的参数；跨进程重新核对可变权重。"""
++    options = command["options"]
+     if options['mtp_runtime_path'] is not None:
+         from silitok_speed.qwen36.freetoken_mtp import inspect_mtp_runtime
+         _, digest = inspect_mtp_runtime(options['mtp_runtime_path'])
+@@ -503,11 +469,9 @@ def _llm_kwargs(options: dict[str, Any]) -> dict[str, Any]:
+     from freetoken.mm.config import ENCODER_KINDS, MultimodalConfig
+ 
+     return dict(
++        **{target: options[name] for name, target in LLM_OPTION_NAMES.items()},
+         dtype=torch.bfloat16,
+         max_running_req=1,
+-        attention_backend=options["attention_backend"],
+-        moe_strategy=options["moe_backend"],
+-        ple_backend=options["ple_backend"],
+         # 0.1.3 默认启用视觉编码器；Speed 当前协议只接受文本消息。
+         mm=MultimodalConfig(disabled_encoders=frozenset(ENCODER_KINDS)),
+         quant_backend=(
+@@ -515,30 +479,7 @@ def _llm_kwargs(options: dict[str, Any]) -> dict[str, Any]:
+             if options["nvfp4_backend"] == "auto"
+             else f"moe.nvfp4={options['nvfp4_backend']}"
+         ),
+-        expert_load=options["expert_load"],
+-        moe_cache_size=options["moe_cache_size"],
+-        moe_cache_auto=options["moe_cache_auto"],
+-        moe_q2_resident_experts=options["moe_q2_resident_experts"],
+-        moe_q2_dynamic_slots=options["moe_q2_dynamic_slots"],
+-        kv_reserve_tokens=options["kv_reserve_tokens"],
+-        num_token_override=options["kv_cache_tokens"],
+-        cuda_graph_max_bs=options["cuda_graph_max_bs"],
+-        memory_ratio=options["memory_ratio"],
+-        max_seq_len_override=options["max_seq_len"],
+-        max_extend_tokens=options["max_prefill_length"],
+-        cache_type=options["cache_type"],
+-        decode_log_interval=options["decode_log_interval"],
+-        mtp_runtime_path=options['mtp_runtime_path'],
+         mtp_max_context=8192,
+-        mtp_compact_state=options['mtp_compact_state'],
+-        mtp_draft_policy=options['mtp_draft_policy'],
+-        linear_state_cache_slots=options['linear_state_cache_slots'],
+-        moe_q2_adapt_every=options['moe_q2_adapt_every'],
+-        moe_q2_adapt_decay=options['moe_q2_adapt_decay'],
+-        gguf_embedding_host=options['gguf_embedding_host'],
+-        ple_row_cache_rows=options['ple_row_cache_rows'],
+-        moe_q2_prefill_workspace=options['moe_q2_prefill_workspace'],
+-        fixed_q2_rebuild_reserve_mib=options['fixed_q2_rebuild_reserve_mib'],
+     )
+ 
+ 
+@@ -570,7 +511,6 @@ def _build_llm(command: dict[str, Any], writer):
+     from silitok_speed.qwen36.freetoken_kernel_cache import verify_runtime_abi
+     verify_runtime_abi(torch_version=torch.__version__, torch_cuda=torch.version.cuda)
+     from freetoken.core import SamplingParams
+-    from freetoken.mm.config import ENCODER_KINDS, MultimodalConfig
+ 
+     _startup_log("FreeToken core imported; importing streaming runtime")
+ 
+diff --git a/silitok_speed/qwen36/release.json b/silitok_speed/qwen36/release.json
+index 8c316349..b1a712c3 100644
+--- a/silitok_speed/qwen36/release.json
++++ b/silitok_speed/qwen36/release.json
+@@ -1,6 +1,6 @@
+ {
+   "format": 1,
+-  "version": "0.1.3+speed.strataq2perf8",
++  "version": "0.1.3+speed.strataq2review1",
+   "upstream_commit": "078132480ea4a0424f677a27eb22085624d331e6",
+   "python_minor": [
+     3,
+@@ -12,8 +12,8 @@
+   "apache_tvm_ffi": "0.1.13.post3",
+   "sm": "120",
+   "wheel": {
+-    "path": "wheels/freetoken-0.1.3+speed.strataq2perf8-cp312-cp312-win_amd64.whl",
+-    "sha256": "496138edb215a0469b88bf06dfb07f10b598032d7006e70b135ea70dee2b2b0f",
++    "path": "wheels/freetoken-0.1.3+speed.strataq2review1-cp312-cp312-win_amd64.whl",
++    "sha256": "796a61b497df99c0c1956654a908cc8d3c6213b5eeef3758d20de4dc03dd6a86",
+     "native_modules": [
+       "freetoken/kernel/_cpu_moe.cp312-win_amd64.pyd",
+       "freetoken/kernel/_pinned_tensor.cp312-win_amd64.pyd",
+@@ -22,7 +22,7 @@
+   },
+   "kernel_cache": {
+     "path": "kernel-cache",
+-    "package_path": "kernel_cache_strataq2perf8",
++    "package_path": "kernel_cache_strataq2review1",
+     "dll_count": 27,
+     "manifest": "kernel-cache/speed-kernel-manifest.json",
+     "specs": "build/specs/strataq2perf7-sm120.txt"
+@@ -168,7 +168,7 @@
+       "sha256": "e3ee361095b5d929ce22b45586c3081c56352d68257b61b08a925cffdf7e30b3"
+     }
+   },
+-  "producer_commit": "5beafbb70ac09cc42681d6264d2caf990b95e906",
++  "producer_commit": "03db12b21e1e82aa78fb6e1b4250642653ede7be",
+   "mtp_runtime": {
+     "manifest_sha256": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
+     "source_repository": "Qwen/Qwen3.8-Flash-Next",
+@@ -195,5 +195,6 @@
+       "source_int32_sha256": "b1e1d3a7a9e4bf862dcd5923ce661fb59bbd07907e594df5cf86a62ac235cb91"
+     }
+   },
+-  "consumer_verifier": "tools/verify_performance8_consumer.py"
++  "consumer_verifier": "tools/verify_performance8_consumer.py",
++  "consumer_contract": "integration/speed/consumer-contract-strataq2review1.json"
+ }
+diff --git a/silitok_speed/setup_compile.py b/silitok_speed/setup_compile.py
+index 8a159844..5c0c65f0 100644
+--- a/silitok_speed/setup_compile.py
++++ b/silitok_speed/setup_compile.py
+@@ -67,7 +67,7 @@ del _load_jit_payload
+ 
+ 
+ def collect(build_root, identity):
+-    """Select runtime assets and prepare generated sources outside the package."""
++    """收集运行资源并生成隔离源码；FreeToken缓存由安装包的runtime目录独立交付。"""
+     extensions, resources, modules = [], [], {}
+     for path in sorted(SRC.rglob("*")):
+         relative = path.relative_to(SRC)
+@@ -76,6 +76,8 @@ def collect(build_root, identity):
+             continue
+         if not path.is_file() or path.name == "setup_compile.py":
+             continue
++        if relative.parts[0] == "qwen36" and relative.parts[1].startswith("kernel_cache"):
++            continue
+         name = relative.as_posix()
+         if path.suffix != ".py":
+             if (path.suffix in RESOURCE_SUFFIXES or name == "pyproject.toml"
+diff --git a/tests/integration/test_compiled_package.py b/tests/integration/test_compiled_package.py
+index ea8de917..3c325c37 100644
+--- a/tests/integration/test_compiled_package.py
++++ b/tests/integration/test_compiled_package.py
+@@ -42,10 +42,12 @@ def test_compiled_freetoken_worker_self_check(package, tmp_path):
+     code = '''import io, json, subprocess, sys
+ sys.path.insert(0, sys.argv[1])
+ from silitok_speed.backends.freetoken_qwen36 import _worker_command
++from silitok_speed.qwen36.freetoken_contract import RELEASE
+ result = subprocess.run(_worker_command() + ['--self-check'],
+                         capture_output=True, text=True, encoding='utf-8', check=True)
+ report = json.loads(result.stdout)
+-assert report['kernel_artifacts'] == 17
++assert report['kernel_artifacts'] == len(RELEASE['spec_names'])
++assert report['freetoken'] == RELEASE['version']
+ assert 'freetoken.models.qwen3_5_moe.model' in report['imports']
+ # 不加载模型：关闭命令管道，验证真实协议启动帧及随后的明确 EOF 失败。
+ from silitok_speed.qwen36.freetoken_wire import read_frame
+@@ -166,10 +168,12 @@ assets = Path(speed._sp_base)
+ assert not list(assets.rglob('*.py'))
+ assert not list(assets.rglob('*.pyc'))
+ assert {p.relative_to(assets).as_posix() for p in assets.rglob('*') if p.is_file()} == set(speed._sp_manifest['resources'])
+-assert 'qwen36/kernel_cache/speed-kernel-manifest.json' in speed._sp_manifest['resources']
+-kernel_manifest = assets / 'qwen36/kernel_cache/speed-kernel-manifest.json'
+-assert kernel_manifest.is_file()
+-assert len(json.loads(kernel_manifest.read_text(encoding='utf-8'))['artifacts']) == 17
++assert not any(name.startswith('qwen36/kernel_cache') for name in speed._sp_manifest['resources'])
++from silitok_speed.qwen36.freetoken_kernel_cache import kernel_cache_directory, verify_kernel_cache
++from silitok_speed.qwen36.freetoken_contract import RELEASE
++cache = kernel_cache_directory()
++assert not cache.is_relative_to(assets)
++assert verify_kernel_cache(cache).artifact_count == len(RELEASE['spec_names'])
+ assert Path(speed.__spec__.origin).resolve() == Path(sys.argv[1]) / 'silitok_speed/__init__.pyd'
+ if 'h3_native' in speed._sp_manifest:
+     assert discovery._H3_BUNDLED_FUSED_PREPROCESS.is_file()
+diff --git a/tests/unit/test_freetoken_worker.py b/tests/unit/test_freetoken_worker.py
+index b26b454c..1ebb1afd 100644
+--- a/tests/unit/test_freetoken_worker.py
++++ b/tests/unit/test_freetoken_worker.py
+@@ -2,6 +2,9 @@ from __future__ import annotations
+ 
+ import sys
+ import types
++import io
++from pathlib import Path
++import subprocess
+ from dataclasses import dataclass
+ from types import SimpleNamespace
+ 
+@@ -416,68 +419,80 @@ def test_runtime_builds_engine_before_starting_pipe_reader(monkeypatch):
+     ]
+ 
+ 
+-@pytest.mark.parametrize("moe_backend", ["fused", "offload"])
+-def test_worker_load_contract_accepts_only_owned_moe_backends(moe_backend):
+-    options = {
+-        "attention_backend": "triton",
+-        "ple_backend": "disk",
+-        "memory_ratio": 0.9,
+-        "cache_type": "radix",
+-        "max_seq_len": 4096,
+-        "max_prefill_length": 4096,
+-        "kv_cache_tokens": 4096,
+-        "kv_reserve_tokens": 8192,
+-        "cuda_graph_max_bs": 1,
+-        "decode_log_interval": 1000,
+-        "moe_backend": moe_backend,
+-        "expert_load": "auto",
+-        "nvfp4_backend": "triton",
+-        "moe_cache_size": 0,
+-        "moe_cache_auto": False,
+-        "moe_q2_resident_experts": 0,
+-        "moe_q2_dynamic_slots": 1024,
+-        "mtp_runtime_path": None,
+-        "mtp_runtime_manifest_sha256": None,
+-        "mtp_compact_state": False, "mtp_draft_policy": "full",
+-        "linear_state_cache_slots": None,
+-        "moe_q2_adapt_every": 0,
+-        "moe_q2_adapt_decay": 1.0,
+-        "gguf_embedding_host": False,
+-        "ple_row_cache_rows": 0,
+-        "moe_q2_prefill_workspace": False, "fixed_q2_rebuild_reserve_mib": 512,
+-    }
+-
+-    assert worker_module._worker_options({"options": options}) is options
+-
+-    options["moe_backend"] = "unowned"
+-    with pytest.raises(ValueError, match="invalid moe_backend"):
+-        worker_module._worker_options({"options": options})
+-
+-
+-def test_worker_options_construct_real_freetoken_scheduler_without_cuda(tmp_path):
++def test_worker_options_construct_real_freetoken_scheduler_without_cuda(tmp_path, monkeypatch):
++    """从checkpoint和backend生成IPC，实际构造原生配置，覆盖字段重命名和视觉关闭。"""
+     pytest.importorskip("freetoken")
+-    from pathlib import Path
+     import torch
+     from freetoken.distributed import DistributedInfo
+     from freetoken.scheduler.config import SchedulerConfig
+-
+-    config = Path(__file__).parents[1] / "fixtures/qwen38-flash-next-nvfp4-config.json"
+-    (tmp_path / "config.json").write_text(config.read_text(encoding="utf-8"), encoding="utf-8")
+-    options = {"attention_backend": "qsa_sparse", "ple_backend": "disk",
+-               "memory_ratio": 0.8, "cache_type": "radix", "max_seq_len": 262144,
+-               "max_prefill_length": 1024, "kv_cache_tokens": 8192, "kv_reserve_tokens": 8192,
+-               "cuda_graph_max_bs": 1, "decode_log_interval": 1000, "moe_backend": "offload",
+-               "expert_load": "serial", "nvfp4_backend": "triton",
+-               "moe_cache_size": 1024, "moe_cache_auto": False,
+-               "moe_q2_resident_experts": 0, "moe_q2_dynamic_slots": 1024,
+-               "mtp_runtime_path": None, "mtp_runtime_manifest_sha256": None,
+-               "mtp_compact_state": False, "mtp_draft_policy": "full", "linear_state_cache_slots": None, "moe_q2_adapt_every": 0,
+-               "moe_q2_adapt_decay": 1.0, "gguf_embedding_host": False, "ple_row_cache_rows": 0,
+-               "moe_q2_prefill_workspace": False, "fixed_q2_rebuild_reserve_mib": 512}
++    from silitok_speed.backends.base import BackendConfig
++    from silitok_speed.backends.freetoken_qwen36 import _runtime_options, _worker_option_payload
++    from silitok_speed.qwen36.freetoken_contract import inspect_freetoken_checkpoint
++    from test_freetoken_strata_q2 import _checkpoint
++
++    _checkpoint(tmp_path, monkeypatch)
++    options = _runtime_options(inspect_freetoken_checkpoint(tmp_path), BackendConfig(extra={
++        "max_prefill_length": 1024, "linear_state_cache_slots": 1,
++        "moe_q2_adapt_every": 32, "moe_q2_adapt_decay": 0.7,
++        "gguf_embedding_host": True, "ple_row_cache_rows": 1048576,
++        "moe_q2_prefill_workspace": True, "fixed_q2_rebuild_reserve_mib": 0,
++    }))
++    payload = worker_module._worker_options({"options": _worker_option_payload(options)})
+     was_initialized = torch.cuda.is_initialized()
+     scheduler = SchedulerConfig(model_path=str(tmp_path), tp_info=DistributedInfo(0, 1),
+-                                offline_mode=True, **worker_module._llm_kwargs(options))
++                                offline_mode=True, **worker_module._llm_kwargs(payload))
+     assert scheduler.moe_strategy == "offload"
+     assert scheduler.ple_backend == "disk"
++    assert scheduler.num_token_override == 8192
++    assert scheduler.max_extend_tokens == 1024 and scheduler.max_seq_len_override == 262144
++    assert scheduler.moe_cache_size == 11264 and scheduler.linear_state_cache_slots == 1
++    assert scheduler.moe_q2_adapt_every == 32 and scheduler.moe_q2_adapt_decay == 0.7
++    assert scheduler.gguf_embedding_host and scheduler.ple_row_cache_rows == 1048576
++    assert scheduler.moe_q2_prefill_workspace and scheduler.fixed_q2_rebuild_reserve_mib == 0
+     assert not scheduler.active_encoders
+     assert torch.cuda.is_initialized() == was_initialized
++
++
++def test_stdout_protocol_survives_python_native_and_child_output():
++    """真实子进程验证CRT描述符和Win32标准句柄均隔离，避免JIT输出破坏协议。"""
++    from silitok_speed.qwen36.freetoken_wire import read_frame
++
++    script = '''
++import os
++import subprocess
++import sys
++sys.path.insert(0, sys.argv[1])
++from silitok_speed.qwen36.freetoken_worker import _redirect_stdout_to_protocol
++from silitok_speed.qwen36.freetoken_wire import FrameWriter
++with _redirect_stdout_to_protocol() as protocol:
++    writer = FrameWriter(protocol)
++    writer.send({'type': 'hello'})
++    print('python-output', flush=True)
++    os.write(1, b'native-output\\n')
++    if os.name == 'nt':
++        import ctypes
++        from ctypes import wintypes
++        kernel = ctypes.WinDLL('kernel32', use_last_error=True)
++        kernel.GetStdHandle.argtypes = [wintypes.DWORD]
++        kernel.GetStdHandle.restype = wintypes.HANDLE
++        kernel.WriteFile.argtypes = [wintypes.HANDLE, ctypes.c_void_p, wintypes.DWORD,
++                                     ctypes.POINTER(wintypes.DWORD), ctypes.c_void_p]
++        written = wintypes.DWORD()
++        data = ctypes.create_string_buffer(b'win32-output\\n')
++        if not kernel.WriteFile(kernel.GetStdHandle(-11), data, len(data.value),
++                                ctypes.byref(written), None):
++            raise ctypes.WinError(ctypes.get_last_error())
++    subprocess.run([sys.executable, '-c', "print('child-output', flush=True)"], check=True)
++    writer.send({'type': 'stopped'})
++'''
++    result = subprocess.run([sys.executable, '-I', '-B', '-c', script,
++                             str(Path(__file__).resolve().parents[2])],
++                            check=True, capture_output=True, timeout=30)
++    frames = io.BytesIO(result.stdout)
++    assert read_frame(frames)["type"] == "hello"
++    assert read_frame(frames)["type"] == "stopped"
++    assert read_frame(frames) is None
++    expected = {b"python-output", b"native-output", b"child-output"}
++    if sys.platform == 'win32':
++        expected.add(b"win32-output")
++    assert set(result.stderr.splitlines()) == expected
+diff --git a/tests/unit/test_qwen36_backend.py b/tests/unit/test_qwen36_backend.py
+index b39f7437..e1c4d920 100644
+--- a/tests/unit/test_qwen36_backend.py
++++ b/tests/unit/test_qwen36_backend.py
+@@ -983,7 +983,8 @@ def test_compat_requires_sm120_and_preserves_strict_resource_estimates(
+     )
+     assert cost.cpu_heap_peak == 24 * 1024**3
+     assert cost.strict_commit_limit is True
+-    assert cost.weight_files == [str(model / "model.safetensors")]
++    assert len(cost.weight_files) == 1
++    assert Path(cost.weight_files[0]).samefile(model / "model.safetensors")
+     incompatible = FreeTokenQwen36Backend.compat_check(
+         spec,
+         HardwareInfo(
+diff --git a/tests/unit/test_windows_packaging.py b/tests/unit/test_windows_packaging.py
+index 5e856008..d31a6a3f 100644
+--- a/tests/unit/test_windows_packaging.py
++++ b/tests/unit/test_windows_packaging.py
+@@ -1,394 +1,79 @@
++"""包装配置和实际资源收集；保护包行为由compiled_package集成测试执行。"""
+ from __future__ import annotations
+ 
++import ast
++import importlib.util
+ from pathlib import Path
+ from xml.etree import ElementTree
+ 
++import pytest
++
+ 
+ REPO_ROOT = Path(__file__).resolve().parents[2]
+ WINDOWS_PACKAGING = REPO_ROOT / "packaging" / "windows"
+ 
+ 
+-def _read(path: Path) -> str:
+-    return path.read_text(encoding="utf-8")
+-
+-
+ def test_winsw_launches_embedded_python_without_batch_wrapper():
+     service = ElementTree.parse(WINDOWS_PACKAGING / "SiltokSpeed.xml").getroot()
+ 
+     assert service.findtext("executable") == r"%BASE%\python\python.exe"
+     assert service.findtext("arguments") == (
+         "-X utf8 -B -m silitok_speed.release_profile serve "
+-        '--config-root "%ProgramData%\\Siltok\Speed\\config" '
+-        '--runtime-dir "%ProgramData%\\Siltok\Speed\\runtime"'
++        '--config-root "%ProgramData%\\Siltok\\Speed\\config" '
++        '--runtime-dir "%ProgramData%\\Siltok\\Speed\\runtime"'
+     )
+ 
+ 
+-def test_build_requires_inno_setup_when_installer_is_not_skipped():
+-    script = _read(WINDOWS_PACKAGING / "build.ps1")
+-
+-    assert 'throw "ISCC.exe not found' in script
+-    assert 'Write-Warning "ISCC.exe not found' not in script
+-
+-
+-def test_post_staging_python_probes_disable_bytecode_and_gate_payload():
+-    script = _read(WINDOWS_PACKAGING / "build.ps1")
+-
+-    probe_lines = [
+-        line.strip()
+-        for line in script.splitlines()
+-        if line.strip().startswith("& (Join-Path $PyDir")
+-    ]
+-    assert len(probe_lines) == 2
+-    assert all(" -B " in f" {line} " for line in probe_lines)
+-    assert '$env:PYTHONDONTWRITEBYTECODE = "1"' in script
+-    assert '"-B", "-m", "silitok_speed.release_profile"' in script
+-    assert 'Get-ChildItem -LiteralPath $App -Recurse -File -Filter "*.pyc"' in script
+-    assert "bytecode policy violation" in script
+-
+-
+-def test_staged_verifier_propagates_no_bytecode_to_all_python_processes():
+-    verifier = _read(WINDOWS_PACKAGING / "verify-staged-release.ps1")
+-
+-    assert '"-B",' in verifier
+-    assert "$Output = & $Python @Arguments" in verifier
+-    assert '$Info.ArgumentList.Add("-B")' in verifier
+-    assert '$Info.EnvironmentVariables["PYTHONDONTWRITEBYTECODE"] = "1"' in verifier
+-    assert '$PreviousBytecodePolicy = [Environment]::GetEnvironmentVariable' in verifier
+-    assert 'Remove-Item Env:PYTHONDONTWRITEBYTECODE' in verifier
+-    assert 'Get-ChildItem -LiteralPath $AppDir -Recurse -File -Filter "*.pyc"' in verifier
+-    assert "Staged bytecode policy: zero .pyc files." in verifier
+-    kill_index = verifier.index('taskkill.exe')
+-    wait_index = verifier.index('$Process.WaitForExit(5000)')
+-    scan_index = verifier.index('Get-ChildItem -LiteralPath $AppDir -Recurse -File -Filter "*.pyc"')
+-    assert kill_index < wait_index < scan_index
+-
+-
+-def test_post_install_python_probes_disable_bytecode():
+-    verifier = _read(WINDOWS_PACKAGING / "verify-install.ps1")
+-
+-    calls = [
+-        line.strip()
+-        for line in verifier.splitlines()
+-        if "$out = & $py" in line
+-    ]
+-    assert calls
+-    assert all(" -B " in f" {line} " for line in calls)
+-
+-
+-def test_build_validates_required_cp312_extension_modules():
+-    script = _read(WINDOWS_PACKAGING / "build.ps1")
+-
+-    # ISA-independent CUDA extensions are validated as a group ($GpuPyds);
+-    # cpuinfer_ext is handled by the variant/single staging logic below.
+-    assert "$GpuPyds" in script
+-    assert "cpuinfer_ext.cp312-win_amd64.pyd" in script
+-    assert "KTransformersOps.cp312-win_amd64.pyd" in script
+-    assert "vLLMMarlin.cp312-win_amd64.pyd" in script
+-    assert "missing required extension .pyd" in script
+-
+-
+-def test_build_stages_python_development_files_for_triton_tcc():
+-    script = _read(WINDOWS_PACKAGING / "build.ps1")
+-
+-    assert "PythonDevRoot" in script
+-    assert 'Join-Path $SourceVenv "pyvenv.cfg"' in script
+-    assert 'Join-Path $PythonDevInclude "Python.h"' in script
+-    assert 'Join-Path $PythonDevLibs "python$PythonAbi.lib"' in script
+-    assert 'Join-Path $PyDir "include"' in script
+-    assert 'Join-Path $PyDir "libs"' in script
+-
+-
+-def test_build_requires_sageattention_in_verified_venv():
+-    script = _read(WINDOWS_PACKAGING / "build.ps1")
+-
+-    assert '"torch", "torchvision", "torchaudio", "sageattention"' in script
+-
+-
+-def test_windows_bundle_requires_qwen36_runtime():
+-    build = _read(WINDOWS_PACKAGING / "build.ps1")
+-    verify = _read(WINDOWS_PACKAGING / "verify-install.ps1")
+-    installer = _read(REPO_ROOT / "scripts" / "install.ps1")
+-
+-    assert '"torch", "torchvision", "torchaudio", "sageattention", "triton"' in build
+-    assert "FreeToken Qwen3.6 worker runtime" in verify
+-    assert "$sili[api,scail2,qwen36]" in installer
+-
+-
+-def test_build_stages_external_kernel_cache_into_installer():
+-    build = _read(WINDOWS_PACKAGING / "build.ps1")
+-    compile_script = _read(WINDOWS_PACKAGING / "compile-speed.ps1")
+-    setup = _read(REPO_ROOT / "silitok_speed" / "setup_compile.py")
+-    pyproject = _read(REPO_ROOT / "silitok_speed" / "pyproject.toml")
+-    service_xml = _read(WINDOWS_PACKAGING / "SiltokSpeed.xml")
+-    launcher = _read(WINDOWS_PACKAGING / "launch.cmd")
+-    verify_install = _read(WINDOWS_PACKAGING / "verify-install.ps1")
+-
+-    # kernel cache 是外部构建输入：不进仓库、不封入编译包，但随安装包交付。
+-    assert "[Parameter(Mandatory)] [string]$KernelCacheDir" in build
+-    assert "Require-Path $KernelCacheDir" in build
+-    assert "generate-manifest" in build
+-    assert "Robo $GeneratedKernelCache $BundledKernelCache" in build
+-    assert "$BundledKernelCache = Join-Path $App \"runtime\\kernel-cache\"" in build
+-    # 探针与安装后验证都读取交付的 runtime\kernel-cache，而非外部输入目录。
+-    assert "$env:SILITOK_FREETOKEN_KERNEL_CACHE_DIR = $BundledKernelCache" in build
+-    assert "runtime\\kernel-cache" in verify_install
+-    # 安装机默认 cache 目录：服务 env（%BASE%）与手动启动器各有一份。
+-    assert 'name="SILITOK_FREETOKEN_KERNEL_CACHE_DIR" value="%BASE%\\runtime\\kernel-cache"' in service_xml
+-    assert "SILITOK_FREETOKEN_KERNEL_CACHE_DIR=%SILITOK_HOME%\\runtime\\kernel-cache" in launcher
+-    assert "-FreetokenManifest" in build
+-    assert "--freetoken-manifest" in compile_script
+-    assert "FREETOKEN_MANIFEST_RESOURCE" not in setup
+-    assert "kernel_cache/speed-kernel-manifest.json" not in pyproject
+-
+-
+-def test_installer_writes_managed_base_from_renderer_output():
+-    script = _read(WINDOWS_PACKAGING / "siltok-speed.iss")
+-
+-    assert "WriteManagedBase" in script
+-    assert "__MODELS_DIR__" in script
+-    assert "managed-base.yaml not found" in script
+-
+-
+-def test_installer_fresh_install_uses_machine_model_store_default():
+-    script = _read(REPO_ROOT / "packaging" / "windows" / "siltok-speed.iss")
+-
+-    assert "ExpandConstant('{commonappdata}\\Siltok\Speed\\models')" in script
+-    assert "GetEnv('USERPROFILE') + '\\workspace\\aipc\\models'" not in script
+-
+-
+-def test_installer_defers_legacy_diff_migration_to_release_renderer():
+-    script = _read(WINDOWS_PACKAGING / "siltok-speed.iss")
+-    renderer = _read(REPO_ROOT / "silitok_speed" / "release_profile.py")
+-
+-    assert "PreserveLegacyOperatorConfig" not in script
+-    assert "CopyFile(LegacyPath, OverridePath" not in script
+-    assert "WriteManagedBase" in script
+-    assert "legacy-windows-config-v0.yaml" in renderer
+-    assert "legacy-migration.json" in renderer
+-
+-
+-def test_verify_install_warm_selects_chat_capable_model():
+-    script = _read(WINDOWS_PACKAGING / "verify-install.ps1")
+-
+-    assert "function Select-ChatModel" in script
+-    assert "features" in script
+-    assert "chat" in script
+-    assert "no chat-capable model" in script
+-    assert "$Model = Select-ChatModel $catalog" in script
+-
+-
+-def test_installer_locks_down_programdata_acl():
+-    script = _read(WINDOWS_PACKAGING / "siltok-speed.iss")
+-
+-    assert "LockdownDataAcl" in script
+-    assert "icacls" in script
+-    assert "/inheritance:r" in script
+-    # SYSTEM + Administrators by SID (locale-independent)
+-    assert "S-1-5-18" in script
+-    assert "S-1-5-32-544" in script
+-
+-
+-def test_installer_acl_grants_apply_to_existing_files_during_upgrade():
+-    script = _read(WINDOWS_PACKAGING / "siltok-speed.iss")
+-
+-    assert "*S-1-5-18:F" in script
+-    assert "*S-1-5-32-544:F" in script
+-
+-
+-def test_installer_gpu_detection_uses_bounded_nvidia_smi_waits():
+-    # Driver-gate GPU probe in the installer is bounded (no unbounded hang).
+-    # select-profile.ps1 is gone (single config.yaml needs no GPU->SKU pick).
+-    iss = _read(WINDOWS_PACKAGING / "siltok-speed.iss")
+-
+-    assert "NvidiaSmiCapture" in iss
+-    assert "System.Diagnostics.ProcessStartInfo" in iss
+-    assert "WaitForExit(15000)" in iss
+-    assert "CmdCapture('nvidia-smi" not in iss
+-
+-
+-def test_installer_checks_service_start_result():
+-    script = _read(WINDOWS_PACKAGING / "siltok-speed.iss")
+-
+-    assert "WinSW start returned" in script
+-    assert "did not reach RUNNING" in script
+-    assert "sc query SiltokSpeed" in script
+-
+-
+-def test_installer_disables_inno_restart_manager_for_service_upgrade():
+-    script = _read(WINDOWS_PACKAGING / "siltok-speed.iss")
+-
+-    assert "CloseApplications=no" in script
+-    assert "RestartApplications=no" in script
+-    assert "PrepareToInstall" in script
+-
+-
+-def test_installer_fails_fast_on_missing_config_template():
+-    script = _read(WINDOWS_PACKAGING / "siltok-speed.iss")
+-
+-    assert "managed-base.yaml not found" in script
+-
+-
+-def test_build_and_auxiliary_launcher_use_release_renderer():
+-    script = _read(WINDOWS_PACKAGING / "build.ps1")
+-    launcher = _read(WINDOWS_PACKAGING / "launch.cmd")
+-
+-    assert "silitok_speed.release_profile" in script
+-    assert "render-package" in script
+-    assert "deployment-base.yaml" in script
+-    assert "managed-base.yaml" in script
+-    assert "silitok_speed.release_profile serve" in launcher
+-
+-
+-def test_tier2_attests_staged_embedded_runtime_before_publish():
+-    workflow = _read(REPO_ROOT / ".github" / "workflows" / "silitok-packaging-build.yml")
+-    verifier = _read(WINDOWS_PACKAGING / "verify-staged-release.ps1")
+-
+-    assert "Verify staged embedded runtime" in workflow
+-    assert "verify-staged-release.ps1" in workflow
+-    assert workflow.index("Verify staged embedded runtime") < workflow.index("Publish to GitHub Release")
+-    assert "release-runtime-metadata.json" in verifier
+-    assert "launch_nonce" in verifier
+-    assert "identity_matches_expected" in verifier
+-    assert "taskkill.exe" in verifier
+-
+-
+-def test_cpu_variant_detector_exists_and_uses_avx512f_feature():
+-    script = _read(WINDOWS_PACKAGING / "select-cpu-variant.ps1")
+-
+-    assert "IsProcessorFeaturePresent" in script
+-    assert "41" in script  # PF_AVX512F_INSTRUCTIONS_AVAILABLE
+-    assert "avx2" in script
+-    assert "avx512" in script
+-
+-
+-def test_build_stages_cpu_variants_separately():
+-    script = _read(WINDOWS_PACKAGING / "build.ps1")
+-
+-    assert "CpuVariantsDir" in script
+-    assert "cpu-variants" in script
+-    # the ISA-independent CUDA extensions stay a single copy
+-    assert "KTransformersOps.cp312-win_amd64.pyd" in script
+-    assert "vLLMMarlin.cp312-win_amd64.pyd" in script
+-
+-
+-def test_installer_selects_cpu_variant_at_install_time():
+-    script = _read(WINDOWS_PACKAGING / "siltok-speed.iss")
+-
+-    assert "SelectCpuVariant" in script
+-    assert "cpu-variants" in script
+-    assert "select-cpu-variant.ps1" in script
+-    assert "/CPUVARIANT=" in script
+-
+-
+-def test_build_cpuinfer_supports_explicit_isa_variants():
+-    script = (REPO_ROOT / "kt-sft" / "build-cpuinfer.bat").read_text(encoding="utf-8")
+-
+-    assert "LLAMA_AVX2" in script
+-    assert "LLAMA_AVX512" in script
+-    assert "LLAMA_NATIVE=OFF" in script
+-    assert "cpu-variants" in script
+-
+-
+-def test_build_cpuinfer_propagates_each_subbuild_failure():
+-    script = (REPO_ROOT / "kt-sft" / "build-cpuinfer.bat").read_text(encoding="utf-8")
+-    lines = [line.strip().lower() for line in script.splitlines() if line.strip()]
+-    calls = [index for index, line in enumerate(lines) if line.startswith("call :build_one ")]
+-
+-    assert len(calls) == 5
+-    for index in calls:
+-        assert lines[index + 1] == "if errorlevel 1 exit /b 1"
+-
+-
+-def test_packaging_validation_runs_in_canonical_repository():
+-    validate = _read(REPO_ROOT / ".github" / "workflows" / "silitok-packaging-validate.yml")
+-
+-    assert "siltok/silitok-speed" in validate
+-    assert "Yourens/silitok-speed" not in validate
+-    assert "silitok-ai/silitok-speed" not in validate
+-
+-
+-def test_packaging_release_stays_disabled_until_runner_inputs_are_migrated():
+-    build = _read(REPO_ROOT / ".github" / "workflows" / "silitok-packaging-build.yml")
+-
+-    assert "Yourens/silitok-speed" in build
+-    assert "siltok/silitok-speed" not in build
+-    assert "silitok-ai/silitok-speed" not in build
+-
+-
+-def test_packaging_validation_runs_on_packaging_pull_requests():
+-    workflow = _read(REPO_ROOT / ".github" / "workflows" / "silitok-packaging-validate.yml")
+-
+-    assert "pull_request:" in workflow
+-    assert "packaging/windows/**" in workflow
+-    assert "silitok_speed/release_profile.py" in workflow
+-    assert "silitok_speed/release_profiles/**" in workflow
+-    assert "tests/unit/test_release_profile.py" in workflow
+-    assert "tests/unit/test_windows_packaging.py" in workflow
+-    assert ".github/workflows/silitok-packaging-validate.yml" in workflow
+-    assert ".github/workflows/silitok-packaging-build.yml" in workflow
+-
+-
+-def test_kt_staging_excludes_nonruntime_subtrees():
+-    # ktransformers is vendored wholesale; its eval harnesses (`tests`) and web
+-    # UI (`website`) are not on the Speed serve path and pull dev-only deps.
+-    # They must be excluded from the kt-sft robocopy.
+-    script = _read(WINDOWS_PACKAGING / "build.ps1")
+-
+-    assert '"tests", "website"' in script
+-
+-
+-def test_all_triton_modules_preserve_python_source_in_release():
+-    import ast
+-
+-    package = REPO_ROOT / "silitok_speed"
+-    setup = ast.parse(_read(package / "setup_compile.py"))
+-    configured = next(
+-        ast.literal_eval(node.value)
+-        for node in setup.body
+-        if isinstance(node, ast.Assign)
+-        and any(isinstance(target, ast.Name) and target.id == "JIT_MODULES"
+-                for target in node.targets)
+-    )
+-    required = set()
+-    for path in package.rglob("*.py"):
+-        if any(part.startswith(".") or part == "__pycache__"
+-               for part in path.relative_to(package).parts):
+-            continue
+-        tree = ast.parse(_read(path))
++def test_compiled_assets_externalize_current_and_historical_kernel_caches(tmp_path, monkeypatch):
++    """执行真实资源收集：保留模型元数据及其他原生资源，排除全部FreeToken缓存。"""
++    pytest.importorskip("Cython")
++    spec = importlib.util.spec_from_file_location(
++        "review_compile_setup", REPO_ROOT / "silitok_speed/setup_compile.py")
++    compiler = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(compiler)
++    package = tmp_path / "source"
++    resources = {
++        "qwen36/release.json": b'{"version": "fixture"}',
++        "other/native.dll": b"unrelated-native-resource",
++        "qwen36/kernel_cache/current.dll": b"legacy",
++        "qwen36/kernel_cache_strataq2perf8/old/old.dll": b"historical",
++        "qwen36/kernel_cache_strataq2review1/new/new.dll": b"current",
++        "qwen36/kernel_cache_strataq2review1/speed-kernel-manifest.json": b"{}",
++    }
++    for name, data in resources.items():
++        path = package / name
++        path.parent.mkdir(parents=True, exist_ok=True)
++        path.write_bytes(data)
++    (package / "settings.py").write_text("def value():\n    return 42\n", encoding="utf-8")
++    monkeypatch.setattr(compiler, "SRC", package)
++    extensions, selected, modules = compiler.collect(tmp_path / "output", {})
++    assert {name for name, _ in selected} == {"qwen36/release.json", "other/native.dll"}
++    assert {extension.name for extension in extensions} == {"silitok_speed.settings"}
++    assert modules["settings.py"]["module"] == "silitok_speed.settings"
++    assert (tmp_path / "output/generated/settings.py").is_file()
++
++
++def test_actual_collector_keeps_runtime_data_and_triton_python(tmp_path):
++    """真实收集整个产品，再从原始模块导入关系核对JIT模式与关键数据字节。"""
++    pytest.importorskip("Cython")
++    spec = importlib.util.spec_from_file_location(
++        "review_actual_compile_setup", REPO_ROOT / "silitok_speed/setup_compile.py")
++    compiler = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(compiler)
++    _, resources, modules = compiler.collect(tmp_path / "collected", {})
++    selected = dict(resources)
++    assert {"models/seedvr2/pos_emb.pt", "qwen36/release.json", "data/capabilities_v3.json"} <= selected.keys()
++    assert not any(name.startswith("qwen36/kernel_cache") for name in selected)
++    triton_modules = []
++    for name, entry in modules.items():
++        tree = ast.parse((compiler.SRC / name).read_text(encoding="utf-8"))
++        imports = []
+         for node in ast.walk(tree):
+             if isinstance(node, ast.Import):
+-                imports = [alias.name for alias in node.names]
++                imports.extend(alias.name for alias in node.names)
+             elif isinstance(node, ast.ImportFrom):
+-                imports = [node.module or ""]
+-            else:
+-                continue
+-            if any(name == "triton" or name.startswith("triton.") for name in imports):
+-                required.add(path.relative_to(package).as_posix())
+-    assert required <= configured, f"Triton modules would be Cythonized: {required - configured}"
+-
+-
+-def test_release_seals_every_runtime_data_file():
+-    """Non-Python files the package reads at runtime (e.g. SeedVR2 pos_emb.pt) must be sealed."""
+-    import ast
+-
+-    package = REPO_ROOT / "silitok_speed"
+-    setup = ast.parse(_read(package / "setup_compile.py"))
+-    sealed = next(
+-        ast.literal_eval(node.value)
+-        for node in setup.body
+-        if isinstance(node, ast.Assign)
+-        and any(isinstance(target, ast.Name) and target.id == "RESOURCE_SUFFIXES"
+-                for target in node.targets)
+-    )
+-    # Sources and docs that are compiled or never read by the running service.
+-    unsealed = {".py", ".pyc", ".md", ".cpp", ".cu", ".toml"}
+-    missing = []
+-    for path in package.rglob("*"):
+-        parts = path.relative_to(package).parts
+-        if not path.is_file() or any(part.startswith(".") or part == "__pycache__" for part in parts):
+-            continue
+-        if path.suffix in unsealed or path.name in {"LICENSE", "NOTICE"}:
+-            continue
+-        if path.suffix not in sealed:
+-            missing.append("/".join(parts))
+-    assert missing == []
++                imports.append(node.module or "")
++        if any(imported == "triton" or imported.startswith("triton.") for imported in imports):
++            triton_modules.append(name)
++            assert entry["mode"] == "encrypted-triton", name
++    assert triton_modules
+diff --git a/tools/bench/benchmark_freetoken_http.py b/tools/bench/benchmark_freetoken_http.py
+index e385f6ab..1ac570e1 100644
+--- a/tools/bench/benchmark_freetoken_http.py
++++ b/tools/bench/benchmark_freetoken_http.py
+@@ -22,7 +22,13 @@ from silitok_speed import Engine, EngineConfig
+ from silitok_speed.config import get_config
+ from silitok_speed.api import create_app
+ from silitok_speed.discovery import discover_and_register
+-from tools.smoke.freetoken_qwen36 import _manifest, _link_model_directory, _worker_children, _admission_probe
++from tools.smoke.freetoken_qwen36 import (
++    _add_q2_tuning_args,
++    _admission_probe,
++    _link_model_directory,
++    _manifest,
++    _worker_children,
++)
+ 
+ 
+ def request(client, payload):
+@@ -64,7 +70,6 @@ def request(client, payload):
+ def main():
+     """启动唯一 Engine，冻结资源准入与提示，测量后关闭服务及其全部 worker。"""
+     parser = argparse.ArgumentParser(description=__doc__)
+-    from tools.smoke.freetoken_qwen36 import _add_q2_tuning_args
+     _add_q2_tuning_args(parser)
+     parser.add_argument('--model', type=Path, required=True)
+     parser.add_argument('--kernel-cache', type=Path, required=True)
+diff --git a/tools/verify_flash_next_checkpoint.py b/tools/verify_flash_next_checkpoint.py
+index f9e64748..dd85d070 100644
+--- a/tools/verify_flash_next_checkpoint.py
++++ b/tools/verify_flash_next_checkpoint.py
+@@ -25,8 +25,9 @@ def main() -> int:
+         raise FileNotFoundError(f'Build checkout has no 5070 Ti consumer verifier: {verifier}')
+     command = [sys.executable, '-B', str(verifier), '--speed-root',
+                str(Path(__file__).resolve().parents[1])]
+-    if args.contract is not None:
+-        contract = (build_root / args.contract).resolve(strict=True)
++    contract_name = args.contract or release.get('consumer_contract')
++    if contract_name is not None:
++        contract = (build_root / contract_name).resolve(strict=True)
+         if not contract.is_relative_to(build_root):
+             raise ValueError('Consumer contract must remain inside the Build checkout')
+         command += ['--contract', str(contract)]
