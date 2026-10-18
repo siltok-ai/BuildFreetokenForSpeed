@@ -1,0 +1,9 @@
+{
+  "seconds": 31.68741680000676,
+  "cpu_seconds": 222.640625,
+  "variant": "torch",
+  "prototype_source": null,
+  "prototype_sha256": null,
+  "host_bytes": 26011238400,
+  "gpu_bank_bytes": 10793779200
+}

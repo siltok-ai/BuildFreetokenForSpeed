@@ -1,0 +1,8 @@
+{
+  "seconds": 31.73220259998925,
+  "cpu_seconds": 224.453125,
+  "threads": 8,
+  "chunk_mib": 64,
+  "host_bytes": 26011238400,
+  "gpu_bank_bytes": 10793779200
+}

@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "completed": [
+    "freetoken-source-tests-v1",
+    "freetoken-wheel-tests-v1",
+    "native-quality-off-v1",
+    "native-quality-on-v1"
+  ],
+  "version": "0.1.3+speed.strataq2perf9",
+  "scope": "ordinary installed FT9; Speed and protected package qualification remain separate"
+}

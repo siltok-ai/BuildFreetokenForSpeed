@@ -1,0 +1,79 @@
+{
+  "format": 1,
+  "scope": "Ordinary installed FreeToken wheel; Speed remains separate acceptance",
+  "version": "0.1.3+speed.strataq2perf9",
+  "wheel_sha256": "62e1375eff978807e4392c8285e958dc023b1291d0ef496a06641be906489fae",
+  "known_issues": [
+    "intermittent-long-output-token0: unresolved"
+  ],
+  "files": {
+    "quality-summary-v1.json": {
+      "bytes": 250,
+      "sha256": "27b19285c4d6afdf3370e3308a7ac3c676b53e86f7dc86b5dae76e2977a9de66"
+    },
+    "host-command-records/native-probe-v1.py.txt": {
+      "bytes": 26944,
+      "sha256": "ddbd353477f5337b054975951b2b3fafc6ec29dd298408db8799207426abb961"
+    },
+    "host-command-records/run-freetoken-tests-v1.py.txt": {
+      "bytes": 2146,
+      "sha256": "316d04e35cfb43b284a381401111b7a05c7a4ca10acc89e8a3154571023bb517"
+    },
+    "host-command-records/run-native-qualification-v1.py.txt": {
+      "bytes": 3478,
+      "sha256": "d544793235ae80690ac322f1d05efd5fa7732471c98b14bd08735c2a6145f614"
+    },
+    "runtime/freetoken-source-tests-v1.log": {
+      "bytes": 4617,
+      "sha256": "eb455942ecaab92286570d2ea45eac3116962ab46a8b0de85db53bb2ecf97096"
+    },
+    "runtime/freetoken-wheel-tests-v1.log": {
+      "bytes": 4503,
+      "sha256": "7cbe604e0588e2004d266bc760e37556aeee88f5e227931bf2feefafcdcccf3a"
+    },
+    "runtime/native-qualification-complete-v1.json": {
+      "bytes": 317,
+      "sha256": "d1deff1db8d9c5965f2a4753ce4a350f0eb0f4da2bacbb1033a81dd3e57e62b8"
+    },
+    "runtime/native-quality-off-v1.json": {
+      "bytes": 179662,
+      "sha256": "c2b53cc05a81eb7c006fb7ad8578987e133f6762ecc352765d8833b7e2ea0cbd"
+    },
+    "runtime/native-quality-off-v1.resource.json": {
+      "bytes": 1114,
+      "sha256": "8fe823f24c0f73ad292b7ba78b80d72ce07b677d2f879f8023591290e086cbc0"
+    },
+    "runtime/native-quality-off-v1.samples.jsonl": {
+      "bytes": 89884,
+      "sha256": "e49937dc4f0d9eb879d4bf5fc803e5efdacc0bc14c14d8ae3508b0148c712323"
+    },
+    "runtime/native-quality-off-v1.stderr.log": {
+      "bytes": 1989,
+      "sha256": "3c99e16bdafeec2136c26dbb7eafe890ee58e633b72a0f4186814af2351ef3cf"
+    },
+    "runtime/native-quality-off-v1.stdout.log": {
+      "bytes": 45228,
+      "sha256": "d063bafbce657c9340ae8f405357c35aa4c5bac522f2e4cbc499fa2b0cfd0d4f"
+    },
+    "runtime/native-quality-on-v1.json": {
+      "bytes": 219034,
+      "sha256": "104f0e7cc0496118f59988dd38d757ee9de940f80ce2f6765e853aa2e0a70e7f"
+    },
+    "runtime/native-quality-on-v1.resource.json": {
+      "bytes": 1207,
+      "sha256": "e7c3b51b22f0e73a9452c288b8ff5728c3974945cea0aed6412e724d41c74906"
+    },
+    "runtime/native-quality-on-v1.samples.jsonl": {
+      "bytes": 65277,
+      "sha256": "cb097410801de19b5fbbb422206ff3de61dc4fc788683e7a865b7b2878322062"
+    },
+    "runtime/native-quality-on-v1.stderr.log": {
+      "bytes": 1989,
+      "sha256": "ff7769e37711185cbc1486741ab9e8f4eb27cf7393a2b080e20ab6989ef3c788"
+    },
+    "runtime/native-quality-on-v1.stdout.log": {
+      "bytes": 54950,
+      "sha256": "952434698c40c34331e66ccbf1c7efc754b3a84c5a7bdbc7abe558d75dc7b83d"
+    }
+  }
+}

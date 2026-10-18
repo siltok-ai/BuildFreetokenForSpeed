@@ -1,0 +1,24 @@
+"""cProfile only the accepted full-weight Q2 loader; output is diagnostic."""
+from pathlib import Path
+import cProfile
+import pstats
+import runpy
+import freetoken.moe.q2_residency as residency
+R=Path(__file__).parent
+loader=residency.load_compact_banks
+
+
+def profiled_load(*args,**kwargs):
+    profiler=cProfile.Profile()
+    try:
+        return profiler.runcall(loader,*args,**kwargs)
+    finally:
+        profiler.dump_stats(str(R/'startup-cprofile-v1.prof'))
+        with (R/'startup-cprofile-v1.txt').open('w',encoding='utf-8') as out:
+            stats=pstats.Stats(profiler,stream=out)
+            stats.strip_dirs().sort_stats('tottime').print_stats(35)
+            stats.sort_stats('cumtime').print_stats(20)
+
+
+residency.load_compact_banks=profiled_load
+runpy.run_path(str(R/'native-nsys-probe-v1.py'),run_name='__main__')

@@ -1,0 +1,34 @@
+"""ABBA full-weight startup test after the baseline profiler process exits."""
+from pathlib import Path
+import json
+import os
+import subprocess
+import time
+R=Path(__file__).parent
+deadline=time.monotonic()+1800
+while not (R/'startup-cprofile-v1.resource.json').exists():
+    if time.monotonic()>deadline:raise TimeoutError('Startup profile incomplete')
+    time.sleep(2)
+prior=json.loads((R/'startup-cprofile-v1.resource.json').read_text())
+assert not prior['returncode'] and not prior['remaining_before_cleanup'] and not prior['stop_reason']
+py=r'C:\workspace\envs\siltok-speed\flash-review2b\Scripts\python.exe'
+env=os.environ.copy()
+env.update(PYTHONUTF8='1',PYTHONDONTWRITEBYTECODE='1',FREETOKEN_DISABLE_JIT='1',
+    FREETOKEN_KERNEL_CACHE_DIR=r'C:\workspace\wt\freetoken-mats\flash-perf\artifacts\strataq2review2b-cp312-cu130-sm120\kernel-cache',
+    TRITON_CACHE_DIR=r'C:\workspace\cache\triton\flash-review2b')
+env.pop('PYTHONPATH',None)
+for number,variant in enumerate(('torch','bulk','bulk','torch'),1):
+    stem=f'pack-{variant}-abba{number}-v1'
+    env.update(Q2_PACK_VARIANT=variant,Q2_LOAD_RECEIPT=str(R/f'{stem}.load.json'))
+    command=[py,'-B',str(R/'bulk-pack-experiment-v1.py'),'--output',str(R/f'{stem}.json'),
+        '--resident','5760','--dynamic','1024','--prefill','1024','--state-cache-slots','1',
+        '--mapped-embedding','--adaptive-owners','--adapt-every','32','--adapt-decay','.7',
+        '--suite','performance','--keys','english','--repetitions','1','--tokens','64']
+    print('START',stem,flush=True)
+    subprocess.run([py,'-B',r'C:\workspace\runs\siltok-speed\review-20261017\consumer-tools\supervise-v2.py',
+        '--prefix',str(R/stem),'--cwd',str(R),'--timeout','900','--',*command],check=True,env=env,stdout=subprocess.DEVNULL)
+    data=json.loads((R/f'{stem}.json').read_text(encoding='utf-8'))
+    resource=json.loads((R/f'{stem}.resource.json').read_text())
+    assert data['status']=='passed' and not resource['stop_reason'] and not resource['remaining_before_cleanup']
+    print('PASS',stem,(R/f'{stem}.load.json').read_text().replace('\n',' '),flush=True)
+(R/'bulk-pack-experiments-complete-v1.json').write_text(json.dumps(dict(status='passed'))+'\n')

@@ -1,0 +1,53 @@
+"""Q2 owner-copy diagnostic: byte equality and event time, no model TPS claim."""
+from pathlib import Path
+import json
+import statistics
+import torch
+import numpy as np
+from freetoken.kernel.pinned import alloc_pinned_tensor, device_ptr
+from freetoken.moe.q2_residency import gather
+
+torch.set_num_threads(1)
+torch.cuda.set_device(0)
+row_bytes=(921600,460800)
+rows=128
+host=[alloc_pinned_tensor(rows,b,dtype=torch.uint8) for b in row_bytes]
+for index,t in enumerate(host):
+    t.numpy()[:]=np.arange(rows,dtype=np.uint8)[:,None]+index
+gpu=[t.cuda() for t in host]
+dst=[torch.empty_like(t) for t in gpu]
+di=torch.arange(rows,device='cuda',dtype=torch.int32)
+si=torch.arange(rows-1,-1,-1,device='cuda',dtype=torch.int32)
+dstptr=torch.tensor([t.data_ptr() for t in dst],device='cuda',dtype=torch.int64)
+features=torch.tensor(row_bytes,device='cuda',dtype=torch.int64)
+result=[]
+for placement in ('host','mixed'):
+    sources=torch.tensor([[device_ptr(host[bank])+row*width if placement=='host' or row%2 else gpu[bank].data_ptr()+row*width
+        for row in range(rows)] for bank,width in enumerate(row_bytes)],device='cuda',dtype=torch.int64)
+    descriptor=(dstptr,sources,features)
+    for count in (0,1,4,10,24,40,128):
+        n=torch.tensor([count],device='cuda',dtype=torch.int64)
+        for blocks in (16,32,64,128,192):
+            for t in dst:t.fill_(255)
+            gather(descriptor,di,si,n,blocks)
+            torch.cuda.synchronize()
+            for bank in range(2):
+                actual=dst[bank].cpu()
+                expected=host[bank].index_select(0,si[:count].cpu().long())
+                assert torch.equal(actual[:count],expected),(placement,count,blocks,bank)
+                assert bool((actual[count:]==255).all()),(placement,count,blocks,'overrun')
+            graph=torch.cuda.CUDAGraph()
+            with torch.cuda.graph(graph):
+                for _ in range(20):gather(descriptor,di,si,n,blocks)
+            measurements=[]
+            for repeat in range(5):
+                a,b=torch.cuda.Event(enable_timing=True),torch.cuda.Event(enable_timing=True)
+                a.record();graph.replay();b.record();b.synchronize()
+                measurements.append(a.elapsed_time(b)/20)
+            result.append(dict(placement=placement,count=count,blocks=blocks,ms=statistics.median(measurements),samples_ms=measurements))
+            del graph
+Path(__file__).with_name('gather-microbenchmark-v1.json').write_text(json.dumps(dict(scope='diagnostic-only; fixed synthetic exact Q2 byte geometry',rows=result),indent=2)+'\n')
+for placement in ('host','mixed'):
+    for count in (0,1,4,10,24,40,128):
+        subset=[x for x in result if x['placement']==placement and x['count']==count]
+        print(placement,count,[(x['blocks'],round(x['ms']*1000,2)) for x in subset],flush=True)

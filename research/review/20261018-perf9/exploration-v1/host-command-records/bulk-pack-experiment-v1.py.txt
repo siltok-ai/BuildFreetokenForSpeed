@@ -1,0 +1,35 @@
+"""Isolate CPU Q2 packing prototype; installed wheel files remain unchanged."""
+from pathlib import Path
+import hashlib
+import json
+import os
+import runpy
+import time
+import freetoken.layers.quantization.moe.q2_0 as q2
+import freetoken.moe.q2_residency as residency
+
+candidate=Path(r'C:\workspace\build\freetoken-mats\perf9-20261018-prototype\build-source\python\freetoken\layers\quantization\moe\q2_0.py')
+variant=os.environ['Q2_PACK_VARIANT']
+if variant=='bulk':
+    import ast
+    tree=ast.parse(candidate.read_text(encoding='utf-8'))
+    cls=next(n for n in tree.body if isinstance(n,ast.ClassDef) and n.name=='TritonQ20MoEKernel')
+    method=next(n for n in cls.body if isinstance(n,ast.FunctionDef) and n.name=='pack')
+    namespace={}
+    exec(compile(ast.Module(body=[method],type_ignores=[]),str(candidate),'exec'),namespace)
+    q2.TritonQ20MoEKernel.pack=namespace['pack']
+loader=residency.load_compact_banks
+
+
+def timed_load(*args,**kwargs):
+    start=time.perf_counter();cpu=time.process_time()
+    result=loader(*args,**kwargs)
+    Path(os.environ['Q2_LOAD_RECEIPT']).write_text(json.dumps(dict(seconds=time.perf_counter()-start,
+        cpu_seconds=time.process_time()-cpu,variant=variant,prototype_source=str(candidate) if variant=='bulk' else None,
+        prototype_sha256=hashlib.sha256(candidate.read_bytes()).hexdigest() if variant=='bulk' else None,
+        host_bytes=result[1].host_bytes,gpu_bank_bytes=result[1].gpu_bank_bytes),indent=2)+'\n')
+    return result
+
+
+residency.load_compact_banks=timed_load
+runpy.run_path(str(Path(__file__).with_name('native-nsys-probe-v1.py')),run_name='__main__')

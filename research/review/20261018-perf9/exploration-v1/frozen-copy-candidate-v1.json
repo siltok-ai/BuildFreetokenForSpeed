@@ -1,0 +1,15 @@
+{
+  "version": "0.1.3+speed.strataq2perf9",
+  "patches": 57,
+  "scope": "verified original-thread-policy startup prototype only; ordinary/source/packaged consumer qualification pending",
+  "included_changes": [
+    "contiguous compact-host destination copies",
+    "version"
+  ],
+  "excluded_experiments": [
+    "single-thread loading",
+    "larger read chunks",
+    "NumPy packing",
+    "gather launch tuning"
+  ]
+}

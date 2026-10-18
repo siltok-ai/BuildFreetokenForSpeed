@@ -1,0 +1,71 @@
+         5688635 function calls (5192612 primitive calls) in 32.241 seconds
+
+   Ordered by: internal time
+   List reduced from 282 to 35 due to restriction <35>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    12384   20.383    0.002   20.383    0.002 {method 'readinto' of '_io.FileIO' objects}
+     6532    2.743    0.000    2.743    0.000 {method 'to' of 'torch._C.TensorBase' objects}
+    14782    2.594    0.000    2.594    0.000 {method 'index_copy_' of 'torch._C.TensorBase' objects}
+       96    2.253    0.023    2.253    0.023 {built-in method freetoken.kernel._pinned_tensor.alloc_pinned_tensor}
+    14782    1.188    0.000    1.188    0.000 {built-in method torch.tensor}
+    14782    0.775    0.000    0.775    0.000 {method 'index_select' of 'torch._C.TensorBase' objects}
+    12384    0.557    0.000    0.557    0.000 {method 'copy_' of 'torch._C.TensorBase' objects}
+        1    0.266    0.266   32.241   32.241 q2_residency.py:139(load_compact_banks)
+   998331    0.228    0.000    0.386    0.000 gguf_reader.py:20(read_exact)
+   497222    0.211    0.000    0.943    0.000 gguf_reader.py:33(read_string)
+   501109    0.211    0.000    0.459    0.000 gguf_reader.py:28(unpack)
+496070/73    0.154    0.000    1.094    0.015 gguf_reader.py:40(read_value)
+    20642    0.119    0.000    0.119    0.000 {built-in method torch.empty}
+   998333    0.107    0.000    0.107    0.000 {method 'read' of '_io.BufferedReader' objects}
+   497222    0.084    0.000    0.084    0.000 {method 'decode' of 'bytes' objects}
+     4129    0.076    0.000   21.719    0.005 q2_source.py:80(iter_q2_expert_pieces)
+1023269/1023261    0.059    0.000    0.059    0.000 {built-in method builtins.len}
+    12384    0.056    0.000    0.056    0.000 {method 'numpy' of 'torch._C.TensorBase' objects}
+   501109    0.055    0.000    0.055    0.000 {method 'unpack' of '_struct.Struct' objects}
+     4128    0.045    0.000    0.045    0.000 {method 'any' of 'torch._C.TensorBase' objects}
+     4128    0.030    0.000    0.587    0.000 q2_0.py:34(pack)
+    12384    0.016    0.000    0.016    0.000 {method 'seek' of '_io.FileIO' objects}
+    12384    0.004    0.000    0.004    0.000 {method 'cast' of 'memoryview' objects}
+     4148    0.004    0.000    0.004    0.000 {built-in method builtins.min}
+     4128    0.004    0.000    0.591    0.000 base.py:186(pack)
+        2    0.001    0.001    0.001    0.001 {built-in method _io.open_code}
+        1    0.001    0.001    1.103    1.103 q2_source.py:21(read_q2_directory)
+       48    0.001    0.000    0.001    0.000 {method 'flush' of '_io.TextIOWrapper' objects}
+     4135    0.001    0.000    0.001    0.000 {method 'items' of 'dict' objects}
+        1    0.001    0.001    0.001    0.001 {built-in method torch.full}
+       48    0.001    0.000    0.002    0.000 __init__.py:298(__init__)
+       48    0.001    0.000    0.001    0.000 {built-in method time.localtime}
+       48    0.001    0.000    0.009    0.000 logger.py:103(_call_rank0)
+     5761    0.001    0.000    0.001    0.000 q2_residency.py:150(<genexpr>)
+       48    0.000    0.000    0.002    0.000 logger.py:66(format)
+
+
+         5688635 function calls (5192612 primitive calls) in 32.241 seconds
+
+   Ordered by: cumulative time
+   List reduced from 282 to 20 due to restriction <20>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.266    0.266   32.241   32.241 q2_residency.py:139(load_compact_banks)
+     4129    0.076    0.000   21.719    0.005 q2_source.py:80(iter_q2_expert_pieces)
+    12384   20.383    0.002   20.383    0.002 {method 'readinto' of '_io.FileIO' objects}
+     6532    2.743    0.000    2.743    0.000 {method 'to' of 'torch._C.TensorBase' objects}
+    14782    2.594    0.000    2.594    0.000 {method 'index_copy_' of 'torch._C.TensorBase' objects}
+       96    0.000    0.000    2.254    0.023 pinned.py:42(alloc_pinned_tensor)
+       96    2.253    0.023    2.253    0.023 {built-in method freetoken.kernel._pinned_tensor.alloc_pinned_tensor}
+    14782    1.188    0.000    1.188    0.000 {built-in method torch.tensor}
+        1    0.001    0.001    1.103    1.103 q2_source.py:21(read_q2_directory)
+496070/73    0.154    0.000    1.094    0.015 gguf_reader.py:40(read_value)
+   497222    0.211    0.000    0.943    0.000 gguf_reader.py:33(read_string)
+    14782    0.775    0.000    0.775    0.000 {method 'index_select' of 'torch._C.TensorBase' objects}
+     4128    0.004    0.000    0.591    0.000 base.py:186(pack)
+     4128    0.030    0.000    0.587    0.000 q2_0.py:34(pack)
+    12384    0.557    0.000    0.557    0.000 {method 'copy_' of 'torch._C.TensorBase' objects}
+   501109    0.211    0.000    0.459    0.000 gguf_reader.py:28(unpack)
+   998331    0.228    0.000    0.386    0.000 gguf_reader.py:20(read_exact)
+    20642    0.119    0.000    0.119    0.000 {built-in method torch.empty}
+   998333    0.107    0.000    0.107    0.000 {method 'read' of '_io.BufferedReader' objects}
+   497222    0.084    0.000    0.084    0.000 {method 'decode' of 'bytes' objects}
+
+

@@ -1,0 +1,10 @@
+{
+  "seconds": 30.4009958000388,
+  "cpu_seconds": 211.546875,
+  "threads": 8,
+  "variant": "indexed",
+  "prototype_source": null,
+  "prototype_sha256": null,
+  "host_bytes": 26011238400,
+  "gpu_bank_bytes": 10793779200
+}
