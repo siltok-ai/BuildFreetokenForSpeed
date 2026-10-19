@@ -23,7 +23,13 @@
 5. 先提交供应材料，Speed再锁定此commit；消费证据反向引用最终Speed提交，避免循环更新commit。
 6. 最后更新当前指针及其输入SHA，写明各层验收范围。新源码不能继承旧安装资格。
 
-本轮review1是相邻perf8的Python修订；`build/derive_python_materials.py` 允许的源码边界明确，3个native模块和27项AOT逐字节复用。`validate_python_revision.py --base-profile <perf8> ...` 重放两份源码、重算差异并验证复用边界。涉及row-store/pinned C++时只能走实际选择性重编；公共编译接线保留各自来源/回执。涉及其他native、AOT规格或ABI必须完整重建，不能扩大允许清单以跳过重编。
+历史review1是相邻perf8的Python修订；`build/derive_python_materials.py` 允许的源码边界明确，3个native模块和27项AOT逐字节复用。`validate_python_revision.py --base-profile <perf8> ...` 重放两份源码、重算差异并验证复用边界。涉及row-store/pinned C++时只能走实际选择性重编；公共编译接线保留各自来源/回执。涉及其他native、AOT规格或ABI必须完整重建，不能扩大允许清单以跳过重编。
+
+## Speed历史整理与文档维护
+
+分支改名、rebase或压缩提交后，分别记录源码开发入口与实际验收提交，更新README、当前交付说明及合同索引。完整Git tree相等可以证明受版本控制的文件内容、模式和子模块指针一致；不能只凭分支名、提交说明或空的工作区diff判断。当前 `feat/flash-next` 与原整合分支的精确身份及复核步骤见 [源码分支与验收身份](speed-source-history.md)。
+
+仅整理Speed历史且tree完全相同时，保留现有FreeToken版本、材料、供应提交和当前消费合同。既有安装包的构建SHA与冻结证据保持原样；消费验证器的精确提交检查不放宽。若从新提交重新构建交付，则为新产物记录真实构建身份，按影响范围重新验收并新增合同；若源码tree也改变，按新修订处理。维护文档时将历史案例标明为历史，构建步骤从所选profile读取补丁与规格，不沿用旧数量。
 
 ## 验证和性能
 
@@ -39,4 +45,4 @@
 
 上游候选通过 `tools/export_upstream.py --repo <checkout> --commit <完整commit> --output <新目录>` 导出，只读官方仓库。逐项判断本地patch是否仍需要，处理冲突，固定新snapshot和输入后按上述流程验收。不得自动向官方FreeToken提交；遵守其贡献政策。
 
-回滚整体恢复旧Speed adapter/release和匹配材料，不往旧wheel覆盖新文件。保存原因、影响、证据与边界即可，精确操作由commit、SHA和报告追溯。[本轮review](flash-next-review-20261017.txt)、[当前交付](flash-next-current-delivery.md)与不可变 [旧维护说明](history/maintenance-before-review-20261017.txt) 分别提供当前结论、运行步骤和历史背景。
+回滚整体恢复旧Speed adapter/release和匹配材料，不往旧wheel覆盖新文件。保存原因、影响、证据与边界即可，精确操作由commit、SHA和报告追溯。[当前交付](flash-next-current-delivery.md)提供运行步骤，[历史review1](flash-next-review-20261017.txt)与不可变 [旧维护说明](history/maintenance-before-review-20261017.txt) 保留各自修订的结论与背景。

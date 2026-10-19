@@ -42,7 +42,7 @@ uv pip install --python D:\envs\ft-current\Scripts\python.exe -r .\build\require
 
 通过后去掉`-PreflightOnly`。OutDir必须是新目录。复现历史版时显式传入`-Profile build/profiles/win1.json`或其他旧profile。
 
-构建会校验全部冻结输入，在独立build-source重放当前20组补丁，再生成wheel、27个AOT DLL及实际SHA库存。源码来自本仓库归档，不在线拉取可变main，不读取其他开发worktree。输出状态`built_requires_runtime_validation`只说明构建完成。
+构建会校验全部冻结输入，在独立build-source重放所选profile指定的全部有序补丁，再按其规格生成wheel、AOT DLL及实际SHA库存。当前FT9为57组补丁、3个native模块和27项AOT；切换profile时以其catalog与spec为准。源码来自本仓库归档，不在线拉取可变main，不读取其他开发worktree。输出状态`built_requires_runtime_validation`只说明构建完成。
 
 ```text
 <OutDir>/
@@ -68,7 +68,7 @@ python -B -m unittest discover -s tests -v
 
 `verify_materials`核对库存；`validate_python_revision.py`可进一步将wheel Python与指定profile完整重放结果比较。仓库验证保留历史win1等价证明及后续版本各自的证据，不将旧验收转移给新候选。离线检查不能代替模型/GPU验收。
 
-复用已验收材料时，整体使用当前指针的 `materials` 目录，安装其中wheel并显式指向配套kernel-cache。Speed同时锁定wheel实际SHA；跨机器重编译可能产生不同二进制，必须另存、验收并更新Speed消费身份，不能覆盖原材料或仅复用版本号。review1使用perf8相邻Python修订的显式复用路径，3个native/27个AOT不重编，验证两份源码及允许边界。
+复用已验收材料时，整体使用当前指针的 `materials` 目录，安装其中wheel并显式指向配套kernel-cache。Speed同时锁定wheel实际SHA；跨机器重编译可能产生不同二进制，必须另存、验收并更新Speed消费身份，不能覆盖原材料或仅复用版本号。历史review1使用perf8相邻Python修订的显式复用路径，3个native/27个AOT不重编，验证两份源码及允许边界。
 
 完整权重、MTP可复现转换、搬迁回执和Speed配置见 [当前交付流程](../docs/flash-next-current-delivery.md)。MTP默认关闭。Speed编译包、安装器和干净机验收仍须在Speed侧完成。
 
