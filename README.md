@@ -4,7 +4,7 @@
 
 当前版本由 [current-release.json](integration/speed/current-release.json) 唯一选择，包含 profile、有序补丁、材料目录、preset 与验收合同。不要按文件名排序选择版本，也不要把 `consumer-contract.json` 当作当前合同。Speed 的 `silitok_speed/runtimes/freetoken/release.json` 另锁定 wheel SHA、配套缓存和供应提交。
 
-Speed 当前开发入口为压缩分支 `feat/flash-next`（`abc03e11`），与保留的原整合分支 `integrate/flash-next-dev-20261018`（`02074c99`）具有完全相同的 Git tree。当前安装包和消费合同仍绑定原提交；本次历史整理不更换 FT9 材料，详见 [源码分支与验收身份](docs/speed-source-history.md)。
+Speed 当前开发入口为单提交分支 `feat/flash-next`（`a3e8b635`），原20笔历史保留在 `integrate/flash-next-dev-20261018`（`02074c99`）。本次精简Speed文档、研究记录和属性规则，产品代码与FT9材料不变；当前安装包和消费合同仍绑定原提交，详见 [源码分支与验收身份](docs/speed-source-history.md)。
 
 本轮 [外部材料边界修复与实装验收](docs/flash-next-external-final-20261019.txt) 删除 Speed 的旧 qwen36 包与全部324个AOT DLL，保留公开模型ID及manifest backend别名。材料统一由本仓库提供；新普通wheel不带DLL，Windows安装器使用明确外部输入。新源码、普通wheel、迁移编译包及实际安装i08均独立验收，实装测试实例已卸载清理。
 

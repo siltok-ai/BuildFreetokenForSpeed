@@ -2,7 +2,7 @@
 
 唯一选择是 [current-release.json](../integration/speed/current-release.json)：它绑定版本、profile、有序补丁、材料、消费合同与推荐preset。Speed的 `silitok_speed/runtimes/freetoken/release.json` 固定实际 wheel SHA 与供应提交。
 
-配套源码开发入口为 `feat/flash-next`（`abc03e11`），原20笔提交保留在 `integrate/flash-next-dev-20261018`（`02074c99`）。两者 Git tree 完全相同，继续使用同一 FT9 wheel、外部 kernel-cache 和 preset；已验收安装包、合同及报告仍绑定 `02074c99`。分支核对和 `--speed-root` 使用边界见 [源码分支与验收身份](speed-source-history.md)。旧 perf8 等历史安装证据保留各自范围。
+配套源码开发入口为 `feat/flash-next`（`a3e8b635`，dev之上1笔），原20笔提交保留在 `integrate/flash-next-dev-20261018`（`02074c99`）。新分支已精简文档、研究记录和属性规则，产品代码与资源保持不变，继续使用同一FT9 wheel、外部kernel-cache和preset；已验收安装包、合同及报告仍绑定 `02074c99`。分支核对和 `--speed-root` 使用边界见 [源码分支与验收身份](speed-source-history.md)。Speed的统一使用说明位于 `doc/speed/models/freetoken.md`。
 
 本轮 [外部材料边界修复与实际安装验收](flash-next-external-final-20261019.txt) 删除Speed旧qwen36包及全部AOT DLL；新源码、普通wheel、迁移保护载荷和实际i08安装均独立验收，测试安装已卸载并完成15项清理。既有MTP下降/长输出问题保留，非干净OS或异机验证。
 
