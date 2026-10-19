@@ -1,0 +1,26 @@
+........................................................................ [ 25%]
+..........................................s............................. [ 50%]
+....................................ss.................................. [ 75%]
+........................................ssssssssss.....................  [100%]
+============================== warnings summary ===============================
+..\..\..\envs\siltok-speed\flash-perf9\Lib\site-packages\_pytest\config\__init__.py:1345
+  C:\workspace\envs\siltok-speed\flash-perf9\Lib\site-packages\_pytest\config\__init__.py:1345: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; anyio
+    self._mark_plugins_for_rewrite(hook, disable_autoload)
+
+..\..\..\envs\siltok-speed\flash-perf9\Lib\site-packages\fastapi\testclient.py:1
+  C:\workspace\envs\siltok-speed\flash-perf9\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+..\..\..\envs\siltok-speed\flash-perf9\Lib\site-packages\starlette\testclient.py:53
+  C:\workspace\envs\siltok-speed\flash-perf9\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+SKIPPED [1] tests\unit\test_minimax_h3_dit.py:1036: requires the on-disk fl2va/ref2va int8_convrot artifacts
+SKIPPED [1] tests\unit\test_sensenova_u1_5.py:738: SenseNova U1.5 weights not present
+SKIPPED [1] tests\unit\test_sensenova_u1_5.py:771: SenseNova U1.5 weights not present
+SKIPPED [1] tests\contract\test_bonnet_http_integration.py:23: set BONNET_WORKTREE to run cross-repository HTTP integration
+SKIPPED [1] tests\contract\test_bonnet_http_integration.py:173: Speed recovery subprocess entry
+SKIPPED [8] tests\contract\test_bonnet_http_integration.py:228: set BONNET_WORKTREE for cross-process recovery integration
+274 passed, 13 skipped, 3 warnings in 17.74s

@@ -1,0 +1,22 @@
+{
+  "format": 1,
+  "observed_utc": "2026-10-19T03:18:49.1646554Z",
+  "phase": "installed",
+  "install_path": "C:\\workspace\\build\\siltok-speed\\i08",
+  "data_path": "C:\\ProgramData\\Siltok\\Speed",
+  "service": {
+    "path": "\"C:\\workspace\\build\\siltok-speed\\i08\\SiltokSpeed.exe\"",
+    "pid": 12572,
+    "state": "Running"
+  },
+  "install_present": true,
+  "data_present": true,
+  "event_source_present": true,
+  "uninstall_keys": [
+    "HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{A3F1C2E4-7B6D-4E9A-8C12-9D4E5F6A7B80}}_is1"
+  ],
+  "data_creation_utc": "2026-10-19T03:17:14.2576564Z",
+  "bundle_cache_hash": "dcbd7c546c7dba03d94f29908eb825f96d7f4d510670838b435be4234e07f774",
+  "bundle_sha256": "379356120e4ef05b8b8a450cea5f6a5735be7c2c2a853bbea285d3255739f9c7",
+  "install_log_sha256": "c8258e2884b6b1285067b18e4294812a4ea4f14f8987790bd4305dec1a5a8370"
+}

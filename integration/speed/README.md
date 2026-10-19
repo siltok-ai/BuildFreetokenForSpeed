@@ -2,6 +2,7 @@
 
 [current-release.json](current-release.json) 是唯一选择入口，字段绑定profile、materials、consumer_contract、preset和输入SHA。`consumer-contract.json` 是历史win1合同，文件名顺序不表示当前版本。
 
+- external：沿用FT9原材料，Speed移除qwen36包/源码AOT DLL并消费明确外部cache；源码/普通wheel/保护包/实际i08安装分别封存，实际卸载及15项清理通过，见[本轮交付](../../docs/flash-next-external-final-20261019.txt)。此前perf9、runtime2及整体diff review合同保留各自范围。
 - review2b：晚间8项边界/生命周期修复，55组补丁；源码、普通wheel与隔离保护载荷分别验收，未实装，见[记录](../../docs/flash-next-review2-20261017.txt)。
 - review1：perf8后追加正确性与维护性修订，范围见 [本轮review](../../docs/flash-next-review-20261017.txt)。
 - perf8：普通wheel、Speed源码、保护载荷及真实安装分别封存；旧安装资格不会自动转移到review1。

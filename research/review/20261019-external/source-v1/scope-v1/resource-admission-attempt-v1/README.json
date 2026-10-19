@@ -1,0 +1,26 @@
+{
+  "reason": "Warmup rejected before model load: 540672 bytes below unchanged 15.25 GiB admission threshold.",
+  "retry": "User authorized clearing background GPU users; WidgetBoard and Radeon control panel stopped. Same model, workload, resource estimate and safety margins.",
+  "files": [
+    {
+      "name": "source-http-on-performance-v2.json",
+      "sha256": "02bf15d27959004ae5c5bed4cc62cb2b06c81b9c5f2ec64e1810cfc1e41d3e55"
+    },
+    {
+      "name": "source-http-on-performance-v2.resource.json",
+      "sha256": "fd4419d1c1afeb04d739b4d74d05b1a9207db734bf2f488fa071f049be9b03de"
+    },
+    {
+      "name": "source-http-on-performance-v2.samples.jsonl",
+      "sha256": "3f95541fb89d588ea1ebfb08e878780c6191ba6543b73f909acfd3c3a69bb93f"
+    },
+    {
+      "name": "source-http-on-performance-v2.stderr.log",
+      "sha256": "14dc571167768e52999326bb76669f624614de328c392e821314cf3620320a51"
+    },
+    {
+      "name": "source-http-on-performance-v2.stdout.log",
+      "sha256": "cd7fbd36665361f368def13d2ee42355286c21a4c9e842ed5612888c826e7df3"
+    }
+  ]
+}

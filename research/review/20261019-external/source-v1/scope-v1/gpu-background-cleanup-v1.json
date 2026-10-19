@@ -1,0 +1,21 @@
+{
+  "time": "2026-10-19T10:41:21.4442425+08:00",
+  "authorization": "User explicitly authorized clearing other VRAM consumers",
+  "before": "15616 MiB, 380 MiB",
+  "actions": [
+    {
+      "pid": 10436,
+      "name": "WidgetBoard",
+      "path": "C:\\Program Files\\WindowsApps\\MicrosoftWindows.Client.WebExperience_526.21100.40.0_x64__cw5n1h2txyewy\\WidgetBoard.exe",
+      "action": "stopped_background_process"
+    },
+    {
+      "pid": 17052,
+      "name": "RadeonSoftware",
+      "path": "C:\\Program Files\\AMD\\CNext\\CNext\\RadeonSoftware.exe",
+      "action": "stopped_background_process"
+    }
+  ],
+  "after": "15676 MiB, 320 MiB",
+  "preserved": "Windows desktop, current development session, browser, Settings and AMD recording extension"
+}

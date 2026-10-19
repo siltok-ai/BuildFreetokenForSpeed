@@ -21,7 +21,7 @@ def main():
     args = parser.parse_args()
     os.environ["FREETOKEN_KERNEL_CACHE_DIR"] = args.kernel_cache
     os.environ["FREETOKEN_DISABLE_JIT"] = "1"
-    from silitok_speed.qwen36.freetoken_kernel_cache import activate_runtime
+    from silitok_speed.runtimes.freetoken.runtime import activate_runtime
     activate_runtime()
     backend = importlib.import_module("freetoken.kernel.backend")
     backend.is_flashinfer_installed = lambda: False

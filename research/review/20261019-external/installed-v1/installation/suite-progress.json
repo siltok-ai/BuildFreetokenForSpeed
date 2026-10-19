@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "scope": "actual_installed_payload_not_clean_os",
+  "completed": [
+    "runtime-identity-v1",
+    "http-off-functional-v1",
+    "http-off-performance-v1",
+    "http-on-functional-v1",
+    "http-on-performance-v1"
+  ],
+  "commit": "02074c99d8c4b922cb063cdb4bb84dfef8172ae6",
+  "app": "C:\\workspace\\build\\siltok-speed\\i08"
+}

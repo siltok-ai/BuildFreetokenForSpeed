@@ -1,0 +1,33 @@
+"""Compare fixed-workload observations without claiming a controlled ABBA result."""
+from pathlib import Path
+import hashlib
+import json
+import statistics
+
+R=Path(__file__).parent
+before=R.with_name('blast-final-20261018')
+observations={}
+for mode in ('off','on'):
+    reports={label:root/f'source-http-{mode}-performance-v2.json'
+             for label,root in (('before',before),('after',R))}
+    data={label:json.loads(path.read_text()) for label,path in reports.items()}
+    assert data['before']['prompts_sha256']==data['after']['prompts_sha256']
+    assert all(len(d['runs'])==6 and all(row['output_tokens']==512 for row in d['runs']) for d in data.values())
+    groups={}
+    for prefix in ('70-0','diverse-4096-0'):
+        samples={label:[row['decode_tps'] for row in d['runs'] if row['label'].startswith(prefix)]
+                 for label,d in data.items()}
+        assert all(len(values)==3 for values in samples.values())
+        medians={label:statistics.median(values) for label,values in samples.items()}
+        groups[prefix]=dict(samples=samples,median_tps=medians,
+            change_percent=100*(medians['after']/medians['before']-1))
+    observations[mode]=dict(reports={label:dict(path=str(path),sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+        for label,path in reports.items()},groups=groups)
+output=dict(scope='descriptive_cross_cohort_not_controlled_abba',
+    before_commit='4de927269439c59640578efcd46a10c001b65f72',
+    after_commit='02074c99d8c4b922cb063cdb4bb84dfef8172ae6',
+    note='Identical prompts and six actual 512-token outputs per mode. Separate overnight cohorts; background GPU processes cleared before final ON retry. Same FT9/native/AOT/engine algorithms. This is a sanity comparison, not a causal performance guarantee.',
+    observations=observations)
+(R/'scope-v1/performance-observation-v1.json').write_text(json.dumps(output,indent=2)+'\n')
+print(json.dumps({mode:{prefix:d['change_percent'] for prefix,d in record['groups'].items()}
+    for mode,record in observations.items()}))

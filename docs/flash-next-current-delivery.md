@@ -1,8 +1,10 @@
 # 当前 Flash Next 全 GGUF / MTP 交付
 
-唯一选择是 [current-release.json](../integration/speed/current-release.json)：它绑定版本、profile、有序补丁、材料、消费合同与推荐preset。配套 Speed 分支是 `integrate/flash-next-dev-20261018`，Speed的 `silitok_speed/qwen36/release.json` 固定实际 wheel SHA 与供应提交。旧 perf8 的真实安装证据保留，新review修订的范围由自己的合同声明，不能继承旧包的安装资格。
+唯一选择是 [current-release.json](../integration/speed/current-release.json)：它绑定版本、profile、有序补丁、材料、消费合同与推荐preset。配套 Speed 分支是 `integrate/flash-next-dev-20261018`，Speed的 `silitok_speed/runtimes/freetoken/release.json` 固定实际 wheel SHA 与供应提交。旧 perf8 的真实安装证据保留，新review修订的范围由自己的合同声明，不能继承旧包的安装资格。
 
-当前Speed输入边界与整体diff审查见 [本轮review](flash-next-blast-review-20261018.txt)；性能改动、相同材料及此前迁移打包验证见 [perf9说明](flash-next-perf9-20261018.txt)；此前包装层和MTP别名兼容记录见 [runtime2说明](flash-next-runtime2-20261018.txt)。公共`models[].id`和旧`Qwen36Backend`继续有效，`FreeTokenBackend`是等价新入口。
+本轮 [外部材料边界修复与实际安装验收](flash-next-external-final-20261019.txt) 删除Speed旧qwen36包及全部AOT DLL；新源码、普通wheel、迁移保护载荷和实际i08安装均独立验收，测试安装已卸载并完成15项清理。既有MTP下降/长输出问题保留，非干净OS或异机验证。
+
+此前Speed输入边界与整体diff审查见 [本轮review](flash-next-blast-review-20261018.txt)；性能改动、相同材料及此前迁移打包验证见 [perf9说明](flash-next-perf9-20261018.txt)；此前包装层和MTP别名兼容记录见 [runtime2说明](flash-next-runtime2-20261018.txt)。公共`models[].id`和旧`Qwen36Backend`继续有效，`FreeTokenBackend`是等价新入口。
 
 ## 环境与匹配材料
 
@@ -67,7 +69,7 @@ $env:SILITOK_FREETOKEN_KERNEL_CACHE_DIR = Join-Path $materials 'kernel-cache'
 
 ## 安装包与验证
 
-普通Speed wheel只携带当前缓存；历史缓存继续留在源码仓库。保护编译包不内封这些DLL，Windows安装器将明确的输入复制为 `app/runtime/kernel-cache`，WinSW和launch.cmd选择该目录。安装版的资源覆盖项合并到 `C:\ProgramData\Siltok\Speed\config\operator.override.yaml`，保留用户其他设置，模型目录使用 `/MODELSDIR`。缓存路径使用ASCII；TVM-FFI在中文路径加载AOT受限。
+Speed源码仓库和普通wheel不携带FreeToken AOT DLL；当前及历史二进制材料由BuildFreetokenForSpeed维护。源码和普通wheel显式配置外部缓存，Windows安装器将打包者提供的输入复制为 `app/runtime/kernel-cache`，WinSW和launch.cmd选择该目录。安装版的资源覆盖项合并到 `C:\ProgramData\Siltok\Speed\config\operator.override.yaml`，保留用户其他设置，模型目录使用 `/MODELSDIR`。缓存路径使用ASCII；TVM-FFI在中文路径加载AOT受限。
 
 ```powershell
 python -B tools/validate_repository.py

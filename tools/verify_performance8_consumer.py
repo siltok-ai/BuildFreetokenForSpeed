@@ -138,7 +138,8 @@ def verify(contract_path=DEFAULT,speed_root=None):
     gain={key:measured['on'][key]/measured['off'][key]-1 for key in measured['off']}
     if speed_root is not None:
         speed_root=speed_root.resolve(strict=True)
-        release=read(contained(speed_root,'silitok_speed/qwen36/release.json'))
+        release=read(contained(speed_root,contract.get(
+            'speed_release_path','silitok_speed/qwen36/release.json')))
         require(release['version']==contract['version'] and release['wheel']==contract['speed_release_wheel']
                 and release['producer_commit']==contract['materials_commit'],'Speed material binding changed')
         for name,digest in contract['speed_source_files'].items():

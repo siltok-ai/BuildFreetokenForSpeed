@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "commit": "02074c99d8c4b922cb063cdb4bb84dfef8172ae6",
+  "source": "C:\\workspace\\wt\\siltok-speed\\rebase-dev-20261018",
+  "build_checkout": "C:\\workspace\\wt\\siltok-speed\\external final",
+  "python_and_product_bytes_equal": true,
+  "eol_only_files_aligned_to_tested_source": []
+}
