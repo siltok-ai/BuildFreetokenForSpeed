@@ -1,5 +1,7 @@
 # Speed源码分支与验收身份
 
+本文记录2026-10-19压缩历史时的固定身份。后续 `feat/flash-next` 已推进，当前 GGUF 资源包及消费资格见 [当前交付](flash-next-gguf-bundle.md) 和 [current-release.json](../integration/speed/current-release.json)。下文的材料、SHA要求与验收范围仅适用于当时版本。
+
 2026-10-19，Speed整合分支压为dev之上的1笔提交，并将相关使用说明收敛到 `doc/speed/models/freetoken.md`。根 `docs/`、research阶段记录及旧MTP2专用核验脚本移出当前源码树，`.gitattributes`恢复dev策略。原20笔分支保持不变。
 
 | 用途 | 分支 | 固定提交 |
@@ -12,7 +14,7 @@
 
 ## 材料与验收范围
 
-[当前选择](../integration/speed/current-release.json)保持 `0.1.3+speed.strataq2perf9`，57组补丁、wheel内3个native模块及配套27项AOT不变。Speed的generic release仍锁定原供应提交和实际wheel SHA；打包者继续提供本仓库的匹配wheel和外部kernel-cache。新源码分支不包含旧 `silitok_speed/qwen36` 目录或AOT DLL，历史公开模型ID及manifest backend别名仍兼容。
+当时选择 `0.1.3+speed.strataq2perf9`，57组补丁、wheel内3个native模块及配套27项AOT不变。该历史版本的Speed generic release锁定原供应提交和实际wheel SHA；打包者提供匹配wheel和外部kernel-cache。该源码分支不包含旧 `silitok_speed/qwen36` 目录或AOT DLL，历史公开模型ID及manifest backend别名仍兼容。
 
 现有 [实际安装合同](../integration/speed/consumer-contract-strataq2perf9-external-installed.json)、其源码/编译合同和 [实装报告](flash-next-external-final-20261019.txt)仍记录 `02074c99`。本次通过mdBook、文档manifest注册、打包资源收集和真实外部材料自检，并另在全LF源码副本上复核；没有重跑整模型或安装测试，也没有改写旧安装包的构建SHA。已记录的MTP观测下降及长输出问题继续保留。
 

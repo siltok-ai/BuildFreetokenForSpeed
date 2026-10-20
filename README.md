@@ -6,7 +6,9 @@
 
 Speed 当前开发入口为 `feat/flash-next`，原20笔历史保留在 `integrate/flash-next-dev-20261018`。当前资源包从两片GGUF生成全部主模型配套信息，官方MTP预置在同一包中；历史安装身份仍按原合同保存。
 
-本轮 [外部材料边界修复与实装验收](docs/flash-next-external-final-20261019.txt) 删除 Speed 的旧 qwen36 包与全部324个AOT DLL，保留公开模型ID及manifest backend别名。材料统一由本仓库提供；新普通wheel不带DLL，Windows安装器使用明确外部输入。新源码、普通wheel、迁移编译包及实际安装i08均独立验收，实装测试实例已卸载清理。
+本轮 [GGUF独立资源包](docs/flash-next-gguf-bundle.md) 从单一GGUF来源导出主模型配套信息，预置官方MTP，支持相对路径搬迁。源码、普通wheel和保护载荷OFF/ON已在删除历史RadixArk后实机验证，当前合同分别记录各层资格。
+
+此前 [外部材料边界修复与实装验收](docs/flash-next-external-final-20261019.txt) 删除 Speed 的旧 qwen36 包与全部324个AOT DLL，保留公开模型ID及manifest backend别名。材料统一由本仓库提供；新普通wheel不带DLL，Windows安装器使用明确外部输入。新源码、普通wheel、迁移编译包及实际安装i08均独立验收，实装测试实例已卸载清理。
 
 此前 [整体diff review](docs/flash-next-blast-review-20261018.txt) 分开审查重构与功能变更，修复SDK/backend数值边界并移除过时测试耦合；沿用相同FT9材料，新Speed源码/普通wheel/迁移保护包独立验收。
 

@@ -1,0 +1,147 @@
+{
+  "format": 1,
+  "scope": "GGUF-only main metadata; official compact MTP pre-included; process-scoped test grants",
+  "hardware": "RTX5070 Ti 16GiB; Windows x64; existing OS",
+  "reports": {
+    "package": "package-proof.json",
+    "performance": "performance-comparison.json",
+    "source-off": "source-v1-off.json",
+    "source-on": "source-v1-on.json",
+    "ordinary-off": "ordinary-v2-off.json",
+    "ordinary-on": "ordinary-v2-on.json",
+    "control-off": "control-ft9-v1-off.json",
+    "control-on": "control-ft9-v1-on.json",
+    "protected-off": "protected-v2-off.json",
+    "protected-on": "protected-v2-on.json"
+  },
+  "files": {
+    "package-proof.json": {
+      "bytes": 5592,
+      "sha256": "8258c116a0bbf35b5e0c4d89f38e7360f3f28c225988ddf4f55f8aa96a289830"
+    },
+    "performance-comparison.json": {
+      "bytes": 2190,
+      "sha256": "d27420c247620588c79fd82f6853c93afbe99311a1e9d64c6ad8d7ba0cc07d8e"
+    },
+    "source-v1-off.json": {
+      "bytes": 5359,
+      "sha256": "ec50e76d5cb1632ca2a79a5ddec8d6ec7bb2d11d22955470842565948acebada"
+    },
+    "source-v1-on.json": {
+      "bytes": 5326,
+      "sha256": "96ecd2efe7c0800147ab7cad82c9b371b1df7334d209112cea49678da2069148"
+    },
+    "ordinary-v2-off.json": {
+      "bytes": 116472,
+      "sha256": "201206ab7d06e98ace7f9a8cc017e2ccb69a2d5a0e8d98eacc4896cf296d56d2"
+    },
+    "ordinary-v2-on.json": {
+      "bytes": 116878,
+      "sha256": "928b18068418f1b340172f14dad3d2708ee73bc42c0eda7bb65ccfd79b10ab66"
+    },
+    "control-ft9-v1-off.json": {
+      "bytes": 116570,
+      "sha256": "a3f2ef6b348ce64a17c54e30150f757bd05cf797f0ce6e45b7e36d71977f5cef"
+    },
+    "control-ft9-v1-on.json": {
+      "bytes": 116921,
+      "sha256": "12b1067aa4ecb9f64238918ab61cd480fb5528c36356b7ccce2e2030cf3aed26"
+    },
+    "protected-v2-off.json": {
+      "bytes": 5968,
+      "sha256": "d4f2d8eb34e556b622024e0ed3de2c7a887e431a5e7e8d0cc5dd1613d8e19a58"
+    },
+    "protected-v2-on.json": {
+      "bytes": 6374,
+      "sha256": "a73a26c99ba98f38497a6664abd30ea91e9daf3fa53d89ded6fbdd73c036825c"
+    },
+    "source-models-v1.log": {
+      "bytes": 318,
+      "sha256": "d3a252f1717e92e043f430924360f097736d31e7313f4a4abe6b173b7e972f7e"
+    },
+    "ordinary-models-v2.log": {
+      "bytes": 1871,
+      "sha256": "17cf477d0fc3858092ff59531247dadc904875d0fe878203230286d26ef1b55a"
+    },
+    "control-ft9-models-v1.log": {
+      "bytes": 1988,
+      "sha256": "da2282b69dc19002be06b733721087ea79ec21d698d977681bc5a254adcd9e96"
+    },
+    "protected-v2-models.log": {
+      "bytes": 324,
+      "sha256": "c067f3ff216cebed11efdfc4442b8e85fd571004e20f805577169a5238e67c9d"
+    },
+    "protected-build-v2.log": {
+      "bytes": 5330631,
+      "sha256": "59d4b93001ec7ecffd75e604b5934b9d74387b4452deb800062a37e8d7c7c53a"
+    },
+    "freetoken-portable-unit.log": {
+      "bytes": 656,
+      "sha256": "28ceeafc92b70f5de9db32bcb319c9dd9dc840c608837db9fc8cf06ace41eac8"
+    },
+    "runtime-self-check.json": {
+      "bytes": 912,
+      "sha256": "2f674c276259e0f9baea0b494f57f8f2f44caa43a3f3db79ad24e96e52d555c2"
+    },
+    "full-env-self-check.json": {
+      "bytes": 929,
+      "sha256": "34e0ba61a7532135013fab6b469cb5dea330b4571799ea73b1bf979cf60347bb"
+    },
+    "speed-regression-v2.log": {
+      "bytes": 1757,
+      "sha256": "96511205b50634c8eeac4e8b8c036963c9356d8b931258c87f1913b4ce1173c1"
+    },
+    "build-unit-v1.log": {
+      "bytes": 13314,
+      "sha256": "a2a0eeecd58018f0afeef004199d1815d5dfd44efb972377d85d7fc343e32533"
+    },
+    "gguf-unit-v2.log": {
+      "bytes": 543,
+      "sha256": "ff34f2a080ad70e59b3cbb6dc5d1fb1688e3b6100a216aaf702013ee23c7876a"
+    },
+    "portable-materials-validation-v1.log": {
+      "bytes": 390,
+      "sha256": "14aee0de6dae1679eb05bce88c80bcde6895eed38213fd5d080fffcb43147020"
+    },
+    "package-relocated-preflight-v2.json": {
+      "bytes": 410,
+      "sha256": "cc022e066e1716411aa6bda4577023e258fd0d843ef838935f70e742475ec4df"
+    },
+    "radix-cleanup-before.json": {
+      "bytes": 1036,
+      "sha256": "4a31f832d27ac275abd9fafe4e8d0e10557c2fa47a3746b854100e5f1df4bfe0"
+    },
+    "protected-v2-environment.json": {
+      "bytes": 917,
+      "sha256": "a052db92321158425a031d40176e5334b7e28af6b1e6c265241d49b8fe2c65bb"
+    },
+    "http-portable-probe.py": {
+      "bytes": 9719,
+      "sha256": "7b706c63e2defa8fb5ed198e06147410bb3a751150895927d5afe36f5c13d102"
+    },
+    "run-resource-payload.py": {
+      "bytes": 2722,
+      "sha256": "e5b14a6636ce252ff413b81fd381b8222835e4303a70686facffc542218cf9b2"
+    },
+    "build-portable-v2.ps1": {
+      "bytes": 1718,
+      "sha256": "bf08aeea3d379e906d6cde00cefdc21dc734257c6c9a403367b903b22eecfe1f"
+    },
+    "prepare-performance-control.py": {
+      "bytes": 1758,
+      "sha256": "117e1371aa1f4f6924d749604408a10dbaf2828ea9c719359314beb73a2dff3e"
+    },
+    "performance-control-inputs.json": {
+      "bytes": 245,
+      "sha256": "cf15fd900174f4bd08000807f9c0d54e0fd7c9a92b94d69984da1879aa1a2e17"
+    },
+    "performance-inspection.log": {
+      "bytes": 3311,
+      "sha256": "596e7c6a04546aee1faa6a8dfebae3a6c50546934db1fe0b87edcd4c39891c21"
+    }
+  },
+  "earlier_attempts": "Original failures remain in the run directory: missing grants in unrelated contract tests; preflight float32 top_p mismatch fixed; ordinary v1 harness BatchEncoding serialization fixed; protected build v1 missing existing TSS submodule fixed; protected model v1 counted a baseline conhost as a worker, fixed in v2. These attempts are not passing evidence.",
+  "known_issues": [
+    "intermittent-long-output-token0: unresolved"
+  ]
+}

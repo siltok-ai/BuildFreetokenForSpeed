@@ -62,3 +62,20 @@ $inputs = 'D:\flash-next-inputs'
 Speed 检查配套版本、依赖、ABI、文件布局及几何，不要求固定 SHA 或制包机时间回执。本仓库保留既有构建来源和材料校验。离线验证执行 `python -B tools/validate_repository.py` 与 `python -B -m unittest discover -s tests -v`，不代替本轮真实 GPU 验证。
 
 GGUF 内嵌模板与旧 HF 模板不同，需要单独验证。删除历史 RadixArk 后的离线搬迁、OFF/ON、中文/SSE/thinking、worker 退出、普通 wheel/保护包消费，以及实际安装、设备许可证、异机测试分别记账，不能继承历史资格。既有间歇长输出问题仍保留。
+
+## 2026-10-20 本机结果
+
+Speed `79c39410`、供应提交 `313e2ab5`，FreeToken `0.1.3+speed.strataq2portable1`，RTX5070 Ti 16GiB。先删除历史 Flash Next RadixArk 配套文件和旧派生 checkpoint，再把资源包移至带空格的新路径、改变 GGUF 文件时间，启用离线模式和空 Hugging Face 缓存。Speed 源码、普通 wheel、embedded Python 保护载荷均通过 OFF/ON 的真实 TCP 同步、中文 SSE、thinking、MTP 所有权和模型进程退出检查。
+
+组件17项及9个子项、Speed相关236项、Build52项通过；3native/27AOT与FT9相同，58组补丁和462个Python文件重放匹配。完整材料及消费记录由当前合同离线复核。首轮保护测试把主进程自带的 conhost 算成模型 worker，修正外置驱动后重测通过；原失败记录保留。此检查点已构建安装器，实际安装和接收者整体验收另行记录。
+
+性能对照双方使用相同 GGUF 元数据、prompt IDs、每模式专家/KV预算、MTP策略和实际512输出token，英文/中文各3次。旧FT9使用其必要的来源包装配置；新版本直接消费资源包。
+
+| 模式/负载 | FT9中位数 tok/s | portable1中位数 tok/s |
+| --- | ---: | ---: |
+| OFF 英文 | 93.88 | 98.60 |
+| OFF 中文 | 99.08 | 99.10 |
+| ON 英文 | 104.00 | 104.12 |
+| ON 中文 | 105.30 | 104.91 |
+
+本轮未测到 decode 衰退；OFF英文旧组有一次慢值，不能把中位数差异解释为优化收益。主权重和计算内核未改，但GGUF内嵌模板与旧RadixArk模板有差异，上表不验证两种模板的完整质量等价，也不代表5090或长期稳定性验收。全部模型测试使用进程范围测试授权，未验证真实设备许可证。

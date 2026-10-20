@@ -1,21 +1,19 @@
 {
   "format": 1,
-  "profile": "build/profiles/strataq2perf9.json",
-  "materials": "artifacts/strataq2perf9-cp312-cu130-sm120",
-  "consumer_contract": "integration/speed/consumer-contract-strataq2perf9-external-installed.json",
-  "weight_source_lock": "model-weights/qwen3.8-flash-next-strata-q2/source-lock.json",
-  "mtp_manifest": "model-weights/qwen3.8-flash-next-strata-q2/mtp-runtime.json",
+  "profile": "build/profiles/strataq2portable1.json",
+  "materials": "artifacts/strataq2portable1-cp312-cu130-sm120",
+  "consumer_contract": "integration/speed/consumer-contract-strataq2portable1.json",
+  "weight_source_lock": "model-weights/qwen3.8-flash-next-gguf-q2/source-lock.json",
+  "mtp_manifest": "model-weights/qwen3.8-flash-next-gguf-q2/mtp-runtime.json",
   "input_sha256": {
-    "build/profiles/strataq2perf9.json": "3a089467f4fb1e452ee195baf30adace71e380d95072c29fbcb228e603cb2fef",
-    "model-weights/qwen3.8-flash-next-strata-q2/source-lock.json": "a9c445bbeb1103938656137ce94dd31a69d3b835bfd4bf555e1e6c0a56d5ab49",
-    "model-weights/qwen3.8-flash-next-strata-q2/mtp-runtime.json": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
-    "integration/speed/presets/flash-next-sm120-16g-perf9.json": "491ad553af8e5e986af30ab0985c8ecefce13c11e96e9447e21ac3de24f5e36d",
-    "integration/speed/consumer-contract-strataq2perf9-external-compiled.json": "496b572373677b38945b42d9257fab1ca04e3fa88b15024c7f774c06907f94db",
-    "integration/speed/consumer-contract-strataq2perf9-external.json": "843afd5ba9d776c4fac57204f739377549f5fbca927798fcc6bd2973850a0f08",
-    "integration/speed/consumer-contract-strataq2perf9-external-installed.json": "3133fcd7c75af5d23404f4cd0ff3db802797a865711c11ae23b888044d8caece"
+    "build/profiles/strataq2portable1.json": "8451645845e771bc33ce1d658fe815d69febee8f8c58bd704feb402b2ae79bcb",
+    "model-weights/qwen3.8-flash-next-gguf-q2/source-lock.json": "0081fa2c0290559c7e8b5d218b2eb0834424b483f16f55031b623e236a20dff5",
+    "model-weights/qwen3.8-flash-next-gguf-q2/mtp-runtime.json": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
+    "integration/speed/presets/flash-next-sm120-16g-portable1.json": "7624f1b374add15258bcc3f1179409b0e1e1e275efa5c43264f4770a1cb5f2a8",
+    "integration/speed/consumer-contract-strataq2portable1.json": "0c2cf7db499e0e48d71bd3a00cfea259866c8288236344499344f0918f291b91"
   },
-  "version": "0.1.3+speed.strataq2perf9",
+  "version": "0.1.3+speed.strataq2portable1",
   "mtp_default_enabled": false,
-  "scope": "Speed 02074c99 removes qwen36 package and all source-tree FreeToken AOT DLLs; public model IDs/backend aliases preserved. FT9 exact materials unchanged. Source, zero-DLL ordinary wheel, relocated protected payload, actual i08 installation HTTP OFF/ON, normal unlicensed service and owned uninstall/15-point cleanup accepted. Existing OS; prior MTP loss and long-output issue retained.",
-  "speed_preset": "integration/speed/presets/flash-next-sm120-16g-perf9.json"
+  "speed_preset": "integration/speed/presets/flash-next-sm120-16g-portable1.json",
+  "scope": "GGUF-only main model metadata and portable relative paths; official compact MTP in one resource package. Source/ordinary/protected staged OFF+ON accepted under scoped test grants; installer built, not yet installed. Same native/AOT; no measured decode regression in controlled English/Chinese 512-token comparison. Existing OS only; no real device licence qualification; previous long-output issue retained."
 }

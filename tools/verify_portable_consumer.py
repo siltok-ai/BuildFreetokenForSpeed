@@ -1,15 +1,21 @@
 """复核 GGUF 独立资源包的冻结消费证据，不把离线检查算作新的实机运行。"""
 from pathlib import Path
+import argparse
 import json
+import subprocess
 
 from prepare_source import ROOT, load_profile
 from validate_python_revision import validate
 from verify_performance8_consumer import frozen_index
 
 
-def verify(contract_path):
+def verify(contract_path, speed_root=None):
     """分别核对材料复用、各消费层 OFF/ON、删除与搬迁记录、以及性能对照范围。"""
     contract = json.loads(Path(contract_path).read_text(encoding='utf-8'))
+    if speed_root is not None:
+        commit = subprocess.check_output(['git','-C',str(speed_root),'rev-parse','HEAD'],text=True).strip()
+        if commit != contract['speed_commit']:
+            raise ValueError('Speed checkpoint commit changed')
     if (contract['kind'] != 'flash_next_portable_resource_consumer'
             or contract['license_mode'] != 'test_stub'
             or contract['device_license_validated'] is not False
@@ -54,3 +60,17 @@ def verify(contract_path):
         metadata_source='embedded_gguf', runtime_stages=stages,
         actual_install_validated=contract['actual_install_validated'],
         device_license_validated=False, clean_os_validated=False)
+
+
+def main():
+    """兼容 Speed 的消费检查入口，实际复核合同后才返回成功。"""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--contract',type=Path,
+        default=ROOT/'integration/speed/consumer-contract-strataq2portable1.json')
+    parser.add_argument('--speed-root',type=Path)
+    args = parser.parse_args()
+    print(json.dumps(verify(args.contract,args.speed_root)))
+
+
+if __name__ == '__main__':
+    main()

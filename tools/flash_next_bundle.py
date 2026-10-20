@@ -6,10 +6,12 @@ import shutil
 
 from flash_next_gguf import read_metadata, model_config, export_metadata
 from flash_next_weights import ROOT, read, write, layout, verify_file
+from current_release import load_current
 
-SOURCE_LOCK = ROOT/'model-weights/qwen3.8-flash-next-gguf-q2/source-lock.json'
-PROFILE = ROOT/'build/profiles/strataq2portable1.json'
-PRESET = ROOT/'integration/speed/presets/flash-next-sm120-16g-portable1.json'
+CURRENT = load_current()
+SOURCE_LOCK = ROOT/CURRENT['weight_source_lock']
+PROFILE = ROOT/CURRENT['profile']
+PRESET = ROOT/CURRENT['speed_preset']
 
 
 def shard_rows(lock):
@@ -81,8 +83,8 @@ def prepare_bundle(output, gguf_directory, mtp_directory, lock=None):
     write(output/'sources.json', dict(format=1, freetoken_version=read(PROFILE)['custom_version'],
         gguf=lock['gguf'], metadata='Derived from the GGUF vocabulary, merges, template and architecture metadata',
         mtp=lock['mtp'], preset=preset['name'], runtime_requires_source_repositories=False))
-    shutil.copytree(ROOT/'model-weights/qwen3.8-flash-next-gguf-q2/licenses', output/'licenses')
-    shutil.copy2(ROOT/'model-weights/qwen3.8-flash-next-gguf-q2/README.txt', output/'README.txt')
+    shutil.copytree(SOURCE_LOCK.parent/'licenses', output/'licenses')
+    shutil.copy2(SOURCE_LOCK.parent/'README.txt', output/'README.txt')
     return dict(status='prepared', package=str(output), model_ids=[m['id'] for m in models],
         required_freetoken_version=read(PROFILE)['custom_version'])
 
