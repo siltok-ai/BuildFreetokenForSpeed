@@ -1,16 +1,31 @@
-# 本地差异的入口
+# FreeToken 定制补丁
 
-机器按 [series.json](series.json) 的顺序应用补丁；人按 [改动说明](../docs/changes.md) 理解每组的理由。编号 FTWIN / FTEXP / FTPKG 是后续重放、退休和追踪的稳定标识。
+当前有序目录由 [current-release.json](../integration/speed/current-release.json) 指向的 profile 选择，即 [strataq2portable1-series.json](strataq2portable1-series.json)。它包含 58 个补丁；构建按 JSON 顺序应用，不能按文件名排序，也不能只应用最后一个补丁。
 
-| 顺序 | 稳定编号 | 差异 |
-| --- | --- | --- |
-| 1 | FTWIN-001 | [Windows 运行与 SSD IO](series/0001-windows-runtime.patch) |
-| 2 | FTWIN-002 | [MSVC / CUDA 构建](series/0002-windows-build.patch) |
-| 3 | FTEXP-001 | [INVALID 专家复用实验](series/0003-invalid-expert-experiment.patch) |
-| 4 | FTPKG-001 | [定制 wheel 版本](series/0004-speed-wheel-version.patch) |
+## 当前功能
 
-这四组按文件边界从此前实际构建使用的 [完整补丁](legacy/windows-source.patch) 拆分，29 个修改文件没有重叠。仓库验证器实际应用两种表示，并比较所有文件，保证结果完全相同。
+| 补丁范围 | 作用 |
+| --- | --- |
+| 1–6 | Windows runtime、原生/AOT 构建、Q2 专家执行及包版本 |
+| 7–13 | 完整两片 GGUF 加载、主干/PLE、批量算术、原生解码及专家驻留 |
+| 14–20 | MTP 草稿、前缀状态、事务所有权、greedy 调度与取消 |
+| 21–48 | Q2 预填充、紧凑状态、专家缓存、主机存储及解码执行 |
+| 49–57 | stop/采样/输出预算边界，以及主存加载和 Windows Q2 等待策略 |
+| 58 | checkpoint 相对 GGUF 路径与可搬迁加载 |
 
-`legacy/` 是历史溯源证据，新构建使用 `series.json`。后续上游升级的补丁自然可能不同于 win1 历史补丁：应为新版本建立自己的 series / profile / 验证规则，保留 win1，而不是改写历史等价断言或旧 SHA。
+每项的 `title`、`files` 和 patch 正文给出具体改动。补丁文件名保留原标识，部分名称沿用开发阶段命名。当前功能由完整序列叠加形成。
 
-仅删除实验补丁不能直接称为当前 win1 等价版本。正式无实验代码版本应采用新版本号、重建 wheel 与 cache，再执行旧模型回归。
+## 重放和修改
+
+```powershell
+python -B tools/prepare_source.py --output D:\builds\ft-source
+```
+
+在输出目录的 `build-source` 中开发，不直接修改 `upstream/FreeToken`。需要提交引擎改动时：
+
+1. 以当前重放结果为基线生成新增补丁，保留既有补丁内容与顺序。
+2. 新建有序 catalog、profile 和 FreeToken 修订版本，列明改变的文件。
+3. 根据是否改变原生/AOT 输入选择重新封装或完整构建。
+4. 完成工具检查及受影响的 GPU/Speed 验证，再更新当前指针。
+
+[维护规则](../docs/maintenance.md) 说明输入、版本和检查要求。[构建入口](../build/README.md) 负责实际生成 wheel/AOT。`strataq2perf9-series.json` 仅用于当前二进制复用基线重放。

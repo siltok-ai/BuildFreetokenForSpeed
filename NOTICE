@@ -5,21 +5,20 @@ https://github.com/FlashML-org/FreeToken at commit
 078132480ea4a0424f677a27eb22085624d331e6, licensed under Apache-2.0.
 The upstream LICENSE and contributor documents are retained in upstream/FreeToken.
 
-Local modifications are distributed separately in patches/series and are
-identified in patches/series.json and docs/changes.md. The customized wheel
-0.1.3+speed.win1 is a Speed build, not an official FreeToken distribution.
+Local modifications are distributed separately in patches/series. The ordered
+catalog is selected by integration/speed/current-release.json and its profile.
+Customized FreeToken wheels are Speed builds, not official FreeToken releases.
 Repository-owned tooling and patches are provided under the root Apache-2.0
-LICENSE. Model weights are not included. Third-party runtime dependencies
-must be obtained and distributed under their own licenses.
+LICENSE. Model weights are not included. Third-party dependencies and model
+weights must be obtained and distributed under their respective licenses.
 
-The strataq2dev4 research patch also includes adapted CUDA components from
-https://github.com/Niko1221/Strata at commit
-6674a0065fb96bacde33e3eb10f91a1df86f95f2, and its pinned ggml-derived code at
-3cf03257f219afbe7334045ff7c6a06ac68c627d. These components retain their MIT
-licenses and attribution; the repository's Apache-2.0 license does not replace
-them. The replayed FreeToken source contains LICENSE-strata.txt,
-LICENSE-ggml.txt and per-file provenance in
-python/freetoken/kernel/csrc/third_party/strata_mmvq/UPSTREAM.json.
-The corresponding wheel includes those license files. This integrates native
-kernels into FreeToken and does not distribute or replace it with the Strata
-inference engine. Model weights are not included.
+The native GGUF patches and MTP preparation tools include adapted components
+from https://github.com/Niko1221/Strata at commit
+6674a0065fb96bacde33e3eb10f91a1df86f95f2, including its pinned ggml-derived code
+at 3cf03257f219afbe7334045ff7c6a06ac68c627d. These retain their MIT licenses and
+attribution; this repository's Apache-2.0 license does not replace them.
+The replayed FreeToken source and wheels include LICENSE-strata.txt,
+LICENSE-ggml.txt and native component provenance. MTP reference source and
+its LICENSE are retained in tools/mtp/references.
+This integrates components into FreeToken and does not distribute the Strata
+inference engine. Model resource license texts are in model-weights.

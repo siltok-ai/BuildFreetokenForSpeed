@@ -1,9 +1,0 @@
-{
-  "status": "passed",
-  "source": "C:\\workspace\\wt\\siltok-speed\\rebase-dev-20261018",
-  "checkout": "C:\\workspace\\wt\\siltok-speed\\perf9 relocated",
-  "speed_commit": "84538603ab71fde4d0921310f725a9d511270891",
-  "all_tracked_python_equal": true,
-  "canonical_lf_shim": true,
-  "git_clean": true
-}

@@ -1,9 +1,0 @@
-{
-  "status": "passed",
-  "source": "C:\\workspace\\wt\\siltok-speed\\rebase-dev-20261018",
-  "checkout": "C:\\workspace\\wt\\siltok-speed\\blast final",
-  "speed_commit": "4de927269439c59640578efcd46a10c001b65f72",
-  "all_tracked_python_equal": true,
-  "all_product_files_equal": true,
-  "git_clean": true
-}

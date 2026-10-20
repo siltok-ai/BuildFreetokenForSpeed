@@ -1,4 +1,4 @@
-"""当前 Speed 材料入口：显式切换版本，保留历史 profile 和制品。"""
+"""当前 Speed 材料、构建配置和模型来源的统一入口。"""
 import json
 from pathlib import Path
 import hashlib

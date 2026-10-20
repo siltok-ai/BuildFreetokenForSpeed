@@ -2,7 +2,7 @@
   "format": 1,
   "profile": "build/profiles/strataq2portable1.json",
   "materials": "artifacts/strataq2portable1-cp312-cu130-sm120",
-  "consumer_contract": "integration/speed/consumer-contract-strataq2portable1-receiver.json",
+  "consumer_contract": "integration/speed/consumer-contract-strataq2portable1.json",
   "weight_source_lock": "model-weights/qwen3.8-flash-next-gguf-q2/source-lock.json",
   "mtp_manifest": "model-weights/qwen3.8-flash-next-gguf-q2/mtp-runtime.json",
   "input_sha256": {
@@ -10,11 +10,10 @@
     "model-weights/qwen3.8-flash-next-gguf-q2/source-lock.json": "0081fa2c0290559c7e8b5d218b2eb0834424b483f16f55031b623e236a20dff5",
     "model-weights/qwen3.8-flash-next-gguf-q2/mtp-runtime.json": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
     "integration/speed/presets/flash-next-sm120-16g-portable1.json": "7624f1b374add15258bcc3f1179409b0e1e1e275efa5c43264f4770a1cb5f2a8",
-    "integration/speed/consumer-contract-strataq2portable1.json": "0c2cf7db499e0e48d71bd3a00cfea259866c8288236344499344f0918f291b91",
-    "integration/speed/consumer-contract-strataq2portable1-receiver.json": "9d1f401e631f8562e72208134b6ee240f487991b19b35a4d780737256ba4fe77"
+    "integration/speed/consumer-contract-strataq2portable1.json": "40c3f57c8e9d166ee94e9859c0250f382c0f881485969a805c34b83d169e717c"
   },
   "version": "0.1.3+speed.strataq2portable1",
   "mtp_default_enabled": false,
   "speed_preset": "integration/speed/presets/flash-next-sm120-16g-portable1.json",
-  "scope": "GGUF-only main model metadata and portable relative paths; official compact MTP in one resource package. Source/ordinary/protected staged OFF+ON accepted under scoped test grants; installer built, not yet installed. Same native/AOT; no measured decode regression in controlled English/Chinese 512-token comparison. Existing OS only; no real device licence qualification; previous long-output issue retained. Post-publication standalone receiver simulation, documented release configuration, same-service three OFF/ON rounds, quality and restart accepted. UAC cancelled before installation; actual-install qualification remains false."
+  "scope": "Windows x64 CPython 3.12 SM120 FreeToken materials; complete Q2 GGUF main model with embedded metadata and optional preconverted official Qwen MTP in one portable resource package."
 }

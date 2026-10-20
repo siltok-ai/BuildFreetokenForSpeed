@@ -1,2 +1,0 @@
-{"custom_version": "0.1.3+speed.strataq2review2a", "aot_count": 27, "wheel_sha256": "5c419a20399df60cbbc0d391cb08ca3405c92e690565b1848c1ae871a94594cd", "status": "derived_requires_runtime_validation", "verified": true}
-{"verified": true, "scope": "offline_source_and_binary_identity_only", "version": "0.1.3+speed.strataq2review2a", "patches": 53, "python_files": 462, "aot_count": 27}

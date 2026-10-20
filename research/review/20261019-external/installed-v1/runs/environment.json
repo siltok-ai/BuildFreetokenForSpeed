@@ -1,8 +1,0 @@
-{
-  "PATH": "C:\\workspace\\build\\siltok-speed\\i08\\python\\Scripts;C:\\Windows\\System32;C:\\Windows;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\Program Files\\NVIDIA Corporation\\NVSMI",
-  "TEMP": "C:\\workspace\\runs\\siltok-speed\\external-final-20261019\\install-i08\\tmp",
-  "SILITOK_CONFIG": "C:\\workspace\\runs\\siltok-speed\\external-final-20261019\\install-i08\\config",
-  "FREETOKEN_KERNEL_CACHE_DIR": "C:\\workspace\\build\\siltok-speed\\i08\\runtime\\kernel-cache",
-  "TRITON_CACHE_DIR": "C:\\workspace\\cache\\triton\\installed-i08\\warmup",
-  "TORCH_EXTENSIONS_DIR": "C:\\workspace\\cache\\ext\\installed-i08"
-}

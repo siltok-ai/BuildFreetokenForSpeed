@@ -1,4 +1,4 @@
-"""实际重放源码和封装新 wheel，验证二进制复用的边界及 RECORD 完整性。"""
+"""Rebuild the current wheel and exercise native reuse boundaries with real files."""
 import base64
 import csv
 import hashlib
@@ -11,162 +11,74 @@ import unittest
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / 'build'))
-from derive_python_materials import derive, validate_python_only_changes, validate_gguf_rebuild_changes
-from prepare_source import prepare
+sys.path.insert(0, str(ROOT/'build'))
+from derive_python_materials import derive, validate_python_only_changes
 
 
 class PythonMaterials(unittest.TestCase):
-    def test_perf3_reuses_all_native_inputs_and_includes_compact_kernels(self):
-        """实际重放31补丁、生成新wheel，核对新模块/RECORD及全部原生复用边界。"""
-        with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / 'derived'
-            base_root = ROOT / 'artifacts/strataq2perf2-cp312-cu130-sm120'
-            derive(ROOT / 'build/profiles/strataq2perf3.json', ROOT / 'build/profiles/strataq2perf2.json',
-                   base_root, output)
-            record = json.loads((output / 'build-record.json').read_text())
-            base = json.loads((base_root / 'build-record.json').read_text())
+    def test_current_wheel_replays_and_repackages_without_changing_native_bytes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary)/'derived'
+            derive(ROOT/'build/profiles/strataq2portable1.json',
+                   ROOT/'build/profiles/strataq2perf9.json',
+                   ROOT/'artifacts/strataq2perf9-cp312-cu130-sm120', output)
+            record = json.loads((output/'build-record.json').read_text(encoding='utf-8'))
+            base = json.loads((ROOT/'artifacts/strataq2perf9-cp312-cu130-sm120/build-record.json')
+                              .read_text(encoding='utf-8'))
             self.assertEqual(record['status'], 'derived_requires_runtime_validation')
             self.assertNotIn('validation_summary', record)
             self.assertEqual({n:r for n,r in record['artifacts'].items() if n.endswith('.dll')},
                              {n:r for n,r in base['artifacts'].items() if n.endswith('.dll')})
             with zipfile.ZipFile(output/'wheels'/record['wheel_filename']) as wheel:
-                for name in ('freetoken/kernel/triton/gguf_gdn_compact.py','freetoken/moe/q2_adaptive.py'):
-                    self.assertEqual(wheel.read(name),
-                                     (output/'candidate-source/build-source/python'/name).read_bytes())
-                listed = {r[0] for r in csv.reader(io.StringIO(wheel.read(
-                    'freetoken-0.1.3+speed.strataq2perf3.dist-info/RECORD').decode()))}
-                self.assertEqual(listed,set(wheel.namelist()))
-            before, _ = prepare(ROOT/'build/profiles/strataq2perf2.json',Path(directory)/'base')
-            after = output/'candidate-source/build-source'
-            changed = validate_python_only_changes(before,after)
-            self.assertEqual(sorted(changed),record['binary_reuse']['changed_source_files'])
-            altered = after/'python/freetoken/kernel/csrc/jit/gguf_mmvq.cuh'
-            altered.write_bytes(altered.read_bytes()+b'\n// forbidden native change\n')
-            with self.assertRaisesRegex(ValueError,'binary reuse forbidden'):
-                validate_python_only_changes(before,after)
-
-    def test_selective_gguf_rebuild_rejects_shared_native_or_unrelated_spec_changes(self):
-        """重放真实候选；禁止把其他CUDA、AOT规格或构建行为混入26项复用边界。"""
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            before, _ = prepare(ROOT / 'build/profiles/strataq2perf1.json', root / 'base')
-            after, _ = prepare(ROOT / 'build/profiles/strataq2perf2.json', root / 'candidate')
-            validate_gguf_rebuild_changes(before, after)
-            with self.assertRaisesRegex(ValueError, 'binary reuse forbidden'):
-                validate_python_only_changes(before, after)
-            for name, suffix, error in [
-                ('python/freetoken/kernel/csrc/include/freetoken/utils.cuh', b'\n// changed shared header\n', 'source boundary'),
-                ('python/freetoken/kernel/aot.py', b'\n# unrelated spec edit\n', 'unrelated AOT'),
-                ('tools/build_windows_kernel_cache.py', b'\n# unrelated build edit\n', 'builder change'),
-            ]:
-                with self.subTest(name=name):
-                    path = after / name
-                    original = path.read_bytes()
-                    path.write_bytes(original + suffix)
-                    with self.assertRaisesRegex(ValueError, error):
-                        validate_gguf_rebuild_changes(before, after)
-                    path.write_bytes(original)
-
-    def test_r3_rebuild_retains_already_fixed_builder_and_rejects_shared_source_edits(self):
-        """使用真实r2/r3候选，保留既有构建器字节并守住其他26项AOT边界。"""
-        with tempfile.TemporaryDirectory() as directory:
-            root=Path(directory)
-            before,_=prepare(ROOT/'build/profiles/strataq2perf6.json',root/'base')
-            after,_=prepare(ROOT/'build/profiles/strataq2perf7.json',root/'candidate')
-            validate_gguf_rebuild_changes(before,after,'freetoken__gguf_mmvq_r2','freetoken__gguf_mmvq_r3')
-            path=after/'python/freetoken/kernel/csrc/include/freetoken/utils.cuh'
-            path.write_bytes(path.read_bytes()+b'\n// unrelated shared native change\n')
-            with self.assertRaisesRegex(ValueError,'source boundary'):
-                validate_gguf_rebuild_changes(before,after,'freetoken__gguf_mmvq_r2','freetoken__gguf_mmvq_r3')
-
-    def test_review_revision_reuses_native_bytes_without_inheriting_acceptance(self):
-        with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / 'derived'
-            derive(ROOT / 'build/profiles/q2opt2.json', ROOT / 'build/profiles/q2opt1.json',
-                   ROOT / 'artifacts/q2opt1-cp312-cu130-sm120', output)
-            record = json.loads((output / 'build-record.json').read_text(encoding='utf-8'))
-            self.assertNotIn('validation_summary', record)
-            self.assertEqual(record['status'], 'derived_requires_runtime_validation')
-            base = json.loads((ROOT / 'artifacts/q2opt1-cp312-cu130-sm120/build-record.json').read_text(encoding='utf-8'))
-            self.assertEqual(record['binary_reuse']['native_sha256'], base['binary_reuse']['native_sha256'])
-            self.assertEqual({key: value for key, value in record['artifacts'].items() if key.endswith('.dll')},
-                             {key: value for key, value in base['artifacts'].items() if key.endswith('.dll')})
+                dist = 'freetoken-'+record['custom_version']+'.dist-info'
+                rows = list(csv.reader(io.StringIO(wheel.read(dist+'/RECORD').decode())))
+                self.assertEqual({r[0] for r in rows}, set(wheel.namelist()))
+                for name, encoded, size in rows:
+                    if name.endswith('/RECORD'):
+                        continue
+                    data = wheel.read(name)
+                    digest = base64.urlsafe_b64encode(hashlib.sha256(data).digest()).rstrip(b'=').decode()
+                    self.assertEqual(encoded, 'sha256='+digest)
+                    self.assertEqual(int(size), len(data))
+                    if name.startswith('freetoken/') and name.endswith('.py'):
+                        self.assertEqual(data, (output/'candidate-source/build-source/python'/name).read_bytes())
+                asset = 'freetoken/moe/configs/q2_residency/strata_flash_next.json'
+                self.assertEqual(len(json.loads(wheel.read(asset))['ranked']), 48*512)
+                self.assertEqual({name:hashlib.sha256(wheel.read(name)).hexdigest()
+                                  for name in record['native_modules']},
+                                 record['binary_reuse']['native_sha256'])
+            changed = validate_python_only_changes(output/'base-source/build-source',
+                                                    output/'candidate-source/build-source')
+            self.assertEqual(sorted(changed), record['binary_reuse']['changed_source_files'])
 
     def test_native_input_changes_are_rejected(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            before, after = root / 'before', root / 'after'
-            for tree in (before, after):
-                file = tree / 'python/freetoken/kernel/csrc/example.cpp'
-                file.parent.mkdir(parents=True)
-                file.write_bytes(b'original native source\n')
-            (after / 'python/freetoken/kernel/csrc/example.cpp').write_bytes(b'changed native source\n')
+        with tempfile.TemporaryDirectory() as temporary:
+            before, after = Path(temporary)/'before', Path(temporary)/'after'
+            for tree, text in ((before, 'original'), (after, 'changed')):
+                path = tree/'python/freetoken/kernel/csrc/example.cpp'
+                path.parent.mkdir(parents=True)
+                path.write_text(text)
             with self.assertRaisesRegex(ValueError, 'binary reuse forbidden'):
                 validate_python_only_changes(before, after)
 
-    def test_protected_revision_includes_ranking_and_preserves_native_identity(self):
-        """实际封装新 JSON 资源并核对 RECORD，防止可导入却缺少专家排名。"""
-        with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / 'derived'
-            derive(ROOT / 'build/profiles/strataq2dev6.json', ROOT / 'build/profiles/strataq2dev4.json',
-                   ROOT / 'artifacts/strataq2dev4-cp312-cu130-sm120', output)
-            record = json.loads((output / 'build-record.json').read_text(encoding='utf-8'))
-            with zipfile.ZipFile(output / 'wheels' / record['wheel_filename']) as wheel:
-                asset = 'freetoken/moe/configs/q2_residency/strata_flash_next.json'
-                data = wheel.read(asset)
-                self.assertEqual(data, (output / 'candidate-source/build-source/python' / asset).read_bytes())
-                profile = json.loads(data)
-                self.assertEqual(len({tuple(p) for p in profile['ranked']}), 48 * 512)
-                dist = f"freetoken-{record['custom_version']}.dist-info"
-                rows = {r[0]: r for r in csv.reader(io.StringIO(wheel.read(dist + '/RECORD').decode()))}
-                digest = base64.urlsafe_b64encode(hashlib.sha256(data).digest()).rstrip(b'=').decode()
-                self.assertEqual(rows[asset][1:], ['sha256=' + digest, str(len(data))])
-                self.assertEqual({name: hashlib.sha256(wheel.read(name)).hexdigest() for name in record['native_modules']},
-                                 record['binary_reuse']['native_sha256'])
-            self.assertEqual(record['status'], 'derived_requires_runtime_validation')
-
     def test_unlisted_package_data_cannot_bypass_native_reuse_guard(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            before, after = root / 'before', root / 'after'
+        with tempfile.TemporaryDirectory() as temporary:
+            before, after = Path(temporary)/'before', Path(temporary)/'after'
             before.mkdir()
-            asset = after / 'python/freetoken/moe/configs/unknown.json'
+            asset = after/'python/freetoken/moe/configs/unknown.json'
             asset.parent.mkdir(parents=True)
             asset.write_text('{}')
             with self.assertRaisesRegex(ValueError, 'binary reuse forbidden'):
                 validate_python_only_changes(before, after)
 
     def test_existing_artifacts_are_preserved(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            marker = root / 'accepted-wheel.whl'
-            marker.write_bytes(b'accepted bytes')
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            marker = root/'accepted-wheel.whl'
+            marker.write_bytes(b'accepted')
             with self.assertRaises(FileExistsError):
                 derive(None, None, None, root)
-            self.assertEqual(marker.read_bytes(), b'accepted bytes')
-
-    def test_real_profile_replays_and_repackages_without_changing_native_bytes(self):
-        with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / 'derived'
-            derive(ROOT / 'build/profiles/q2opt1.json', ROOT / 'build/profiles/q2exp1.json',
-                   ROOT / 'artifacts/q2exp1-cp312-cu130-sm120', output)
-            record = json.loads((output / 'build-record.json').read_text(encoding='utf-8'))
-            with zipfile.ZipFile(output / 'wheels' / record['wheel_filename']) as archive:
-                dist = f"freetoken-{record['custom_version']}.dist-info"
-                rows = list(csv.reader(io.StringIO(archive.read(dist + '/RECORD').decode())))
-                self.assertEqual({r[0] for r in rows}, set(archive.namelist()))
-                for name, encoded, size in rows:
-                    if name.endswith('/RECORD'):
-                        continue
-                    data = archive.read(name)
-                    digest = base64.urlsafe_b64encode(hashlib.sha256(data).digest()).rstrip(b'=').decode()
-                    self.assertEqual(encoded, 'sha256=' + digest)
-                    self.assertEqual(int(size), len(data))
-                    if name.startswith('freetoken/') and name.endswith('.py'):
-                        self.assertEqual(data, (output / 'candidate-source/build-source/python' / name).read_bytes())
-                native = {name: hashlib.sha256(archive.read(name)).hexdigest() for name in record['native_modules']}
-                self.assertEqual(native, record['binary_reuse']['native_sha256'])
+            self.assertEqual(marker.read_bytes(), b'accepted')
 
 
 if __name__ == '__main__':

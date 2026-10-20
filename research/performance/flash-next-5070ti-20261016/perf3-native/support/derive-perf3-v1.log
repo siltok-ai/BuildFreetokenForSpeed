@@ -1,3 +1,0 @@
-{"custom_version": "0.1.3+speed.strataq2perf2", "aot_count": 27, "wheel_sha256": "9c6ca866b7752f42cf01c7a1e83608ad7ee7437f4d1ac36bbc64fca5e134e330", "status": "partially_rebuilt_requires_runtime_validation", "verified": true}
-{"custom_version": "0.1.3+speed.strataq2perf3", "aot_count": 27, "wheel_sha256": "2a075cace8849611ea170de9cf110355755b6b54c890c0c4eda34da7b5684afd", "status": "derived_requires_runtime_validation", "verified": true}
-{"wheel": "C:\\workspace\\build\\freetoken-mats\\flash-perf-materials-03\\wheels\\freetoken-0.1.3+speed.strataq2perf3-cp312-cp312-win_amd64.whl", "sha256": "2a075cace8849611ea170de9cf110355755b6b54c890c0c4eda34da7b5684afd", "status": "derived_requires_runtime_validation"}

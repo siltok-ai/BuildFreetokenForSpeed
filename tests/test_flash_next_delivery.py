@@ -40,18 +40,17 @@ def fixture(root):
 
 
 class DeliveryBoundaries(unittest.TestCase):
-    def test_default_points_to_current_speed_and_old_profile_is_explicitly_available(self):
+    def test_default_points_to_current_speed(self):
         from prepare_source import DEFAULT_PROFILE, load_profile
         current = load_current()
         self.assertEqual(DEFAULT_PROFILE, ROOT/current['profile'])
         self.assertEqual(load_profile(DEFAULT_PROFILE)[0]['custom_version'], current['version'])
-        self.assertEqual(load_profile(ROOT/'build/profiles/q2opt2.json')[0]['custom_version'], '0.1.3+speed.q2opt2')
 
     def test_plan_and_config_dry_run_create_nothing(self):
         with tempfile.TemporaryDirectory() as directory:
             target = Path(directory)/'absent'
             for script, arguments in [('flash_next_weights.py', ['plan']),
-                ('flash_next_speed_config.py', ['--dry-run','--preset','sm120-24g-measured'])]:
+                ('flash_next_speed_config.py', ['--dry-run','--preset','sm120-16g-portable1'])]:
                 subprocess.run([sys.executable,'-B',str(ROOT/'tools'/script),*arguments,'--root',str(target)],
                                check=True,capture_output=True)
                 self.assertFalse(target.exists())
@@ -143,60 +142,18 @@ class DeliveryBoundaries(unittest.TestCase):
             self.assertFalse((Path(directory)/'runtime.json').exists())
 
     def test_same_budget_on_off_and_best_off_are_explicit(self):
-        preset=read(ROOT/'integration/speed/presets/flash-next-sm120-24g.json')
+        preset=read(ROOT/'integration/speed/presets/flash-next-sm120-16g-portable1.json')
         on, config=configuration('on',preset)
         off, _=configuration('off-matched',preset)
         best, _=configuration('off',preset)
         a=on['models'][0];b=off['models'][0];c=best['models'][0]
         self.assertEqual(a['engine']['extra']['moe_cache_size'],b['engine']['extra']['moe_cache_size'])
-        self.assertEqual(c['engine']['extra']['moe_cache_size'],11264)
+        self.assertEqual(c['engine']['extra']['moe_cache_size'],7808)
         self.assertIn('mtp',a['artifacts']);self.assertNotIn('mtp',b['artifacts'])
         self.assertEqual(config['resource']['gpu_probe'],'nvml')
         self.assertFalse(b['engine']['extra']['mtp_enabled'])
 
-    def test_16g_cli_selects_fitting_pools_and_preserves_dry_run_roots(self):
-        """真实CLI选择16GiB方案，不能继续误用24GiB预算或创建空模型目录。"""
-        with tempfile.TemporaryDirectory() as directory:
-            root=Path(directory)/'weights'
-            deployment=Path(directory)/'deployment'
-            for preset in ('sm120-16g-measured','sm120-16g-roomy-measured'):
-                results={}
-                for mode in ('off','on','off-matched'):
-                    result=subprocess.run([sys.executable,'-B',str(ROOT/'tools/flash_next_speed_config.py'),
-                        '--root',str(root),'--deployment-root',str(deployment),'--preset',preset,
-                        '--mode',mode,'--dry-run'],check=True,capture_output=True,text=True)
-                    value=json.loads(result.stdout)
-                    model=value['manifest']['models'][0]
-                    extra=model['engine']['extra'];resource=value['config']['resource']
-                    self.assertLess(extra['vram_estimate_bytes']/2**30+resource['vram_safety_gb'],15.2)
-                    self.assertLess(extra['vram_estimate_bytes']/2**30+extra['host_commit_estimate_bytes']/2**30+resource['commit_safety_gb'],54)
-                    self.assertGreaterEqual(extra['vram_estimate_bytes'],extra['moe_cache_size']*1_382_400)
-                    self.assertGreaterEqual(extra['host_commit_estimate_bytes'],(24576-extra['moe_q2_resident_experts'])*1_382_400)
-                    results[mode]=model
-                on=results['on'];off=results['off-matched']
-                self.assertEqual(on['engine']['extra']['moe_cache_size'],off['engine']['extra']['moe_cache_size'])
-                self.assertIn('mtp',on['artifacts']);self.assertNotIn('mtp',off['artifacts'])
-                self.assertFalse(root.exists());self.assertFalse(deployment.exists())
 
-    def test_review2b_cli_rejects_old_material_and_keeps_measured_geometry(self):
-        """新材料通过真实CLI显式选择，旧preset和材料不会被悄悄混用。"""
-        with tempfile.TemporaryDirectory() as directory:
-            root=Path(directory)/'missing-weights'
-            command=[sys.executable,'-B',str(ROOT/'tools/flash_next_speed_config.py'),
-                '--root',str(root),'--preset','sm120-16g-review2b','--dry-run']
-            rejected=subprocess.run(command+['--profile','build/profiles/strataq2review1.json'],
-                                    capture_output=True,text=True)
-            self.assertNotEqual(rejected.returncode,0)
-            old=read(ROOT/'integration/speed/presets/flash-next-sm120-16g-review1.json')
-            for mode in ('off','on','off-matched'):
-                result=subprocess.run(command+['--profile','build/profiles/strataq2review2b.json',
-                    '--mode',mode],check=True,capture_output=True,text=True)
-                value=json.loads(result.stdout)
-                self.assertEqual(value['freetoken_version'],'0.1.3+speed.strataq2review2b')
-                expected,resource=configuration(mode,old)
-                self.assertEqual(value['manifest'],expected)
-                self.assertEqual(value['config'],resource)
-            self.assertFalse(root.exists())
 
     def test_shared_checkpoint_entry_reads_original_bytes_and_refuses_replacement(self):
         """实际目录共享必须读取源文件，并拒绝覆盖已有入口。"""
@@ -212,24 +169,6 @@ class DeliveryBoundaries(unittest.TestCase):
                 link_checkpoints(source,link)
             self.assertEqual((source/'weight.bin').read_bytes(),b'original-weight-bytes')
 
-    def test_perf3_candidate_cli_rejects_wrong_material_and_projects_measured_geometry(self):
-        """候选不能误用默认FT2材料；真实CLI明确传递已测配置且不创建模型目录。"""
-        with tempfile.TemporaryDirectory() as directory:
-            root=Path(directory)/'missing-weights'
-            command=[sys.executable,'-B',str(ROOT/'tools/flash_next_speed_config.py'),
-                '--root',str(root),'--preset','sm120-16g-perf3-candidate','--dry-run']
-            rejected=subprocess.run(command+['--profile','build/profiles/strataq2perf2.json'],capture_output=True,text=True)
-            self.assertNotEqual(rejected.returncode,0)
-            for mode,resident in [('off',5120),('on',4352)]:
-                result=subprocess.run(command+['--profile','build/profiles/strataq2perf3.json','--mode',mode],
-                                      check=True,capture_output=True,text=True)
-                value=json.loads(result.stdout)
-                self.assertEqual(value['freetoken_version'],'0.1.3+speed.strataq2perf3')
-                extra=value['manifest']['models'][0]['engine']['extra']
-                self.assertEqual((extra['moe_q2_resident_experts'],extra['moe_cache_size']),(resident,resident+2048))
-                self.assertEqual((extra['max_prefill_length'],extra['linear_state_cache_slots'],extra['moe_q2_adapt_every']),(1024,1,32))
-                self.assertEqual(extra.get('mtp_compact_state',False),mode=='on')
-            self.assertFalse(root.exists())
 
 
 if __name__=='__main__':

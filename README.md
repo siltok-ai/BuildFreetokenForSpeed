@@ -1,58 +1,41 @@
 # BuildFreetokenForSpeed
 
-为 [Silitok Speed](https://github.com/siltok-ai/siltok-speed) 提供 FreeToken 的冻结补丁、Windows wheel/AOT、权重准备工具与消费证据。官方浏览源码 `upstream/FreeToken/` 保持原貌；应用 backend、worker 与 HTTP 在 Speed 仓库。
+为 [Speed](https://github.com/siltok-ai/siltok-speed) 提供 FreeToken 定制补丁、Windows wheel/AOT 和 Flash Next 模型资源包制作工具。Speed 的服务、授权、HTTP 和安装器逻辑在 Speed 仓库维护。
 
-当前版本由 [current-release.json](integration/speed/current-release.json) 唯一选择，包含 profile、有序补丁、材料目录、preset 与验收合同。不要按文件名排序选择版本，也不要把 `consumer-contract.json` 当作当前合同。Speed 的 `silitok_speed/runtimes/freetoken/release.json` 选择配套版本、缓存和供应提交，不要求固定 wheel SHA。
+当前版本由 [current-release.json](integration/speed/current-release.json) 选择：`0.1.3+speed.strataq2portable1`，Windows x64、CPython 3.12、SM120，Torch 2.11.0+cu130。材料包含一个 wheel（3 个原生模块）和 27 项 AOT DLL。
 
-Speed 当前开发入口为 `feat/flash-next`，原20笔历史保留在 `integrate/flash-next-dev-20261018`。当前资源包从两片GGUF生成全部主模型配套信息，官方MTP预置在同一包中；历史安装身份仍按原合同保存。
-
-本轮 [GGUF独立资源包](docs/flash-next-gguf-bundle.md) 从单一GGUF来源导出主模型配套信息，预置官方MTP，支持相对路径搬迁。源码、普通wheel和保护载荷OFF/ON已在删除历史RadixArk后实机验证，当前合同分别记录各层资格。
-
-此前 [外部材料边界修复与实装验收](docs/flash-next-external-final-20261019.txt) 删除 Speed 的旧 qwen36 包与全部324个AOT DLL，保留公开模型ID及manifest backend别名。材料统一由本仓库提供；新普通wheel不带DLL，Windows安装器使用明确外部输入。新源码、普通wheel、迁移编译包及实际安装i08均独立验收，实装测试实例已卸载清理。
-
-此前 [整体diff review](docs/flash-next-blast-review-20261018.txt) 分开审查重构与功能变更，修复SDK/backend数值边界并移除过时测试耦合；沿用相同FT9材料，新Speed源码/普通wheel/迁移保护包独立验收。
-
-此前 [性能探索与review](docs/flash-next-perf9-20261018.txt) 采用连续Q2主存加载和Windows Q2等待策略优化，使用独立perf9版本、同字节3native/27AOT；源码/普通wheel/迁移保护包重新验证。完整安装器未实装，旧MTP观测下降及长输出问题保留。
-
-此前 [runtime2包装层重构](docs/flash-next-runtime2-20261018.txt) 基于最新dev，保留公共模型ID与旧入口，统一HTTP/direct SDK准入，并修复新backend别名的MTP manifest验收。FT2b材料原字节不变；新源码、普通wheel及迁移目录保护包独立验收，完整安装器已构建，本修订未实装、未验干净OS。MTP的观测性能下降和策略分叉如实保留。
-
-晚间 [探索review](docs/flash-next-review2-20261017.txt) 在下午review1之后继续确认8项请求边界及生命周期问题，生成独立 `0.1.3+speed.strataq2review2b`（55组补丁）。修复Unicode/最早stop、超大top-k、共享输出预算、离线stop文本，以及Speed固定KV预检、ASGI取消清理和幂等流所有权。3个native模块与27个AOT保持原字节。最终普通wheel、Speed源码和隔离embedded保护载荷已独立验收，完整安装器已构建；本修订未实装、未验干净OS。MTP默认关闭，使用配套 `sm120-16g-review2b`。下午[综合review](docs/flash-next-review-20261017.txt)与[历史perf8实装](docs/flash-next-5070ti-perf8.txt)保留各自范围。
-
-| 运行输入 | 合同 |
-| --- | --- |
-| 平台 | Windows x64 / CPython3.12 / SM120；本轮RTX5070 Ti 16GB |
-| 依赖 | Torch2.11.0+cu130 / triton-windows3.6.0.post26 / apache-tvm-ffi0.1.13.post3 |
-| 材料 | wheel内3个native模块 + 配套27项AOT DLL；逐文件SHA不可变 |
-| 主模型 | 固定GSQ-RCO Q2完整两片GGUF；原始Q2专家、分段量化主干、完整主词表 |
-| MTP | 默认关闭；显式 `paired_cjk` 或 `full`，独立31份BF16来源张量 |
-
-## 使用
-
-[当前交付流程](docs/flash-next-gguf-bundle.md) 包含配套wheel、独立资源包制作、接收者使用与5070 Ti配置。
+## 获取与使用
 
 ```powershell
-python -B tools/verify_current_release.py
-python -B tools/prepare_source.py --output D:\builds\freetoken-current
-python -B tools/flash_next_weights.py plan --root D:\models\flash-next
-python -B tools/flash_next_weights.py download --root D:\models\flash-next
-python -B tools/flash_next_weights.py prepare --root D:\models\flash-next
-# 仅MTP开启时需要
-python -B tools/flash_next_mtp.py fetch --root D:\models\flash-next
-python -B tools/flash_next_mtp.py build --root D:\models\flash-next
-python -B tools/flash_next_mtp.py verify --root D:\models\flash-next
+git clone https://github.com/siltok-ai/BuildFreetokenForSpeed.git
+cd BuildFreetokenForSpeed
 ```
 
-配置、tokenizer和模板从GGUF导出；`tools/flash_next_bundle.py` 把GGUF和现成MTP组合为独立资源包，终端用户复制后即可挂载，无需Python整理或refresh。权重大文件不进Git。5070 Ti preset是显式设备档，不改变其他机器的全局安全余量。
+| 需要完成的事情 | 入口 |
+| --- | --- |
+| 给 Speed 开发环境或 Windows 安装包提供 wheel/AOT | [Speed 接入](docs/speed-integration.md) |
+| 制作包含全部 Flash Next 模型资源的可搬迁目录 | [资源包制作与部署](docs/flash-next-gguf-bundle.md) |
+| 从源码构建 wheel 和全部 AOT | [构建说明](build/README.md) |
+| 维护 FreeToken 定制补丁或更新上游 | [补丁说明](patches/README.md)、[维护规则](docs/maintenance.md) |
 
-## 开发验证
+使用前将本仓库所选版本与 Speed 的 `silitok_speed/runtimes/freetoken/release.json` 对齐。当前 `main` 配套 Speed 的 `feat/flash-next`；其他 Speed 版本按其 release 选择对应材料版本。
 
-构建/源码重放和复用边界见 [build/README.md](build/README.md)，升级与回滚见 [维护规则](docs/maintenance.md)。
+Flash Next 优先使用 **siltok31 上已处理好的资源包**：完整复制该机器的 `C:\workspace\flash-next-resources` 目录，配套 Speed 即可使用。不方便获取或希望自行制作时，按 [资源包流程](docs/flash-next-gguf-bundle.md) 从固定来源生成内容相同的包。
+
+主模型及配置、tokenizer、模板来自同一来源的完整两片 Q2 GGUF；官方 Qwen MTP 预先转换并放入同一资源包。接收方无需运行转换工具。
+
+## 仓库检查
+
+工具测试使用 Python 3.12 和 Git，不需要 CUDA 或完整 Speed 环境：
 
 ```powershell
+python -m pip install -r tools/requirements-test.txt
 python -B tools/validate_repository.py
 python -B -m unittest discover -s tests -v
 ```
 
-离线验证检查补丁、SHA、wheel源码、native/AOT来源及冻结证据；不启动GPU，也不代替普通wheel、Speed源码、编译载荷、安装器或干净OS验收。旧质量门槛15/20、thinking3/3，间歇长输出标点/token0问题仍未解决；报告不得把它改写成已修复。
+检查覆盖当前补丁重放、wheel 源码、原生材料和模型准备工具。GPU 推理与安装器验收分别进行，离线检查不授予实机资格。
 
-历史profile、补丁、合同和材料保留，目录索引见 [integration/speed](integration/speed/README.md)。`q2opt2` 是旧HF主干+Q2专家方案，不能与当前全GGUF混用。早期正文存于 [原README](docs/history/readme-before-review-20261017.txt)，许可见 [NOTICE](NOTICE)。
+默认模型预算适用于 RTX 5070 Ti 16GiB，建议主机内存 64GiB。MTP 默认关闭，推测解码使用 `temperature=0`。其他设备需调整预算；已知间歇长输出异常见 [资源包说明](docs/flash-next-gguf-bundle.md)。
+
+官方源码在 `upstream/FreeToken` 保持原样；权重大文件及运行日志放在仓库外。许可及第三方署名见 [NOTICE](NOTICE)。

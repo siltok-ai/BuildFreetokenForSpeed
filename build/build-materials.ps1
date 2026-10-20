@@ -4,6 +4,8 @@ param(
     [Parameter(Mandatory)][string]$CudaHome,
     [Parameter(Mandatory)][string]$OutDir,
     [string]$Profile = '',
+    [string]$VsRoot = '',
+    [string]$ToolsetVersion = '14.44',
     [int]$Jobs = 2,
     [switch]$PreflightOnly
 )
@@ -14,11 +16,13 @@ if (-not $Profile) {
 }
 # 按目标机器探测 VS；不写死本机 workspace、venv 或 CUDA 路径。
 $VsWhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
-$VsRoot = & $VsWhere -latest -products '*' -version '[17.0,18.0)' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath | Select-Object -First 1
+if (-not $VsRoot) {
+    $VsRoot = & $VsWhere -latest -products '*' -version '[17.0,18.0)' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath | Select-Object -First 1
+}
 if (-not $VsRoot) { throw 'VS2022 C++ Build Tools are unavailable' }
 $DevCmd = Join-Path $VsRoot 'Common7\Tools\VsDevCmd.bat'
-$CompilerEnvironment = & $env:ComSpec /d /s /c "call `"$DevCmd`" -arch=x64 -host_arch=x64 >nul && set"
-if ($LASTEXITCODE -ne 0) { throw 'VS2022 environment initialization failed' }
+$CompilerEnvironment = & $env:ComSpec /d /s /c "call `"$DevCmd`" -arch=x64 -host_arch=x64 -vcvars_ver=$ToolsetVersion >nul && set"
+if ($LASTEXITCODE -ne 0) { throw 'Visual Studio environment initialization failed' }
 foreach ($Line in $CompilerEnvironment) {
     if ($Line -match '^([^=]+)=(.*)$') { Set-Item -Path "Env:$($Matches[1])" -Value $Matches[2] }
 }
@@ -30,7 +34,7 @@ $env:PYTHONUTF8 = '1'
 $env:PYTHONIOENCODING = 'utf-8'
 $env:PYTHONDONTWRITEBYTECODE = '1'
 $env:MAX_JOBS = [string]$Jobs
-$env:PATH = (Split-Path -Parent (Get-Command cl.exe).Source) + ';' + (Split-Path -Parent $BuildPython) + ';' + (Join-Path $env:CUDA_HOME 'bin') + ';' + $env:PATH
+$env:PATH = (Split-Path -Parent (Get-Command cl.exe).Source) + ';' + (Split-Path -Parent $BuildPython) + ';' + (Join-Path $env:CUDA_HOME 'bin') + ';' + (Join-Path $env:CUDA_HOME 'bin/x64') + ';' + $env:PATH
 $ProducerArguments = @('--output', $OutDir, '--jobs', [string]$Jobs, '--profile', $Profile)
 if ($PreflightOnly) { $ProducerArguments += '--preflight-only' }
 & $BuildPython -X utf8 -B (Join-Path $PSScriptRoot 'build_materials.py') @ProducerArguments

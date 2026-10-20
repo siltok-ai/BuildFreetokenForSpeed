@@ -1,7 +1,0 @@
-C:\workspace\artifacts\flash-next-q2-optimization-20261010\runtime-candidate\freetoken\engine\engine.py:1191: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
-  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
-[W1010 19:47:16.000000000 socket.cpp:764] [c10d] The client socket has failed to connect to [DESKTOP-6DNHREH]:2333 (system error: 10049 - 在其上下文中，该请求的地址无效。).
-C:\workspace\envs\speed-flash-next-q2\Lib\site-packages\torch\utils\_device.py:116: UserWarning: expandable_segments not supported on this platform (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\c10/cuda/CUDAAllocatorConfig.h:39.)
-  return func(*args, **kwargs)
-Loading weights:   0%|          | 0/14 [00:00<?, ?it/s]Loading weights:   7%|▋         | 1/14 [00:00<00:05,  2.32it/s]Loading weights:  14%|█▍        | 2/14 [00:00<00:04,  2.64it/s]Loading weights:  21%|██▏       | 3/14 [00:06<00:32,  3.00s/it]Loading weights:  29%|██▊       | 4/14 [00:10<00:33,  3.34s/it]Loading weights: 100%|██████████| 14/14 [00:10<00:00,  1.30it/s]
-Preparing for capturing CUDA graphs...:   0%|          | 0/1 [00:00<?, ?batch/s]Capturing graphs: bs = 1   | avail_mem = 10.24 GiB:   0%|          | 0/1 [00:00<?, ?batch/s]Capturing graphs: bs = 1   | avail_mem = 10.24 GiB: 100%|██████████| 1/1 [00:00<00:00,  1.10batch/s]Capturing graphs: bs = 1   | avail_mem = 10.24 GiB: 100%|██████████| 1/1 [00:00<00:00,  1.10batch/s]

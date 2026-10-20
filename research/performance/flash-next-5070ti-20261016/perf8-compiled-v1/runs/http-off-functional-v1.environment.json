@@ -1,6 +1,0 @@
-{
-  "PATH": "C:\\workspace\\build\\siltok-speed\\p04\\app\\python\\Scripts;C:\\Windows\\System32;C:\\Windows;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\Program Files\\NVIDIA Corporation\\NVSMI",
-  "FREETOKEN_KERNEL_CACHE_DIR": "C:\\workspace\\build\\siltok-speed\\p04\\app\\runtime\\kernel-cache",
-  "FREETOKEN_DISABLE_JIT": "1",
-  "TRITON_CACHE_DIR": "C:\\workspace\\cache\\triton\\staged-p04-off-v2"
-}

@@ -1,9 +1,0 @@
-{
-  "seconds": 31.196562800032552,
-  "cpu_seconds": 218.046875,
-  "threads": 8,
-  "kmp_blocktime_ms": 200,
-  "omp_wait_policy": null,
-  "host_bytes": 26011238400,
-  "gpu_bank_bytes": 10793779200
-}

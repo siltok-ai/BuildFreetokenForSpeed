@@ -1,9 +1,0 @@
-{
-  "seconds": 31.787559600023087,
-  "cpu_seconds": 222.90625,
-  "variant": "bulk",
-  "prototype_source": "C:\\workspace\\build\\freetoken-mats\\perf9-20261018-prototype\\build-source\\python\\freetoken\\layers\\quantization\\moe\\q2_0.py",
-  "prototype_sha256": "4efe66875036e2f1c846eb974194dc13ef1c645ddf84509fc2311612fdf69980",
-  "host_bytes": 26011238400,
-  "gpu_bank_bytes": 10793779200
-}

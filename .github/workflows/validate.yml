@@ -1,4 +1,4 @@
-name: Frozen source and materials
+name: Current source and materials
 on:
   push:
   pull_request:
@@ -17,7 +17,9 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
-      - name: Validate snapshot, patches, wheel source and DLL checksums
+      - name: Install tool test dependencies
+        run: python -m pip install -r tools/requirements-test.txt
+      - name: Validate current source and materials
         run: python -B tools/validate_repository.py
-      - name: Test preparation failure boundaries
+      - name: Test build and model preparation tools
         run: python -B -m unittest discover -s tests -v

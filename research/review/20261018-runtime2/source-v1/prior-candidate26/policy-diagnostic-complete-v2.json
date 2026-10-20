@@ -1,8 +1,0 @@
-{
-  "status": "measured",
-  "scope": "pure parent/worker roots; post-request policy diagnostics only",
-  "reports": {
-    "before": "policy-diagnostic-before-v2.json",
-    "after": "policy-diagnostic-after-v2.json"
-  }
-}

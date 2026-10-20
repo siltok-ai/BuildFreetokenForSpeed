@@ -419,8 +419,8 @@ def main():
     """显式指定新旧 profile、基础制品和新输出目录，以保证可重放。"""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--profile', type=Path, required=True)
-    parser.add_argument('--base-profile', type=Path, default=ROOT / 'build/profiles/q2exp1.json')
-    parser.add_argument('--base-materials', type=Path, default=ROOT / 'artifacts/q2exp1-cp312-cu130-sm120')
+    parser.add_argument('--base-profile', type=Path, required=True)
+    parser.add_argument('--base-materials', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--rebuild-gguf', action='store_true', help='rebuild isolated GGUF r2 AOT; reject other native changes')
     parser.add_argument('--rebuild-row-store', action='store_true', help='actually rebuild only the row-store CPU extension')

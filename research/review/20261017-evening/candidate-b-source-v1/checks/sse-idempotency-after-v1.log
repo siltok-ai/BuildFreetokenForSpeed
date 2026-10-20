@@ -1,9 +1,0 @@
-{"source": "C:\\workspace\\wt\\siltok-speed\\flash-perf\\silitok_speed\\__init__.py", "python": "C:\\workspace\\envs\\siltok-speed\\flash-review2b\\Scripts\\python.exe", "process_only_license_fixture": true}
-.......................................................                  [100%]
-============================== warnings summary ===============================
-..\..\..\envs\siltok-speed\flash-review2b\Lib\site-packages\_pytest\config\__init__.py:1345
-  C:\workspace\envs\siltok-speed\flash-review2b\Lib\site-packages\_pytest\config\__init__.py:1345: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; anyio
-    self._mark_plugins_for_rewrite(hook, disable_autoload)
-
--- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-55 passed, 1 warning in 9.16s

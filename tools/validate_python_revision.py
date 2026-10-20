@@ -1,4 +1,4 @@
-"""离线重放性能修订，核对 wheel 源码、原生复用和配套库存，不冒充 GPU 验收。"""
+"""离线重放所选源码，核对 wheel、原生复用和配套库存。"""
 import argparse
 import hashlib
 import json
@@ -21,12 +21,15 @@ def validate(profile_path, materials, base_profile_path=None):
             raise ValueError(f"patch file catalog differs from actual diff: {patch['path']}")
     materials = Path(materials).resolve(strict=True)
     record = json.loads((materials / 'build-record.json').read_text(encoding='utf-8'))
+    reuse = record.get('binary_reuse')
+    if base_profile_path is not None and reuse is None:
+        raise ValueError('A base profile applies only to derived materials')
     for key in ('source_commit', 'custom_version', 'wheel_filename', 'torch', 'cuda', 'sm', 'input_sha256'):
         if record[key] != profile[key]:
             raise ValueError(f'Python revision differs from frozen profile: {key}')
     subprocess.run([sys.executable, '-B', str(ROOT / 'tools/verify_materials.py'), str(materials)], check=True)
     wheel = materials / 'wheels' / profile['wheel_filename']
-    with tempfile.TemporaryDirectory(prefix='q2opt-source-replay-') as directory:
+    with tempfile.TemporaryDirectory(prefix='freetoken-source-replay-') as directory:
         source, _ = prepare(profile_path, Path(directory) / 'source')
         if base_profile_path is not None:
             # 新复用修订直接证明相邻来源差异，无需为每个版本复制一套验证器。
@@ -42,11 +45,16 @@ def validate(profile_path, materials, base_profile_path=None):
             actual = {name: archive.read(name) for name in archive.namelist()
                       if name.startswith('freetoken/') and name.endswith('.py')}
             if expected != actual:
-                raise ValueError('optimized wheel Python source differs from frozen patch replay')
+                raise ValueError('wheel Python source differs from frozen patch replay')
             native = {name: hashlib.sha256(archive.read(name)).hexdigest() for name in record['native_modules']}
-            if native != record['binary_reuse']['native_sha256']:
-                raise ValueError('optimized wheel native reuse identity mismatch')
-    base_name = record['binary_reuse']['base_materials']
+            if reuse is not None and native != reuse['native_sha256']:
+                raise ValueError('wheel native reuse identity mismatch')
+    if reuse is None:
+        print(json.dumps({'verified': True, 'scope': 'offline_source_and_materials',
+                          'version': profile['custom_version'], 'patches': len(series['patches']),
+                          'python_files': len(expected), 'aot_count': record['aot_count']}))
+        return
+    base_name = reuse['base_materials']
     if Path(base_name).name != base_name:
         raise ValueError('base materials must name a repository artifact directory')
     base_record = ROOT / 'artifacts' / base_name / 'build-record.json'
@@ -63,16 +71,6 @@ def validate(profile_path, materials, base_profile_path=None):
     for name, entry in record['artifacts'].items():
         if name.endswith('.dll') and entry != baseline['artifacts'][name]:
             raise ValueError(f'AOT binary differs from accepted base: {name}')
-    if record['status'] == 'validated_speed_source_q2_performance_revision':
-        evidence = materials / 'validation/performance-20261010'
-        index = json.loads((evidence / 'evidence.json').read_text(encoding='utf-8'))
-        for name, frozen in index['files'].items():
-            path = (evidence / name).resolve()
-            if not path.is_relative_to(evidence.resolve()) or path.stat().st_size != frozen['bytes'] or sha256(path) != frozen['sha256']:
-                raise ValueError(f'performance evidence identity mismatch: {name}')
-        summary = json.loads((evidence / 'validation-summary.json').read_text(encoding='utf-8'))
-        if summary['wheel_sha256'] != record['wheel_sha256'] or summary['version'] != profile['custom_version']:
-            raise ValueError('performance evidence is bound to a different wheel')
     print(json.dumps({'verified': True, 'scope': 'offline_source_and_binary_identity_only',
                       'version': profile['custom_version'], 'patches': len(series['patches']),
                       'python_files': len(expected), 'aot_count': record['aot_count']}))
@@ -81,8 +79,10 @@ def validate(profile_path, materials, base_profile_path=None):
 def main():
     """允许对仓库材料或独立输出做同样的冻结身份验证。"""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--profile', type=Path, default=ROOT / 'build/profiles/q2opt1.json')
-    parser.add_argument('--materials', type=Path, default=ROOT / 'artifacts/q2opt1-cp312-cu130-sm120')
+    from current_release import load_current
+    current = load_current()
+    parser.add_argument('--profile', type=Path, default=ROOT / current['profile'])
+    parser.add_argument('--materials', type=Path, default=ROOT / current['materials'])
     parser.add_argument('--base-profile', type=Path,
                         help='Recompute the Python-only source delta against this frozen base')
     args = parser.parse_args()

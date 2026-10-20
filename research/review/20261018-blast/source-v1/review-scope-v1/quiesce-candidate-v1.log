@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "C:\workspace\runs\siltok-speed\blast-review-20261018\quiesce-candidate-v1.py", line 14, in <module>
-    process,=matches
-    ^^^^^^^^
-ValueError: too many values to unpack (expected 1)

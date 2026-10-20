@@ -1,4 +1,0 @@
-{
-  "status": "failed",
-  "error": "由于以下错误，无法运行此命令: An error occurred trying to start process 'C:\\Program Files\\PowerShell\\7\\pwsh.exe' with working directory 'C:\\workspace'. 操作已被用户取消。"
-}

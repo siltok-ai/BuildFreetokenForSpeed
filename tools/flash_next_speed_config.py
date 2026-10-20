@@ -11,16 +11,6 @@ from current_release import load_current
 from prepare_source import load_profile, sha256
 
 PRESETS = {
-    'sm120-24g-measured': 'integration/speed/presets/flash-next-sm120-24g.json',
-    'sm120-16g-measured': 'integration/speed/presets/flash-next-sm120-16g.json',
-    'sm120-16g-roomy-measured': 'integration/speed/presets/flash-next-sm120-16g-roomy.json',
-    'sm120-16g-perf3-candidate': 'integration/speed/presets/flash-next-sm120-16g-perf3.json',
-    'sm120-16g-perf5-candidate': 'integration/speed/presets/flash-next-sm120-16g-perf5.json',
-    'sm120-16g-perf6-candidate': 'integration/speed/presets/flash-next-sm120-16g-perf6.json',
-    'sm120-16g-perf8-candidate': 'integration/speed/presets/flash-next-sm120-16g-perf8.json',
-    'sm120-16g-review1': 'integration/speed/presets/flash-next-sm120-16g-review1.json',
-    'sm120-16g-review2b': 'integration/speed/presets/flash-next-sm120-16g-review2b.json',
-    'sm120-16g-perf9': 'integration/speed/presets/flash-next-sm120-16g-perf9.json',
     'sm120-16g-portable1': 'integration/speed/presets/flash-next-sm120-16g-portable1.json',
 }
 

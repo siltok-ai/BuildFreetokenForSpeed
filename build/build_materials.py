@@ -51,12 +51,13 @@ def main():
             raise RuntimeError(f"BuildPython dependency mismatch: {line}; installed {installed}")
         dependencies[requirement.name] = installed
     compiler = subprocess.run(["nvcc", "--version"], capture_output=True, text=True, check=True).stdout
-    if "release 13.0," not in compiler:
-        raise RuntimeError("CUDA Toolkit compiler must be 13.0")
+    toolchain = inputs.get('build_toolchain', {'cuda': '13.0', 'msvc': '19.44'})
+    if f"release {toolchain['cuda']}," not in compiler:
+        raise RuntimeError(f"CUDA Toolkit compiler must be {toolchain['cuda']}")
     msvc = subprocess.run(["cl"], capture_output=True, text=True)
     compiler_msvc = msvc.stdout + msvc.stderr
-    if "19.44." not in compiler_msvc:
-        raise RuntimeError("the win1 profile requires MSVC 19.44 (VS2022 toolset 14.44)")
+    if f"{toolchain['msvc']}." not in compiler_msvc:
+        raise RuntimeError(f"MSVC compiler must be {toolchain['msvc']}; select the matching toolset")
     import torch
     if torch.__version__ != inputs["torch"] or torch.version.cuda != inputs["cuda"]:
         raise RuntimeError("BuildPython Torch/CUDA differs from the frozen build contract")

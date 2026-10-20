@@ -1,6 +1,0 @@
-{
-  "status": "not_installed",
-  "returncode": 2,
-  "reason": "UAC not completed",
-  "install_directory_present": false
-}

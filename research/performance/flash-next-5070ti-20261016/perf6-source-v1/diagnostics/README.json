@@ -1,6 +1,0 @@
-{
-  "scope": "failed_diagnostics_not_acceptance",
-  "v1": "First cold non-greedy request corrupted the worker protocol; D4 reproduced and fixed stdout isolation.",
-  "v2": "After D4, raw resource monitor terminated at253849600B free VRAM. The exact256MiB transient matches Triton cold-autotune cache buffer; no acceptance claimed.",
-  "v3": "Accepted roles below use128 fewer resident experts in both modes and a fresh compiler cache; external256MiB floor unchanged."
-}

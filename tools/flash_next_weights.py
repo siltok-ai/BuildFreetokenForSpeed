@@ -64,7 +64,7 @@ def plan(root, lock):
 
 def download(root, lock, workers=8, metadata_only=False):
     """只使用固定 revision；已有文件必须验真，不覆盖损坏来源。"""
-    from download_q2_experts import download_ranges
+    from download_ranges import download_ranges
     if metadata_only and 'metadata' not in lock:
         raise ValueError('Metadata is embedded in GGUF; download both GGUF shards instead')
     kinds = ('gguf','metadata') if 'metadata' in lock else ('gguf',)
@@ -237,7 +237,7 @@ def main():
     parser.add_argument('--workers', type=int, default=8)
     parser.add_argument('--metadata-only', action='store_true')
     parser.add_argument('--source-lock', type=Path, default=LOCK,
-                        help='Default uses current release; select a historical lock explicitly for reproduction')
+                        help='Defaults to the source lock selected by current-release.json')
     args = parser.parse_args()
     lock = read(args.source_lock)
     if not 1 <= args.workers <= 32:

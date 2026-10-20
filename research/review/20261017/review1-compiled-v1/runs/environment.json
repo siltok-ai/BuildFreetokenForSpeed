@@ -1,8 +1,0 @@
-{
-  "PATH": "C:\\workspace\\build\\siltok-speed\\review1-p01\\app\\python\\Scripts;C:\\Windows\\System32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0;C:\\Program Files\\NVIDIA Corporation\\NVSMI",
-  "TEMP": "C:\\workspace\\runs\\siltok-speed\\review-20261017\\staged-review1\\tmp",
-  "SILITOK_CONFIG": "C:\\workspace\\runs\\siltok-speed\\review-20261017\\staged-review1\\config",
-  "FREETOKEN_KERNEL_CACHE_DIR": "C:\\workspace\\build\\siltok-speed\\review1-p01\\app\\runtime\\kernel-cache",
-  "TRITON_CACHE_DIR": "C:\\workspace\\cache\\triton\\staged-review1",
-  "TORCH_EXTENSIONS_DIR": "C:\\workspace\\runs\\siltok-speed\\review-20261017\\staged-review1\\extensions"
-}

@@ -1,5 +1,0 @@
-Compatibility scope for runtime1
-Public models[].id, request model IDs, old Qwen36Backend manifests and old explicit Python imports remain supported. New FreeTokenBackend manifests select the same class.
-The diagnostic status field backend_class uses type(backend).__name__ (engine/pool.py), so it now reports FreeTokenBackend instead of FreeTokenQwen36Backend. This field describes the implementation class and is not the public model ID.
-Real TCP tests use the original model IDs; the protected suite separately selects old and new manifest backend aliases.
-Bonnet checkout/address is still unavailable locally; its real cross-repository suite has not run. Existing Speed-side Bonnet contracts pass; this is not a claim of actual Bonnet integration acceptance.

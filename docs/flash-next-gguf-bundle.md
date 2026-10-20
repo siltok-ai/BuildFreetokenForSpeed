@@ -1,98 +1,95 @@
-# Flash Next GGUF 资源包
+# Flash Next GGUF 资源包制作与部署
 
-当前材料由 [current-release.json](../integration/speed/current-release.json) 选择。Speed 使用 `feat/flash-next`，本仓库使用 `main`。终端用户安装匹配的 Speed 后，只需复制整个资源包，将模型目录指向包根；无需安装本仓库、运行 Python 整理或搬迁后 refresh。
+本流程生成一个包含全部模型资源的目录，配套 Speed 的 `feat/flash-next` 和 FreeToken `0.1.3+speed.strataq2portable1`。接收方取得这个目录与匹配的 Speed 安装包后即可使用，无需 Python 转换。
 
-## 来源与目录
+## 优先使用现成资源包
 
-主模型唯一来源为 [ISTA-DASLab GSQ-RCO Q2 的完整两片 GGUF](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/tree/ed59f92082b1e93c0e96d60a8b11aab089b52f09/Q2_0)。架构配置、248320词表、BPE merges、特殊 token 和模板从 GGUF 导出，不下载 RadixArk 或其他 HF 配套元数据，也不加载 NVFP4/FP8/BF16 主模型。主模型不合并、不重排、不重新量化。
+优先从 **siltok31** 获取已处理好的 `C:\workspace\flash-next-resources`，完整复制整个目录，然后按本文的“接收方部署”使用。包内主模型、配置、tokenizer、模板、MTP 和资源预算已配套，无需再次处理。
 
-两片 GGUF 没有 MTP 张量。制包者仍从 [官方 Qwen](https://huggingface.co/Qwen/Qwen3.8-Flash-Next/tree/de4b8e4d43b917e7706784d8bb445c9af86a3540) 提取31份来源张量，共5214301696字节，转换成823887872字节的紧凑数据，预置在同一个资源包中。接收者无需另外获取或转换 MTP。
+不方便获取或希望从头制作时，使用下列固定来源、依赖和制作步骤。自行制作与现成包使用同一输入和转换格式，生成的模型资源内容一致；外层目录和文件时间可以不同。
 
-```text
-flash-next-resources/
-  manifest.json                      OFF / ON 两个模型 ID
-  checkpoints/
-    flash-next-strata-q2/
-      gguf/                          两片 GGUF，真实文件
-      config.json
-      tokenizer.json
-      tokenizer_config.json
-      generation_config.json
-      chat_template.jinja
-    flash-next-mtp/                   31份数据与 runtime.json
-  speed-config/config.yaml           16GiB 档资源预算
-  sources.json
-  licenses/
-  README.txt                         安装版配置及完整请求
-```
+## 固定来源
 
-配置使用包内相对路径，没有指向制作者机器的目录链接。外层目录可重命名、搬盘或使用带空格的英文路径，保持包内相对层级即可。GGUF 与 MTP 合计约67.25GB；不交付 BF16 转换来源、range-parts 下载缓存或旧 HF 元数据。软件运行库和 AOT 由匹配 Speed 安装包提供。
+- 主模型：[ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/tree/ed59f92082b1e93c0e96d60a8b11aab089b52f09/Q2_0)，修订 `ed59f92082b1e93c0e96d60a8b11aab089b52f09` 的完整两片 Q2 GGUF。
+- MTP：[Qwen/Qwen3.8-Flash-Next](https://huggingface.co/Qwen/Qwen3.8-Flash-Next/tree/de4b8e4d43b917e7706784d8bb445c9af86a3540)，修订 `de4b8e4d43b917e7706784d8bb445c9af86a3540` 的 31 份 MTP 张量。
 
-## 制包者操作
+配置、248320 词表、BPE merges、特殊 token 和模板从 GGUF 导出，主模型不重新量化。无需 RadixArk 或其他格式的主模型。GGUF 没有 MTP 张量：制包者下载约 5.21GB 的官方 MTP 来源并转换为约 0.824GB 的运行数据，预置到同一个包。
 
-先在独立环境安装当前 profile 对应 FreeToken wheel 及依赖。完整 Speed 打包环境由打包者维护，本仓库只维护 FreeToken/Flash Next 材料。
+[source-lock.json](../model-weights/qwen3.8-flash-next-gguf-q2/source-lock.json) 固定来源，[mtp-runtime.json](../model-weights/qwen3.8-flash-next-gguf-q2/mtp-runtime.json) 固定转换格式。使用相同仓库修订、依赖版本及这些输入，生成相同的模型资源内容；不要替换模板、修改 preset 或选择其他 GGUF 量化。
+
+## 制包者准备
+
+从 [构建说明](../build/README.md) 的步骤创建环境并安装固定依赖即可，不制作 wheel/AOT 时无需安装 C++/CUDA 编译工具。安装 [当前材料](../artifacts/README.md) 中的 FreeToken wheel，供配置导出使用：
 
 ```powershell
-$python = 'D:\envs\speed\Scripts\python.exe'
+$python = 'D:\envs\ft-build\Scripts\python.exe'
 $release = Get-Content integration/speed/current-release.json -Raw | ConvertFrom-Json
 $profile = Get-Content $release.profile -Raw | ConvertFrom-Json
 $materials = Join-Path (Get-Location) $release.materials
 & $python -m pip install --no-deps (Join-Path $materials ('wheels/' + $profile.wheel_filename))
 $inputs = 'D:\flash-next-inputs'
+$plan = & $python -B tools/flash_next_weights.py plan --root $inputs | ConvertFrom-Json
+```
+
+下载和转换使用仓库外的短英文路径。最终资源包约 67.3GB。
+
+```powershell
 & $python -B tools/flash_next_weights.py download --root $inputs --workers 8
 & $python -B tools/flash_next_mtp.py fetch --root $inputs
 & $python -B tools/flash_next_mtp.py build --root $inputs
+& $python -B tools/flash_next_mtp.py verify --root $inputs
 & $python -B tools/flash_next_bundle.py --output D:\flash-next-resources `
-  --gguf-dir '<sources下GGUF的固定revision目录>' `
-  --mtp-dir "$inputs\checkpoints\flash-next-mtp"
+  --gguf-dir $plan.paths.gguf --mtp-dir $plan.paths.mtp
 ```
 
-`--gguf-dir` 下应有 `Q2_0/<原始两片文件名>`；已有正确文件可直接复用。输出目录须不存在，工具会复制真实文件，需要额外磁盘空间。单独 `flash_next_weights.py prepare` 也生成相同的独立 checkpoint。新格式 `refresh` 只验证，不改写路径或时间。历史来源锁、profile、patch、合同和制品保持原字节。
+GGUF 下载可在失败后重试同一命令，保留 `range-parts` 缓存以续传。已有两片正确文件时，将它们置于 `$plan.paths.gguf\Q2_0\`，保持原文件名，下载器会核验后复用。输出资源包必须是新目录；转换中断后保留诊断，将不完整的 MTP 输出移到另一个位置再重建，不与现用数据混合。
 
-## 接收者使用
+已有配套的紧凑 MTP 时可直接将 `--mtp-dir` 指向它，跳过 fetch/build；制包工具仍检查其清单和数据。直接制作整合包不需要先运行 `flash_next_weights.py prepare`，避免多复制一份主模型。
 
-安装包含 FreeToken `0.1.3+speed.strataq2portable1` 的配套 Speed，复制资源包到例如 `D:\models\flash-next`。安装时用 `/MODELSDIR` 指定包根；已安装服务在 `C:\ProgramData\Siltok\Speed\config\operator.override.yaml` 中设置 `service.models_dir`，并合并包内 `speed-config/config.yaml` 的资源预算，保留已有配置。重启服务，按正常流程配置设备许可证和 API 授权。
+## 输出与分发
 
-查询 `/v1/models` 可看到 `flash-next-strata-q2-off` 与 `flash-next-strata-q2-on`。默认推荐 OFF；请求中的 model 选择 ON 即使用 MTP，两入口共享权重。完整文本和 Bonnet 调用说明在包内 README。源码运行时仍需显式设置外部 AOT，组件自检与测试授权边界见 Speed 的 `doc/speed/models/freetoken.md`。
+```text
+flash-next-resources/
+  manifest.json                      OFF / ON 两个模型入口
+  checkpoints/
+    flash-next-strata-q2/
+      gguf/                          两片完整 GGUF，真实文件
+      config.json
+      tokenizer.json
+      tokenizer_config.json
+      generation_config.json
+      chat_template.jinja
+      gguf-preparation.json
+    flash-next-mtp/                   runtime.json 与 31 个数据文件
+  speed-config/config.yaml           默认 16GiB 档资源预算
+  sources.json
+  licenses/
+  README.txt                         接收者操作说明
+```
 
-要实际使用MTP草稿加速，请在ON请求中显式设置 `temperature: 0`。当前MTP只处理greedy请求；未传temperature时默认使用采样（no-thinking为0.7，thinking为1.0），此时ON可以正常生成，但沿原生采样路径执行。资源包README的示例已显式设置0；此次只补充说明，未改变采样或MTP行为。
+分发整个输出目录。原始 BF16 转换来源、下载缓存、日志、开发环境不随包分发。生成器复制真实文件，运行路径相对于 checkpoint；外层目录可改名、换盘或含英文空格，内部层级保持不变。Speed 安装目录和 AOT 路径也使用英文路径。
 
-配套 `sm120-16g-portable1` 沿用 perf9 的 RTX5070Ti 16GiB 预算：OFF 永久专家5760、总槽7808；ON 永久专家4992、总槽7040，紧凑 MTP、`paired_cjk` 策略。KV8192、prefill1024、NVML探测、GPU安全余量0.25GiB、commit安全余量4GiB。其他设备需要单独验证，不能据此推断5090性能上限。
+`README.txt`、来源说明、manifest 和预算由当前仓库生成；不要手工沿用旧模板。打包应用所需的软件运行库和 AOT 由匹配 Speed 安装包交付，见 [接入说明](speed-integration.md)。
 
-## 验证边界
+## 接收方部署
 
-Speed 检查配套版本、依赖、ABI、文件布局及几何，不要求固定 SHA 或制包机时间回执。本仓库保留既有构建来源和材料校验。离线验证执行 `python -B tools/validate_repository.py` 与 `python -B -m unittest discover -s tests -v`，不代替本轮真实 GPU 验证。
+1. 安装包含 FreeToken `0.1.3+speed.strataq2portable1` 的配套 Speed，复制整个资源包到例如 `D:\models\flash-next`。
+2. 安装向导的模型目录（`/MODELSDIR`）填写**包含 manifest.json 的包根**。已安装服务在 `C:\ProgramData\Siltok\Speed\config\operator.override.yaml` 设置 `service.models_dir`，合并包内 `speed-config/config.yaml` 的 `resource` 段，保留已有设置。
+3. 重启服务，按 Speed 正常流程配置设备许可证和 API 授权。
+4. 查询 `GET /v1/models`，选择 `flash-next-strata-q2-off` 或 `flash-next-strata-q2-on`。
 
-GGUF 内嵌模板与旧 HF 模板不同，需要单独验证。删除历史 RadixArk 后的离线搬迁、OFF/ON、中文/SSE/thinking、worker 退出、普通 wheel/保护包消费，以及实际安装、设备许可证、异机测试分别记账，不能继承历史资格。既有间歇长输出问题仍保留。
+```json
+{"model":"flash-next-strata-q2-on","messages":[{"role":"user","content":"计算17+25。"}],"max_tokens":128,"temperature":0,"enable_thinking":false,"stream":false}
+```
 
-## 2026-10-20 本机结果
+向 `POST http://127.0.0.1:8000/v1/chat/completions` 发送上述 JSON，按实际配置提供 API 授权；`stream=true` 使用 SSE。Bonnet 使用 `/api/openai/v1/chat/completions` 和模型列表中的 `local/` 前缀 ID。
 
-Speed `79c39410`、供应提交 `313e2ab5`，FreeToken `0.1.3+speed.strataq2portable1`，RTX5070 Ti 16GiB。先删除历史 Flash Next RadixArk 配套文件和旧派生 checkpoint，再把资源包移至带空格的新路径、改变 GGUF 文件时间，启用离线模式和空 Hugging Face 缓存。Speed 源码、普通 wheel、embedded Python 保护载荷均通过 OFF/ON 的真实 TCP 同步、中文 SSE、thinking、MTP 所有权和模型进程退出检查。
+推荐默认 OFF。ON 载入 MTP，推测解码仅用于 greedy 请求，需显式 `temperature=0`；省略时默认使用采样，正常生成但沿原生采样路径执行。两种入口共享主模型文件。
 
-组件17项及9个子项、Speed相关236项、Build52项通过；3native/27AOT与FT9相同，58组补丁和462个Python文件重放匹配。完整材料及消费记录由当前合同离线复核。首轮保护测试把主进程自带的 conhost 算成模型 worker，修正外置驱动后重测通过；原失败记录保留。此检查点已构建安装器，实际安装和接收者整体验收另行记录。
+## 设备与使用限制
 
-性能对照双方使用相同 GGUF 元数据、prompt IDs、每模式专家/KV预算、MTP策略和实际512输出token，英文/中文各3次。旧FT9使用其必要的来源包装配置；新版本直接消费资源包。
+当前 preset 在 RTX 5070 Ti 16GiB、约 64GiB 主机内存验证：OFF 永久专家 5760/总槽 7808；ON 永久专家 4992/总槽 7040，紧凑 MTP 和 `paired_cjk`。KV 8192、prefill 1024、启动限时 600 秒。其他设备按显存及 host commit 调整预算，这不是 32GiB 显卡的性能上限配置。
 
-| 模式/负载 | FT9中位数 tok/s | portable1中位数 tok/s |
-| --- | ---: | ---: |
-| OFF 英文 | 93.88 | 98.60 |
-| OFF 中文 | 99.08 | 99.10 |
-| ON 英文 | 104.00 | 104.12 |
-| ON 中文 | 105.30 | 104.91 |
+资源包内容一致不等于跨 GPU 性能完全一致。首次加载和形状编译需要时间；间歇长输出标点/token0 异常仍是已知限制。结构化文本可通过普通提示生成，当前模型不支持 `response_format`。
 
-本轮未测到 decode 衰退；OFF英文旧组有一次慢值，不能把中位数差异解释为优化收益。主权重和计算内核未改，但GGUF内嵌模板与旧RadixArk模板有差异，上表不验证两种模板的完整质量等价，也不代表5090或长期稳定性验收。全部模型测试使用进程范围测试授权，未验证真实设备许可证。
-
-## 推送后的接收者模拟
-
-在 Speed `79c39410`、Build `b12e265` 推送并核对远端后，用原资源包和同一保护载荷进行独立部署：只用包内Python、运行库和AOT，清除开发环境变量，使用空HF缓存和离线模式；导入路径没有源码或venv目录。按安装器的模板生成独立managed-base，合并包内resource配置，再走正常 `release_profile` 服务入口。授权适配只在外置验收进程替换原生ABI，产品及资源包字节未改。
-
-同一服务三轮OFF/ON切换、第二次启动后的OFF/ON、中文SSE、参数拒绝与正常退出均通过；被替换的模型worker按PID和创建时间核实已退出。OFF/ON各自完整20题均15/20，thinking均3/3，与既有本机协议的五个失败样本一致。此分数不能与5090上另一套20题直接比较。原始报告及配置见当前消费合同的 `receiver` 证据。
-
-未发现额外权重下载、RadixArk引用、MTP文件缺失或本轮引入的加载/切换障碍。接收者需注意：
-
-- 使用包含 `0.1.3+speed.strataq2portable1` 的匹配Speed；旧FT9安装器不支持这个相对路径格式。
-- 安装向导的模型目录填写**含manifest.json的包根**，保留包内层级。资源预算在ProgramData的 `config/operator.override.yaml` 合并，随后重启服务。
-- 当前档位只在SM120、5070Ti 16GiB和约64GiB主机内存验证；其他容量要检查显存及host commit。它不是5090的性能上限配置。
-- `engine_unlicensed` 表示设备授权尚未就绪，不能靠重新下载权重解决；JSON文本可用普通prompt生成，`response_format` 在此模型合同中返回400 `unsupported_feature`。
-
-Windows UAC在实装前返回操作已取消，未创建i09安装目录、服务或ProgramData。本轮是现有系统上的保护载荷接收者模拟，**未取得实际安装/卸载、干净OS或真实设备许可证资格**；此前i08的资格也不转移。验收脚本首轮误写了公开错误码，修正后用新编号完整复验，失败记录保留。
+`engine_unlicensed` 表示设备授权未就绪，需处理 Speed 授权。离线工具检查和测试授权下的推理不代表真实设备许可证、全新系统或实际安装验收。

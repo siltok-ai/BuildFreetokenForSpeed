@@ -1,66 +1,54 @@
-# Speed 接入约定
+# 在 Speed 中使用 FreeToken 材料
 
-FreeToken 定制与素材生成由本仓库负责，Speed 的 backend、worker、服务协议和最终发布包由 Speed 仓库负责。接入是**固定并消费一套匹配的素材**，同时更新 Speed 自己的 API adapter。
+当前材料由 [current-release.json](../integration/speed/current-release.json) 选择。先核对 Speed 的 `silitok_speed/runtimes/freetoken/release.json`：FreeToken 版本、Windows/CPython ABI、Torch/CUDA、AOT 规格必须配套。
 
-机器可读摘要见 [consumer-contract.json](../integration/speed/consumer-contract.json)，模型示例见 [examples](../integration/speed/examples/)。
-
-## 使用哪些文件，最终放到哪里
-
-| 输入 | Speed 最终运行位置 / 行为 |
-| --- | --- |
-| 定制 wheel | 安装 / 暂存到 `app/python/Lib/site-packages/`，包括 `freetoken/` 与对应 `.dist-info/` |
-| wheel 内 3 个 native `.pyd` | `app/python/Lib/site-packages/freetoken/kernel/` |
-| `kernel-cache/<spec>/<spec>.dll` | `app/runtime/kernel-cache/<spec>/<spec>.dll` |
-| cache manifest / metadata | 随 cache 一起保存，供版本与库存校验 |
-| 模型 manifest | Speed 模型目录中；示例的相对权重路径需自行绑定 |
-
-wheel 不能仅取 Python 源码、丢弃发行元数据或 `.pyd`；DLL 不能与别的版本 wheel 混用。模型权重不由本仓库提供。
-
-## 开发环境
-
-先在完整、独立的 SourceVenv 安装同一 wheel；配置：
-
-```text
-service.freetoken_kernel_cache_dir = <素材目录>/kernel-cache
-```
-
-使用 venv 安装时由它的 site-packages 提供 FreeToken。若用独立 runtime root，配置 `service.freetoken_runtime_dir`，并保留完整 `freetoken/` 和 `.dist-info/`；仅指向源码 `python/` 不满足版本校验合同。
-
-运行 native / cache 自检、Speed worker 和真实模型回归后，再进入完整发布流程。禁止用 `.pth` 借另一个 venv 来满足交付闭包；Speed stager 按 SourceVenv 实际发行元数据及文件收集依赖。
-
-## Speed 必须完成的源码适配
-
-1. 更新被锁定的定制 FreeToken 版本、wheel SHA 和 cache 合同；完整 commit 与补丁身份也应写入发布溯源。
-2. 适配新 FreeToken 配置：Speed IPC 的 `moe_backend` 投影为上游 `moe_strategy`，增加 `ple_backend`；原基线已有生成事件三元组、pending 与 `PromptAdmitted` 处理，升级时保持 reasoning / text 分流、usage、EOS、取消后复用。
-3. 文本路径禁用不需要的多模态 encoder，Windows 路径使用已验证 attention 能力，不能假设 Linux FlashInfer 路径可用。
-4. 旧 MoE 与 dense 模型采用各自参数。dense 不传 MoE cache 字段，使用其对应 KV 规格；不能仅凭版本升级复用旧 AOT 列表。
-5. 正常 worker 清除 INVALID 环境变量。实验 worker 仅对显式 `allow_invalid_model` 条目启用，并检查原索引、保留权重 SHA、拓扑和实际资源预算。
-6. Flash Next 正常条目仍要求完整 checkpoint 与真实内存预算；实验条目单独命名、单独 guard，不能全局降低完整模型预算或放松缺片检查。
-
-实际实现留在 Speed 仓库。最终分支 `feat/freetoken-win1-flash-next` 在打包基线 `5fd331bc5257a6593d6bcb4707c5fa13cf69396b` 上只有一个提交：[808003f0efc70e7f43226e5d1e8c32b3704405cb](https://github.com/siltok-ai/siltok-speed/commit/808003f0efc70e7f43226e5d1e8c32b3704405cb)。源码说明见该提交的 `silitok_speed/qwen36/FLASH-NEXT.md`；原探索快照仍保留为历史证据，本仓库不复制应用源码 patch。
-
-最终 review 收紧 Flash Next 为实际验证的 RadixArk NVFP4 量化布局，拒绝未认证的混合格式；实验 manifest 同时识别 `Qwen36Backend` 和 `FreeTokenQwen36Backend`，同路径普通条目独立校验。QSA 只用于 Flash Next，不允许旧模型误选。这些修复均在 Speed，本轮未追加 FreeToken 补丁。
-
-## Windows 打包
-
-沿用 Speed 的 `packaging/windows/build.ps1`，显式提供：
+在本仓库根执行：
 
 ```powershell
-# 示意参数，应添加到 Speed 自己的完整、已审核构建命令中。
--FreetokenWheel '<素材目录>\wheels\freetoken-0.1.3+speed.win1-cp312-cp312-win_amd64.whl'
--KernelCacheDir '<素材目录>\kernel-cache'
+$selected = Get-Content integration/speed/current-release.json -Raw | ConvertFrom-Json
+$profile = Get-Content $selected.profile -Raw | ConvertFrom-Json
+$materials = Join-Path (Get-Location) $selected.materials
+$wheel = Join-Path $materials ('wheels/' + $profile.wheel_filename)
+$cache = Join-Path $materials 'kernel-cache'
+python -B tools/verify_portable_consumer.py --speed-root D:\src\siltok-speed
 ```
 
-SourceVenv 必须先安装同一 wheel，因为 stager 在复制前还会导入自检；单靠暂存阶段替换 wheel 不足以纠正 SourceVenv 身份。打包应使用匹配的 BuildVenv / SourceVenv，收集真实依赖库存，并更新旧默认素材路径。
+版本不匹配时，选择与 Speed release 对应的本仓库修订，或升级为配套的 Speed；不要混用不同材料目录中的 DLL。现成 wheel/AOT 已在 Git 中，消费它们无需安装 CUDA 编译工具链。
 
-最终 Speed 会检查 wheel 的**实际 SHA**，不是只检查版本或文件名。直接复用当前制品即可匹配其锁定 SHA；跨机器重新编译若字节变化，即使源码与版本相同也会被拒绝。应先登记新的构建记录与实际 SHA、完成验收，再在 Speed 独立候选中更新 `silitok_speed/qwen36/freetoken_contract.py` 的 wheel SHA 与消费身份，用新目录重新打包。源码或补丁发生变化则必须使用新的定制修订，不能覆盖已接受的 win1。禁止重命名未知 wheel、跳过 SHA 或只改 cache 版本字符串来通过检查。
+## Speed 源码或普通 wheel
 
-本次保持 Torch ABI 组合，不能因此推断其他后端一律需要重编译；Speed 自己修改的模块仍要进入它的正式编译流程。FreeToken wheel 负责自己的 native `.pyd`，AOT DLL 独立暂存，无需把它们编进 Speed 的业务扩展。
+先按 Speed 自己的说明准备所需运行环境，再安装本仓库 wheel，并指定外部 AOT：
 
-关闭 FreeToken C++/CUDA JIT 不等于关闭 Triton 的运行编译需求。发布闭包仍须保留相应 Triton 工具、头文件和依赖。对未覆盖的 shape，不应自动放开 JIT 掩盖 cache 缺项。
+```powershell
+$python = 'D:\envs\speed\Scripts\python.exe'
+& $python -m pip install --no-deps $wheel
+$env:SILITOK_FREETOKEN_KERNEL_CACHE_DIR = $cache
+$env:FREETOKEN_KERNEL_CACHE_DIR = $cache
+& $python -m silitok_speed.runtimes.freetoken.release self-check --pip-check --kernel-cache $cache
+```
 
-## 准入与验收边界
+使用 uv 创建环境时可加 `--seed` 安装 pip。`--pip-check` 仅用于确实安装了 pip 的环境。
+完整 Speed 环境如包含已登记的依赖约束例外，自检时按 Speed 文档附加 `--constraint-policy <Speed仓库>/packaging/windows/runtime-requirements.toml`。
 
-旧两个模型使用真实 NVFP4 权重，Flash Next 当前仅使用 INVALID-alias20，见 [验收说明](validation.md)。本次 SourceVenv 审计有 101 个发行包、31,452 个 owned 文件，0 缺失、0 editable；原 SAM3 两项约束例外维持原政策。71 项 FreeToken 构建 lock 不能替代完整 Speed 应用闭包。
+FreeToken 可导入和组件自检通过，不代表 Engine 已获得设备授权。源码/CI 测试授权用法、服务启动命令及 API 授权由 [Speed 使用说明](https://github.com/siltok-ai/siltok-speed/blob/feat/flash-next/doc/speed/models/freetoken.md) 维护。
 
-已执行完整 `build.ps1 -SkipInstaller`，并使用随包编译后的 Speed、embedded Python 3.12.10、FreeToken/native/cache，在清理外部 Python/CUDA 路径后完成三个模型共 6 组 HTTP/SSE 与 backend 实际运行。208 个模块源码 SHA 与最终提交对应的 worktree 全部一致；见 [随包证据](../artifacts/win1-cp312-cu130-sm120/validation/packaged-speed-20261009/)。这是同一本机的隔离运行环境验收，尚需安装器安装 / 运行 / 卸载、干净机器和完整正确 Flash Next 验收。
+## Windows 安装包
+
+按 Speed 的 [Windows 打包说明](https://github.com/siltok-ai/siltok-speed/blob/feat/flash-next/packaging/windows/README.md) 准备应用环境。在 Speed 仓库执行其构建入口，显式传入：
+
+```powershell
+# 将以下参数加入 Speed Windows 打包说明中的完整 build.ps1 命令：
+# -FreetokenWheel $wheel -KernelCacheDir $cache
+```
+
+SourceVenv 中安装同一个 wheel，安装器消费配套 kernel-cache。Speed 检查版本、依赖、ABI 和文件布局，不将 wheel/AOT 固定到某个二进制 SHA。本仓库现有材料来源校验用于构建端，不增加产品运行时校验。
+
+保护安装版使用包内 Python；其加载器不适用 `python -m` 模块入口，embedded Python 也不要求 pip。诊断应通过导入调用：
+
+```powershell
+$app = 'D:\Speed'
+$env:SILITOK_FREETOKEN_KERNEL_CACHE_DIR = Join-Path $app 'runtime/kernel-cache'
+& "$app\python\python.exe" -B -c 'from silitok_speed.runtimes.freetoken.release import main; raise SystemExit(main(["self-check"]))'
+```
+
+安装器升级、依赖服务处理和设备授权属于 Speed。模型资源的独立制作与挂载步骤见 [资源包说明](flash-next-gguf-bundle.md)。

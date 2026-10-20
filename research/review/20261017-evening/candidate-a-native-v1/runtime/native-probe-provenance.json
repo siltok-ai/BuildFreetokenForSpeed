@@ -1,6 +1,0 @@
-{
-  "source": "C:\\workspace\\runs\\siltok-speed\\review-20261017\\probe-review1-wheel.py",
-  "source_sha256": "a7ccb824059dd5c8d9f12b54c39f8424c00ad911fa91c41b142b559eb3a6a293",
-  "target_sha256": "9341420f2bd3dc7c4566e8bfc3179f8a798d8da2159a7775a670e913f73963bb",
-  "changes": "Only interpreter path, required version and report scope; same model/protocol"
-}

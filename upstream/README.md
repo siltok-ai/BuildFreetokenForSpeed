@@ -10,10 +10,10 @@
 
 归档 SHA-256：`49a51eb5480c61571a69b44684f236cd86992b2b79062544f85bbcd263fd2443`。归档包含 686 个文件，另含目录条目；两个源码表示由仓库验证器逐文件比较。
 
-## 与本次任务有关的官方代码
+## 官方代码导航
 
 - [models/qwen4_exp](FreeToken/python/freetoken/models/qwen4_exp/)：Flash Next 架构、配置解析、权重加载与 PLE。
-- [qwen4_exp/ple_ssd.py](FreeToken/python/freetoken/models/qwen4_exp/ple_ssd.py)：官方磁盘 PLE 数据源。
+- [qwen4_exp/ple_disk.py](FreeToken/python/freetoken/models/qwen4_exp/ple_disk.py)：官方磁盘 PLE 数据源。
 - [models/loader.py](FreeToken/python/freetoken/models/loader.py)：统一加载与 runtime 构建。
 - [moe/expert_banks.py](FreeToken/python/freetoken/moe/expert_banks.py)、[moe/host_banks.py](FreeToken/python/freetoken/moe/host_banks.py)：专家存储、主机内存与 offload。
 - [models/nvfp4_banks.py](FreeToken/python/freetoken/models/nvfp4_banks.py)：NVFP4 专家读取。

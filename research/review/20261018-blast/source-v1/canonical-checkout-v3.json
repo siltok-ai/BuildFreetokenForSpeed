@@ -1,8 +1,0 @@
-{
-  "status": "passed",
-  "canonical_checkout_attributes": true,
-  "aligned_eol_only": [],
-  "ast_unchanged": true,
-  "git_clean": true,
-  "prior_attempts": "C:\\workspace\\runs\\siltok-speed\\blast-review-20261018"
-}

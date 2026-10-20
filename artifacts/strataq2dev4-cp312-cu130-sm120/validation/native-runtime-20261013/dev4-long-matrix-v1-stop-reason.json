@@ -1,7 +1,0 @@
-{
-  "status": "manually_stopped_test_parameter_mismatch",
-  "reason": "2700 construction gives 2385 input tokens and 17-token hot suffix; existing diagnostic compares the last 33 tokens. Re-run with prior accepted 3072 construction, yielding 2721 input tokens and 33-token suffix.",
-  "model_correctness_conclusion": null,
-  "replacement": "dev4-long-matrix-v2.json",
-  "preserve_partial_outputs": true
-}

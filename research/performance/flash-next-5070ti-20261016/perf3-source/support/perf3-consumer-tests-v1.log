@@ -1,7 +1,0 @@
-test_claimed_pass_cannot_hide_output_case_score_or_lifecycle_changes (test_performance3_consumer.SourceQualityTests.test_claimed_pass_cannot_hide_output_case_score_or_lifecycle_changes) ... ok
-test_real_native_cases_can_be_cross_checked (test_performance3_consumer.SourceQualityTests.test_real_native_cases_can_be_cross_checked) ... ok
-
-----------------------------------------------------------------------
-Ran 2 tests in 0.010s
-
-OK

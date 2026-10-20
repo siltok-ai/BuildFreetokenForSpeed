@@ -1,1 +1,0 @@
-{"t": 0.0, "commit_used": 11292872704, "commit_available": 59026038784, "ram_available": 57828278272, "gpu_used": 715407360, "gpu_free": 16379527168, "tree_rss": 5517312, "tree_private": 1028096, "gpu_telemetry": {"sm_clock_mhz": 315, "memory_clock_mhz": 7001, "power_mw": 41587, "temperature_c": 44, "throttle_reasons": 1024}}

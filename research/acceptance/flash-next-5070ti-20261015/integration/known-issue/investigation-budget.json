@@ -1,6 +1,0 @@
-{
-  "start_utc": "2026-10-15T07:20:58.310006+00:00",
-  "deadline_utc": "2026-10-15T07:50:58.310006+00:00",
-  "minutes": 30,
-  "user_instruction": "If no clear progress and not deterministic, retain as known risk and resume remaining acceptance, pushes and single-commit integration rebase"
-}

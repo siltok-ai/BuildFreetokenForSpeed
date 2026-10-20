@@ -1,3 +1,0 @@
-C:\workspace\build\freetoken-mats\flash-perf-materials-03\candidate-source\build-source\python\freetoken\kernel\csrc\third_party\strata_mmvq\src\kernels\cuda\native_mmvq.cu
-sha256=928a8d9d1af75c4caf62ff6de2fdcc80fd03f08014d07c9e3b4d2bf1c78e5f4e
-Q5 dot and reductions unchanged; weight row comes from validated row_ids.

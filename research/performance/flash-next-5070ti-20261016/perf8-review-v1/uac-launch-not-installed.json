@@ -1,9 +1,0 @@
-{
-  "status": "requesting",
-  "observed_utc": "2026-10-16T21:01:21.8208861Z",
-  "session_id": 1,
-  "already_admin": false,
-  "helper": "C:\\workspace\\runs\\siltok-speed\\flash-perf-20261016\\install-test-cleanup-p04-i07.ps1",
-  "helper_sha256": "986d4e513e934341d96f682439ba1e833bfb8da0bdd9dfb039fa700cce25c8ee",
-  "installer_sha256": "08259eecd8ae09eabe839d57140d8d191b92c0ae63d790c54b5019c8f0fbb5f4"
-}

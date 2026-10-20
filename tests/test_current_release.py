@@ -1,8 +1,8 @@
-"""当前指针不能把未知验收类型当成已验证交付。"""
+"""Exercise the public compatibility entry point without a GPU."""
 import json
 from pathlib import Path
-import sys
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -14,26 +14,26 @@ from verify_current_release import verify
 
 
 class CurrentAcceptanceTests(unittest.TestCase):
-    def test_portable_consumer_cli_rejects_a_different_checkout(self):
-        """通过实际 CLI 拒绝其他提交，防止脚本未调用验证器却以零退出。"""
+    def test_speed_cli_rejects_incompatible_runtime_before_source_replay(self):
         with tempfile.TemporaryDirectory() as temporary:
-            path = Path(temporary)/'consumer.json'
-            path.write_text(json.dumps(dict(speed_commit='0'*40)),encoding='utf-8')
-            result = subprocess.run([sys.executable,'-B',str(ROOT/'tools/verify_portable_consumer.py'),
-                '--contract',str(path),'--speed-root',str(ROOT)],capture_output=True,text=True)
-            self.assertNotEqual(result.returncode,0)
-            self.assertIn('Speed checkpoint commit changed',result.stderr)
+            root = Path(temporary)
+            target = root/'silitok_speed/runtimes/freetoken/release.json'
+            target.parent.mkdir(parents=True)
+            target.write_text(json.dumps(dict(version='unsupported')), encoding='utf-8')
+            result = subprocess.run([sys.executable, '-B', str(ROOT/'tools/verify_portable_consumer.py'),
+                '--speed-root', str(root)], capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('Speed runtime contract differs: version', result.stderr)
 
-    def test_unknown_consumer_kind_cannot_claim_verified_current_release(self):
-        """使用真实profile和实际wheel/AOT，仅替换消费合同类型，仍须明确拒绝。"""
+    def test_unknown_consumer_kind_is_rejected(self):
         current = load_current()
         contract = json.loads((ROOT/current['consumer_contract']).read_text(encoding='utf-8'))
-        contract['kind'] = 'unrecognized_acceptance'
+        contract['kind'] = 'unknown'
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary)/'consumer.json'
             path.write_text(json.dumps(contract), encoding='utf-8')
-            selection = dict(current, consumer_contract=str(path))
-            with patch('verify_current_release.load_current', return_value=selection):
+            with patch('verify_current_release.load_current',
+                       return_value=dict(current, consumer_contract=str(path))):
                 with self.assertRaisesRegex(ValueError, 'Unsupported current consumer kind'):
                     verify()
 

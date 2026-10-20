@@ -79,13 +79,13 @@ def main():
         import subprocess
         import sys
         if args.command == 'fetch':
-            script = ROOT/'research/mtp/fetch_source.py'
+            script = ROOT/'tools/mtp/fetch_source.py'
             if not (source/'mtp-inventory.json').exists():
                 subprocess.run([sys.executable,'-B',str(script),'inventory','--output',str(source)],check=True)
             subprocess.run([sys.executable,'-B',str(script),'fetch','--output',str(source)],check=True)
             result = dict(status='source_verified', source=str(source))
         else:
-            subprocess.run([sys.executable,'-B',str(ROOT/'research/mtp/build_runtime.py'),
+            subprocess.run([sys.executable,'-B',str(ROOT/'tools/mtp/build_runtime.py'),
                             '--source',str(source),'--output',str(paths['mtp'])],check=True)
             result = verify_runtime(paths['mtp'])
     print(json.dumps(result,ensure_ascii=False))

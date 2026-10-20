@@ -1,6 +1,0 @@
-C:\workspace\worktrees\build-freetoken-flash-next-strata-q2\build\build-materials.ps1 : The expression after '&' in a p
-ipeline element produced an object that was not valid. It must result in a command name, a script block, or a CommandIn
-fo object.
-    + CategoryInfo          : InvalidOperation: (:) [build-materials.ps1], RuntimeException
-    + FullyQualifiedErrorId : BadExpression,build-materials.ps1
- 

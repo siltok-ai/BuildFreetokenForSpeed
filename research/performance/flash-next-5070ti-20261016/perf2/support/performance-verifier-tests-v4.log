@@ -1,8 +1,0 @@
-test_actual_stream_timing (test_performance_consumer.PerformanceConsumerTests.test_actual_stream_timing) ... ok
-test_installer_ownership_rejects_staging_and_existing_data (test_performance_consumer.PerformanceConsumerTests.test_installer_ownership_rejects_staging_and_existing_data) ... ok
-test_rejects_fabricated_statistics_and_broken_stream (test_performance_consumer.PerformanceConsumerTests.test_rejects_fabricated_statistics_and_broken_stream) ... ok
-
-----------------------------------------------------------------------
-Ran 3 tests in 0.003s
-
-OK

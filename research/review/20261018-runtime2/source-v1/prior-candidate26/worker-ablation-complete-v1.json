@@ -1,8 +1,0 @@
-{
-  "status": "measured",
-  "scope": "diagnostic mixed layers only",
-  "reports": {
-    "new-parent-old-worker": "worker-ablation-new-parent-old-worker-v1.json",
-    "old-parent-new-worker": "worker-ablation-old-parent-new-worker-v1.json"
-  }
-}

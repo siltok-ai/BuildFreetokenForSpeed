@@ -1,6 +1,0 @@
-{
-  "scope": "source_and_protected_payload_accepted_actual_install_pending",
-  "utc": "2026-10-16T21:13:05.695779+00:00",
-  "tests": "47 passed, no skipped historical regression",
-  "pending": "Actual installer UAC cancelled before helper start; VNC readiness requested. This archive does not claim installation."
-}

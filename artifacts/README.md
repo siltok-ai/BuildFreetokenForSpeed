@@ -1,23 +1,18 @@
-# 制品与证据
+# FreeToken 构建材料
 
-[win1-cp312-cu130-sm120](win1-cp312-cu130-sm120/) 是本机实际验证过的初始制品集：一个 wheel、26 DLL、cache 合同、构建身份与报告。不是某次 GitHub CI 自动编译结果，也不是完整 Speed 安装器。
+当前可交付材料读取 [current-release.json](../integration/speed/current-release.json) 的 `materials`。当前目录为 `strataq2portable1-cp312-cu130-sm120`：
 
-复用时复制完整子目录并运行 `python -B tools/verify_materials.py <复制后的目录>`。不要从不同版本目录挑选 DLL 混用。具体 Speed 消费方式见 [接入约定](../docs/speed-integration.md)。
+- `wheels/`：CPython 3.12 Windows x64 wheel，包含 CPU MoE、pinned tensor、row store 三个原生模块。
+- `kernel-cache/`：SM120 的 27 项 AOT DLL、构建元数据及 Speed 缓存清单。
+- `build-record.json`：版本、源码输入、工具链和实际材料库存。
 
-## 保留历史真实性
+将整个材料目录作为一套使用。Speed 打包时显式提供 wheel 和 kernel-cache，见 [接入说明](../docs/speed-integration.md)。
 
-`build-record.json`、cache 元数据与验证报告保留原始内容。原工具包当时叫 `source/base.zip`、`source/windows-source.patch`、`speed-specs.txt`，历史 JSON 中仍使用这些名称；它们在本仓库分别对应：
+```powershell
+python -B tools/verify_current_release.py
+python -B tools/verify_materials.py D:\materials\freetoken
+```
 
-| 历史名称 | 新位置 |
-| --- | --- |
-| `source/base.zip` | `upstream/freetoken-0781324.zip` |
-| `source/windows-source.patch` | `patches/legacy/windows-source.patch` |
-| `speed-specs.txt` | `build/specs/speed-sm120.txt` |
+`strataq2perf9-cp312-cu130-sm120` 是当前版本原生二进制复用所需的基线，保留它供源码差异检查及重新封装使用；Speed 消费当前 portable1 目录。其更早的来源记录可从 Git 历史查询，日常检查不递归验证历史版本。
 
-校验器验证映射后的 SHA 一致，并验证拆分补丁结果一致。历史日志里的本机路径只用于定位当时证据，构建入口不依赖这些路径。
-
-历史 AOT 是 25 项整批重建，再用同一冻结源码补构 dense KV store，共 26 项。当前规格已经包含完整 26 项，新入口可一次生成；不把历史记录改写成当时已经使用新目录、新脚本一次编完。
-
-新构建会输出新 `build-record.json`，使用本仓库路径、实际 producer SHA 与 `built_requires_runtime_validation` 状态。重编译的 SHA 可能变化，不能覆盖这份历史已验证结果。长期多版本制品转向 Releases，参见 [维护方案](../docs/maintenance.md)。
-
-后续使用同一材料完成了完整 Speed 运行目录打包及三模型随包运行。新证据追加在 [validation/packaged-speed-20261009/](win1-cp312-cu130-sm120/validation/packaged-speed-20261009/)，绑定最终 Speed commit、材料 commit 与 SHA；原 `build-record.json` 和 `validation-summary.json` 保留当时真实状态，不回写历史。此轮没有重新生成 FreeToken wheel/DLL，也没有生成安装器。
+新构建输出到仓库外的新目录，经验证后再决定是否发布；不要覆盖现有 wheel/DLL。完整构建与 Python 修订重新封装见 [build](../build/README.md)。本目录不保存性能探索或安装验收日志。
