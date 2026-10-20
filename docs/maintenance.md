@@ -33,3 +33,5 @@ python -B -m unittest discover -s tests -v
 使用 `tools/export_upstream.py --repo <checkout> --commit <完整commit> --output <新目录>` 导出候选。逐项判断补丁是否仍需要，处理冲突后建立新 profile；不得直接修改浏览快照或自动向官方仓库提交。
 
 回滚时恢复配套的 Speed release、FreeToken 材料和模型配置。旧版本从 Git 历史获取；开发探索、性能轨迹和安装日志放在仓库外，README 维护当前步骤和必要限制。
+
+整理前的验收合同及其原始记录索引可在 [固定 Git 修订](https://github.com/siltok-ai/BuildFreetokenForSpeed/blob/2cc99cfb30262cc62c3b9b5376506cd1c4f2c740/integration/speed/consumer-contract-strataq2portable1-receiver.json) 查询。当前消费检查仅校验源码、材料和兼容性，历史硬件记录不作为日常检查的前提。

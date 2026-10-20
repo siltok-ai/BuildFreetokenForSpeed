@@ -13,6 +13,8 @@ $cache = Join-Path $materials 'kernel-cache'
 python -B tools/verify_portable_consumer.py --speed-root D:\src\siltok-speed
 ```
 
+上面的检查针对仓内现成材料。使用[自行构建](../build/README.md)的产物时，将 `$materials` 改为本次输出根（含 `wheels` 和 `kernel-cache`），再计算 `$wheel`、`$cache`；按构建说明检查新产物。仓内检查通过不代表已检查这个外部目录。
+
 版本不匹配时，选择与 Speed release 对应的本仓库修订，或升级为配套的 Speed；不要混用不同材料目录中的 DLL。现成 wheel/AOT 已在 Git 中，消费它们无需安装 CUDA 编译工具链。
 
 ## Speed 源码或普通 wheel
@@ -21,13 +23,14 @@ python -B tools/verify_portable_consumer.py --speed-root D:\src\siltok-speed
 
 ```powershell
 $python = 'D:\envs\speed\Scripts\python.exe'
-& $python -m pip install --no-deps $wheel
+& $python -m pip install --force-reinstall --no-deps $wheel
 $env:SILITOK_FREETOKEN_KERNEL_CACHE_DIR = $cache
 $env:FREETOKEN_KERNEL_CACHE_DIR = $cache
 & $python -m silitok_speed.runtimes.freetoken.release self-check --pip-check --kernel-cache $cache
 ```
 
 使用 uv 创建环境时可加 `--seed` 安装 pip。`--pip-check` 仅用于确实安装了 pip 的环境。
+源码不变而重新编译的 wheel 可以沿用相同版本号；这里显式重装，避免 pip 因版本相同而继续使用环境中的旧二进制。
 完整 Speed 环境如包含已登记的依赖约束例外，自检时按 Speed 文档附加 `--constraint-policy <Speed仓库>/packaging/windows/runtime-requirements.toml`。
 
 FreeToken 可导入和组件自检通过，不代表 Engine 已获得设备授权。源码/CI 测试授权用法、服务启动命令及 API 授权由 [Speed 使用说明](https://github.com/siltok-ai/siltok-speed/blob/feat/flash-next/doc/speed/models/freetoken.md) 维护。
@@ -42,6 +45,8 @@ FreeToken 可导入和组件自检通过，不代表 Engine 已获得设备授�
 ```
 
 SourceVenv 中安装同一个 wheel，安装器消费配套 kernel-cache。Speed 检查版本、依赖、ABI 和文件布局，不将 wheel/AOT 固定到某个二进制 SHA。本仓库现有材料来源校验用于构建端，不增加产品运行时校验。
+
+`FREETOKEN_DISABLE_JIT=1` 禁止原生扩展临时构建，不会关闭 Triton 的形状编译。匹配的 Triton 运行依赖仍由 Speed 发布闭包提供，不能因已有 AOT 而省略。
 
 保护安装版使用包内 Python；其加载器不适用 `python -m` 模块入口，embedded Python 也不要求 pip。诊断应通过导入调用：
 

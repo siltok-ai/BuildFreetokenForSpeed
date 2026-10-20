@@ -19,14 +19,10 @@
 
 ## 制包者准备
 
-从 [构建说明](../build/README.md) 的步骤创建环境并安装固定依赖即可，不制作 wheel/AOT 时无需安装 C++/CUDA 编译工具。安装 [当前材料](../artifacts/README.md) 中的 FreeToken wheel，供配置导出使用：
+从 [构建说明](../build/README.md) 的步骤创建 Python 环境并安装固定依赖即可。模型制包工具不需要安装 FreeToken wheel 或 C++/CUDA 编译工具；推理使用的 wheel/AOT 按 [Speed 接入说明](speed-integration.md) 准备。
 
 ```powershell
 $python = 'D:\envs\ft-build\Scripts\python.exe'
-$release = Get-Content integration/speed/current-release.json -Raw | ConvertFrom-Json
-$profile = Get-Content $release.profile -Raw | ConvertFrom-Json
-$materials = Join-Path (Get-Location) $release.materials
-& $python -m pip install --no-deps (Join-Path $materials ('wheels/' + $profile.wheel_filename))
 $inputs = 'D:\flash-next-inputs'
 $plan = & $python -B tools/flash_next_weights.py plan --root $inputs | ConvertFrom-Json
 ```
@@ -45,6 +41,8 @@ $plan = & $python -B tools/flash_next_weights.py plan --root $inputs | ConvertFr
 GGUF 下载可在失败后重试同一命令，保留 `range-parts` 缓存以续传。已有两片正确文件时，将它们置于 `$plan.paths.gguf\Q2_0\`，保持原文件名，下载器会核验后复用。输出资源包必须是新目录；转换中断后保留诊断，将不完整的 MTP 输出移到另一个位置再重建，不与现用数据混合。
 
 已有配套的紧凑 MTP 时可直接将 `--mtp-dir` 指向它，跳过 fetch/build；制包工具仍检查其清单和数据。直接制作整合包不需要先运行 `flash_next_weights.py prepare`，避免多复制一份主模型。
+
+MTP 转换输出和清单状态字段见 [MTP 工具说明](../tools/mtp/README.md)。
 
 ## 输出与分发
 
