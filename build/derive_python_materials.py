@@ -34,6 +34,9 @@ PYTHON_ONLY_CHANGES = {
     'python/freetoken/kernel/triton/gguf_gdn.py',
     'python/freetoken/kernel/triton/qsa/attend.py',
     'python/freetoken/kernel/triton/qsa/score.py',
+    # Candidate only: Python/Triton selection, no native/AOT ABI changes.
+    'python/freetoken/kernel/triton/qsa/topk.py',
+    'tests/models/qwen4_exp/test_qsa_causal_extent.py',
     'python/freetoken/kvcache/__init__.py',
     'python/freetoken/kvcache/base.py',
     'python/freetoken/kvcache/linear_state_pool.py',

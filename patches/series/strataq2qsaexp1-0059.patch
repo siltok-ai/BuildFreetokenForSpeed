@@ -1,0 +1,167 @@
+diff --git a/python/freetoken/attention/qsa_sparse.py b/python/freetoken/attention/qsa_sparse.py
+--- a/python/freetoken/attention/qsa_sparse.py
++++ b/python/freetoken/attention/qsa_sparse.py
+@@ -142,6 +142,7 @@
+             ).to(self.device)
+ 
+         self._block_topk_kernel = _resolve_block_topk()
++        self._dense_score_skip = os.getenv("FREETOKEN_QSA_DENSE_SCORE_SKIP", "1") == "1"
+         # decode staging (static buffers under CUDA graphs; eager decode snapshots per step)
+         self._graph: dict[str, torch.Tensor] = {}
+         self.capture_bs: List[int] = []
+@@ -319,6 +320,7 @@
+             md.block_table,
+             md.token_to_req,
+             torch.empty_like(q),
++            causal_positions=md.positions,
+         )
+ 
+     def _plan_index_writes(self, md: QSASparseMetadata, batch: Batch) -> None:
+@@ -440,6 +442,7 @@
+                 self.ratio,
+                 logits,
+                 visible,
++                select_all_below=self.block_topk if self._dense_score_skip else 0,
+             )
+             blocks = self._scratch("blocks", end - start, self.block_topk, dtype=torch.int32)
+             self._top_blocks(logits, visible, blocks)
+diff --git a/python/freetoken/kernel/triton/qsa/attend.py b/python/freetoken/kernel/triton/qsa/attend.py
+--- a/python/freetoken/kernel/triton/qsa/attend.py
++++ b/python/freetoken/kernel/triton/qsa/attend.py
+@@ -21,6 +21,7 @@
+     partial_output_ptr,
+     partial_lse_ptr,
+     output_ptr,
++    positions_ptr,
+     stride_q_row,
+     stride_q_head,
+     stride_k_block,
+@@ -36,6 +37,7 @@
+     num_rows,
+     num_cache_blocks,
+     num_requests,
++    HAS_CAUSAL_BOUND: tl.constexpr,
+     TOPK: tl.constexpr,
+     PAGE_SIZE: tl.constexpr,
+     PAGE_TABLE_WIDTH: tl.constexpr,
+@@ -75,6 +77,11 @@
+     # Dynamic bounds avoid padded main-loop iterations for uneven splits.
+     split_tile_start = split_id * NUM_TILES // NUM_SPLITS
+     split_tile_end = (split_id + 1) * NUM_TILES // NUM_SPLITS
++    # The packed causal selection has no live entry after position + 1. Keep
++    # split boundaries and nonempty-tile reduction order unchanged.
++    if HAS_CAUSAL_BOUND:
++        bound = tl.minimum(TOPK, tl.maximum(tl.load(positions_ptr + row) + 1, 0))
++        split_tile_end = tl.minimum(split_tile_end, tl.cdiv(bound, BLOCK_N))
+     for tile in range(split_tile_start, split_tile_end):
+         columns = tile * BLOCK_N + column_offsets
+         logical_token = tl.load(
+@@ -240,6 +247,7 @@
+     token_to_req: torch.Tensor,
+     out: torch.Tensor | None = None,
+     *, num_stages: int = 2,
++    causal_positions: torch.Tensor | None = None,
+ ) -> torch.Tensor:
+     """Run sparse GQA directly over paged BF16 K/V caches."""
+ 
+@@ -322,6 +330,7 @@
+         partial_output,
+         partial_lse,
+         out,
++        causal_positions,
+         q.stride(0),
+         q.stride(1),
+         k_cache.stride(0),
+@@ -337,6 +346,7 @@
+         q.shape[0],
+         k_cache.shape[0],
+         block_table.shape[0],
++        HAS_CAUSAL_BOUND=causal_positions is not None,
+         TOPK=logical_indices.shape[1],
+         PAGE_SIZE=k_cache.shape[1],
+         PAGE_TABLE_WIDTH=block_table.shape[1],
+diff --git a/python/freetoken/kernel/triton/qsa/score.py b/python/freetoken/kernel/triton/qsa/score.py
+--- a/python/freetoken/kernel/triton/qsa/score.py
++++ b/python/freetoken/kernel/triton/qsa/score.py
+@@ -46,6 +46,7 @@
+     STAGES: tl.constexpr,
+     MAX_N: tl.constexpr,
+     COMPRESS_RATIO: tl.constexpr,
++    SELECT_ALL_BELOW: tl.constexpr,
+ ) -> None:
+     row = tl.program_id(0)
+     dims = tl.arange(0, BLOCK_D)
+@@ -70,6 +71,19 @@
+         return
+     tile_end = tl.minimum(tile_start + TILES_PER_PROG, tl.cdiv(visible, BLOCK_N))
+     tile_end = tl.minimum(tile_end, tl.cdiv(num_columns, BLOCK_N))
++    # With finite model activations, all visible blocks win when they fit the
++    # budget. Emit neutral scores; preserve invalid-page exclusion and ordering.
++    if SELECT_ALL_BELOW > 0:
++        if visible <= SELECT_ALL_BELOW:
++            columns = tile_start * BLOCK_N + tl.arange(0, BLOCK_N * TILES_PER_PROG)
++            live = (columns < visible) & (columns < num_columns)
++            logical_page = tl.minimum(columns // PAGE_SIZE, PAGE_TABLE_WIDTH - 1)
++            physical_page = tl.load(page_table_ptr + safe_request * stride_table_req
++                + logical_page * stride_table_page, mask=live, other=-1)
++            valid = (physical_page >= 0) & (physical_page < num_pages)
++            tl.store(logits_ptr + row * stride_logits_row + columns,
++                     tl.where(valid, 0.0, -float("inf")), mask=live)
++            return
+ 
+     # Pad the small head axis to a tensor-core-compatible N dimension.
+     query = tl.load(
+@@ -129,6 +143,7 @@
+     logits: torch.Tensor,
+     visible_blocks: torch.Tensor,
+     score_scale: float | None = None,
++    select_all_below: int = 0,
+ ) -> tuple[torch.Tensor, torch.Tensor]:
+     """Compute QSA scores directly from a paged compressed-key cache."""
+ 
+@@ -186,6 +201,7 @@
+         STAGES=2,
+         MAX_N=MAX_N,
+         COMPRESS_RATIO=compress_ratio,
++        SELECT_ALL_BELOW=select_all_below,
+         num_warps=2,
+     )
+     return logits, visible_blocks
+diff --git a/python/freetoken/kernel/triton/qsa/topk.py b/python/freetoken/kernel/triton/qsa/topk.py
+--- a/python/freetoken/kernel/triton/qsa/topk.py
++++ b/python/freetoken/kernel/triton/qsa/topk.py
+@@ -194,6 +194,16 @@
+     out_row = out_ptr + row.to(tl.int64) * stride_out_row
+     offsets = tl.arange(0, BLOCK_N)
+     tiles = tl.cdiv(limit, BLOCK_N)
++    # No ranking is needed when the visible prefix fits the output budget.
++    # _compact keeps nonfinite/dead columns excluded and emits ascending columns.
++    if limit <= TOP_K:
++        live_columns = tl.arange(0, PAD_K)
++        live_keys = _load_keys(logits_row, live_columns, limit)
++        rank = tl.cumsum((live_keys != 0).to(tl.int32), 0) - 1
++        tl.store(out_row + rank, live_columns, mask=(live_keys != 0) & (rank < TOP_K))
++        count = tl.sum((live_keys != 0).to(tl.int32))
++        tl.store(out_row + live_columns, -1, mask=(live_columns >= count) & (live_columns < TOP_K))
++        return
+     if SINGLE_TILE:
+         resident = _load_keys(logits_row, offsets, limit)
+ 
+diff --git a/python/freetoken/models/qwen4_exp/mtp_draft_graph.py b/python/freetoken/models/qwen4_exp/mtp_draft_graph.py
+--- a/python/freetoken/models/qwen4_exp/mtp_draft_graph.py
++++ b/python/freetoken/models/qwen4_exp/mtp_draft_graph.py
+@@ -67,7 +67,7 @@
+     def attend(self, q, positions):
+         """Mask future/private speculative cells on device before paged FP32 attention."""
+         indices = torch.where(self.columns <= positions[0], self.columns, -1).to(torch.int32)
+-        return qsa_sparse_paged_attention(q.reshape(1, 24, 256), self.keys, self.values, indices, self.table, self.mapping, num_stages=1).reshape(1, 24, 1, 256)
++        return qsa_sparse_paged_attention(q.reshape(1, 24, 256), self.keys, self.values, indices, self.table, self.mapping, num_stages=1, causal_positions=positions).reshape(1, 24, 1, 256)
+ 
+     def chain(self, residual, token, cell, count):
+         """Launch one draft chain and read its candidates once on the host."""
+diff --git a/python/freetoken/version.py b/python/freetoken/version.py
+--- a/python/freetoken/version.py
++++ b/python/freetoken/version.py
+@@ -1 +1 @@
+-__version__ = "0.1.3+speed.strataq2portable1"
++__version__ = "0.1.3+speed.strataq2qsaexp1"

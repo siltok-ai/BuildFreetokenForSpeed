@@ -1,0 +1,59 @@
+diff --git a/tests/models/qwen4_exp/test_qsa_causal_extent.py b/tests/models/qwen4_exp/test_qsa_causal_extent.py
+new file mode 100644
+--- /dev/null
++++ b/tests/models/qwen4_exp/test_qsa_causal_extent.py
+@@ -0,0 +1,54 @@
++"""Check causal extent pruning against the original kernel and full scoring."""
++import pytest
++import torch
++from freetoken.kernel.triton.qsa import qsa_sparse_paged_attention, qsa_mqa_paged, qsa_block_topk
++
++pytestmark=pytest.mark.skipif(not torch.cuda.is_available(), reason="requires CUDA")
++
++@pytest.mark.parametrize("rows", [1,4])
++@pytest.mark.parametrize("width", [2051,8192])
++def test_causal_extent_replays_changed_lengths_bitwise(rows,width):
++    """Preserve original split reductions across budget boundaries and stale padding."""
++    torch.manual_seed(9012)
++    q=torch.randn(rows,24,256,device="cuda",dtype=torch.float32)*.1
++    k=torch.randn(128,64,2,256,device="cuda",dtype=torch.bfloat16)*.1
++    v=torch.randn_like(k)
++    table=torch.randperm(128,device="cuda",dtype=torch.int32)[None,:]
++    mapping=torch.zeros(rows,device="cuda",dtype=torch.int32)
++    positions=torch.zeros(rows,device="cuda",dtype=torch.int32)
++    columns=torch.arange(width,device="cuda",dtype=torch.int32)[None,:]
++    indices=torch.where(columns<=positions[:,None],columns,-1)
++    def run(bound):
++        return qsa_sparse_paged_attention(q,k,v,indices,table,mapping,num_stages=1,
++            causal_positions=positions if bound else None)
++    stream=torch.cuda.Stream();stream.wait_stream(torch.cuda.current_stream())
++    with torch.cuda.stream(stream):
++        run(True);graph=torch.cuda.CUDAGraph()
++        with torch.cuda.graph(graph,stream=stream):output=run(True)
++    torch.cuda.current_stream().wait_stream(stream)
++    for length in (8192,1,31,32,33,2047,2048,2049,2051,2052,4096):
++        positions.fill_(length-1)
++        indices.copy_(torch.where(columns<=positions[:,None],columns,-1))
++        indices[:,17]=-1
++        graph.replay()
++        torch.testing.assert_close(output,run(False),rtol=0,atol=0)
++    graph.reset()
++
++@pytest.mark.parametrize("length", [1,2047,2048,2051,2052,8192])
++def test_full_budget_score_bypass_preserves_selected_blocks(length):
++    """Compare to real dot scores with invalid pages and high-valued stale logits."""
++    torch.manual_seed(8264)
++    q=torch.randn(4,4,128,device="cuda")
++    k=torch.randn(128,16,1,128,device="cuda")
++    table=torch.randperm(128,device="cuda",dtype=torch.int32)[None,:];table[0,0]=-1
++    mapping=torch.zeros(4,device="cuda",dtype=torch.int32)
++    positions=torch.arange(length-1,length+3,device="cuda",dtype=torch.int32).clamp_max_(8191)
++    lengths=torch.tensor([8192],device="cuda",dtype=torch.int32)
++    result=[]
++    for budget in (0,512):
++        scores=torch.full((4,2048),1e20,device="cuda")
++        visible=torch.empty(4,device="cuda",dtype=torch.int32)
++        blocks=torch.empty(4,512,device="cuda",dtype=torch.int32)
++        qsa_mqa_paged(q,k,table,mapping,positions,lengths,4,scores,visible,select_all_below=budget)
++        qsa_block_topk(scores,visible,blocks);result.append(blocks)
++    torch.testing.assert_close(result[0],result[1],rtol=0,atol=0)
