@@ -1,4 +1,4 @@
-"""准备完整 Strata Q2 checkpoint；权重只读校验，路径可随模型目录搬迁。"""
+"""准备完整 Strata Q2 checkpoint；当前版本从 GGUF 生成可搬迁配套信息。"""
 from __future__ import annotations
 
 import argparse
@@ -9,9 +9,10 @@ import os
 from pathlib import Path
 import shutil
 import urllib.request
+from current_release import load_current
 
 ROOT = Path(__file__).resolve().parents[1]
-LOCK = ROOT / 'model-weights/qwen3.8-flash-next-strata-q2/source-lock.json'
+LOCK = ROOT / load_current()['weight_source_lock']
 
 
 def read(path):
@@ -46,24 +47,28 @@ def source_directory(root, source):
 def layout(root, lock):
     root = Path(root).resolve()
     return dict(root=root, gguf=source_directory(root, lock['gguf']),
-                metadata=source_directory(root, lock['metadata']),
+                **({'metadata': source_directory(root, lock['metadata'])} if 'metadata' in lock else {}),
                 checkpoint=root/'checkpoints/flash-next-strata-q2',
                 mtp=root/'checkpoints/flash-next-mtp',
                 mtp_source=root/'sources/Qwen/Qwen3.8-Flash-Next'/lock['mtp']['revision']/'mtp-source-bf16')
 
 
 def plan(root, lock):
-    """计划不访问网络或创建目录，完整列明两片和五份元数据。"""
+    """计划不访问网络或创建目录，列明当前来源锁中的实际输入。"""
     paths = layout(root, lock)
+    kinds = ('gguf','metadata') if 'metadata' in lock else ('gguf',)
     return dict(format=1, scope=lock['scope'], paths={k:str(v) for k,v in paths.items()},
-                sources={k:lock[k] for k in ('gguf','metadata','mtp')},
-                downloaded_bytes=sum(f['bytes'] for k in ('gguf','metadata') for f in lock[k]['files']))
+                sources={k:lock[k] for k in (*kinds,'mtp')},
+                downloaded_bytes=sum(f['bytes'] for k in kinds for f in lock[k]['files']))
 
 
 def download(root, lock, workers=8, metadata_only=False):
     """只使用固定 revision；已有文件必须验真，不覆盖损坏来源。"""
     from download_q2_experts import download_ranges
-    for kind in (('metadata',) if metadata_only else ('gguf','metadata')):
+    if metadata_only and 'metadata' not in lock:
+        raise ValueError('Metadata is embedded in GGUF; download both GGUF shards instead')
+    kinds = ('gguf','metadata') if 'metadata' in lock else ('gguf',)
+    for kind in (('metadata',) if metadata_only else kinds):
         source = lock[kind]
         directory = source_directory(root, source)
         for row in source['files']:
@@ -119,6 +124,13 @@ def build_config(output, gguf_directory, metadata_directory, lock):
 
 def prepare(root, lock, gguf_directory=None, metadata_directory=None, refresh=False):
     """新建独立 checkpoint；搬迁后只能刷新由此工具持有且来源相同的目录。"""
+    if 'metadata' not in lock:
+        if metadata_directory is not None:
+            raise ValueError('This release derives all metadata from GGUF')
+        from flash_next_bundle import prepare_checkpoint
+        if refresh:
+            return verify_checkpoint(root, lock)
+        return prepare_checkpoint(root, lock, gguf_directory)
     paths = layout(root, lock)
     output = paths['checkpoint']
     marker = output/'strata-q2-preparation.json'
@@ -166,6 +178,9 @@ def prepare(root, lock, gguf_directory=None, metadata_directory=None, refresh=Fa
 
 def verify_checkpoint(root, lock):
     """全文件重新验真，同时确认现有回执确实对应本机文件版本。"""
+    if 'metadata' not in lock:
+        from flash_next_bundle import verify_checkpoint as verify_portable
+        return verify_portable(root, lock)
     output = layout(root, lock)['checkpoint']
     marker = read(output/'strata-q2-preparation.json')
     expected_marker = dict(format=1, model=lock['model'], gguf_revision=lock['gguf']['revision'],
@@ -221,8 +236,10 @@ def main():
     parser.add_argument('--metadata-dir', type=Path)
     parser.add_argument('--workers', type=int, default=8)
     parser.add_argument('--metadata-only', action='store_true')
+    parser.add_argument('--source-lock', type=Path, default=LOCK,
+                        help='Default uses current release; select a historical lock explicitly for reproduction')
     args = parser.parse_args()
-    lock = read(LOCK)
+    lock = read(args.source_lock)
     if not 1 <= args.workers <= 32:
         parser.error('workers must be between 1 and 32')
     if args.command == 'plan':

@@ -70,7 +70,7 @@ python -B -m unittest discover -s tests -v
 
 复用已验收材料时，整体使用当前指针的 `materials` 目录，安装其中wheel并显式指向配套kernel-cache。Speed同时锁定wheel实际SHA；跨机器重编译可能产生不同二进制，必须另存、验收并更新Speed消费身份，不能覆盖原材料或仅复用版本号。历史review1使用perf8相邻Python修订的显式复用路径，3个native/27个AOT不重编，验证两份源码及允许边界。
 
-完整权重、MTP可复现转换、搬迁回执和Speed配置见 [当前交付流程](../docs/flash-next-current-delivery.md)。MTP默认关闭。Speed编译包、安装器和干净机验收仍须在Speed侧完成。
+完整GGUF派生配套信息、MTP转换和独立资源包制作见 [当前交付流程](../docs/flash-next-gguf-bundle.md)。接收方无需搬迁回执或Python整理，MTP默认关闭。Speed编译包、安装器和干净机验收仍须在Speed侧完成。
 
 ## 更新依赖或历史材料
 

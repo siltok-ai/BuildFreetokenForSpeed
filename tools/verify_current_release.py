@@ -23,6 +23,7 @@ def verify():
     installed=None
     compiled=None
     source=None
+    portable=None
     if consumer.get('kind')=='flash_next_5070ti_installed_consumer':
         from verify_flash_next_5070ti_consumer import verify as verify_installed
         installed=verify_installed(ROOT/current['consumer_contract'])
@@ -35,11 +36,15 @@ def verify():
     elif consumer.get('kind')=='flash_next_5070ti_source_performance_consumer':
         from verify_performance8_consumer import verify as verify_source
         source=verify_source(ROOT/current['consumer_contract'])
+    elif consumer.get('kind')=='flash_next_portable_resource_consumer':
+        from verify_portable_consumer import verify as verify_portable
+        portable=verify_portable(ROOT/current['consumer_contract'])
     else:
         raise ValueError('Unsupported current consumer kind: '+str(consumer.get('kind')))
     return dict(status='verified',version=current['version'],profile=current['profile'],
                 consumer_contract=current['consumer_contract'],mtp_default_enabled=False,
-                installed_5070ti=installed,compiled_5070ti=compiled,source_5070ti=source)
+                installed_5070ti=installed,compiled_5070ti=compiled,source_5070ti=source,
+                portable_resource_consumer=portable)
 
 
 if __name__=='__main__':

@@ -1,0 +1,111 @@
+--- a/python/freetoken/layers/quantization/configs/gguf.py
++++ b/python/freetoken/layers/quantization/configs/gguf.py
+@@ -12,7 +12,7 @@
+     STORAGE = {}
+ 
+     def __init__(self, hf_config, *, name_map=None):
+-        """校验两片来源回执并绑定完整目录，忽略 checkpoint 遗留的 NVFP4 标签。"""
++        """按 checkpoint 目录解析可迁移来源；目录和几何校验由 GGUF reader 执行。"""
+         super().__init__(name_map)
+         from freetoken.models.qwen4_exp.gguf_source import GGUFModelSource, map_tensor
+         contract = cfg_get(hf_config, "freetoken_gguf_source")
+@@ -21,14 +21,14 @@
+         paths = []
+         for shard in contract["shards"]:
+             path = Path(shard["path"])
++            if not path.is_absolute():
++                root = cfg_get(hf_config, "_name_or_path")
++                if not root:
++                    raise ValueError("Relative GGUF paths require a local checkpoint directory")
++                path = Path(root) / path
+             stat = path.stat()
+-            if not path.is_absolute() or stat.st_size != shard["size"] or stat.st_mtime_ns != shard["verified_mtime_ns"]:
+-                raise ValueError("GGUF source changed after verification; reverify complete SHA256")
+-            digest = shard["sha256"]
+-            if len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
+-                raise ValueError("GGUF source requires a full SHA256 receipt")
+-            if shard["revision"] != contract["revision"]:
+-                raise ValueError("GGUF shard revision mismatch")
++            if stat.st_size != shard["size"]:
++                raise ValueError("GGUF shard size differs from checkpoint configuration")
+             paths.append(path)
+         self.source = GGUFModelSource(paths)
+         self._validate_geometry(hf_config)
+--- a/python/freetoken/models/qwen4_exp/q2_source.py
++++ b/python/freetoken/models/qwen4_exp/q2_source.py
+@@ -78,7 +78,7 @@
+ 
+ 
+ def iter_q2_expert_pieces(model_path, config, *, chunk=8 << 20):
+-    """校验已验字节的来源身份，再分块读取全部专家；不在热启动重复扫描大文件。"""
++    """检查文件大小和专家几何，再分块读取；允许模型目录独立搬迁。"""
+     source = config.expert_source
+     if (not isinstance(source, dict) or source.get("format") != "q2_0"
+             or source.get("scope") != "routed_experts_only"):
+@@ -89,16 +89,12 @@
+                 "expert_bytes": 3 * config.num_layers * E * H * I // Q2_BLOCK_ELEMENTS * Q2_BLOCK_BYTES}
+     if any(source.get(key) != value for key, value in geometry.items()):
+         raise ValueError("Q2_0 source contract does not match model geometry")
+-    digest = source.get("sha256")
+-    if not isinstance(digest, str) or re.fullmatch(r"[0-9a-f]{64}", digest) is None:
+-        raise ValueError("Q2_0 source needs a verified SHA256 receipt")
+     path = Path(source["path"])
+     if not path.is_absolute():
+         path = Path(model_path) / path
+     stat = path.stat()
+-    if (stat.st_size != source.get("size")
+-            or source.get("verified_mtime_ns") != stat.st_mtime_ns):
+-        raise ValueError("Q2_0 source identity changed; reverify the complete artifact")
++    if stat.st_size != source.get("size"):
++        raise ValueError("Q2_0 source size differs from checkpoint configuration")
+     directory = read_q2_directory(path, layers=config.num_layers, experts=config.num_experts,
+                                   hidden=config.hidden_size, intermediate=config.moe_intermediate_size)
+     per_expert = 3 * H * I // 64 * 18
+--- a/python/freetoken/version.py
++++ b/python/freetoken/version.py
+@@ -1 +1 @@
+-__version__ = "0.1.3+speed.strataq2perf9"
++__version__ = "0.1.3+speed.strataq2portable1"
+--- a/tests/moe/test_q2_source.py
++++ b/tests/moe/test_q2_source.py
+@@ -1,5 +1,7 @@
+ """Exercise a real miniature GSQ Q2_0 GGUF, including expert order and corruption."""
+ import hashlib
++import os
++import shutil
+ import struct
+ from types import SimpleNamespace
+ 
+@@ -82,11 +84,29 @@
+         read_q2_directory(path, layers=2, experts=4 if change == 'geometry' else 3, hidden=64, intermediate=128)
+ 
+ 
+-def test_source_change_requires_reverification(tmp_path):
++def test_relocated_source_streams_original_bytes_without_receipts(tmp_path):
++    """搬迁及文件时间变化不影响读取；不要求 SHA 或本机时间回执。"""
++    path = tmp_path / 'small.gguf'
++    config, expected = _source(path)
++    config.expert_source.pop('sha256')
++    config.expert_source.pop('verified_mtime_ns')
++    moved = tmp_path / 'moved directory'
++    moved.mkdir()
++    target = moved / path.name
++    shutil.move(path, target)
++    os.utime(target, (1, 1))
++    batches = list(iter_q2_expert_pieces(moved, config))
++    for layer, start, end, pieces in batches:
++        for role, tensor in pieces.items():
++            for index, expert in enumerate(range(start, end)):
++                assert tensor[index].numpy().tobytes() == expected[layer, role, expert]
++
++
++def test_truncated_source_is_rejected_before_streaming(tmp_path):
+     path = tmp_path / 'small.gguf'
+     config, _ = _source(path)
+-    config.expert_source['verified_mtime_ns'] -= 1
+-    with pytest.raises(ValueError, match='identity changed'):
++    path.write_bytes(path.read_bytes()[:-1])
++    with pytest.raises(ValueError, match='source size'):
+         list(iter_q2_expert_pieces(tmp_path, config))
+ 
+ 

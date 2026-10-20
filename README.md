@@ -2,9 +2,9 @@
 
 为 [Silitok Speed](https://github.com/siltok-ai/siltok-speed) 提供 FreeToken 的冻结补丁、Windows wheel/AOT、权重准备工具与消费证据。官方浏览源码 `upstream/FreeToken/` 保持原貌；应用 backend、worker 与 HTTP 在 Speed 仓库。
 
-当前版本由 [current-release.json](integration/speed/current-release.json) 唯一选择，包含 profile、有序补丁、材料目录、preset 与验收合同。不要按文件名排序选择版本，也不要把 `consumer-contract.json` 当作当前合同。Speed 的 `silitok_speed/runtimes/freetoken/release.json` 另锁定 wheel SHA、配套缓存和供应提交。
+当前版本由 [current-release.json](integration/speed/current-release.json) 唯一选择，包含 profile、有序补丁、材料目录、preset 与验收合同。不要按文件名排序选择版本，也不要把 `consumer-contract.json` 当作当前合同。Speed 的 `silitok_speed/runtimes/freetoken/release.json` 选择配套版本、缓存和供应提交，不要求固定 wheel SHA。
 
-Speed 当前开发入口为单提交分支 `feat/flash-next`（`a3e8b635`），原20笔历史保留在 `integrate/flash-next-dev-20261018`（`02074c99`）。本次精简Speed文档、研究记录和属性规则，产品代码与FT9材料不变；当前安装包和消费合同仍绑定原提交，详见 [源码分支与验收身份](docs/speed-source-history.md)。
+Speed 当前开发入口为 `feat/flash-next`，原20笔历史保留在 `integrate/flash-next-dev-20261018`。当前资源包从两片GGUF生成全部主模型配套信息，官方MTP预置在同一包中；历史安装身份仍按原合同保存。
 
 本轮 [外部材料边界修复与实装验收](docs/flash-next-external-final-20261019.txt) 删除 Speed 的旧 qwen36 包与全部324个AOT DLL，保留公开模型ID及manifest backend别名。材料统一由本仓库提供；新普通wheel不带DLL，Windows安装器使用明确外部输入。新源码、普通wheel、迁移编译包及实际安装i08均独立验收，实装测试实例已卸载清理。
 
@@ -26,7 +26,7 @@ Speed 当前开发入口为单提交分支 `feat/flash-next`（`a3e8b635`），�
 
 ## 使用
 
-[当前交付流程](docs/flash-next-current-delivery.md) 包含安装配套wheel、完整权重/MTP准备、目录搬迁与5070 Ti配置。
+[当前交付流程](docs/flash-next-gguf-bundle.md) 包含配套wheel、独立资源包制作、接收者使用与5070 Ti配置。
 
 ```powershell
 python -B tools/verify_current_release.py
@@ -40,7 +40,7 @@ python -B tools/flash_next_mtp.py build --root D:\models\flash-next
 python -B tools/flash_next_mtp.py verify --root D:\models\flash-next
 ```
 
-主模型GGUF路径与HF元数据分开：HF只提供固定配置/tokenizer，不加载RadixArk主干。搬迁后执行 `flash_next_weights.py refresh` 完整验真生成新路径回执。权重大文件不进Git。5070 Ti preset是显式设备档，不改变24GiB方案和其他机器的全局安全余量。
+配置、tokenizer和模板从GGUF导出；`tools/flash_next_bundle.py` 把GGUF和现成MTP组合为独立资源包，终端用户复制后即可挂载，无需Python整理或refresh。权重大文件不进Git。5070 Ti preset是显式设备档，不改变其他机器的全局安全余量。
 
 ## 开发验证
 

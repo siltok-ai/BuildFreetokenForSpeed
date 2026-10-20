@@ -11,4 +11,4 @@ Speed 开发入口为单提交分支 `feat/flash-next`（`a3e8b635`）；当前e
 - perf2/3/5/6、mtp2、dev7、q2opt2、win1等合同均保留其原材料和各自范围。
 - weight source lock和MTP manifest为引擎输入身份，用户checkpoint与运行路径由准备工具生成，不把本机绝对路径写入发布锁。
 
-当前使用步骤见 [交付流程](../../docs/flash-next-current-delivery.md)。
+当前使用步骤见 [GGUF 资源包流程](../../docs/flash-next-gguf-bundle.md)，旧 FT9 的准备流程仅用于历史复现。

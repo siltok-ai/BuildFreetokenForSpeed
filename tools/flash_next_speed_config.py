@@ -3,6 +3,7 @@ from pathlib import Path
 import argparse
 import json
 import os
+import shutil
 
 from flash_next_weights import ROOT, LOCK, layout, read, verify_checkpoint, write
 from flash_next_mtp import verify_runtime
@@ -20,6 +21,7 @@ PRESETS = {
     'sm120-16g-review1': 'integration/speed/presets/flash-next-sm120-16g-review1.json',
     'sm120-16g-review2b': 'integration/speed/presets/flash-next-sm120-16g-review2b.json',
     'sm120-16g-perf9': 'integration/speed/presets/flash-next-sm120-16g-perf9.json',
+    'sm120-16g-portable1': 'integration/speed/presets/flash-next-sm120-16g-portable1.json',
 }
 
 
@@ -70,6 +72,7 @@ def main():
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--profile', type=Path,
                         help='Explicit candidate profile inside build/profiles; default uses current release')
+    parser.add_argument('--source-lock', type=Path, default=LOCK)
     args = parser.parse_args()
     current = load_current()
     preset = read(ROOT/PRESETS[args.preset])
@@ -88,7 +91,8 @@ def main():
     if preset.get('required_version', current['version']) != current['version']:
         raise ValueError('This preset requires its explicit candidate --profile')
     manifest, resource = configuration(args.mode, preset)
-    paths = layout(args.root, read(LOCK))
+    lock = read(args.source_lock)
+    paths = layout(args.root, lock)
     deployment = (args.deployment_root or paths['root']).resolve()
     if args.dry_run:
         print(json.dumps(dict(manifest=manifest, config=resource, scope=preset['scope'],
@@ -100,12 +104,15 @@ def main():
     shared = deployment != paths['root']
     if shared and os.path.lexists(deployment/'checkpoints'):
         raise FileExistsError('Existing checkpoint entry is preserved; use a new deployment root')
-    verify_checkpoint(args.root, read(LOCK))
+    verify_checkpoint(args.root, lock)
     if args.mode == 'on':
         verify_runtime(paths['mtp'])
     deployment.mkdir(parents=True, exist_ok=True)
     if shared:
-        link_checkpoints(paths['root']/'checkpoints', deployment/'checkpoints')
+        if 'metadata' in lock:
+            link_checkpoints(paths['root']/'checkpoints', deployment/'checkpoints')
+        else:
+            shutil.copytree(paths['root']/'checkpoints', deployment/'checkpoints')
     write(targets[0], manifest)
     # JSON 是 YAML 子集，使用同一序列化器保持配置键和数值的精确性。
     targets[1].parent.mkdir(exist_ok=True)

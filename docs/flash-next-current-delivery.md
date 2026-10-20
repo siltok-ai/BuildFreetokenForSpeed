@@ -1,4 +1,6 @@
-# 当前 Flash Next 全 GGUF / MTP 交付
+# 历史 FT9 全 GGUF / MTP 交付
+
+以下保存 FT9 的准备与已安装验收流程，供历史材料复现。当前去除外部 HF 元数据依赖的可搬迁资源包请使用 [GGUF 资源包流程](flash-next-gguf-bundle.md)；不再要求接收者执行下面的 metadata 下载或 refresh。
 
 唯一选择是 [current-release.json](../integration/speed/current-release.json)：它绑定版本、profile、有序补丁、材料、消费合同与推荐preset。Speed的 `silitok_speed/runtimes/freetoken/release.json` 固定实际 wheel SHA 与供应提交。
 

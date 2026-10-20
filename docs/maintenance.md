@@ -1,6 +1,6 @@
 # FreeToken定制与Speed消费维护
 
-当前选择读取 [current-release.json](../integration/speed/current-release.json)。profile固定上游归档、补丁顺序与输入SHA；Speed的release固定实际wheel、缓存和供应提交。实际执行源码必须由profile重放，不在 `upstream/FreeToken` 或共享site-packages临时改代码。
+当前选择读取 [current-release.json](../integration/speed/current-release.json)。profile固定上游归档、补丁顺序与输入SHA；Speed的release选择配套版本、缓存和供应提交。实际执行源码必须由profile重放，不在 `upstream/FreeToken` 或共享site-packages临时改代码。GGUF资源包使用相对路径，不要求消费者重建制包机的时间或验真回执。
 
 ## 职责和修改位置
 
