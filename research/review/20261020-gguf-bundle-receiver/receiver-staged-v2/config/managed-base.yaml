@@ -1,0 +1,7 @@
+service:
+  host: 127.0.0.1
+  port: 8000
+  models_dir: C:/workspace/flash-next-resources
+  log_dir: C:/workspace/runs/siltok-speed/flash-portable-20261020/receiver-staged-v2/logs
+  result_dir: C:/workspace/runs/siltok-speed/flash-portable-20261020/receiver-staged-v2/results
+

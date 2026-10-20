@@ -1,0 +1,8 @@
+{
+  "change": "README only: explicitly use temperature=0 for greedy MTP; weights, metadata, manifest and runtime unchanged",
+  "before_readme_bytes": 2518,
+  "after_readme_bytes": 2729,
+  "before_readme_sha256": "eac25f7a68c6accbba4eedcd4a6ab433bb753543f196e226483f8d78dc620b26",
+  "after_readme_sha256": "8b4e63079bd5da4d6d465ed1b57ae87bb889df84ee043801276729e8bdbad5d1",
+  "package_bytes": 67267829061
+}

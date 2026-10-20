@@ -27,8 +27,10 @@ MTP 单独来自官方 Qwen/Qwen3.8-Flash-Next；它不在原始 GGUF 中。
      flash-next-strata-q2-on    开启 MTP
    两个入口共享同一份权重；Speed 按现有资源调度规则切换。
 4. POST http://127.0.0.1:8000/v1/chat/completions，JSON 示例：
-   {"model":"flash-next-strata-q2-off","messages":[{"role":"user","content":"计算17+25。"}],"max_tokens":128,"enable_thinking":false,"stream":false}
+   {"model":"flash-next-strata-q2-off","messages":[{"role":"user","content":"计算17+25。"}],"max_tokens":128,"temperature":0,"enable_thinking":false,"stream":false}
    将 model 改成 flash-next-strata-q2-on 即使用 MTP。stream=true 可接收 SSE。
+   当前 MTP 草稿加速仅用于 greedy 请求，请显式设置 temperature=0。
+   省略 temperature 时默认使用采样；ON 仍能生成文本，但采样请求沿原生路径执行。
    端口及 API 授权按实际服务配置填写；通过 Bonnet 调用时使用列表中 local/ 前缀的 ID。
 
 包内 checkpoints、manifest.json 和 sources.json 一起保留。

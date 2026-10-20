@@ -56,9 +56,23 @@ def verify(contract_path, speed_root=None):
                     or b['output_tokens'] != 512 or a['finish_reason'] != 'length'
                     or b['finish_reason'] != 'length'):
                 raise ValueError('Performance inputs or actual delivered lengths differ')
+    if contract.get('receiver_simulation_validated'):
+        receiver = report('receiver')
+        if (receiver['status'] != 'passed' or len(receiver['rounds']) != 8
+                or len(receiver['restarts']) != 2
+                or receiver['actual_install_validated'] != contract['actual_install_validated']
+                or any(row['returncode'] != 0 or not row['workers_gone'] for row in receiver['restarts'])):
+            raise ValueError('Incomplete receiver switching/restart proof')
+        for mode in ('off','on'):
+            rows = receiver['quality'][mode]
+            measured = dict(no_thinking=sum(row['quality_pass'] for row in rows if not row['thinking']),
+                thinking=sum(row['quality_pass'] for row in rows if row['thinking']))
+            if len(rows) != 23 or measured != contract['receiver_quality_scores'][mode]:
+                raise ValueError('Receiver quality summary differs from raw samples')
     return dict(status='verified', version=contract['version'],
         metadata_source='embedded_gguf', runtime_stages=stages,
         actual_install_validated=contract['actual_install_validated'],
+        receiver_simulation_validated=contract.get('receiver_simulation_validated', False),
         device_license_validated=False, clean_os_validated=False)
 
 

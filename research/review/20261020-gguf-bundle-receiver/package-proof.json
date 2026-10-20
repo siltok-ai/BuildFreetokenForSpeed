@@ -1,0 +1,197 @@
+{
+  "package": "C:\\workspace\\flash-next-resources",
+  "files": [
+    {
+      "path": "manifest.json",
+      "bytes": 2945
+    },
+    {
+      "path": "README.txt",
+      "bytes": 2518
+    },
+    {
+      "path": "sources.json",
+      "bytes": 1159
+    },
+    {
+      "path": "licenses/GGUF-Apache-2.0.txt",
+      "bytes": 11358
+    },
+    {
+      "path": "licenses/Qwen-MTP-LICENSE",
+      "bytes": 3235
+    },
+    {
+      "path": "speed-config/config.yaml",
+      "bytes": 103
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/attn_hyper_connection.block_inject_weight.weight.bin",
+      "bytes": 81920
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/attn_hyper_connection.hc_norm.weight.bin",
+      "bytes": 40960
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/attn_hyper_connection.input_mix_weight_down.weight.bin",
+      "bytes": 6553600
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/attn_hyper_connection.input_mix_weight_up.weight.bin",
+      "bytes": 6553600
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/fc_embedding.weight.bin",
+      "bytes": 6963200
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/fc_hidden.weight.bin",
+      "bytes": 6963200
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/hyper_connection_mixer.hc_norm.weight.bin",
+      "bytes": 40960
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/hyper_connection_mixer.input_mix_weight_down.weight.bin",
+      "bytes": 6553600
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/hyper_connection_mixer.input_mix_weight_up.weight.bin",
+      "bytes": 6553600
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/mlp.experts.down_proj.bin",
+      "bytes": 235929600
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/mlp.experts.gate_up_proj.bin",
+      "bytes": 471859200
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/mlp.gate.weight.bin",
+      "bytes": 2621440
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/mlp.shared_expert.down_proj.weight.bin",
+      "bytes": 1740800
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/mlp.shared_expert.gate_proj.weight.bin",
+      "bytes": 1740800
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/mlp.shared_expert.up_proj.weight.bin",
+      "bytes": 1740800
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/mlp.shared_expert_gate.weight.bin",
+      "bytes": 5120
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/mlp_hyper_connection.block_inject_weight.weight.bin",
+      "bytes": 81920
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/mlp_hyper_connection.hc_norm.weight.bin",
+      "bytes": 40960
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/mlp_hyper_connection.input_mix_weight_down.weight.bin",
+      "bytes": 6553600
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/mlp_hyper_connection.input_mix_weight_up.weight.bin",
+      "bytes": 6553600
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/pre_fc_norm_embedding.weight.bin",
+      "bytes": 10240
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/pre_fc_norm_hidden.weight.bin",
+      "bytes": 40960
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/runtime.json",
+      "bytes": 18450
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/self_attn.indexer.index_qk_proj.weight.bin",
+      "bytes": 1740800
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/self_attn.indexer.k_layernorm.weight.bin",
+      "bytes": 512
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/self_attn.indexer.q_layernorm.weight.bin",
+      "bytes": 512
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/self_attn.k_norm.weight.bin",
+      "bytes": 1024
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/self_attn.k_proj.weight.bin",
+      "bytes": 1392640
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/self_attn.o_proj.weight.bin",
+      "bytes": 16711680
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/self_attn.q_norm.weight.bin",
+      "bytes": 1024
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/self_attn.q_proj.weight.bin",
+      "bytes": 33423360
+    },
+    {
+      "path": "checkpoints/flash-next-mtp/self_attn.v_proj.weight.bin",
+      "bytes": 1392640
+    },
+    {
+      "path": "checkpoints/flash-next-strata-q2/chat_template.jinja",
+      "bytes": 9993
+    },
+    {
+      "path": "checkpoints/flash-next-strata-q2/config.json",
+      "bytes": 4262
+    },
+    {
+      "path": "checkpoints/flash-next-strata-q2/generation_config.json",
+      "bytes": 190
+    },
+    {
+      "path": "checkpoints/flash-next-strata-q2/gguf-preparation.json",
+      "bytes": 224
+    },
+    {
+      "path": "checkpoints/flash-next-strata-q2/tokenizer.json",
+      "bytes": 19997291
+    },
+    {
+      "path": "checkpoints/flash-next-strata-q2/tokenizer_config.json",
+      "bytes": 10626
+    },
+    {
+      "path": "checkpoints/flash-next-strata-q2/gguf/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+      "bytes": 37623740192
+    },
+    {
+      "path": "checkpoints/flash-next-strata-q2/gguf/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+      "bytes": 28800138432
+    }
+  ],
+  "total_bytes": 67267828850,
+  "external_links": [],
+  "metadata_source": "embedded_gguf",
+  "radix_files_removed": true,
+  "remaining_legacy_metadata_files": 0,
+  "all_weight_paths_relative": true,
+  "relocated_before_inference": true,
+  "gguf_timestamps_changed": true
+}

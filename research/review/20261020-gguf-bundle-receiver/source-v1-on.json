@@ -1,0 +1,168 @@
+{
+  "mode": "on",
+  "license_mode": "test_stub",
+  "product": "C:\\workspace\\wt\\siltok-speed\\flash-next\\silitok_speed\\__init__.py",
+  "speed_version": "0.2.0+flashnext.portable1",
+  "models_dir": "C:\\workspace\\flash-next move-test",
+  "hf_offline": true,
+  "runs": [
+    {
+      "kind": "sync",
+      "seconds": 52.78200000000652,
+      "response": {
+        "id": "chatcmpl-1792468199523",
+        "object": "chat.completion",
+        "created": 1792468199,
+        "model": "flash-next-strata-q2-on",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "reasoning_content": null,
+              "content": "42"
+            },
+            "logprobs": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 26,
+          "completion_tokens": 2,
+          "total_tokens": 28
+        }
+      }
+    },
+    {
+      "kind": "sse",
+      "text": "猫",
+      "chunks": [
+        "{\"id\": \"chatcmpl-1792468199820\", \"object\": \"chat.completion.chunk\", \"created\": 1792468199, \"model\": \"flash-next-strata-q2-on\", \"choices\": [{\"index\": 0, \"delta\": {\"role\": \"assistant\"}, \"logprobs\": null, \"finish_reason\": null}]}",
+        "{\"id\": \"chatcmpl-1792468199820\", \"object\": \"chat.completion.chunk\", \"created\": 1792468199, \"model\": \"flash-next-strata-q2-on\", \"choices\": [{\"index\": 0, \"delta\": {\"content\": \"猫\"}, \"logprobs\": null, \"finish_reason\": null}]}",
+        "{\"id\": \"chatcmpl-1792468199820\", \"object\": \"chat.completion.chunk\", \"created\": 1792468199, \"model\": \"flash-next-strata-q2-on\", \"choices\": [{\"index\": 0, \"delta\": {}, \"logprobs\": null, \"finish_reason\": \"stop\"}]}",
+        "{\"id\": \"chatcmpl-1792468199820\", \"object\": \"chat.completion.chunk\", \"created\": 1792468199, \"model\": \"flash-next-strata-q2-on\", \"choices\": [], \"usage\": {\"prompt_tokens\": 23, \"completion_tokens\": 1, \"total_tokens\": 24}}",
+        "[DONE]"
+      ]
+    },
+    {
+      "kind": "thinking",
+      "response": {
+        "id": "chatcmpl-1792468202694",
+        "object": "chat.completion",
+        "created": 1792468202,
+        "model": "flash-next-strata-q2-on",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "reasoning_content": "We need answer user's request in Chinese likely: \"计算 (12 - 3) * 7，最后只输出结果。\" Need compute: 12-3=9, *7=63. Final only output result. Ensure no extra.\n",
+              "content": "\n\n63"
+            },
+            "logprobs": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 69,
+          "completion_tokens": 60,
+          "total_tokens": 129
+        }
+      }
+    }
+  ],
+  "status": "passed",
+  "models": {
+    "object": "list",
+    "data": [
+      {
+        "id": "flash-next-strata-q2-off",
+        "object": "model",
+        "created": 1792468146,
+        "owned_by": "siltok",
+        "type": "language",
+        "features": [
+          "chat"
+        ],
+        "supports_tool_calls": false,
+        "tool_call_format": null,
+        "context_length": 262144,
+        "max_output_tokens": 4096,
+        "max_request_text_chars": 2000000,
+        "request_deadline_seconds": 1800.0,
+        "supported_request_fields": [
+          "stop",
+          "top_k"
+        ],
+        "unsupported_request_fields": [
+          "frequency_penalty",
+          "logprobs",
+          "min_p",
+          "parallel_tool_calls",
+          "presence_penalty",
+          "preserve_thinking",
+          "response_format",
+          "seed",
+          "tool_choice",
+          "tools",
+          "top_logprobs"
+        ],
+        "supports_multimodal": false,
+        "supports_thinking": true,
+        "supports_thinking_history": false
+      },
+      {
+        "id": "flash-next-strata-q2-on",
+        "object": "model",
+        "created": 1792468146,
+        "owned_by": "siltok",
+        "type": "language",
+        "features": [
+          "chat"
+        ],
+        "supports_tool_calls": false,
+        "tool_call_format": null,
+        "context_length": 262144,
+        "max_output_tokens": 4096,
+        "max_request_text_chars": 2000000,
+        "request_deadline_seconds": 1800.0,
+        "supported_request_fields": [
+          "stop",
+          "top_k"
+        ],
+        "unsupported_request_fields": [
+          "frequency_penalty",
+          "logprobs",
+          "min_p",
+          "parallel_tool_calls",
+          "presence_penalty",
+          "preserve_thinking",
+          "response_format",
+          "seed",
+          "tool_choice",
+          "tools",
+          "top_logprobs"
+        ],
+        "supports_multimodal": false,
+        "supports_thinking": true,
+        "supports_thinking_history": false
+      }
+    ]
+  },
+  "server_stopped": true,
+  "workers": [
+    [
+      10988,
+      1792468147.3004832
+    ],
+    [
+      5808,
+      1792468147.305037
+    ],
+    [
+      16736,
+      1792468147.3165476
+    ]
+  ],
+  "workers_gone": true
+}

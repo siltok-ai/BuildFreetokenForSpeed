@@ -1,0 +1,78 @@
+{
+  "protocol": "Same GGUF-derived metadata, exact prompt IDs, cache geometry, MTP policy and 512 delivered tokens; English/Chinese, three repetitions; first use and hot repeats retained separately",
+  "candidate": "Ordinary installed Speed wheel with FreeToken portable1",
+  "control": "Speed 4ca2ab2b source with original FT9 wheel; GGUF-derived metadata and old-loader binding wrapper; RadixArk remains deleted",
+  "rows": [
+    {
+      "mode": "off",
+      "language": "english",
+      "old_tps": [
+        93.87681579742122,
+        82.22278138701557,
+        99.208125016791
+      ],
+      "new_tps": [
+        90.59561974963901,
+        98.5963259773175,
+        98.8525616363784
+      ],
+      "old_median": 93.87681579742122,
+      "new_median": 98.5963259773175,
+      "change_percent": 5.027343694827291
+    },
+    {
+      "mode": "off",
+      "language": "chinese",
+      "old_tps": [
+        84.99459228140022,
+        99.08040970505985,
+        99.19887108267326
+      ],
+      "new_tps": [
+        93.60444257289033,
+        99.23399319187229,
+        99.10482163679336
+      ],
+      "old_median": 99.08040970505985,
+      "new_median": 99.10482163679336,
+      "change_percent": 0.02463850503462428
+    },
+    {
+      "mode": "on",
+      "language": "english",
+      "old_tps": [
+        103.99730852520942,
+        106.0877004799162,
+        103.75988249446931
+      ],
+      "new_tps": [
+        104.11968588513878,
+        96.6695047646274,
+        108.62955756216273
+      ],
+      "old_median": 103.99730852520942,
+      "new_median": 104.11968588513878,
+      "change_percent": 0.11767358373480086
+    },
+    {
+      "mode": "on",
+      "language": "chinese",
+      "old_tps": [
+        97.70601571499337,
+        105.3028864431902,
+        105.52404542032464
+      ],
+      "new_tps": [
+        99.36362942715421,
+        104.90511906844144,
+        106.48019948615297
+      ],
+      "old_median": 105.3028864431902,
+      "new_median": 104.90511906844144,
+      "change_percent": -0.3777364402668626
+    }
+  ],
+  "known_issues": [
+    "intermittent-long-output-token0: unresolved"
+  ]
+}

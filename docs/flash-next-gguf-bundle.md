@@ -55,6 +55,8 @@ $inputs = 'D:\flash-next-inputs'
 
 查询 `/v1/models` 可看到 `flash-next-strata-q2-off` 与 `flash-next-strata-q2-on`。默认推荐 OFF；请求中的 model 选择 ON 即使用 MTP，两入口共享权重。完整文本和 Bonnet 调用说明在包内 README。源码运行时仍需显式设置外部 AOT，组件自检与测试授权边界见 Speed 的 `doc/speed/models/freetoken.md`。
 
+要实际使用MTP草稿加速，请在ON请求中显式设置 `temperature: 0`。当前MTP只处理greedy请求；未传temperature时默认使用采样（no-thinking为0.7，thinking为1.0），此时ON可以正常生成，但沿原生采样路径执行。资源包README的示例已显式设置0；此次只补充说明，未改变采样或MTP行为。
+
 配套 `sm120-16g-portable1` 沿用 perf9 的 RTX5070Ti 16GiB 预算：OFF 永久专家5760、总槽7808；ON 永久专家4992、总槽7040，紧凑 MTP、`paired_cjk` 策略。KV8192、prefill1024、NVML探测、GPU安全余量0.25GiB、commit安全余量4GiB。其他设备需要单独验证，不能据此推断5090性能上限。
 
 ## 验证边界
@@ -79,3 +81,18 @@ Speed `79c39410`、供应提交 `313e2ab5`，FreeToken `0.1.3+speed.strataq2port
 | ON 中文 | 105.30 | 104.91 |
 
 本轮未测到 decode 衰退；OFF英文旧组有一次慢值，不能把中位数差异解释为优化收益。主权重和计算内核未改，但GGUF内嵌模板与旧RadixArk模板有差异，上表不验证两种模板的完整质量等价，也不代表5090或长期稳定性验收。全部模型测试使用进程范围测试授权，未验证真实设备许可证。
+
+## 推送后的接收者模拟
+
+在 Speed `79c39410`、Build `b12e265` 推送并核对远端后，用原资源包和同一保护载荷进行独立部署：只用包内Python、运行库和AOT，清除开发环境变量，使用空HF缓存和离线模式；导入路径没有源码或venv目录。按安装器的模板生成独立managed-base，合并包内resource配置，再走正常 `release_profile` 服务入口。授权适配只在外置验收进程替换原生ABI，产品及资源包字节未改。
+
+同一服务三轮OFF/ON切换、第二次启动后的OFF/ON、中文SSE、参数拒绝与正常退出均通过；被替换的模型worker按PID和创建时间核实已退出。OFF/ON各自完整20题均15/20，thinking均3/3，与既有本机协议的五个失败样本一致。此分数不能与5090上另一套20题直接比较。原始报告及配置见当前消费合同的 `receiver` 证据。
+
+未发现额外权重下载、RadixArk引用、MTP文件缺失或本轮引入的加载/切换障碍。接收者需注意：
+
+- 使用包含 `0.1.3+speed.strataq2portable1` 的匹配Speed；旧FT9安装器不支持这个相对路径格式。
+- 安装向导的模型目录填写**含manifest.json的包根**，保留包内层级。资源预算在ProgramData的 `config/operator.override.yaml` 合并，随后重启服务。
+- 当前档位只在SM120、5070Ti 16GiB和约64GiB主机内存验证；其他容量要检查显存及host commit。它不是5090的性能上限配置。
+- `engine_unlicensed` 表示设备授权尚未就绪，不能靠重新下载权重解决；JSON文本可用普通prompt生成，`response_format` 在此模型合同中返回400 `unsupported_feature`。
+
+Windows UAC在实装前返回操作已取消，未创建i09安装目录、服务或ProgramData。本轮是现有系统上的保护载荷接收者模拟，**未取得实际安装/卸载、干净OS或真实设备许可证资格**；此前i08的资格也不转移。验收脚本首轮误写了公开错误码，修正后用新编号完整复验，失败记录保留。

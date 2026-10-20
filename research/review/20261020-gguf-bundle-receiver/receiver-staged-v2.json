@@ -1,0 +1,2763 @@
+{
+  "status": "passed",
+  "license_mode": "test_stub",
+  "clean_os_validated": false,
+  "device_license_validated": false,
+  "tested_python": "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\python.exe",
+  "actual_install_validated": false,
+  "rounds": [
+    {
+      "iteration": 1,
+      "step": 0,
+      "mode": "off",
+      "workers": [
+        [
+          19792,
+          1792471474.5448537
+        ]
+      ],
+      "result": {
+        "response": {
+          "id": "chatcmpl-1792471531255",
+          "object": "chat.completion",
+          "created": 1792471531,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "42"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 26,
+            "completion_tokens": 2,
+            "total_tokens": 28
+          }
+        },
+        "seconds": 61.98399999999674
+      },
+      "status": {
+        "started": true,
+        "uptime_seconds": 62.07,
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5070 Ti",
+          "cuda_capability": [
+            12,
+            0
+          ]
+        },
+        "vram": {
+          "used_bytes": 15319695360,
+          "total_bytes": 17094934528,
+          "used_gb": 15.32,
+          "total_gb": 17.09,
+          "free_gb": 1.78
+        },
+        "ram": {
+          "used_bytes": 37555646464,
+          "total_bytes": 66158161920,
+          "used_gb": 37.56,
+          "total_gb": 66.16,
+          "available_bytes": 28602515456,
+          "available_gb": 28.6
+        },
+        "resources": {
+          "vram": {
+            "total_bytes": 17094934528,
+            "free_bytes": 841613312,
+            "torch_allocated_bytes": 0,
+            "torch_reserved_bytes": 0,
+            "total_gb": 17.09,
+            "free_gb": 0.84,
+            "torch_allocated_gb": 0.0,
+            "torch_reserved_gb": 0.0
+          },
+          "ram": {
+            "total_bytes": 66158161920,
+            "available_bytes": 28602515456,
+            "total_gb": 66.16,
+            "available_gb": 28.6
+          },
+          "commit": {
+            "limit_bytes": 78979846144,
+            "used_bytes": 58770710528,
+            "available_bytes": 20209135616,
+            "limit_gb": 78.98,
+            "used_gb": 58.77,
+            "available_gb": 20.21
+          },
+          "process": {
+            "private_bytes": 1785876480,
+            "working_set_bytes": 912306176,
+            "virtual_bytes": 1785876480,
+            "private_gb": 1.79,
+            "working_set_gb": 0.91,
+            "virtual_gb": 1.79
+          },
+          "pagefile": {
+            "allocated_bytes": 12821684224,
+            "current_bytes": 246280192,
+            "peak_bytes": null,
+            "allocated_gb": 12.82,
+            "current_gb": 0.25,
+            "peak_gb": null
+          }
+        },
+        "queue": {
+          "depth": 0,
+          "running": 0
+        },
+        "tasks": {
+          "running": [],
+          "queued": []
+        },
+        "task_service": {
+          "status": "ready",
+          "error_code": null,
+          "staged_bytes": 0
+        },
+        "recent_durations": {
+          "chat": {
+            "count": 1,
+            "p50_s": 61.835,
+            "p95_s": 61.835,
+            "p99_s": 61.835,
+            "last_s": 61.835
+          }
+        },
+        "loaded_backends": [
+          {
+            "model_id": "flash-next-strata-q2-off",
+            "backend_class": "FreeTokenBackend",
+            "vram_bytes": 15319695360,
+            "vram_gb": 15.32,
+            "state": "loaded",
+            "refcount": 0,
+            "idle": true,
+            "commit_delta_bytes": 45136912384,
+            "commit_delta_gb": 45.14,
+            "private_delta_bytes": 0,
+            "private_delta_gb": 0.0,
+            "weight_files": [
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf"
+            ]
+          }
+        ]
+      },
+      "main_private_bytes": 1785876480
+    },
+    {
+      "iteration": 1,
+      "step": 1,
+      "mode": "on",
+      "workers": [
+        [
+          3776,
+          1792471572.0469992
+        ]
+      ],
+      "result": {
+        "response": {
+          "id": "chatcmpl-1792471632487",
+          "object": "chat.completion",
+          "created": 1792471632,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "42"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 26,
+            "completion_tokens": 2,
+            "total_tokens": 28
+          }
+        },
+        "seconds": 63.51600000000326
+      },
+      "status": {
+        "started": true,
+        "uptime_seconds": 163.29,
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5070 Ti",
+          "cuda_capability": [
+            12,
+            0
+          ]
+        },
+        "vram": {
+          "used_bytes": 15338569728,
+          "total_bytes": 17094934528,
+          "used_gb": 15.34,
+          "total_gb": 17.09,
+          "free_gb": 1.76
+        },
+        "ram": {
+          "used_bytes": 38853771264,
+          "total_bytes": 66158161920,
+          "used_gb": 38.85,
+          "total_gb": 66.16,
+          "available_bytes": 27304390656,
+          "available_gb": 27.3
+        },
+        "resources": {
+          "vram": {
+            "total_bytes": 17094934528,
+            "free_bytes": 776601600,
+            "torch_allocated_bytes": 0,
+            "torch_reserved_bytes": 0,
+            "total_gb": 17.09,
+            "free_gb": 0.78,
+            "torch_allocated_gb": 0.0,
+            "torch_reserved_gb": 0.0
+          },
+          "ram": {
+            "total_bytes": 66158161920,
+            "available_bytes": 27304390656,
+            "total_gb": 66.16,
+            "available_gb": 27.3
+          },
+          "commit": {
+            "limit_bytes": 78979846144,
+            "used_bytes": 60157558784,
+            "available_bytes": 18822287360,
+            "limit_gb": 78.98,
+            "used_gb": 60.16,
+            "available_gb": 18.82
+          },
+          "process": {
+            "private_bytes": 1785815040,
+            "working_set_bytes": 913281024,
+            "virtual_bytes": 1785815040,
+            "private_gb": 1.79,
+            "working_set_gb": 0.91,
+            "virtual_gb": 1.79
+          },
+          "pagefile": {
+            "allocated_bytes": 12821684224,
+            "current_bytes": 246280192,
+            "peak_bytes": null,
+            "allocated_gb": 12.82,
+            "current_gb": 0.25,
+            "peak_gb": null
+          }
+        },
+        "queue": {
+          "depth": 0,
+          "running": 0
+        },
+        "tasks": {
+          "running": [],
+          "queued": []
+        },
+        "task_service": {
+          "status": "ready",
+          "error_code": null,
+          "staged_bytes": 0
+        },
+        "recent_durations": {
+          "chat": {
+            "count": 26,
+            "p50_s": 0.808,
+            "p95_s": 61.835,
+            "p99_s": 63.35,
+            "last_s": 63.35
+          }
+        },
+        "loaded_backends": [
+          {
+            "model_id": "flash-next-strata-q2-on",
+            "backend_class": "FreeTokenBackend",
+            "vram_bytes": 15338569728,
+            "vram_gb": 15.34,
+            "state": "loaded",
+            "refcount": 0,
+            "idle": true,
+            "commit_delta_bytes": 46590664704,
+            "commit_delta_gb": 46.59,
+            "private_delta_bytes": 0,
+            "private_delta_gb": 0.0,
+            "weight_files": [
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf"
+            ]
+          }
+        ]
+      },
+      "main_private_bytes": 1785815040
+    },
+    {
+      "iteration": 1,
+      "step": 2,
+      "mode": "off",
+      "workers": [
+        [
+          3224,
+          1792471672.9507537
+        ]
+      ],
+      "result": {
+        "response": {
+          "id": "chatcmpl-1792471730949",
+          "object": "chat.completion",
+          "created": 1792471730,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "42"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 26,
+            "completion_tokens": 2,
+            "total_tokens": 28
+          }
+        },
+        "seconds": 61.14000000001397
+      },
+      "status": {
+        "started": true,
+        "uptime_seconds": 261.74,
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5070 Ti",
+          "cuda_capability": [
+            12,
+            0
+          ]
+        },
+        "vram": {
+          "used_bytes": 15319695360,
+          "total_bytes": 17094934528,
+          "used_gb": 15.32,
+          "total_gb": 17.09,
+          "free_gb": 1.78
+        },
+        "ram": {
+          "used_bytes": 37550186496,
+          "total_bytes": 66158161920,
+          "used_gb": 37.55,
+          "total_gb": 66.16,
+          "available_bytes": 28607975424,
+          "available_gb": 28.61
+        },
+        "resources": {
+          "vram": {
+            "total_bytes": 17094934528,
+            "free_bytes": 841613312,
+            "torch_allocated_bytes": 0,
+            "torch_reserved_bytes": 0,
+            "total_gb": 17.09,
+            "free_gb": 0.84,
+            "torch_allocated_gb": 0.0,
+            "torch_reserved_gb": 0.0
+          },
+          "ram": {
+            "total_bytes": 66158161920,
+            "available_bytes": 28607975424,
+            "total_gb": 66.16,
+            "available_gb": 28.61
+          },
+          "commit": {
+            "limit_bytes": 78979846144,
+            "used_bytes": 58775105536,
+            "available_bytes": 20204740608,
+            "limit_gb": 78.98,
+            "used_gb": 58.78,
+            "available_gb": 20.2
+          },
+          "process": {
+            "private_bytes": 1785815040,
+            "working_set_bytes": 913297408,
+            "virtual_bytes": 1785815040,
+            "private_gb": 1.79,
+            "working_set_gb": 0.91,
+            "virtual_gb": 1.79
+          },
+          "pagefile": {
+            "allocated_bytes": 12821684224,
+            "current_bytes": 246280192,
+            "peak_bytes": null,
+            "allocated_gb": 12.82,
+            "current_gb": 0.25,
+            "peak_gb": null
+          }
+        },
+        "queue": {
+          "depth": 0,
+          "running": 0
+        },
+        "tasks": {
+          "running": [],
+          "queued": []
+        },
+        "task_service": {
+          "status": "ready",
+          "error_code": null,
+          "staged_bytes": 0
+        },
+        "recent_durations": {
+          "chat": {
+            "count": 51,
+            "p50_s": 0.821,
+            "p95_s": 60.992,
+            "p99_s": 63.35,
+            "last_s": 60.992
+          }
+        },
+        "loaded_backends": [
+          {
+            "model_id": "flash-next-strata-q2-off",
+            "backend_class": "FreeTokenBackend",
+            "vram_bytes": 15319695360,
+            "vram_gb": 15.32,
+            "state": "loaded",
+            "refcount": 0,
+            "idle": true,
+            "commit_delta_bytes": 45146275840,
+            "commit_delta_gb": 45.15,
+            "private_delta_bytes": 106496,
+            "private_delta_gb": 0.0,
+            "weight_files": [
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf"
+            ]
+          }
+        ]
+      },
+      "main_private_bytes": 1785815040
+    },
+    {
+      "iteration": 1,
+      "step": 3,
+      "mode": "on",
+      "workers": [
+        [
+          4716,
+          1792471733.9520445
+        ]
+      ],
+      "result": {
+        "response": {
+          "id": "chatcmpl-1792471794355",
+          "object": "chat.completion",
+          "created": 1792471794,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "42"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 26,
+            "completion_tokens": 2,
+            "total_tokens": 28
+          }
+        },
+        "seconds": 63.40600000001723
+      },
+      "status": {
+        "started": true,
+        "uptime_seconds": 325.16,
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5070 Ti",
+          "cuda_capability": [
+            12,
+            0
+          ]
+        },
+        "vram": {
+          "used_bytes": 15338569728,
+          "total_bytes": 17094934528,
+          "used_gb": 15.34,
+          "total_gb": 17.09,
+          "free_gb": 1.76
+        },
+        "ram": {
+          "used_bytes": 38849028096,
+          "total_bytes": 66158161920,
+          "used_gb": 38.85,
+          "total_gb": 66.16,
+          "available_bytes": 27309133824,
+          "available_gb": 27.31
+        },
+        "resources": {
+          "vram": {
+            "total_bytes": 17094934528,
+            "free_bytes": 776601600,
+            "torch_allocated_bytes": 0,
+            "torch_reserved_bytes": 0,
+            "total_gb": 17.09,
+            "free_gb": 0.78,
+            "torch_allocated_gb": 0.0,
+            "torch_reserved_gb": 0.0
+          },
+          "ram": {
+            "total_bytes": 66158161920,
+            "available_bytes": 27309133824,
+            "total_gb": 66.16,
+            "available_gb": 27.31
+          },
+          "commit": {
+            "limit_bytes": 78979846144,
+            "used_bytes": 60138598400,
+            "available_bytes": 18841247744,
+            "limit_gb": 78.98,
+            "used_gb": 60.14,
+            "available_gb": 18.84
+          },
+          "process": {
+            "private_bytes": 1785815040,
+            "working_set_bytes": 913457152,
+            "virtual_bytes": 1785815040,
+            "private_gb": 1.79,
+            "working_set_gb": 0.91,
+            "virtual_gb": 1.79
+          },
+          "pagefile": {
+            "allocated_bytes": 12821684224,
+            "current_bytes": 246280192,
+            "peak_bytes": null,
+            "allocated_gb": 12.82,
+            "current_gb": 0.25,
+            "peak_gb": null
+          }
+        },
+        "queue": {
+          "depth": 0,
+          "running": 0
+        },
+        "tasks": {
+          "running": [],
+          "queued": []
+        },
+        "task_service": {
+          "status": "ready",
+          "error_code": null,
+          "staged_bytes": 0
+        },
+        "recent_durations": {
+          "chat": {
+            "count": 52,
+            "p50_s": 0.828,
+            "p95_s": 61.835,
+            "p99_s": 63.35,
+            "last_s": 63.239
+          }
+        },
+        "loaded_backends": [
+          {
+            "model_id": "flash-next-strata-q2-on",
+            "backend_class": "FreeTokenBackend",
+            "vram_bytes": 15338569728,
+            "vram_gb": 15.34,
+            "state": "loaded",
+            "refcount": 0,
+            "idle": true,
+            "commit_delta_bytes": 46577766400,
+            "commit_delta_gb": 46.58,
+            "private_delta_bytes": 106496,
+            "private_delta_gb": 0.0,
+            "weight_files": [
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf"
+            ]
+          }
+        ]
+      },
+      "main_private_bytes": 1785815040
+    },
+    {
+      "iteration": 1,
+      "step": 4,
+      "mode": "off",
+      "workers": [
+        [
+          6000,
+          1792471797.503199
+        ]
+      ],
+      "result": {
+        "response": {
+          "id": "chatcmpl-1792471855482",
+          "object": "chat.completion",
+          "created": 1792471855,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "42"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 26,
+            "completion_tokens": 2,
+            "total_tokens": 28
+          }
+        },
+        "seconds": 60.98499999998603
+      },
+      "status": {
+        "started": true,
+        "uptime_seconds": 386.16,
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5070 Ti",
+          "cuda_capability": [
+            12,
+            0
+          ]
+        },
+        "vram": {
+          "used_bytes": 15319695360,
+          "total_bytes": 17094934528,
+          "used_gb": 15.32,
+          "total_gb": 17.09,
+          "free_gb": 1.78
+        },
+        "ram": {
+          "used_bytes": 37546934272,
+          "total_bytes": 66158161920,
+          "used_gb": 37.55,
+          "total_gb": 66.16,
+          "available_bytes": 28611227648,
+          "available_gb": 28.61
+        },
+        "resources": {
+          "vram": {
+            "total_bytes": 17094934528,
+            "free_bytes": 841613312,
+            "torch_allocated_bytes": 0,
+            "torch_reserved_bytes": 0,
+            "total_gb": 17.09,
+            "free_gb": 0.84,
+            "torch_allocated_gb": 0.0,
+            "torch_reserved_gb": 0.0
+          },
+          "ram": {
+            "total_bytes": 66158161920,
+            "available_bytes": 28611227648,
+            "total_gb": 66.16,
+            "available_gb": 28.61
+          },
+          "commit": {
+            "limit_bytes": 78979846144,
+            "used_bytes": 58767204352,
+            "available_bytes": 20212641792,
+            "limit_gb": 78.98,
+            "used_gb": 58.77,
+            "available_gb": 20.21
+          },
+          "process": {
+            "private_bytes": 1785815040,
+            "working_set_bytes": 913457152,
+            "virtual_bytes": 1785815040,
+            "private_gb": 1.79,
+            "working_set_gb": 0.91,
+            "virtual_gb": 1.79
+          },
+          "pagefile": {
+            "allocated_bytes": 12821684224,
+            "current_bytes": 246280192,
+            "peak_bytes": null,
+            "allocated_gb": 12.82,
+            "current_gb": 0.25,
+            "peak_gb": null
+          }
+        },
+        "queue": {
+          "depth": 0,
+          "running": 0
+        },
+        "tasks": {
+          "running": [],
+          "queued": []
+        },
+        "task_service": {
+          "status": "ready",
+          "error_code": null,
+          "staged_bytes": 0
+        },
+        "recent_durations": {
+          "chat": {
+            "count": 53,
+            "p50_s": 0.828,
+            "p95_s": 61.835,
+            "p99_s": 63.35,
+            "last_s": 60.941
+          }
+        },
+        "loaded_backends": [
+          {
+            "model_id": "flash-next-strata-q2-off",
+            "backend_class": "FreeTokenBackend",
+            "vram_bytes": 15319695360,
+            "vram_gb": 15.32,
+            "state": "loaded",
+            "refcount": 0,
+            "idle": true,
+            "commit_delta_bytes": 45143461888,
+            "commit_delta_gb": 45.14,
+            "private_delta_bytes": 106496,
+            "private_delta_gb": 0.0,
+            "weight_files": [
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf"
+            ]
+          }
+        ]
+      },
+      "main_private_bytes": 1785815040
+    },
+    {
+      "iteration": 1,
+      "step": 5,
+      "mode": "on",
+      "workers": [
+        [
+          10712,
+          1792471858.3294184
+        ]
+      ],
+      "result": {
+        "response": {
+          "id": "chatcmpl-1792471918946",
+          "object": "chat.completion",
+          "created": 1792471918,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "42"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 26,
+            "completion_tokens": 2,
+            "total_tokens": 28
+          }
+        },
+        "seconds": 63.57799999997951
+      },
+      "status": {
+        "started": true,
+        "uptime_seconds": 449.75,
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5070 Ti",
+          "cuda_capability": [
+            12,
+            0
+          ]
+        },
+        "vram": {
+          "used_bytes": 15338569728,
+          "total_bytes": 17094934528,
+          "used_gb": 15.34,
+          "total_gb": 17.09,
+          "free_gb": 1.76
+        },
+        "ram": {
+          "used_bytes": 38837739520,
+          "total_bytes": 66158161920,
+          "used_gb": 38.84,
+          "total_gb": 66.16,
+          "available_bytes": 27320422400,
+          "available_gb": 27.32
+        },
+        "resources": {
+          "vram": {
+            "total_bytes": 17094934528,
+            "free_bytes": 776601600,
+            "torch_allocated_bytes": 0,
+            "torch_reserved_bytes": 0,
+            "total_gb": 17.09,
+            "free_gb": 0.78,
+            "torch_allocated_gb": 0.0,
+            "torch_reserved_gb": 0.0
+          },
+          "ram": {
+            "total_bytes": 66158161920,
+            "available_bytes": 27320422400,
+            "total_gb": 66.16,
+            "available_gb": 27.32
+          },
+          "commit": {
+            "limit_bytes": 78979846144,
+            "used_bytes": 60137922560,
+            "available_bytes": 18841923584,
+            "limit_gb": 78.98,
+            "used_gb": 60.14,
+            "available_gb": 18.84
+          },
+          "process": {
+            "private_bytes": 1785815040,
+            "working_set_bytes": 913465344,
+            "virtual_bytes": 1785815040,
+            "private_gb": 1.79,
+            "working_set_gb": 0.91,
+            "virtual_gb": 1.79
+          },
+          "pagefile": {
+            "allocated_bytes": 12821684224,
+            "current_bytes": 246276095,
+            "peak_bytes": null,
+            "allocated_gb": 12.82,
+            "current_gb": 0.25,
+            "peak_gb": null
+          }
+        },
+        "queue": {
+          "depth": 0,
+          "running": 0
+        },
+        "tasks": {
+          "running": [],
+          "queued": []
+        },
+        "task_service": {
+          "status": "ready",
+          "error_code": null,
+          "staged_bytes": 0
+        },
+        "recent_durations": {
+          "chat": {
+            "count": 54,
+            "p50_s": 0.833,
+            "p95_s": 63.239,
+            "p99_s": 63.411,
+            "last_s": 63.411
+          }
+        },
+        "loaded_backends": [
+          {
+            "model_id": "flash-next-strata-q2-on",
+            "backend_class": "FreeTokenBackend",
+            "vram_bytes": 15338569728,
+            "vram_gb": 15.34,
+            "state": "loaded",
+            "refcount": 0,
+            "idle": true,
+            "commit_delta_bytes": 46568214528,
+            "commit_delta_gb": 46.57,
+            "private_delta_bytes": 106496,
+            "private_delta_gb": 0.0,
+            "weight_files": [
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf"
+            ]
+          }
+        ]
+      },
+      "main_private_bytes": 1785815040
+    },
+    {
+      "iteration": 2,
+      "step": 0,
+      "mode": "off",
+      "workers": [
+        [
+          8204,
+          1792471931.8330164
+        ]
+      ],
+      "result": {
+        "response": {
+          "id": "chatcmpl-1792471989316",
+          "object": "chat.completion",
+          "created": 1792471989,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "42"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 26,
+            "completion_tokens": 2,
+            "total_tokens": 28
+          }
+        },
+        "seconds": 62.84399999998277
+      },
+      "status": {
+        "started": true,
+        "uptime_seconds": 63.23,
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5070 Ti",
+          "cuda_capability": [
+            12,
+            0
+          ]
+        },
+        "vram": {
+          "used_bytes": 15319695360,
+          "total_bytes": 17094934528,
+          "used_gb": 15.32,
+          "total_gb": 17.09,
+          "free_gb": 1.78
+        },
+        "ram": {
+          "used_bytes": 37540794368,
+          "total_bytes": 66158161920,
+          "used_gb": 37.54,
+          "total_gb": 66.16,
+          "available_bytes": 28617367552,
+          "available_gb": 28.62
+        },
+        "resources": {
+          "vram": {
+            "total_bytes": 17094934528,
+            "free_bytes": 841613312,
+            "torch_allocated_bytes": 0,
+            "torch_reserved_bytes": 0,
+            "total_gb": 17.09,
+            "free_gb": 0.84,
+            "torch_allocated_gb": 0.0,
+            "torch_reserved_gb": 0.0
+          },
+          "ram": {
+            "total_bytes": 66158161920,
+            "available_bytes": 28617367552,
+            "total_gb": 66.16,
+            "available_gb": 28.62
+          },
+          "commit": {
+            "limit_bytes": 78979846144,
+            "used_bytes": 58746990592,
+            "available_bytes": 20232855552,
+            "limit_gb": 78.98,
+            "used_gb": 58.75,
+            "available_gb": 20.23
+          },
+          "process": {
+            "private_bytes": 1783513088,
+            "working_set_bytes": 908046336,
+            "virtual_bytes": 1783513088,
+            "private_gb": 1.78,
+            "working_set_gb": 0.91,
+            "virtual_gb": 1.78
+          },
+          "pagefile": {
+            "allocated_bytes": 12821684224,
+            "current_bytes": 246276095,
+            "peak_bytes": null,
+            "allocated_gb": 12.82,
+            "current_gb": 0.25,
+            "peak_gb": null
+          }
+        },
+        "queue": {
+          "depth": 0,
+          "running": 0
+        },
+        "tasks": {
+          "running": [],
+          "queued": []
+        },
+        "task_service": {
+          "status": "ready",
+          "error_code": null,
+          "staged_bytes": 0
+        },
+        "recent_durations": {
+          "chat": {
+            "count": 1,
+            "p50_s": 62.829,
+            "p95_s": 62.829,
+            "p99_s": 62.829,
+            "last_s": 62.829
+          }
+        },
+        "loaded_backends": [
+          {
+            "model_id": "flash-next-strata-q2-off",
+            "backend_class": "FreeTokenBackend",
+            "vram_bytes": 15319695360,
+            "vram_gb": 15.32,
+            "state": "loaded",
+            "refcount": 0,
+            "idle": true,
+            "commit_delta_bytes": 45134872576,
+            "commit_delta_gb": 45.13,
+            "private_delta_bytes": 0,
+            "private_delta_gb": 0.0,
+            "weight_files": [
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf"
+            ]
+          }
+        ]
+      },
+      "main_private_bytes": 1783586816
+    },
+    {
+      "iteration": 2,
+      "step": 1,
+      "mode": "on",
+      "workers": [
+        [
+          13648,
+          1792471992.3164153
+        ]
+      ],
+      "result": {
+        "response": {
+          "id": "chatcmpl-1792472052308",
+          "object": "chat.completion",
+          "created": 1792472052,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "42"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 26,
+            "completion_tokens": 2,
+            "total_tokens": 28
+          }
+        },
+        "seconds": 62.98399999999674
+      },
+      "status": {
+        "started": true,
+        "uptime_seconds": 126.24,
+        "gpu": {
+          "name": "NVIDIA GeForce RTX 5070 Ti",
+          "cuda_capability": [
+            12,
+            0
+          ]
+        },
+        "vram": {
+          "used_bytes": 15338569728,
+          "total_bytes": 17094934528,
+          "used_gb": 15.34,
+          "total_gb": 17.09,
+          "free_gb": 1.76
+        },
+        "ram": {
+          "used_bytes": 38840442880,
+          "total_bytes": 66158161920,
+          "used_gb": 38.84,
+          "total_gb": 66.16,
+          "available_bytes": 27317719040,
+          "available_gb": 27.32
+        },
+        "resources": {
+          "vram": {
+            "total_bytes": 17094934528,
+            "free_bytes": 776601600,
+            "torch_allocated_bytes": 0,
+            "torch_reserved_bytes": 0,
+            "total_gb": 17.09,
+            "free_gb": 0.78,
+            "torch_allocated_gb": 0.0,
+            "torch_reserved_gb": 0.0
+          },
+          "ram": {
+            "total_bytes": 66158161920,
+            "available_bytes": 27317719040,
+            "total_gb": 66.16,
+            "available_gb": 27.32
+          },
+          "commit": {
+            "limit_bytes": 78979846144,
+            "used_bytes": 60123607040,
+            "available_bytes": 18856239104,
+            "limit_gb": 78.98,
+            "used_gb": 60.12,
+            "available_gb": 18.86
+          },
+          "process": {
+            "private_bytes": 1783558144,
+            "working_set_bytes": 909934592,
+            "virtual_bytes": 1783558144,
+            "private_gb": 1.78,
+            "working_set_gb": 0.91,
+            "virtual_gb": 1.78
+          },
+          "pagefile": {
+            "allocated_bytes": 12821684224,
+            "current_bytes": 246267904,
+            "peak_bytes": null,
+            "allocated_gb": 12.82,
+            "current_gb": 0.25,
+            "peak_gb": null
+          }
+        },
+        "queue": {
+          "depth": 0,
+          "running": 0
+        },
+        "tasks": {
+          "running": [],
+          "queued": []
+        },
+        "task_service": {
+          "status": "ready",
+          "error_code": null,
+          "staged_bytes": 0
+        },
+        "recent_durations": {
+          "chat": {
+            "count": 2,
+            "p50_s": 62.947,
+            "p95_s": 62.947,
+            "p99_s": 62.947,
+            "last_s": 62.947
+          }
+        },
+        "loaded_backends": [
+          {
+            "model_id": "flash-next-strata-q2-on",
+            "backend_class": "FreeTokenBackend",
+            "vram_bytes": 15338569728,
+            "vram_gb": 15.34,
+            "state": "loaded",
+            "refcount": 0,
+            "idle": true,
+            "commit_delta_bytes": 46586077184,
+            "commit_delta_gb": 46.59,
+            "private_delta_bytes": 0,
+            "private_delta_gb": 0.0,
+            "weight_files": [
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+              "C:\\workspace\\flash-next-resources\\checkpoints\\flash-next-strata-q2\\gguf\\Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf"
+            ]
+          }
+        ]
+      },
+      "main_private_bytes": 1783558144
+    }
+  ],
+  "quality": {
+    "off": [
+      {
+        "name": "multiply",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "527",
+        "response": {
+          "id": "chatcmpl-1792471532174",
+          "object": "chat.completion",
+          "created": 1792471532,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "527"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 26,
+            "completion_tokens": 3,
+            "total_tokens": 29
+          }
+        },
+        "seconds": 0.8900000000139698
+      },
+      {
+        "name": "chain",
+        "thinking": false,
+        "quality_pass": false,
+        "expected": "712",
+        "response": {
+          "id": "chatcmpl-1792471533119",
+          "object": "chat.completion",
+          "created": 1792471533,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "722"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 29,
+            "completion_tokens": 3,
+            "total_tokens": 32
+          }
+        },
+        "seconds": 0.9529999999795109
+      },
+      {
+        "name": "fraction",
+        "thinking": false,
+        "quality_pass": false,
+        "expected": "106",
+        "response": {
+          "id": "chatcmpl-1792471534110",
+          "object": "chat.completion",
+          "created": 1792471534,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "110"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 34,
+            "completion_tokens": 3,
+            "total_tokens": 37
+          }
+        },
+        "seconds": 0.9850000000442378
+      },
+      {
+        "name": "long_multiply",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "10488",
+        "response": {
+          "id": "chatcmpl-1792471535079",
+          "object": "chat.completion",
+          "created": 1792471535,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "10488"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 27,
+            "completion_tokens": 5,
+            "total_tokens": 32
+          }
+        },
+        "seconds": 0.9529999999795109
+      },
+      {
+        "name": "precedence",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "49",
+        "response": {
+          "id": "chatcmpl-1792471535967",
+          "object": "chat.completion",
+          "created": 1792471535,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "49"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 29,
+            "completion_tokens": 2,
+            "total_tokens": 31
+          }
+        },
+        "seconds": 0.9060000000172295
+      },
+      {
+        "name": "probability",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "3/10",
+        "response": {
+          "id": "chatcmpl-1792471536989",
+          "object": "chat.completion",
+          "created": 1792471536,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "3/10"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 49,
+            "completion_tokens": 4,
+            "total_tokens": 53
+          }
+        },
+        "seconds": 1.0160000000032596
+      },
+      {
+        "name": "python_sum",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "55",
+        "response": {
+          "id": "chatcmpl-1792471537954",
+          "object": "chat.completion",
+          "created": 1792471537,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "55"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 36,
+            "completion_tokens": 2,
+            "total_tokens": 38
+          }
+        },
+        "seconds": 0.9689999999827705
+      },
+      {
+        "name": "python_slice",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "bd",
+        "response": {
+          "id": "chatcmpl-1792471538928",
+          "object": "chat.completion",
+          "created": 1792471538,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "bd"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 39,
+            "completion_tokens": 1,
+            "total_tokens": 40
+          }
+        },
+        "seconds": 0.9529999999795109
+      },
+      {
+        "name": "python_list",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": [
+          "a",
+          "c"
+        ],
+        "response": {
+          "id": "chatcmpl-1792471539948",
+          "object": "chat.completion",
+          "created": 1792471539,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "[\"a\", \"c\"]"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 38,
+            "completion_tokens": 6,
+            "total_tokens": 44
+          }
+        },
+        "seconds": 1.0310000000172295
+      },
+      {
+        "name": "set_sort",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "response": {
+          "id": "chatcmpl-1792471540967",
+          "object": "chat.completion",
+          "created": 1792471540,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "[1, 2, 3, 5]"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 38,
+            "completion_tokens": 12,
+            "total_tokens": 50
+          }
+        },
+        "seconds": 1.0310000000172295
+      },
+      {
+        "name": "binary_count",
+        "thinking": false,
+        "quality_pass": false,
+        "expected": "4",
+        "response": {
+          "id": "chatcmpl-1792471541843",
+          "object": "chat.completion",
+          "created": 1792471541,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "3"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 34,
+            "completion_tokens": 1,
+            "total_tokens": 35
+          }
+        },
+        "seconds": 0.875
+      },
+      {
+        "name": "json_sum",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "12",
+        "response": {
+          "id": "chatcmpl-1792471542800",
+          "object": "chat.completion",
+          "created": 1792471542,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "12"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 35,
+            "completion_tokens": 2,
+            "total_tokens": 37
+          }
+        },
+        "seconds": 0.9529999999795109
+      },
+      {
+        "name": "group_sum",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": {
+          "A": 7,
+          "B": 5
+        },
+        "response": {
+          "id": "chatcmpl-1792471543989",
+          "object": "chat.completion",
+          "created": 1792471543,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "{\n  \"A\": 7,\n  \"B\": 5\n}"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 42,
+            "completion_tokens": 18,
+            "total_tokens": 60
+          }
+        },
+        "seconds": 1.1880000000237487
+      },
+      {
+        "name": "indexing",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "7",
+        "response": {
+          "id": "chatcmpl-1792471544938",
+          "object": "chat.completion",
+          "created": 1792471544,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "7"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 44,
+            "completion_tokens": 1,
+            "total_tokens": 45
+          }
+        },
+        "seconds": 0.9529999999795109
+      },
+      {
+        "name": "ordering",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": [
+          "Bob",
+          "Ana",
+          "Cara"
+        ],
+        "response": {
+          "id": "chatcmpl-1792471545918",
+          "object": "chat.completion",
+          "created": 1792471545,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "[\"Bob\", \"Ana\", \"Cara\"]"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 36,
+            "completion_tokens": 9,
+            "total_tokens": 45
+          }
+        },
+        "seconds": 0.9689999999827705
+      },
+      {
+        "name": "deduction",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "YES",
+        "response": {
+          "id": "chatcmpl-1792471546852",
+          "object": "chat.completion",
+          "created": 1792471546,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "YES"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 41,
+            "completion_tokens": 1,
+            "total_tokens": 42
+          }
+        },
+        "seconds": 0.9370000000344589
+      },
+      {
+        "name": "boolean",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "PASS",
+        "response": {
+          "id": "chatcmpl-1792471547791",
+          "object": "chat.completion",
+          "created": 1792471547,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "PASS"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 43,
+            "completion_tokens": 1,
+            "total_tokens": 44
+          }
+        },
+        "seconds": 0.8129999999655411
+      },
+      {
+        "name": "multi_turn",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "远山17",
+        "response": {
+          "id": "chatcmpl-1792471548675",
+          "object": "chat.completion",
+          "created": 1792471548,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "远山17"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 56,
+            "completion_tokens": 4,
+            "total_tokens": 60
+          }
+        },
+        "seconds": 1.0150000000139698
+      },
+      {
+        "name": "long_lookup_1",
+        "thinking": false,
+        "quality_pass": false,
+        "expected": {
+          "K000": 148271,
+          "K043": 488788,
+          "K085": 821386
+        },
+        "response": {
+          "id": "chatcmpl-1792471555477",
+          "object": "chat.completion",
+          "created": 1792471555,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "```json\n{\n  \"K000\": 148271,\n  \"K043\": 488788,\n  \"K085\": 821386\n}\n```"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 2248,
+            "completion_tokens": 55,
+            "total_tokens": 2303
+          }
+        },
+        "seconds": 6.797000000020489
+      },
+      {
+        "name": "long_lookup_2",
+        "thinking": false,
+        "quality_pass": false,
+        "expected": {
+          "K000": 196542,
+          "K043": 537059,
+          "K085": 869657
+        },
+        "response": {
+          "id": "chatcmpl-1792471562016",
+          "object": "chat.completion",
+          "created": 1792471562,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "```json\n{\n  \"K000\": 196542,\n  \"K043\": 537059,\n  \"K085\": 869657\n}\n```"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 2248,
+            "completion_tokens": 55,
+            "total_tokens": 2303
+          }
+        },
+        "seconds": 6.530999999959022
+      },
+      {
+        "name": "chain",
+        "thinking": true,
+        "quality_pass": true,
+        "expected": "712",
+        "response": {
+          "id": "chatcmpl-1792471564005",
+          "object": "chat.completion",
+          "created": 1792471564,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": "We need answer user: Calculate 57*13-29. Reply only with integer. Need compute: 57*13 = 57*10 + 57*3 = 570+171=741. 741-29=712. Final only integer.\n",
+                "content": "\n\n712"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 69,
+            "completion_tokens": 79,
+            "total_tokens": 148
+          }
+        },
+        "seconds": 1.9839999999967404
+      },
+      {
+        "name": "fraction",
+        "thinking": true,
+        "quality_pass": true,
+        "expected": "106",
+        "response": {
+          "id": "chatcmpl-1792471565923",
+          "object": "chat.completion",
+          "created": 1792471565,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": "We need answer user: \"Calculate three quarters of 120 plus one fifth of 80. Reply only with the integer.\" Need compute: 3/4*120=90; 1/5*80=16; sum=106. Reply only integer. Ensure final only 106.\n",
+                "content": "\n\n106"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 74,
+            "completion_tokens": 78,
+            "total_tokens": 152
+          }
+        },
+        "seconds": 1.9070000000065193
+      },
+      {
+        "name": "binary_count",
+        "thinking": true,
+        "quality_pass": true,
+        "expected": "4",
+        "response": {
+          "id": "chatcmpl-1792471568293",
+          "object": "chat.completion",
+          "created": 1792471568,
+          "model": "flash-next-strata-q2-off",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": "We need answer user: \"How many 1 bits are in the binary representation of decimal 45? Reply only with the integer.\" Need compute. 45 decimal binary: 32+8+4+1 = 101101? Let's check: 45 = 32 (1), remainder 13; 16 0; 8 1; 4 1; 2 0; 1 1 => 101101. Count ones: 4. Need reply only integer. Ensure final only 4.\n",
+                "content": "\n\n4"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 74,
+            "completion_tokens": 129,
+            "total_tokens": 203
+          }
+        },
+        "seconds": 2.3589999999967404
+      }
+    ],
+    "on": [
+      {
+        "name": "multiply",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "527",
+        "response": {
+          "id": "chatcmpl-1792471633438",
+          "object": "chat.completion",
+          "created": 1792471633,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "527"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 26,
+            "completion_tokens": 3,
+            "total_tokens": 29
+          }
+        },
+        "seconds": 0.9220000000204891
+      },
+      {
+        "name": "chain",
+        "thinking": false,
+        "quality_pass": false,
+        "expected": "712",
+        "response": {
+          "id": "chatcmpl-1792471634430",
+          "object": "chat.completion",
+          "created": 1792471634,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "722"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 29,
+            "completion_tokens": 3,
+            "total_tokens": 32
+          }
+        },
+        "seconds": 0.9849999999860302
+      },
+      {
+        "name": "fraction",
+        "thinking": false,
+        "quality_pass": false,
+        "expected": "106",
+        "response": {
+          "id": "chatcmpl-1792471635406",
+          "object": "chat.completion",
+          "created": 1792471635,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "110"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 34,
+            "completion_tokens": 3,
+            "total_tokens": 37
+          }
+        },
+        "seconds": 0.9839999999967404
+      },
+      {
+        "name": "long_multiply",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "10488",
+        "response": {
+          "id": "chatcmpl-1792471636519",
+          "object": "chat.completion",
+          "created": 1792471636,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "10488"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 27,
+            "completion_tokens": 5,
+            "total_tokens": 32
+          }
+        },
+        "seconds": 1.125
+      },
+      {
+        "name": "precedence",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "49",
+        "response": {
+          "id": "chatcmpl-1792471637444",
+          "object": "chat.completion",
+          "created": 1792471637,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "49"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 29,
+            "completion_tokens": 2,
+            "total_tokens": 31
+          }
+        },
+        "seconds": 0.7970000000204891
+      },
+      {
+        "name": "probability",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "3/10",
+        "response": {
+          "id": "chatcmpl-1792471638305",
+          "object": "chat.completion",
+          "created": 1792471638,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "3/10"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 49,
+            "completion_tokens": 4,
+            "total_tokens": 53
+          }
+        },
+        "seconds": 0.9529999999795109
+      },
+      {
+        "name": "python_sum",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "55",
+        "response": {
+          "id": "chatcmpl-1792471639364",
+          "object": "chat.completion",
+          "created": 1792471639,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "55"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 36,
+            "completion_tokens": 2,
+            "total_tokens": 38
+          }
+        },
+        "seconds": 1.0940000000409782
+      },
+      {
+        "name": "python_slice",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "bd",
+        "response": {
+          "id": "chatcmpl-1792471640354",
+          "object": "chat.completion",
+          "created": 1792471640,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "bd"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 39,
+            "completion_tokens": 1,
+            "total_tokens": 40
+          }
+        },
+        "seconds": 0.9690000000409782
+      },
+      {
+        "name": "python_list",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": [
+          "a",
+          "c"
+        ],
+        "response": {
+          "id": "chatcmpl-1792471641465",
+          "object": "chat.completion",
+          "created": 1792471641,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "[\"a\", \"c\"]"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 38,
+            "completion_tokens": 6,
+            "total_tokens": 44
+          }
+        },
+        "seconds": 1.1099999999860302
+      },
+      {
+        "name": "set_sort",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": [
+          1,
+          2,
+          3,
+          5
+        ],
+        "response": {
+          "id": "chatcmpl-1792471642468",
+          "object": "chat.completion",
+          "created": 1792471642,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "[1, 2, 3, 5]"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 38,
+            "completion_tokens": 12,
+            "total_tokens": 50
+          }
+        },
+        "seconds": 0.9839999999967404
+      },
+      {
+        "name": "binary_count",
+        "thinking": false,
+        "quality_pass": false,
+        "expected": "4",
+        "response": {
+          "id": "chatcmpl-1792471643380",
+          "object": "chat.completion",
+          "created": 1792471643,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "3"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 34,
+            "completion_tokens": 1,
+            "total_tokens": 35
+          }
+        },
+        "seconds": 0.8119999999762513
+      },
+      {
+        "name": "json_sum",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "12",
+        "response": {
+          "id": "chatcmpl-1792471644221",
+          "object": "chat.completion",
+          "created": 1792471644,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "12"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 35,
+            "completion_tokens": 2,
+            "total_tokens": 37
+          }
+        },
+        "seconds": 0.9220000000204891
+      },
+      {
+        "name": "group_sum",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": {
+          "A": 7,
+          "B": 5
+        },
+        "response": {
+          "id": "chatcmpl-1792471645320",
+          "object": "chat.completion",
+          "created": 1792471645,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "{\n  \"A\": 7,\n  \"B\": 5\n}"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 42,
+            "completion_tokens": 18,
+            "total_tokens": 60
+          }
+        },
+        "seconds": 0.9679999999934807
+      },
+      {
+        "name": "indexing",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "7",
+        "response": {
+          "id": "chatcmpl-1792471646145",
+          "object": "chat.completion",
+          "created": 1792471646,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "7"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 44,
+            "completion_tokens": 1,
+            "total_tokens": 45
+          }
+        },
+        "seconds": 0.9529999999795109
+      },
+      {
+        "name": "ordering",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": [
+          "Bob",
+          "Ana",
+          "Cara"
+        ],
+        "response": {
+          "id": "chatcmpl-1792471647142",
+          "object": "chat.completion",
+          "created": 1792471647,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "[\"Bob\", \"Ana\", \"Cara\"]"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 36,
+            "completion_tokens": 9,
+            "total_tokens": 45
+          }
+        },
+        "seconds": 1.0
+      },
+      {
+        "name": "deduction",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "YES",
+        "response": {
+          "id": "chatcmpl-1792471648095",
+          "object": "chat.completion",
+          "created": 1792471648,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "YES"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 41,
+            "completion_tokens": 1,
+            "total_tokens": 42
+          }
+        },
+        "seconds": 0.9380000000237487
+      },
+      {
+        "name": "boolean",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "PASS",
+        "response": {
+          "id": "chatcmpl-1792471649043",
+          "object": "chat.completion",
+          "created": 1792471649,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "PASS"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 43,
+            "completion_tokens": 1,
+            "total_tokens": 44
+          }
+        },
+        "seconds": 0.8279999999795109
+      },
+      {
+        "name": "multi_turn",
+        "thinking": false,
+        "quality_pass": true,
+        "expected": "远山17",
+        "response": {
+          "id": "chatcmpl-1792471650009",
+          "object": "chat.completion",
+          "created": 1792471650,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "远山17"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 56,
+            "completion_tokens": 4,
+            "total_tokens": 60
+          }
+        },
+        "seconds": 0.9679999999934807
+      },
+      {
+        "name": "long_lookup_1",
+        "thinking": false,
+        "quality_pass": false,
+        "expected": {
+          "K000": 148271,
+          "K043": 488788,
+          "K085": 821386
+        },
+        "response": {
+          "id": "chatcmpl-1792471656821",
+          "object": "chat.completion",
+          "created": 1792471656,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "```json\n{\n  \"K000\": 148271,\n  \"K043\": 488788,\n  \"K085\": 821386\n}\n```"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 2248,
+            "completion_tokens": 55,
+            "total_tokens": 2303
+          }
+        },
+        "seconds": 6.922000000020489
+      },
+      {
+        "name": "long_lookup_2",
+        "thinking": false,
+        "quality_pass": false,
+        "expected": {
+          "K000": 196542,
+          "K043": 537059,
+          "K085": 869657
+        },
+        "response": {
+          "id": "chatcmpl-1792471663418",
+          "object": "chat.completion",
+          "created": 1792471663,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": null,
+                "content": "```json\n{\n  \"K000\": 196542,\n  \"K043\": 537059,\n  \"K085\": 869657\n}\n```"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 2248,
+            "completion_tokens": 55,
+            "total_tokens": 2303
+          }
+        },
+        "seconds": 6.60999999998603
+      },
+      {
+        "name": "chain",
+        "thinking": true,
+        "quality_pass": true,
+        "expected": "712",
+        "response": {
+          "id": "chatcmpl-1792471665178",
+          "object": "chat.completion",
+          "created": 1792471665,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": "We need answer user: Calculate 57*13-29. Reply only with integer. Need compute: 57*13 = 57*10 + 57*3 = 570+171=741. 741-29=712. Final only integer.\n",
+                "content": "\n\n712"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 69,
+            "completion_tokens": 79,
+            "total_tokens": 148
+          }
+        },
+        "seconds": 1.7650000000139698
+      },
+      {
+        "name": "fraction",
+        "thinking": true,
+        "quality_pass": true,
+        "expected": "106",
+        "response": {
+          "id": "chatcmpl-1792471666865",
+          "object": "chat.completion",
+          "created": 1792471666,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": "We need answer user: \"Calculate three quarters of 120 plus one fifth of 80. Reply only with the integer.\" Need compute: 3/4*120=90; 1/5*80=16; sum=106. Reply only integer. Ensure final only 106.\n",
+                "content": "\n\n106"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 74,
+            "completion_tokens": 78,
+            "total_tokens": 152
+          }
+        },
+        "seconds": 1.6880000000237487
+      },
+      {
+        "name": "binary_count",
+        "thinking": true,
+        "quality_pass": true,
+        "expected": "4",
+        "response": {
+          "id": "chatcmpl-1792471669067",
+          "object": "chat.completion",
+          "created": 1792471669,
+          "model": "flash-next-strata-q2-on",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": "We need answer user: \"How many 1 bits are in the binary representation of decimal 45? Reply only with the integer.\" Need compute. 45 decimal binary: 32+8+4+1 = 101101? Let's check: 45 = 32 (1), remainder 13; 16 0; 8 1 rem5; 4 1 rem1; 2 0; 1 1 => 101101. Count ones: 4. Need reply only integer. Ensure final only 4.\n",
+                "content": "\n\n4"
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 74,
+            "completion_tokens": 133,
+            "total_tokens": 207
+          }
+        },
+        "seconds": 2.1719999999622814
+      }
+    ]
+  },
+  "restarts": [
+    {
+      "iteration": 1,
+      "pid": 15720,
+      "identity": {
+        "python": "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\python.exe",
+        "product": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\flash-portable-20261020\\receiver-staged-v2\\tmp\\siltok-speed-assets\\5f1c47ba790cdecebb0a1b5a09bc430bcb8f7f1b7f19cbf737e330876f2953d3\\__init__.pyd",
+        "version": "0.2.0+flashnext.portable1",
+        "freetoken": "0.1.3+speed.strataq2portable1",
+        "license_mode": "test_stub",
+        "device_license_validated": false,
+        "sys_path": [
+          "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\python312.zip",
+          "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python",
+          "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\Lib\\site-packages\\kt-sft",
+          "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\Lib\\site-packages",
+          "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\Lib\\site-packages\\win32",
+          "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\Lib\\site-packages\\win32\\lib",
+          "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\Lib\\site-packages\\pythonwin"
+        ],
+        "models_dir": "C:/workspace/flash-next-resources",
+        "resource": {
+          "gpu_probe": "nvml",
+          "vram_safety_gb": 0.25,
+          "commit_safety_gb": 4.0,
+          "ram_safety_gb": 2.0
+        },
+        "host": "127.0.0.1",
+        "port": 8000,
+        "kernel_cache": "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\runtime\\kernel-cache"
+      },
+      "health": {
+        "status": "ok",
+        "version": "0.2.0+flashnext.portable1.2026102012",
+        "commit": "79c39410aadb6f5b49003e2f6c6b7b8804636d79",
+        "dirty": false,
+        "license": {
+          "state": "licensed",
+          "reason": null,
+          "license_id": "speed-test-fixture",
+          "device_id_prefix": "test-abi"
+        }
+      },
+      "returncode": 0,
+      "workers_gone": true
+    },
+    {
+      "iteration": 2,
+      "pid": 5972,
+      "identity": {
+        "python": "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\python.exe",
+        "product": "\\\\?\\C:\\workspace\\runs\\siltok-speed\\flash-portable-20261020\\receiver-staged-v2\\tmp\\siltok-speed-assets\\5f1c47ba790cdecebb0a1b5a09bc430bcb8f7f1b7f19cbf737e330876f2953d3\\__init__.pyd",
+        "version": "0.2.0+flashnext.portable1",
+        "freetoken": "0.1.3+speed.strataq2portable1",
+        "license_mode": "test_stub",
+        "device_license_validated": false,
+        "sys_path": [
+          "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\python312.zip",
+          "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python",
+          "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\Lib\\site-packages\\kt-sft",
+          "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\Lib\\site-packages",
+          "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\Lib\\site-packages\\win32",
+          "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\Lib\\site-packages\\win32\\lib",
+          "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\Lib\\site-packages\\pythonwin"
+        ],
+        "models_dir": "C:/workspace/flash-next-resources",
+        "resource": {
+          "gpu_probe": "nvml",
+          "vram_safety_gb": 0.25,
+          "commit_safety_gb": 4.0,
+          "ram_safety_gb": 2.0
+        },
+        "host": "127.0.0.1",
+        "port": 8000,
+        "kernel_cache": "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\runtime\\kernel-cache"
+      },
+      "health": {
+        "status": "ok",
+        "version": "0.2.0+flashnext.portable1.2026102012",
+        "commit": "79c39410aadb6f5b49003e2f6c6b7b8804636d79",
+        "dirty": false,
+        "license": {
+          "state": "licensed",
+          "reason": null,
+          "license_id": "speed-test-fixture",
+          "device_id_prefix": "test-abi"
+        }
+      },
+      "returncode": 0,
+      "workers_gone": true
+    }
+  ],
+  "reused_component_reports": "receiver-staged-v1-simple",
+  "sse": {
+    "off": {
+      "text": "猫",
+      "chunks": [
+        "{\"id\": \"chatcmpl-1792471568560\", \"object\": \"chat.completion.chunk\", \"created\": 1792471568, \"model\": \"flash-next-strata-q2-off\", \"choices\": [{\"index\": 0, \"delta\": {\"role\": \"assistant\"}, \"logprobs\": null, \"finish_reason\": null}]}",
+        "{\"id\": \"chatcmpl-1792471568560\", \"object\": \"chat.completion.chunk\", \"created\": 1792471568, \"model\": \"flash-next-strata-q2-off\", \"choices\": [{\"index\": 0, \"delta\": {\"content\": \"猫\"}, \"logprobs\": null, \"finish_reason\": null}]}",
+        "{\"id\": \"chatcmpl-1792471568560\", \"object\": \"chat.completion.chunk\", \"created\": 1792471568, \"model\": \"flash-next-strata-q2-off\", \"choices\": [{\"index\": 0, \"delta\": {}, \"logprobs\": null, \"finish_reason\": \"stop\"}]}",
+        "{\"id\": \"chatcmpl-1792471568560\", \"object\": \"chat.completion.chunk\", \"created\": 1792471568, \"model\": \"flash-next-strata-q2-off\", \"choices\": [], \"usage\": {\"prompt_tokens\": 23, \"completion_tokens\": 1, \"total_tokens\": 24}}",
+        "[DONE]"
+      ]
+    },
+    "on": {
+      "text": "猫",
+      "chunks": [
+        "{\"id\": \"chatcmpl-1792471669337\", \"object\": \"chat.completion.chunk\", \"created\": 1792471669, \"model\": \"flash-next-strata-q2-on\", \"choices\": [{\"index\": 0, \"delta\": {\"role\": \"assistant\"}, \"logprobs\": null, \"finish_reason\": null}]}",
+        "{\"id\": \"chatcmpl-1792471669337\", \"object\": \"chat.completion.chunk\", \"created\": 1792471669, \"model\": \"flash-next-strata-q2-on\", \"choices\": [{\"index\": 0, \"delta\": {\"content\": \"猫\"}, \"logprobs\": null, \"finish_reason\": null}]}",
+        "{\"id\": \"chatcmpl-1792471669337\", \"object\": \"chat.completion.chunk\", \"created\": 1792471669, \"model\": \"flash-next-strata-q2-on\", \"choices\": [{\"index\": 0, \"delta\": {}, \"logprobs\": null, \"finish_reason\": \"stop\"}]}",
+        "{\"id\": \"chatcmpl-1792471669337\", \"object\": \"chat.completion.chunk\", \"created\": 1792471669, \"model\": \"flash-next-strata-q2-on\", \"choices\": [], \"usage\": {\"prompt_tokens\": 23, \"completion_tokens\": 1, \"total_tokens\": 24}}",
+        "[DONE]"
+      ]
+    }
+  },
+  "unsupported_request": {
+    "off": {
+      "error": {
+        "code": "unsupported_feature",
+        "message": "Model 'flash-next-strata-q2-off' does not support request field 'response_format' in its current release.",
+        "type": "invalid_request_error",
+        "retryable": false,
+        "param": "response_format"
+      }
+    },
+    "on": {
+      "error": {
+        "code": "unsupported_feature",
+        "message": "Model 'flash-next-strata-q2-on' does not support request field 'response_format' in its current release.",
+        "type": "invalid_request_error",
+        "retryable": false,
+        "param": "response_format"
+      }
+    }
+  },
+  "quality_scores": {
+    "off": {
+      "no_thinking": 15,
+      "thinking": 3
+    },
+    "on": {
+      "no_thinking": 15,
+      "thinking": 3
+    }
+  }
+}

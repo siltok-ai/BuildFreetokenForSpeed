@@ -1,0 +1,13 @@
+{
+  "app": "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app",
+  "python": "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\python.exe",
+  "environment": {
+    "PATH": "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\python\\Scripts;C:\\Windows\\System32;C:\\Windows;C:\\Program Files\\NVIDIA Corporation\\NVSMI",
+    "TEMP": "C:\\workspace\\runs\\siltok-speed\\flash-portable-20261020\\protected-environment-v1\\tmp",
+    "SILITOK_CONFIG": "C:\\workspace\\runs\\siltok-speed\\flash-portable-20261020\\protected-environment-v1\\config",
+    "SILITOK_FREETOKEN_KERNEL_CACHE_DIR": "C:\\workspace\\build\\siltok-speed\\flash portable-p02\\app\\runtime\\kernel-cache",
+    "FREETOKEN_DISABLE_JIT": "1",
+    "TRITON_CACHE_DIR": "C:\\workspace\\cache\\triton\\portable1-protected",
+    "TORCH_EXTENSIONS_DIR": "C:\\workspace\\cache\\ext\\portable1-protected"
+  }
+}
