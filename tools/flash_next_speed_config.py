@@ -1,4 +1,4 @@
-"""按已记录的单机性能配置生成 Speed manifest；不修改机器全局配置。"""
+"""按发布preset生成Speed manifest；硬件自动档位由Speed解析，不修改全局配置。"""
 from pathlib import Path
 import argparse
 import json
@@ -11,19 +11,24 @@ from current_release import load_current
 from prepare_source import load_profile, sha256
 
 PRESETS = {
+    'sm120-auto': 'integration/speed/presets/flash-next-sm120-auto.json',
     'sm120-16g-portable1': 'integration/speed/presets/flash-next-sm120-16g-portable1.json',
 }
 
 
 def configuration(mode, preset):
     """将模型开关、专家预算和准入预算放在同一个明确的测试方案中。"""
+    if mode not in preset['modes']:
+        raise ValueError('Mode '+mode+' is not supported by preset '+preset['name'])
     selected = preset['modes'][mode]
     extra = dict(attention_backend='qsa_sparse', ple_backend='disk', cache_type='radix',
-        memory_ratio=.9, kv_cache_tokens=8192, cuda_graph_max_bs=1, max_prefill_length=4096,
-        moe_q2_resident_experts=selected['resident'], moe_q2_dynamic_slots=1024,
-        moe_cache_size=selected['total_slots'], mtp_enabled=mode == 'on',
-        vram_estimate_bytes=int(selected['vram_estimate_gib']*2**30),
-        host_commit_estimate_bytes=int(selected['host_commit_estimate_gib']*2**30))
+        memory_ratio=.9, kv_cache_tokens=8192, cuda_graph_max_bs=1, mtp_enabled=mode == 'on')
+    if 'resource_profile' not in preset:
+        # 历史固定preset保持原合同；新资源包交由Speed的现有硬件档位统一解析。
+        extra.update(max_prefill_length=4096, moe_q2_resident_experts=selected['resident'],
+            moe_q2_dynamic_slots=1024, moe_cache_size=selected['total_slots'],
+            vram_estimate_bytes=int(selected['vram_estimate_gib']*2**30),
+            host_commit_estimate_bytes=int(selected['host_commit_estimate_gib']*2**30))
     extra.update(preset.get('runtime_extra', {}))
     if mode == 'on' and preset.get('compact_mtp', False):
         extra['mtp_compact_state'] = True
@@ -37,6 +42,8 @@ def configuration(mode, preset):
     manifest = dict(schema='silitok.models/1', models=[dict(id='flash-next-strata-q2-'+mode,
         name='Flash Next Strata Q2 '+mode, type='language', family='qwen3.8', features=['chat'],
         engine=dict(pipeline='chat', backend='Qwen36Backend', offload=False, extra=extra), artifacts=artifacts)])
+    if 'resource_profile' in preset:
+        manifest['models'][0]['engine']['resource_profile'] = preset['resource_profile']
     return manifest, dict(resource=preset['resource'])
 
 
@@ -53,33 +60,34 @@ def link_checkpoints(source, destination):
 
 def main():
     """先验真共享权重，再在独立部署目录生成配置；旧输出始终保留。"""
+    current = load_current()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--mode', choices=['off','on','off-matched'], default='off')
-    parser.add_argument('--preset', choices=sorted(PRESETS), required=True)
+    parser.add_argument('--preset', choices=sorted(PRESETS),
+                        default=read(ROOT/current['speed_preset'])['name'])
     parser.add_argument('--deployment-root', type=Path,
                         help='New configuration root sharing checkpoints from --root; defaults to --root')
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--profile', type=Path,
-                        help='Explicit candidate profile inside build/profiles; default uses current release')
+                        help='Explicit version profile inside build/profiles; default uses current release')
     parser.add_argument('--source-lock', type=Path, default=LOCK)
     args = parser.parse_args()
-    current = load_current()
     preset = read(ROOT/PRESETS[args.preset])
     if args.profile is not None:
         profile_path = (ROOT/args.profile).resolve(strict=True)
         if profile_path.parent != (ROOT/'build/profiles').resolve():
-            raise ValueError('Candidate profile must be inside build/profiles')
+            raise ValueError('Version profile must be inside build/profiles')
         profile, _ = load_profile(profile_path)
         materials = 'artifacts/'+profile_path.stem+'-cp312-cu130-sm120'
         record = read(ROOT/materials/'build-record.json')
         if (record['custom_version'] != profile['custom_version']
                 or sha256(ROOT/materials/'wheels'/profile['wheel_filename']) != record['wheel_sha256']):
-            raise ValueError('Candidate wheel differs from its frozen profile/materials')
+            raise ValueError('Wheel differs from its frozen profile/materials')
         current = dict(version=profile['custom_version'], materials=materials,
                        profile=profile_path.relative_to(ROOT).as_posix())
     if preset.get('required_version', current['version']) != current['version']:
-        raise ValueError('This preset requires its explicit candidate --profile')
+        raise ValueError('Preset and FreeToken version differ; select the matching --profile')
     manifest, resource = configuration(args.mode, preset)
     lock = read(args.source_lock)
     paths = layout(args.root, lock)

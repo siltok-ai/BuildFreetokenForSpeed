@@ -1,12 +1,12 @@
 # Flash Next GGUF 资源包制作与部署
 
-本流程生成一个包含全部模型资源的目录，配套 Speed 的 `feat/flash-next` 和 FreeToken `0.1.3+speed.strataq2portable1`。接收方取得这个目录与匹配的 Speed 安装包后即可使用，无需 Python 转换。
+本流程从 Build `main` 生成包含全部模型资源的目录，当前配套 FreeToken `0.1.3+speed.mtpdecode2`。Speed 在功能分支、dev、main 或 release 中均使用本仓库 `main`，并以其 release 合同检查配套关系。接收方取得此目录与匹配的 Speed 安装包后即可使用，无需 Python 转换。
 
-## 优先使用现成资源包
+## 获取完整资源包
 
-优先从 **siltok31** 获取已处理好的 `C:\workspace\flash-next-resources`，完整复制整个目录，然后按本文的“接收方部署”使用。包内主模型、配置、tokenizer、模板、MTP 和资源预算已配套，无需再次处理。
+任意机器均可按下列步骤从固定公开来源下载、转换和整合，不依赖其他机器的目录或已生成资源包。已有按同一流程制作的包时，可直接完整复制后按“接收方部署”使用。
 
-不方便获取或希望从头制作时，使用下列固定来源、依赖和制作步骤。自行制作与现成包使用同一输入和转换格式，生成的模型资源内容一致；外层目录和文件时间可以不同。
+使用相同来源、依赖和制作工具时，模型数据、元数据和部署配置一致；外层目录和文件时间可以不同。无需 FreeToken 源码环境或制包者的本机路径。
 
 ## 固定来源
 
@@ -59,7 +59,7 @@ flash-next-resources/
       chat_template.jinja
       gguf-preparation.json
     flash-next-mtp/                   runtime.json 与 31 个数据文件
-  speed-config/config.yaml           默认 16GiB 档资源预算
+  speed-config/config.yaml           NVML探测、显存及commit安全余量
   sources.json
   licenses/
   README.txt                         接收者操作说明
@@ -71,7 +71,7 @@ flash-next-resources/
 
 ## 接收方部署
 
-1. 安装包含 FreeToken `0.1.3+speed.strataq2portable1` 的配套 Speed，复制整个资源包到例如 `D:\models\flash-next`。
+1. 安装包含FreeToken `0.1.3+speed.mtpdecode2` 的配套Speed，复制整个资源包到例如 `D:\models\flash-next`。
 2. 安装向导的模型目录（`/MODELSDIR`）填写**包含 manifest.json 的包根**。已安装服务在 `C:\ProgramData\Siltok\Speed\config\operator.override.yaml` 设置 `service.models_dir`，合并包内 `speed-config/config.yaml` 的 `resource` 段，保留已有设置。
 3. 重启服务，按 Speed 正常流程配置设备许可证和 API 授权。
 4. 查询 `GET /v1/models`，选择 `flash-next-strata-q2-off` 或 `flash-next-strata-q2-on`。
@@ -86,8 +86,12 @@ flash-next-resources/
 
 ## 设备与使用限制
 
-当前 preset 在 RTX 5070 Ti 16GiB、约 64GiB 主机内存验证：OFF 永久专家 5760/总槽 7808；ON 永久专家 4992/总槽 7040，紧凑 MTP 和 `paired_cjk`。KV 8192、prefill 1024、启动限时 600 秒。其他设备按显存及 host commit 调整预算，这不是 32GiB 显卡的性能上限配置。
+当前 `sm120-auto` preset在两项入口声明 `engine.resource_profile: auto`，不写死专家池、prefill或准入预算，由Speed已有的硬件档位统一解析。5070 Ti的16GiB档OFF/ON驻留专家5248/4480、总槽7296/6528、GPU预算14.5GiB；32GiB档驻留9216、总槽11264、预算28GiB不变。两档KV8192、动态/staging各1024；ON使用紧凑MTP与 `paired_cjk`，启动限时600秒。建议64GiB主机内存，实际资源仍由正常准入检查决定。
 
-资源包内容一致不等于跨 GPU 性能完全一致。首次加载和形状编译需要时间；间歇长输出标点/token0 异常仍是已知限制。结构化文本可通过普通提示生成，当前模型不支持 `response_format`。
+当前生成器已为 OFF/ON 启用 auto，不写入 `moe_q2_resident_experts`、`moe_cache_size`、`max_prefill_length`、`vram_estimate_bytes`、`host_commit_estimate_bytes` 五项固定覆盖值。部署时保留这一配置，并合并包内 NVML/0.25GiB 显存余量/4GiB commit 余量。
+
+`flash_next_speed_config.py --root <资源根> --mode off|on --dry-run` 可预览当前单入口配置；默认选择当前 preset。
+
+资源包内容一致不等于跨 GPU 性能完全一致。首次加载和形状编译需要时间，部署后应检查 OFF/ON、长请求及实际业务输出。结构化文本可通过普通提示生成，当前模型不支持 `response_format`。
 
 `engine_unlicensed` 表示设备授权未就绪，需处理 Speed 授权。离线工具检查和测试授权下的推理不代表真实设备许可证、全新系统或实际安装验收。

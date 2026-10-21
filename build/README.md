@@ -1,6 +1,6 @@
 # 构建 FreeToken Windows wheel 和 AOT
 
-当前 [release](../integration/speed/current-release.json) 选择 profile、固定上游归档、58 个有序补丁及 AOT 规格。完整构建生成 3 个原生模块和 27 项 AOT DLL；直接消费现成材料见 [Speed 接入](../docs/speed-integration.md)。
+当前 [release](../integration/speed/current-release.json) 选择 mtpdecode2 profile、固定上游归档、65 个有序补丁及 AOT 规格。完整构建生成 3 个原生模块和 27 项 AOT DLL；直接消费现成材料见 [Speed 接入](../docs/speed-integration.md)。默认入口均来自本仓库 main，无需其他开发分支。
 
 ## 准备环境
 
@@ -64,16 +64,38 @@ uv pip install --python $python -r build/requirements.lock.txt
 
 ## 仅 Python 修订重新封装
 
-当前 portable1 的原生代码和 AOT 输入与 FT9 相同，可从保留的基线重新封装：
+当前版本支持复用仓内的配套原生材料，仅重新封装 Python 修订。输入从当前 release 和消费合同读取，不需要切换版本或分支：
 
 ```powershell
+$selected = Get-Content integration/speed/current-release.json -Raw | ConvertFrom-Json
+$contract = Get-Content $selected.consumer_contract -Raw | ConvertFrom-Json
+$baseName = [IO.Path]::GetFileNameWithoutExtension($contract.base_profile)
+$baseMaterials = Join-Path artifacts ($baseName + '-cp312-cu130-sm120')
 & $python -B build/derive_python_materials.py `
-  --profile build/profiles/strataq2portable1.json `
-  --base-profile build/profiles/strataq2perf9.json `
-  --base-materials artifacts/strataq2perf9-cp312-cu130-sm120 `
+  --profile $selected.profile `
+  --base-profile $contract.base_profile `
+  --base-materials $baseMaterials `
   --output D:\builds\ft-python-001
 ```
 
 工具重放两份源码、验证允许的差异并复制原生材料，重新生成 wheel RECORD。原生代码、公共头文件、AOT 或 ABI 改变时应完整构建；选择性原生重编入口只供明确维护相应算子的开发者使用。
 
 修改构建依赖时在独立环境更新 lock 和 profile，按 [维护规则](../docs/maintenance.md) 验证；`freeze_build_requirements.py` 不在正式构建中自动更新锁文件。
+
+## 当前 MTP decode 交付
+
+main 默认的 `mtpdecode2` profile 包含草稿 attention、验证卷积、验证元数据和专家缓存调度优化。新增 Triton 内核仍需运行时形状编译。
+
+上节的重新封装生成当前版本。对新输出显式核对当前 profile 与配套原生材料：
+
+```powershell
+& $python -B tools/verify_materials.py D:\builds\ft-python-001
+& $python -B tools/validate_python_revision.py `
+  --profile $selected.profile `
+  --base-profile $contract.base_profile `
+  --materials D:\builds\ft-python-001
+```
+
+重新封装复用配套的 3 个原生模块和 27 个 AOT DLL，无需重新编译 CUDA/C++。任意分支的 Speed 均以其 release 合同与 Build main 配对；使用新构建时，将上述输出根作为 `$materials`，按 [Speed 接入](../docs/speed-integration.md)安装同一 wheel 并使用同目录的 kernel-cache。默认 `verify_portable_consumer.py --speed-root <Speed根>` 校验仓内当前材料，不会自动检查其他输出目录。
+
+新生成的材料须安装到配套 Speed 环境，验证 OFF/ON、前缀命中、取消、重载和进程回收。安装器、设备许可及目标 GPU 按实际交付验收，不能由源码或材料检查推断；应用操作见实际消费方 Speed 的 FreeToken 文档。

@@ -1,0 +1,108 @@
+--- /dev/null
++++ b/python/freetoken/kernel/triton/mtp_metadata.py
+@@ -0,0 +1,36 @@
++"""一次 H2D 输入包与一个 kernel 更新单请求验证的原 graph 元数据。"""
++import triton
++import triton.language as tl
++
++
++@triton.jit
++def _prepare(PACKET, PT, INPUT, POS, LOC, CACHE, LINEAR, RING, LENS, TABLE,
++             PTSTRIDE: tl.constexpr, PAGESIZE: tl.constexpr, WIDTH: tl.constexpr,
++             T: tl.constexpr, BLOCK: tl.constexpr):
++    col = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)
++    position = tl.load(PACKET)
++    owner = tl.load(PACKET + 1).to(tl.int64)
++    slot = tl.load(PACKET + 2)
++    token = tl.load(PACKET + 4 + col, col < T, 0)
++    p = position + col
++    loc = tl.load(PT + owner * PTSTRIDE + p, col < T, 0)
++    tl.store(INPUT + col, token, col < T)
++    tl.store(POS + col, p, col < T)
++    tl.store(LOC + col, loc, col < T)
++    if tl.program_id(0) == 0:
++        tl.store(CACHE, slot)
++        tl.store(LINEAR, slot)
++        tl.store(RING, owner)
++        tl.store(LENS, position + T)
++    page = tl.load(PT + owner * PTSTRIDE + col * PAGESIZE, col < WIDTH, 0) // PAGESIZE
++    tl.store(TABLE + col, page, col < WIDTH)
++
++
++def stage_verify_metadata(packet, page_table, batch, page_size):
++    """只更新既有 graph buffer；PLE 与 graph 的消费顺序由 MtpRuntime 保持。"""
++    md = batch.attn_metadata
++    width = md.block_table.numel()
++    _prepare[(triton.cdiv(width, 256),)](packet, page_table, batch.input_ids, batch.positions,
++        batch.out_loc, batch.fla_metadata.cache_indices, batch.linear_table_idx,
++        md.ring_slots, md.seq_lens, md.block_table, page_table.stride(0), page_size,
++        width, len(batch.input_ids), 256, num_warps=4)
+--- a/python/freetoken/models/qwen4_exp/mtp_runtime.py
++++ b/python/freetoken/models/qwen4_exp/mtp_runtime.py
+@@ -10,6 +10,8 @@
+ 
+ from freetoken.attention.linear import build_fla_metadata
+ from freetoken.core import Batch
++from freetoken.kernel.pinned import alloc_pinned_tensor
++from freetoken.kernel.triton.mtp_metadata import stage_verify_metadata
+ from .mtp_draft_graph import DraftGraphs
+ from .mtp_draft_policy import PairedPolicy
+ from .mtp_state import MTP_LAST_RESIDUAL
+@@ -42,6 +44,7 @@
+         self.draft = drafter
+         self.ple = engine.model._ple_table
+         self.graphs = {}
++        self._metadata_host = self._metadata_view = self._metadata_device = None
+         self.draft_graphs = None
+         self.full_draft_graphs = None
+         self.draft_policy = None
+@@ -109,6 +112,16 @@
+                     logits = self.engine.model.lm_head.quant_method.apply(self.engine.model.lm_head, hidden)
+                     picks = logits.argmax(-1).to(torch.int32)
+             self.graphs[count] = (batch, graph, picks)
++        # 单窗口串行使用；先预热新 kernel，再接受实际请求。
++        self._metadata_host = alloc_pinned_tensor(16, dtype=torch.int32)
++        self._metadata_host.zero_()
++        self._metadata_view = self._metadata_host.numpy()
++        self._metadata_device = torch.empty(16, device=self.engine.device, dtype=torch.int32)
++        self._metadata_device.copy_(self._metadata_host, non_blocking=True)
++        for batch, _, _ in self.graphs.values():
++            stage_verify_metadata(self._metadata_device, self.engine.page_table, batch,
++                                  self.engine.attn_backend.page_size)
++        torch.cuda.synchronize(self.engine.device)
+         self.draft_graphs = DraftGraphs(self.draft, self.engine.stream,
+             attention_width=self.draft.max_context, vocab_ids=self.draft.draft_vocab)
+         if self.draft.draft_policy == 'paired_cjk':
+@@ -123,6 +136,8 @@
+         for _, graph, _ in self.graphs.values():
+             graph.reset()
+         self.graphs.clear()
++        # 上面的同步已排空 H2D 和 graph，随后释放本 runtime 所有的输入包引用。
++        self._metadata_host = self._metadata_view = self._metadata_device = None
+         if self.draft_graphs is not None:
+             self.draft_graphs.close()
+             self.draft_graphs = None
+@@ -161,16 +176,13 @@
+ 
+     def _replay(self, req, inputs, position):
+         batch, graph, picks = self.graphs[len(inputs)]
+-        batch.input_ids.copy_(torch.tensor(inputs, device=self.engine.device, dtype=torch.int32))
+-        batch.positions.copy_(torch.arange(position, position + len(inputs), device=self.engine.device, dtype=torch.int32))
+-        batch.out_loc.copy_(self.engine.page_table[req.table_idx, batch.positions.long()])
+-        batch.fla_metadata.cache_indices.fill_(req.linear_slot_idx)
+-        batch.linear_table_idx.fill_(req.linear_slot_idx)
+-        md = batch.attn_metadata
+-        md.ring_slots.fill_(req.table_idx)
+-        md.seq_lens.fill_(position + len(inputs))
+-        md.kv_len_cpu.fill_(position + len(inputs))
+-        md.block_table.copy_(self.engine.attn_backend._block_table(md.ring_slots.long()))
++        # 上一窗口 picks.cpu() 已阻塞完成，才允许复用此 pinned 输入包。
++        self._metadata_view[:4] = [position, req.table_idx, req.linear_slot_idx, len(inputs)]
++        self._metadata_view[4:4 + len(inputs)] = inputs
++        self._metadata_device.copy_(self._metadata_host, non_blocking=True)
++        stage_verify_metadata(self._metadata_device, self.engine.page_table, batch,
++                              self.engine.attn_backend.page_size)
++        batch.attn_metadata.kv_len_cpu.fill_(position + len(inputs))
+         context = self.ple._ple_context(req.input_ids, position)
+         self.ple.fill([torch.tensor([*context, *inputs], dtype=torch.int64)], graph=True)
+         graph.replay()

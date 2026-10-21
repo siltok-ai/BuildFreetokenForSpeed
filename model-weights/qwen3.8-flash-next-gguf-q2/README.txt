@@ -6,11 +6,12 @@ Flash Next GGUF Q2 资源包
 MTP 单独来自官方 Qwen/Qwen3.8-Flash-Next；它不在原始 GGUF 中。
 不需要 RadixArk、NVFP4 主模型、BF16 主模型或下载/转换临时缓存。
 
-准备：安装包含 FreeToken 0.1.3+speed.strataq2portable1 的配套 Speed。
+准备：安装包含 FreeToken 0.1.3+speed.mtpdecode2 的配套 Speed。
 软件运行库和 AOT 由 Speed 安装包提供；本包不代替 Speed 安装器或设备许可证。
-当前预算适用于 Windows x64、SM120、RTX5070Ti 16GiB，建议64GiB主机内存。
-模型准入预算为15GiB显存、31GiB host heap，另留4GiB系统commit余量。
-其他设备需要按显存及 host commit 调整预算，不应把此档位当作性能上限。
+当前包声明auto资源档位，适用于Windows x64、SM120，建议64GiB主机内存。
+Speed自动选择16GiB或32GiB档，5070Ti使用14.5GiB模型显存估值与较小专家池，
+32GiB档保留28GiB预算；另留0.25GiB显存与4GiB系统commit余量。
+实际加载仍需通过资源准入，不能仅凭显卡名称判断当前空闲资源充足。
 
 使用：
 1. 把整个文件夹解压或复制到自选位置，例如 D:\models\flash-next。

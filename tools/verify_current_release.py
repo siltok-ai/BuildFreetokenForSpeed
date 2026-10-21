@@ -13,10 +13,12 @@ def verify():
     consumer = json.loads((ROOT/current['consumer_contract']).read_text(encoding='utf-8'))
     _, mtp = canonical_manifest()
     source = json.loads((ROOT/current['weight_source_lock']).read_text(encoding='utf-8'))
+    preset = json.loads((ROOT/current['speed_preset']).read_text(encoding='utf-8'))
     if (current['version'] != profile['custom_version'] or current['version'] != consumer['version']
             or current['materials'] != consumer['materials'] or current['profile'] != consumer['profile']
             or consumer['mtp']['tensor_count'] != len(mtp['tensors'])
             or consumer['mtp']['runtime_bytes'] != mtp['total_bytes']
+            or preset['required_version'] != current['version']
             or len(source['gguf']['files']) != 2 or 'metadata' in source):
         raise ValueError('Current materials and model resource inputs disagree')
     result = verify_consumer(ROOT/current['consumer_contract'])

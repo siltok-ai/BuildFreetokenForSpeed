@@ -2,6 +2,8 @@
 
 当前材料由 [current-release.json](../integration/speed/current-release.json) 选择。先核对 Speed 的 `silitok_speed/runtimes/freetoken/release.json`：FreeToken 版本、Windows/CPython ABI、Torch/CUDA、AOT 规格必须配套。
 
+本仓库 `main` 当前默认交付 `0.1.3+speed.mtpdecode2`，无需额外的 profile 选择。Speed 的功能分支、dev、main 或 release 均使用本仓库 `main`，以实际检出版本的 release 合同检查配套关系；合并或改名不改变材料来源。
+
 在本仓库根执行：
 
 ```powershell
@@ -15,7 +17,7 @@ python -B tools/verify_portable_consumer.py --speed-root D:\src\siltok-speed
 
 上面的检查针对仓内现成材料。使用[自行构建](../build/README.md)的产物时，将 `$materials` 改为本次输出根（含 `wheels` 和 `kernel-cache`），再计算 `$wheel`、`$cache`；按构建说明检查新产物。仓内检查通过不代表已检查这个外部目录。
 
-版本不匹配时，选择与 Speed release 对应的本仓库修订，或升级为配套的 Speed；不要混用不同材料目录中的 DLL。现成 wheel/AOT 已在 Git 中，消费它们无需安装 CUDA 编译工具链。
+版本不匹配时先同步配套的 Speed 与当前材料；不要混用不同材料目录中的 DLL。现成 wheel/AOT 已在 Git 中，消费它们无需安装 CUDA 编译工具链。
 
 ## Speed 源码或普通 wheel
 
@@ -33,11 +35,11 @@ $env:FREETOKEN_KERNEL_CACHE_DIR = $cache
 源码不变而重新编译的 wheel 可以沿用相同版本号；这里显式重装，避免 pip 因版本相同而继续使用环境中的旧二进制。
 完整 Speed 环境如包含已登记的依赖约束例外，自检时按 Speed 文档附加 `--constraint-policy <Speed仓库>/packaging/windows/runtime-requirements.toml`。
 
-FreeToken 可导入和组件自检通过，不代表 Engine 已获得设备授权。源码/CI 测试授权用法、服务启动命令及 API 授权由 [Speed 使用说明](https://github.com/siltok-ai/siltok-speed/blob/feat/flash-next/doc/speed/models/freetoken.md) 维护。
+FreeToken 可导入和组件自检通过，不代表 Engine 已获得设备授权。源码/CI 测试授权用法、服务启动命令及 API 授权见实际检出的 [Speed 仓库](https://github.com/siltok-ai/siltok-speed)中 `doc/speed/models/freetoken.md`，以该版本的说明为准。
 
 ## Windows 安装包
 
-按 Speed 的 [Windows 打包说明](https://github.com/siltok-ai/siltok-speed/blob/feat/flash-next/packaging/windows/README.md) 准备应用环境。在 Speed 仓库执行其构建入口，显式传入：
+按实际检出的 Speed 仓库中 `packaging/windows/README.md` 准备应用环境并执行其构建入口，显式传入：
 
 ```powershell
 # 将以下参数加入 Speed Windows 打包说明中的完整 build.ps1 命令：

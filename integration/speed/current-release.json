@@ -1,19 +1,19 @@
 {
   "format": 1,
-  "profile": "build/profiles/strataq2portable1.json",
-  "materials": "artifacts/strataq2portable1-cp312-cu130-sm120",
-  "consumer_contract": "integration/speed/consumer-contract-strataq2portable1.json",
+  "profile": "build/profiles/mtpdecode2.json",
+  "materials": "artifacts/mtpdecode2-cp312-cu130-sm120",
+  "consumer_contract": "integration/speed/consumer-contract-mtpdecode2.json",
   "weight_source_lock": "model-weights/qwen3.8-flash-next-gguf-q2/source-lock.json",
   "mtp_manifest": "model-weights/qwen3.8-flash-next-gguf-q2/mtp-runtime.json",
   "input_sha256": {
-    "build/profiles/strataq2portable1.json": "8451645845e771bc33ce1d658fe815d69febee8f8c58bd704feb402b2ae79bcb",
+    "build/profiles/mtpdecode2.json": "3016fa6f91f619e4f586c72924a8cafeff0368270f77666c2443c842a6196b27",
     "model-weights/qwen3.8-flash-next-gguf-q2/source-lock.json": "0081fa2c0290559c7e8b5d218b2eb0834424b483f16f55031b623e236a20dff5",
     "model-weights/qwen3.8-flash-next-gguf-q2/mtp-runtime.json": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
-    "integration/speed/presets/flash-next-sm120-16g-portable1.json": "7624f1b374add15258bcc3f1179409b0e1e1e275efa5c43264f4770a1cb5f2a8",
-    "integration/speed/consumer-contract-strataq2portable1.json": "40c3f57c8e9d166ee94e9859c0250f382c0f881485969a805c34b83d169e717c"
+    "integration/speed/presets/flash-next-sm120-auto.json": "467c7c94cdfb52e4aea4562be051c6107f53c475a4332df8741b21d7e9068280",
+    "integration/speed/consumer-contract-mtpdecode2.json": "a58d974a2e5690daec912301b1838f27a83e3e4d7fce10b68aec44abc70f4948"
   },
-  "version": "0.1.3+speed.strataq2portable1",
+  "version": "0.1.3+speed.mtpdecode2",
   "mtp_default_enabled": false,
-  "speed_preset": "integration/speed/presets/flash-next-sm120-16g-portable1.json",
-  "scope": "Windows x64 CPython 3.12 SM120 FreeToken materials; complete Q2 GGUF main model with embedded metadata and optional preconverted official Qwen MTP in one portable resource package."
+  "speed_preset": "integration/speed/presets/flash-next-sm120-auto.json",
+  "scope": "Current Windows x64 CPython 3.12 SM120 materials and portable Q2 GGUF/MTP model format for any Speed branch with a matching release contract; Speed owns automatic 16GiB/32GiB resource tiers."
 }

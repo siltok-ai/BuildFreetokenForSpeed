@@ -1,0 +1,13 @@
+{
+  "format": 1,
+  "kind": "flash_next_portable_resource_consumer",
+  "version": "0.1.3+speed.mtpdecode2",
+  "profile": "build/profiles/mtpdecode2.json",
+  "materials": "artifacts/mtpdecode2-cp312-cu130-sm120",
+  "base_profile": "build/profiles/strataq2portable1.json",
+  "mtp": {
+    "tensor_count": 31,
+    "runtime_bytes": 823887872
+  },
+  "scope": "Current materials for Speed consumers with a matching release contract, independent of branch names; offline source, wheel, AOT and runtime compatibility. Hardware and installer validation are separate."
+}

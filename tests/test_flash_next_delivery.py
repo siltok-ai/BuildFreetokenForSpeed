@@ -50,7 +50,7 @@ class DeliveryBoundaries(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             target = Path(directory)/'absent'
             for script, arguments in [('flash_next_weights.py', ['plan']),
-                ('flash_next_speed_config.py', ['--dry-run','--preset','sm120-16g-portable1'])]:
+                ('flash_next_speed_config.py', ['--dry-run'])]:
                 subprocess.run([sys.executable,'-B',str(ROOT/'tools'/script),*arguments,'--root',str(target)],
                                check=True,capture_output=True)
                 self.assertFalse(target.exists())
@@ -152,6 +152,26 @@ class DeliveryBoundaries(unittest.TestCase):
         self.assertIn('mtp',a['artifacts']);self.assertNotIn('mtp',b['artifacts'])
         self.assertEqual(config['resource']['gpu_probe'],'nvml')
         self.assertFalse(b['engine']['extra']['mtp_enabled'])
+
+    def test_current_cli_generates_auto_tiers_without_fixed_capacity_overrides(self):
+        """真实CLI输出供Speed分档，OFF/ON保持共用权重与MTP开关合同。"""
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)/'absent'
+            entries=[]
+            for mode in ('off','on'):
+                result=subprocess.run([sys.executable,'-B',str(ROOT/'tools/flash_next_speed_config.py'),
+                    '--root',str(root),'--mode',mode,'--dry-run'],check=True,capture_output=True,text=True)
+                data=json.loads(result.stdout)
+                entry=data['manifest']['models'][0]
+                self.assertEqual(data['freetoken_version'],load_current()['version'])
+                self.assertEqual(entry['engine']['resource_profile'],'auto')
+                self.assertEqual(entry['engine']['extra']['mtp_enabled'],mode=='on')
+                self.assertEqual('mtp' in entry['artifacts'],mode=='on')
+                self.assertTrue({'moe_cache_size','moe_q2_resident_experts','max_prefill_length',
+                    'vram_estimate_bytes','host_commit_estimate_bytes'}.isdisjoint(entry['engine']['extra']))
+                entries.append(entry)
+            self.assertEqual(entries[0]['artifacts']['weights'],entries[1]['artifacts']['weights'])
+            self.assertFalse(root.exists())
 
 
 
