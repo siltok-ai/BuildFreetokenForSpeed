@@ -2,6 +2,17 @@
 
 当前材料由 [current-release.json](../integration/speed/current-release.json) 选择。先核对 Speed 的 `silitok_speed/runtimes/freetoken/release.json`：FreeToken 版本、Windows/CPython ABI、Torch/CUDA、AOT 规格必须配套。
 
+配套 Speed 的 `mtp-decode-5070ti` 分支时，先按[候选构建步骤](../build/README.md#mtp-decode-候选)生成新材料，在本仓库根设置：
+
+```powershell
+$profile = Get-Content build/profiles/mtpdecode2.json -Raw | ConvertFrom-Json
+$materials = 'D:\builds\ft-mtpdecode-001'
+$wheel = Join-Path $materials ('wheels/' + $profile.wheel_filename)
+$cache = Join-Path $materials 'kernel-cache'
+```
+
+完成候选构建说明中的显式 profile/base-profile 检查后，直接转到下文的“Speed 源码或普通 wheel”或“Windows 安装包”。下面的 current-release 示例和默认 `verify_portable_consumer.py` 检查仍选择 portable1，供现成材料使用。
+
 在本仓库根执行：
 
 ```powershell

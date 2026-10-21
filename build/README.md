@@ -77,3 +77,27 @@ uv pip install --python $python -r build/requirements.lock.txt
 工具重放两份源码、验证允许的差异并复制原生材料，重新生成 wheel RECORD。原生代码、公共头文件、AOT 或 ABI 改变时应完整构建；选择性原生重编入口只供明确维护相应算子的开发者使用。
 
 修改构建依赖时在独立环境更新 lock 和 profile，按 [维护规则](../docs/maintenance.md) 验证；`freeze_build_requirements.py` 不在正式构建中自动更新锁文件。
+
+## MTP decode 候选
+
+`mtp-decode-5070ti` 分支的 `mtpdecode2` profile 在 portable1 上增加草稿 attention、验证卷积、验证元数据和专家缓存调度优化。它使用相同模型资源、原生 ABI 和 AOT 规格；新增 Triton 内核仍需运行时形状编译。
+
+在上述构建环境中，切换到候选分支，从仓内 portable1 材料生成独立候选目录：
+
+```powershell
+git switch mtp-decode-5070ti
+& $python -B build/derive_python_materials.py `
+  --profile build/profiles/mtpdecode2.json `
+  --base-profile build/profiles/strataq2portable1.json `
+  --base-materials artifacts/strataq2portable1-cp312-cu130-sm120 `
+  --output D:\builds\ft-mtpdecode-001
+& $python -B tools/verify_materials.py D:\builds\ft-mtpdecode-001
+& $python -B tools/validate_python_revision.py `
+  --profile build/profiles/mtpdecode2.json `
+  --base-profile build/profiles/strataq2portable1.json `
+  --materials D:\builds\ft-mtpdecode-001
+```
+
+重新封装复用原有 3 个原生模块和 27 个 AOT DLL，无需重新编译 CUDA/C++。配套 Speed 同名分支的 release 选择新 wheel；将上述输出根作为其 `$materials`，按 [Speed 接入](../docs/speed-integration.md)安装并使用该目录的 kernel-cache。当前仓内现成材料及默认消费检查仍针对 portable1，不能代替候选检查。
+
+本机 RTX 5070 Ti 16GiB 已验证源码和普通 wheel 的 OFF/ON、前缀命中、取消、重载及旧 Qwen3.6 MoE。新安装器、真实设备许可、其他 GPU 和长期稳定性未在本轮验收。性能调参及范围见配套 Speed 的 FreeToken 文档。

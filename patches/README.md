@@ -15,6 +15,8 @@
 
 每项的 `title`、`files` 和 patch 正文给出具体改动。补丁文件名保留原标识，部分名称沿用开发阶段命名。当前功能由完整序列叠加形成。
 
+本分支另有 [mtpdecode2-series.json](mtpdecode2-series.json)：保留以上 58 项，再追加 59–65 项，分别为草稿 attention、验证卷积融合、专家选择向量化、验证元数据融合、候选版本、内核回归及卷积状态覆盖。通过 [mtpdecode2 profile](../build/profiles/mtpdecode2.json)显式选择，构建步骤见[候选说明](../build/README.md#mtp-decode-候选)。
+
 ## 重放和修改
 
 ```powershell

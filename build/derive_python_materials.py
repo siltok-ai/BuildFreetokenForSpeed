@@ -92,6 +92,10 @@ PYTHON_ONLY_CHANGES = {
     'python/freetoken/models/qwen4_exp/mtp_draft_policy.py',
     'python/freetoken/models/qwen4_exp/mtp_draft_vocab.py',
     'tests/models/qwen4_exp/test_mtp_draft_policy.py',
+    # 私有 MTP 验证元数据、卷积及对应 GPU 回归，不改变原生 ABI 或 AOT 规格。
+    'python/freetoken/kernel/triton/gguf_gdn_conv.py',
+    'python/freetoken/kernel/triton/mtp_metadata.py',
+    'tests/models/qwen4_exp/test_mtp_decode_kernels.py',
     'python/freetoken/checkpoint/gguf_reader.py',
     # Stop matching, request-local budgets and sampler bounds do not change native/AOT inputs.
     'python/freetoken/engine/sample.py',

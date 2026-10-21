@@ -4,6 +4,8 @@
 
 当前版本由 [current-release.json](integration/speed/current-release.json) 选择：`0.1.3+speed.strataq2portable1`，Windows x64、CPython 3.12、SM120，Torch 2.11.0+cu130。材料包含一个 wheel（3 个原生模块）和 27 项 AOT DLL。
 
+本分支提供 `0.1.3+speed.mtpdecode2` 候选，配套 Speed 的 `mtp-decode-5070ti` 分支。按[候选构建步骤](build/README.md#mtp-decode-候选)显式生成材料；`current-release.json` 仍选择 portable1。模型资源包无需重新制作。
+
 ## 获取与使用
 
 ```powershell

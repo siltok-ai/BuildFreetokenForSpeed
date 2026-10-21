@@ -1,0 +1,215 @@
+--- a/python/freetoken/models/qwen4_exp/gdn.py
++++ b/python/freetoken/models/qwen4_exp/gdn.py
+@@ -4,6 +4,7 @@
+ import torch.nn.functional as F
+ from freetoken.core import get_global_ctx
+ from freetoken.kernel.causal_conv1d import causal_conv1d_decode, causal_conv1d_varlen
++from freetoken.kernel.triton.gguf_gdn_conv import verify_conv
+ from freetoken.layers import BaseOP, GatedRMSNorm, LinearColParallelMerged, LinearReplicated
+ from freetoken.layers.quantization import QuantConfig
+ from freetoken.models.qwen3_5_moe.gdn_kernels import gdn_decode_fla, gdn_prefill_chunk_fla
+@@ -217,7 +218,6 @@
+             mixed = self._conv_decode(conv_in, fla.cache_indices, pool)
+         elif is_verify:
+             # 卷积、live 更新和全部前缀快照共用一次 kernel；递推事务保持原实现。
+-            from freetoken.kernel.triton.gguf_gdn_conv import verify_conv
+             mixed = verify_conv(conv_in, self._conv_weight(), pool.conv_states[li],
+                                 fla.cache_indices, fla.track_dst, fla.track_boundary_row)
+         else:
+--- a/python/freetoken/kernel/triton/gguf_gdn_conv.py
++++ b/python/freetoken/kernel/triton/gguf_gdn_conv.py
+@@ -5,11 +5,13 @@
+ 
+ 
+ @triton.jit
+-def _verify_conv(X, W, STATE, SLOTS, DST, BOUNDARY, OUT,
+-                 D: tl.constexpr, T: tl.constexpr,
+-                 XS: tl.constexpr, XD: tl.constexpr, WS: tl.constexpr, WD: tl.constexpr,
+-                 SS: tl.constexpr, SD: tl.constexpr, SK: tl.constexpr,
+-                 TRACKS: tl.constexpr, BLOCK: tl.constexpr):
++def _verify_conv(
++    X, W, STATE, SLOTS, DST, BOUNDARY, OUT,
++    D: tl.constexpr, T: tl.constexpr,
++    XS: tl.constexpr, XD: tl.constexpr, WS: tl.constexpr, WD: tl.constexpr,
++    SS: tl.constexpr, SD: tl.constexpr, SK: tl.constexpr,
++    TRACKS: tl.constexpr, BLOCK: tl.constexpr,
++):
+     col = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)
+     mask = col < D
+     slot = tl.load(SLOTS).to(tl.int64)
+@@ -55,7 +57,11 @@
+         raise ValueError('GGUF verify convolution requires width4/state3')
+     out = torch.empty(x.shape, device=x.device, dtype=x.dtype)
+     tracks = 0 if dst is None else dst.numel()
+-    _verify_conv[(triton.cdiv(x.shape[1], 128),)](x, weight, state, slots, dst, boundary, out,
+-        x.shape[1], len(x), *x.stride(), *weight.stride(), *state.stride(), tracks, 128,
+-        num_warps=4, num_stages=2)
++    _verify_conv[(triton.cdiv(x.shape[1], 128),)](
++        x, weight, state, slots, dst, boundary, out,
++        D=x.shape[1], T=len(x), XS=x.stride(0), XD=x.stride(1),
++        WS=weight.stride(0), WD=weight.stride(1),
++        SS=state.stride(0), SD=state.stride(1), SK=state.stride(2),
++        TRACKS=tracks, BLOCK=128, num_warps=4, num_stages=2,
++    )
+     return out
+--- a/python/freetoken/kernel/triton/mtp_metadata.py
++++ b/python/freetoken/kernel/triton/mtp_metadata.py
+@@ -4,9 +4,11 @@
+ 
+ 
+ @triton.jit
+-def _prepare(PACKET, PT, INPUT, POS, LOC, CACHE, LINEAR, RING, LENS, TABLE,
+-             PTSTRIDE: tl.constexpr, PAGESIZE: tl.constexpr, WIDTH: tl.constexpr,
+-             T: tl.constexpr, BLOCK: tl.constexpr):
++def _prepare(
++    PACKET, PT, INPUT, POS, LOC, CACHE, LINEAR, RING, LENS, TABLE,
++    PTSTRIDE: tl.constexpr, PAGESIZE: tl.constexpr, WIDTH: tl.constexpr,
++    T: tl.constexpr, BLOCK: tl.constexpr,
++):
+     col = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)
+     position = tl.load(PACKET)
+     owner = tl.load(PACKET + 1).to(tl.int64)
+@@ -28,9 +30,12 @@
+ 
+ def stage_verify_metadata(packet, page_table, batch, page_size):
+     """只更新既有 graph buffer；PLE 与 graph 的消费顺序由 MtpRuntime 保持。"""
+-    md = batch.attn_metadata
+-    width = md.block_table.numel()
+-    _prepare[(triton.cdiv(width, 256),)](packet, page_table, batch.input_ids, batch.positions,
++    metadata = batch.attn_metadata
++    width = metadata.block_table.numel()
++    _prepare[(triton.cdiv(width, 256),)](
++        packet, page_table, batch.input_ids, batch.positions,
+         batch.out_loc, batch.fla_metadata.cache_indices, batch.linear_table_idx,
+-        md.ring_slots, md.seq_lens, md.block_table, page_table.stride(0), page_size,
+-        width, len(batch.input_ids), 256, num_warps=4)
++        metadata.ring_slots, metadata.seq_lens, metadata.block_table,
++        PTSTRIDE=page_table.stride(0), PAGESIZE=page_size,
++        WIDTH=width, T=len(batch.input_ids), BLOCK=256, num_warps=4,
++    )
+--- a/tests/models/qwen4_exp/test_mtp_decode_kernels.py
++++ b/tests/models/qwen4_exp/test_mtp_decode_kernels.py
+@@ -1,4 +1,4 @@
+-"""候选核心回归：稳定 owner 顺序、动态草稿可见范围和 graph 元数据地址。"""
++"""MTP 核心回归：owner 顺序、草稿可见范围、卷积快照及 graph 元数据。"""
+ from types import SimpleNamespace
+ 
+ import numpy as np
+@@ -69,14 +69,67 @@
+ 
+ @pytest.mark.skipif(not torch.cuda.is_available(), reason='requires CUDA')
+ @pytest.mark.parametrize('count', [1, 2, 3, 4])
++@pytest.mark.parametrize('snapshots', [False, True])
++@pytest.mark.parametrize('strided', [False, True])
++def test_verify_conv_graph_matches_decode_and_every_prefix(count, snapshots, strided):
++    """直接对照既有逐行 decode，核对所有状态并重放新的输入和 live slot。"""
++    from freetoken.kernel.causal_conv1d import causal_conv1d_decode
++    from freetoken.kernel.triton.gguf_gdn_conv import verify_conv
++
++    torch.manual_seed(812 + count)
++    channels = 259  # 覆盖最后一个不足 128 通道的 program。
++    step = 2 if strided else 1
++    x = torch.randn(count, channels * step, device='cuda')[:, ::step]
++    weight = torch.randn(channels, 4 * step, device='cuda')[:, ::step]
++    state = torch.randn(8, channels, 3, device='cuda')
++    slots = torch.zeros(1, device='cuda', dtype=torch.int32)
++    dst = torch.tensor([5, 1, 7, 2][:count], device='cuda') if snapshots else None
++    boundary = torch.arange(count, 0, -1, device='cuda') if snapshots else None
++
++    stream = torch.cuda.Stream()
++    stream.wait_stream(torch.cuda.current_stream())
++    with torch.cuda.stream(stream):
++        verify_conv(x, weight, state, slots, dst, boundary)
++        graph = torch.cuda.CUDAGraph()
++        with torch.cuda.graph(graph, stream=stream):
++            output = verify_conv(x, weight, state, slots, dst, boundary)
++    torch.cuda.current_stream().wait_stream(stream)
++
++    for live_slot in [0, 6]:
++        x.normal_()
++        weight.normal_(std=.3)
++        state.normal_()
++        slots.fill_(live_slot)
++        expected_state = state.clone()
++        rows = []
++        for row in range(count):
++            rows.append(causal_conv1d_decode(
++                x[row:row + 1].clone(), expected_state, weight, slots))
++            if snapshots:
++                # boundary 逆序，验证 kernel 按实际前缀而非 track 下标保存。
++                expected_state[dst[count - row - 1]].copy_(expected_state[live_slot])
++        graph.replay()
++        torch.testing.assert_close(output, torch.cat(rows), rtol=1e-6, atol=1e-6)
++        torch.testing.assert_close(state, expected_state, rtol=0, atol=0)
++    graph.reset()
++
++
++@pytest.mark.skipif(not torch.cuda.is_available(), reason='requires CUDA')
++@pytest.mark.parametrize('count', [1, 2, 3, 4])
+ def test_verify_packet_changes_request_slot_and_page_across_graph_replays(count):
+-    """请求 owner、SSM slot 和跨页位置都来自当前包，graph tensor 地址保持不变。"""
++    """真实 pinned H2D 后由图读取元数据，CPU 读回完成后才复用输入包。"""
++    from freetoken.kernel.pinned import alloc_pinned_tensor
+     from freetoken.kernel.triton.mtp_metadata import stage_verify_metadata
++
+     capacity, page_size = 256, 64
++    host = alloc_pinned_tensor(16, dtype=torch.int32)
++    view = host.numpy()
++    view.fill(0)
+     packet = torch.zeros(16, device='cuda', dtype=torch.int32)
+     pages = torch.randperm(8, device='cuda', dtype=torch.int32).reshape(2, 4)
+     offsets = torch.arange(page_size, device='cuda', dtype=torch.int32)
+     page_table = (pages[:, :, None] * page_size + offsets).reshape(2, capacity)
++    page_table_cpu = page_table.cpu()
+     metadata = SimpleNamespace(ring_slots=torch.empty(1, device='cuda', dtype=torch.int32),
+         seq_lens=torch.empty(1, device='cuda', dtype=torch.int32),
+         block_table=torch.empty(1, 4, device='cuda', dtype=torch.int32))
+@@ -89,27 +142,33 @@
+     tensors = [batch.input_ids, batch.positions, batch.out_loc, batch.linear_table_idx,
+         batch.fla_metadata.cache_indices, metadata.ring_slots, metadata.seq_lens, metadata.block_table]
+     addresses = [value.data_ptr() for value in tensors]
++
+     def stage():
+         stage_verify_metadata(packet, page_table, batch, page_size)
++
++    def consume():
++        return torch.cat([value.reshape(-1) for value in tensors])
++
+     stream = torch.cuda.Stream()
+     stream.wait_stream(torch.cuda.current_stream())
+     with torch.cuda.stream(stream):
+         stage()
++        consume()
+         graph = torch.cuda.CUDAGraph()
+         with torch.cuda.graph(graph, stream=stream):
+-            stage()
++            observed = consume()
+     torch.cuda.current_stream().wait_stream(stream)
+     for owner, slot, position in [(0, 2, 1), (1, 6, 63), (0, 4, 127)]:
+         tokens = list(range(100 + owner, 100 + owner + count))
+-        packet[:4] = torch.tensor([position, owner, slot, count], device='cuda')
+-        packet[4:4 + count] = torch.tensor(tokens, device='cuda')
++        view[:4] = [position, owner, slot, count]
++        view[4:4 + count] = tokens
++        packet.copy_(host, non_blocking=True)
++        stage()
+         graph.replay()
+-        assert batch.input_ids.cpu().tolist() == tokens
+-        assert batch.positions.cpu().tolist() == list(range(position, position + count))
+-        torch.testing.assert_close(batch.out_loc, page_table[owner, position:position + count])
+-        assert batch.linear_table_idx.item() == batch.fla_metadata.cache_indices.item() == slot
+-        assert metadata.ring_slots.item() == owner
+-        assert metadata.seq_lens.item() == position + count
+-        torch.testing.assert_close(metadata.block_table[0], page_table[owner, ::page_size] // page_size)
++        expected = [*tokens, *range(position, position + count),
++            *page_table_cpu[owner, position:position + count].tolist(),
++            slot, slot, owner, position + count,
++            *(page_table_cpu[owner, ::page_size] // page_size).tolist()]
++        assert observed.cpu().tolist() == expected
+         assert [value.data_ptr() for value in tensors] == addresses
+     graph.reset()
+--- a/python/freetoken/version.py
++++ b/python/freetoken/version.py
+@@ -1 +1 @@
+-__version__ = "0.1.3+speed.mtpdecode1"
++__version__ = "0.1.3+speed.mtpdecode2"
