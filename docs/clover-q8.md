@@ -1,11 +1,12 @@
-# Clover Q8 integration candidate
+# Clover Q8 runtime and materials
 
-The integration branch appends one patch to the existing 65 patches and retains
+The Clover profile appends one patch to the existing 65 patches and retains
 the official upstream snapshot unchanged. It uses `build/profiles/cloverq8.json`,
 version `0.1.3+speed.cloverq8.1`, four wheel native modules and 34 AOT DLL specs.
-`integration/speed/current-release.json` selects the matching full rebuild on this
-integration branch. Existing main/dev branches and historical materials remain
-available. Do not combine this Speed release with the previous wheel/cache.
+`integration/speed/current-release.json` selects the matching full rebuild. Pair
+the checked-out revision with Speed through the release version, ABI, dependency,
+native module and AOT inventory contracts. Record both repository commits; do not
+combine this Speed release with the previous wheel/cache.
 
 ## Build
 

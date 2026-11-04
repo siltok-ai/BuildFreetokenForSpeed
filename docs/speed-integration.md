@@ -2,7 +2,7 @@
 
 当前材料由 [current-release.json](../integration/speed/current-release.json) 选择。先核对 Speed 的 `silitok_speed/runtimes/freetoken/release.json`：FreeToken 版本、Windows/CPython ABI、Torch/CUDA、AOT 规格必须配套。
 
-本整合分支交付 `0.1.3+speed.cloverq8.1`，与 Speed 同名整合分支配对，无需额外的 profile 选择。合并前保留两仓 main/dev；合并后按实际检出版本的 release 合同检查配套关系。
+当前选择交付 `0.1.3+speed.cloverq8.1`，默认入口读取 release 指针，无需额外选择 profile。检出与 Speed release 合同匹配的材料修订，记录两仓完整 commit；分支名称不参与配对。
 
 在本仓库根执行：
 

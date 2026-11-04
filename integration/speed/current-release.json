@@ -17,7 +17,7 @@
   "version": "0.1.3+speed.cloverq8.1",
   "mtp_default_enabled": false,
   "speed_preset": "integration/speed/presets/flash-next-sm120-auto-cloverq8.json",
-  "scope": "Premerge integration release: Clover Q8 plus existing Flash Next/Qwen, Windows CPython 3.12 SM120. 5070 Ti validated; 5090 uses the same conservative tier pending tuning.",
+  "scope": "Clover Q8 plus existing Flash Next/Qwen, Windows CPython 3.12 SM120. 5070 Ti validated; 5090 uses the same conservative tier pending tuning.",
   "clover_weight_source_lock": "model-weights/clover-q8/source-lock.json",
   "clover_speed_preset": "integration/speed/presets/clover-q8-sm120-auto.json",
   "source_branch_snapshot": "0b92b351918eb66b0a8637da44342ad1613ae29b",

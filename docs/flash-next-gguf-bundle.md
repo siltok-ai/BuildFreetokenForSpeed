@@ -1,6 +1,6 @@
 # Flash Next GGUF 资源包制作与部署
 
-本流程从当前检出的Build版本生成包含全部模型资源的目录，整合分支配套 FreeToken `0.1.3+speed.cloverq8.1`。合并前使用两仓同名整合分支，并以release合同检查配套关系。Flash Next原有权重、MTP和OFF/ON运行参数保持不变；接收方无需 Python 转换。
+本流程从当前检出的 Build 修订生成包含全部模型资源的目录，当前配套 FreeToken `0.1.3+speed.cloverq8.1`。以两仓 release 合同检查配套关系，并记录实际材料 commit。Flash Next原有权重、MTP和OFF/ON运行参数保持不变；接收方无需 Python 转换。
 
 ## 获取完整资源包
 

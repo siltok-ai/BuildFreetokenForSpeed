@@ -2,7 +2,7 @@
 
 [current-release.json](current-release.json) 是本仓库当前材料的统一选择，包含版本、profile、材料目录、模型来源、MTP 清单及设备 preset。
 
-[consumer-contract-cloverq8.json](consumer-contract-cloverq8.json) 描述当前完整构建材料的兼容要求，由 `current-release.json` 统一选择。以下命令将它与实际消费方 Speed 的 `release.json` 配对；合并前使用同名整合分支。检查验证源码、材料及运行时合同，不执行 GPU 推理。
+[consumer-contract-cloverq8.json](consumer-contract-cloverq8.json) 描述当前完整构建材料的兼容要求，由 `current-release.json` 统一选择。以下命令将它与实际消费方 Speed 的 `release.json` 配对；记录实际检出的两仓修订，不以分支名称判断兼容。检查验证源码、材料及运行时合同，不执行 GPU 推理。
 
 ```powershell
 python -B tools/verify_current_release.py

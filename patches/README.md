@@ -17,7 +17,7 @@
 
 每项的 `title`、`files` 和 patch 正文给出具体改动。补丁文件名保留原标识，部分名称沿用开发阶段命名。当前功能由完整序列叠加形成。
 
-整合分支选择 [cloverq8 profile](../build/profiles/cloverq8.json)，要求[完整构建](../build/README.md)。旧profile、补丁和已验收材料仍保留，当前main未被修改。
+当前 release 指针选择 [cloverq8 profile](../build/profiles/cloverq8.json)，要求[完整构建](../build/README.md)。旧 profile、补丁和已验收材料保留，历史消费方使用对应修订。
 
 ## 重放和修改
 
