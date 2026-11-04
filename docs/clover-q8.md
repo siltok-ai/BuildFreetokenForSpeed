@@ -46,12 +46,9 @@ together: 52GiB of commit, plus the 512MiB commit safety margin. The current sys
 snapshot therefore needs at least 52.5GiB of available commit. Fixed Q8 host weights
 include 31.875GiB of routed expert banks and 0.9473GiB of BF16 input embeddings.
 The host budget additionally covers the worker, loader temporaries and caches.
-Two H3-to-Clover runs on the 5070 Ti, including all decode modes and inputs below
-4K tokens, measured peak system commit increments of 50.21-51.51GiB and physical
-RAM increments of 35.76-36.49GiB. The admission threshold exceeds the higher
-observed commit increment by about 1GiB; it is not a guarantee under arbitrary
-background workloads. Expert-cache capacity remains unchanged. Physical RAM capacity
-alone does not establish that headroom: other processes, initialized model
+The fixed admission budget covers this deployment profile; it is not a guarantee
+under arbitrary background workloads. Physical RAM capacity alone does not
+establish that headroom: other processes, initialized model
 frameworks and the configured paging-file capacity all count. The deployment
 operator owns Windows paging-file sizing. Insufficient commit is rejected with
 the required/current values and remains retryable after resources are available.
