@@ -37,13 +37,20 @@ greedy generation. Requests can set `clover_mode` (`causal`, `selfspec`, `denois
 `clover_width` (8/16; denoise also 32), and `clover_threshold`. Block modes require
 greedy sampling. Capacity is reserved for the declared maximum width at load.
 Both 16GiB and 32GiB presets use 2304 expert slots, KV4096, prefill1024,
-14GiB VRAM and 36GiB host budgets. Clover uses 512MiB VRAM and 4GiB Windows commit safety margins; Flash/Qwen retain the existing global margins. This fits
+14GiB VRAM and 38GiB host budgets. Clover uses 512MiB VRAM and 512MiB Windows commit safety margins; Flash/Qwen retain the existing global margins. This fits
 the 5070 Ti/64GiB Windows configuration; the 5090 preset awaits hardware tuning.
 Larger expert/KV/prefill configurations require explicit GPU and host estimates.
 
-Windows admission accounts for the 14GiB GPU mapping and 36GiB host estimate
-together: 50GiB of commit, plus the 4GiB commit safety margin. The current system
-snapshot therefore needs at least 54GiB of available commit. Physical RAM capacity
+Windows admission accounts for the 14GiB GPU mapping budget and 38GiB host estimate
+together: 52GiB of commit, plus the 512MiB commit safety margin. The current system
+snapshot therefore needs at least 52.5GiB of available commit. Fixed Q8 host weights
+include 31.875GiB of routed expert banks and 0.9473GiB of BF16 input embeddings.
+The host budget additionally covers the worker, loader temporaries and caches.
+Two H3-to-Clover runs on the 5070 Ti, including all decode modes and inputs below
+4K tokens, measured peak system commit increments of 50.21-51.51GiB and physical
+RAM increments of 35.76-36.49GiB. The admission threshold exceeds the higher
+observed commit increment by about 1GiB; it is not a guarantee under arbitrary
+background workloads. Expert-cache capacity remains unchanged. Physical RAM capacity
 alone does not establish that headroom: other processes, initialized model
 frameworks and the configured paging-file capacity all count. The deployment
 operator owns Windows paging-file sizing. Insufficient commit is rejected with
