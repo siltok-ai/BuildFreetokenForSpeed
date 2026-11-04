@@ -41,6 +41,14 @@ Both 16GiB and 32GiB presets use 2304 expert slots, KV4096, prefill1024,
 the 5070 Ti/64GiB Windows configuration; the 5090 preset awaits hardware tuning.
 Larger expert/KV/prefill configurations require explicit GPU and host estimates.
 
+Windows admission accounts for the 14GiB GPU mapping and 36GiB host estimate
+together: 50GiB of commit, plus the 4GiB commit safety margin. The current system
+snapshot therefore needs at least 54GiB of available commit. Physical RAM capacity
+alone does not establish that headroom: other processes, initialized model
+frameworks and the configured paging-file capacity all count. The deployment
+operator owns Windows paging-file sizing. Insufficient commit is rejected with
+the required/current values and remains retryable after resources are available.
+
 ## Acceptance
 
 CPU replay and contract checks do not qualify the binaries or model runtime.
