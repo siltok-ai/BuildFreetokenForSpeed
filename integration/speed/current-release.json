@@ -12,7 +12,7 @@
     "integration/speed/presets/flash-next-sm120-auto-cloverq8.json": "518aa87b4bf15c77b2b8546028c5405adf263b01f1c1024de22e8ba759df422f",
     "integration/speed/consumer-contract-cloverq8.json": "0005204ed905f489e2407f00e9342556b0257206a83a48b6136aab639013afac",
     "model-weights/clover-q8/source-lock.json": "26255fbd50199effe526ddae68db917de8e7a4593a2438fcfeec11e5c9656574",
-    "integration/speed/presets/clover-q8-sm120-auto.json": "c8dda141a82c312598179d766fb0c0f30cea38b9e3f92b1ec6da2f291cd9bb5a"
+    "integration/speed/presets/clover-q8-sm120-auto.json": "f668fbd395ee5fb55a88472177b9e78bf84942df909ba56aeab6495242f29a0a"
   },
   "version": "0.1.3+speed.cloverq8.1",
   "mtp_default_enabled": false,
