@@ -134,7 +134,7 @@ Speed 正式服务仍需正常的设备授权，本包不提供或绕过许可�
 当前自动档位使用2304个GPU专家槽、KV4096、prefill1024，单请求运行；
 5070 Ti 16GiB 已实机验收，5090 暂使用同一配置，尚未单独调优。
 主机建议64GiB内存，同时还要满足当前可用资源：显存预算14GiB另留512MiB，
-Windows可用commit门槛52.5GiB。物理内存容量不等于可用commit；其他进程或模型
+Windows可用commit门槛52.25GiB。物理内存容量不等于可用commit；其他进程或模型
 仍会影响准入。总上下文按该部署档位为4096 token。
 
 先保持 `resource_profile="auto"`，不必填写 Flash Next 专用的 Q2 常驻/自适应参数。
