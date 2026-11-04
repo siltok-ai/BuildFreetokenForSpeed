@@ -1,19 +1,25 @@
 {
   "format": 1,
-  "profile": "build/profiles/mtpdecode2.json",
-  "materials": "artifacts/mtpdecode2-cp312-cu130-sm120",
-  "consumer_contract": "integration/speed/consumer-contract-mtpdecode2.json",
+  "profile": "build/profiles/cloverq8.json",
+  "materials": "artifacts/cloverq8-1-cp312-cu130-sm120",
+  "consumer_contract": "integration/speed/consumer-contract-cloverq8.json",
   "weight_source_lock": "model-weights/qwen3.8-flash-next-gguf-q2/source-lock.json",
   "mtp_manifest": "model-weights/qwen3.8-flash-next-gguf-q2/mtp-runtime.json",
   "input_sha256": {
-    "build/profiles/mtpdecode2.json": "3016fa6f91f619e4f586c72924a8cafeff0368270f77666c2443c842a6196b27",
+    "build/profiles/cloverq8.json": "9a012762f2260f3707b6b4a2083c1d233e506783bb25cb613862b2c471e3388e",
     "model-weights/qwen3.8-flash-next-gguf-q2/source-lock.json": "0081fa2c0290559c7e8b5d218b2eb0834424b483f16f55031b623e236a20dff5",
     "model-weights/qwen3.8-flash-next-gguf-q2/mtp-runtime.json": "610c51dadbfa1b38775a88da708270c0084c84214d934d9192542267f68dc81d",
-    "integration/speed/presets/flash-next-sm120-auto.json": "467c7c94cdfb52e4aea4562be051c6107f53c475a4332df8741b21d7e9068280",
-    "integration/speed/consumer-contract-mtpdecode2.json": "a58d974a2e5690daec912301b1838f27a83e3e4d7fce10b68aec44abc70f4948"
+    "integration/speed/presets/flash-next-sm120-auto-cloverq8.json": "518aa87b4bf15c77b2b8546028c5405adf263b01f1c1024de22e8ba759df422f",
+    "integration/speed/consumer-contract-cloverq8.json": "0005204ed905f489e2407f00e9342556b0257206a83a48b6136aab639013afac",
+    "model-weights/clover-q8/source-lock.json": "26255fbd50199effe526ddae68db917de8e7a4593a2438fcfeec11e5c9656574",
+    "integration/speed/presets/clover-q8-sm120-auto.json": "92cb899d45aee307e88978a2900077ca9b3a240d081638687cf4b6edae95aba5"
   },
-  "version": "0.1.3+speed.mtpdecode2",
+  "version": "0.1.3+speed.cloverq8.1",
   "mtp_default_enabled": false,
-  "speed_preset": "integration/speed/presets/flash-next-sm120-auto.json",
-  "scope": "Current Windows x64 CPython 3.12 SM120 materials and portable Q2 GGUF/MTP model format for any Speed branch with a matching release contract; Speed owns automatic 16GiB/32GiB resource tiers."
+  "speed_preset": "integration/speed/presets/flash-next-sm120-auto-cloverq8.json",
+  "scope": "Premerge integration release: Clover Q8 plus existing Flash Next/Qwen, Windows CPython 3.12 SM120. 5070 Ti validated; 5090 uses the same conservative tier pending tuning.",
+  "clover_weight_source_lock": "model-weights/clover-q8/source-lock.json",
+  "clover_speed_preset": "integration/speed/presets/clover-q8-sm120-auto.json",
+  "source_branch_snapshot": "0b92b351918eb66b0a8637da44342ad1613ae29b",
+  "engine_commit": "9e64bdcf04125b6448ad7d243f8a0606f60559a8"
 }

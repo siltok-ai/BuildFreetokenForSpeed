@@ -1,0 +1,20 @@
+{
+  "format": 1,
+  "kind": "clover_q8_candidate",
+  "status": "5070ti_gpu_verified_full_build",
+  "version": "0.1.3+speed.cloverq8.1",
+  "profile": "build/profiles/cloverq8.json",
+  "materials": "artifacts/cloverq8-1-cp312-cu130-sm120",
+  "consumer_contract": "integration/speed/consumer-contract-cloverq8.json",
+  "weight_source_lock": "model-weights/clover-q8/source-lock.json",
+  "speed_preset": "integration/speed/presets/clover-q8-sm120-auto.json",
+  "engine_commit": "9e64bdcf04125b6448ad7d243f8a0606f60559a8",
+  "source_branch_snapshot": "0b92b351918eb66b0a8637da44342ad1613ae29b",
+  "input_sha256": {
+    "build/profiles/cloverq8.json": "9a012762f2260f3707b6b4a2083c1d233e506783bb25cb613862b2c471e3388e",
+    "integration/speed/consumer-contract-cloverq8.json": "0005204ed905f489e2407f00e9342556b0257206a83a48b6136aab639013afac",
+    "model-weights/clover-q8/source-lock.json": "26255fbd50199effe526ddae68db917de8e7a4593a2438fcfeec11e5c9656574",
+    "integration/speed/presets/clover-q8-sm120-auto.json": "92cb899d45aee307e88978a2900077ca9b3a240d081638687cf4b6edae95aba5"
+  },
+  "runtime_validation_scope": "Source HTTP/test license, all three modes, request recovery and existing Flash MTP OFF/ON and Qwen token-ID regression; device license and 5090 tuning remain separate"
+}

@@ -1,0 +1,8 @@
+{
+  "repository": "Diffuspace/Clover-35B-A3B-Preview-GGUF",
+  "revision": "32e22a02b885e173177b7ce7661ad13448b4f89e",
+  "filename": "Clover-35B-A3B-Preview-Q8_0.gguf",
+  "size": 37863343264,
+  "sha256": "834529e7aae000305ae94656782726bcf0ed77976f95a56383447d8903afddab",
+  "license": "Apache-2.0"
+}

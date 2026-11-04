@@ -1,0 +1,19 @@
+{
+  "format": 1,
+  "kind": "full_build_portable_resource_consumer",
+  "version": "0.1.3+speed.cloverq8.1",
+  "profile": "build/profiles/cloverq8.json",
+  "materials": "artifacts/cloverq8-1-cp312-cu130-sm120",
+  "native_modules": [
+    "_pinned_tensor",
+    "_cpu_moe",
+    "_row_store",
+    "_gguf"
+  ],
+  "aot_count": 34,
+  "mtp": {
+    "tensor_count": 31,
+    "runtime_bytes": 823887872
+  },
+  "scope": "Full wheel/AOT rebuild for Clover Q8 and existing Flash Next/Qwen consumers. Offline source and inventory checks do not grant hardware or installer qualification."
+}

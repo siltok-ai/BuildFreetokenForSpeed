@@ -1,0 +1,28 @@
+{
+  "name": "clover-q8-sm120-auto",
+  "required_version": "0.1.3+speed.cloverq8.1",
+  "resource_profile": "auto",
+  "tiers": {
+    "sm120-16g": {
+      "moe_cache_size": 2304,
+      "kv_cache_tokens": 4096,
+      "clover_max_width": 32,
+      "vram_estimate_bytes": 15032385536,
+      "host_commit_estimate_bytes": 38654705664
+    },
+    "sm120-32g": {
+      "moe_cache_size": 2304,
+      "kv_cache_tokens": 4096,
+      "clover_max_width": 32,
+      "vram_estimate_bytes": 15032385536,
+      "host_commit_estimate_bytes": 38654705664
+    }
+  },
+  "status": "5070ti_runtime_verified_5090_uses_same_configuration_pending_tuning",
+  "admission_safety": {
+    "vram_bytes": 536870912,
+    "commit_bytes": 4294967296,
+    "strict_commit_limit": true,
+    "scope": "Clover only; Flash/Qwen retain global safety margins"
+  }
+}

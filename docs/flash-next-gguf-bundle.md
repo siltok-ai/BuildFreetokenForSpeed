@@ -1,6 +1,6 @@
 # Flash Next GGUF 资源包制作与部署
 
-本流程从 Build `main` 生成包含全部模型资源的目录，当前配套 FreeToken `0.1.3+speed.mtpdecode2`。Speed 在功能分支、dev、main 或 release 中均使用本仓库 `main`，并以其 release 合同检查配套关系。接收方取得此目录与匹配的 Speed 安装包后即可使用，无需 Python 转换。
+本流程从当前检出的Build版本生成包含全部模型资源的目录，整合分支配套 FreeToken `0.1.3+speed.cloverq8.1`。合并前使用两仓同名整合分支，并以release合同检查配套关系。Flash Next原有权重、MTP和OFF/ON运行参数保持不变；接收方无需 Python 转换。
 
 ## 获取完整资源包
 
@@ -71,7 +71,7 @@ flash-next-resources/
 
 ## 接收方部署
 
-1. 安装包含FreeToken `0.1.3+speed.mtpdecode2` 的配套Speed，复制整个资源包到例如 `D:\models\flash-next`。
+1. 安装包含FreeToken `0.1.3+speed.cloverq8.1` 的配套Speed，复制整个资源包到例如 `D:\models\flash-next`。
 2. 安装向导的模型目录（`/MODELSDIR`）填写**包含 manifest.json 的包根**。已安装服务在 `C:\ProgramData\Siltok\Speed\config\operator.override.yaml` 设置 `service.models_dir`，合并包内 `speed-config/config.yaml` 的 `resource` 段，保留已有设置。
 3. 重启服务，按 Speed 正常流程配置设备许可证和 API 授权。
 4. 查询 `GET /v1/models`，选择 `flash-next-strata-q2-off` 或 `flash-next-strata-q2-on`。

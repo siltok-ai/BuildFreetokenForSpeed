@@ -1,6 +1,6 @@
 # FreeToken 定制补丁
 
-当前有序目录由 [current-release.json](../integration/speed/current-release.json) 指向的 profile 选择，即 [mtpdecode2-series.json](mtpdecode2-series.json)。它包含65个补丁；构建按JSON顺序应用，不能按文件名排序，也不能只应用最后一个补丁。
+当前有序目录由 [current-release.json](../integration/speed/current-release.json) 指向的 profile 选择，即 [cloverq8-series.json](cloverq8-series.json)。它包含66个补丁；前65个保持原字节和顺序，构建按JSON顺序应用，不能只应用最后一个补丁。
 
 ## 当前功能
 
@@ -13,10 +13,11 @@
 | 49–57 | stop/采样/输出预算边界，以及主存加载和 Windows Q2 等待策略 |
 | 58 | checkpoint 相对 GGUF 路径与可搬迁加载 |
 | 59–65 | MTP 草稿 attention、验证卷积、专家选择、验证元数据、版本和内核回归 |
+| 66 | Clover Q8加载、dense/专家算子、三模式运行时、预编译GGUF、AOT规格及必要回归 |
 
 每项的 `title`、`files` 和 patch 正文给出具体改动。补丁文件名保留原标识，部分名称沿用开发阶段命名。当前功能由完整序列叠加形成。
 
-main 默认选择 [mtpdecode2 profile](../build/profiles/mtpdecode2.json)，构建步骤见[当前交付说明](../build/README.md#当前-mtp-decode-交付)。完整序列及必要原生复用输入均在本仓库中。
+整合分支选择 [cloverq8 profile](../build/profiles/cloverq8.json)，要求[完整构建](../build/README.md)。旧profile、补丁和已验收材料仍保留，当前main未被修改。
 
 ## 重放和修改
 

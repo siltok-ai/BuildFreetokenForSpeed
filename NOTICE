@@ -22,3 +22,9 @@ LICENSE-ggml.txt and native component provenance. MTP reference source and
 its LICENSE are retained in tools/mtp/references.
 This integrates components into FreeToken and does not distribute the Strata
 inference engine. Model resource license texts are in model-weights.
+
+Clover model/sampling: DiffuSpace/Clover-35B-A3B-Preview (Apache-2.0).
+Clover Triton adaptations: WilliamZR/sglang (Apache-2.0).
+GGUF CUDA/reference code retains vLLM, sgl-kernel and llama.cpp attribution
+and the component license texts shipped in the patched source and wheel.
+See the per-file source revisions and LICENSE-clover-gguf.txt in that source.
