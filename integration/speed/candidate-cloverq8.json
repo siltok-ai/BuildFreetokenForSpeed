@@ -14,7 +14,7 @@
     "build/profiles/cloverq8.json": "9a012762f2260f3707b6b4a2083c1d233e506783bb25cb613862b2c471e3388e",
     "integration/speed/consumer-contract-cloverq8.json": "0005204ed905f489e2407f00e9342556b0257206a83a48b6136aab639013afac",
     "model-weights/clover-q8/source-lock.json": "26255fbd50199effe526ddae68db917de8e7a4593a2438fcfeec11e5c9656574",
-    "integration/speed/presets/clover-q8-sm120-auto.json": "1978bb4b9fd560f70c32bcf1a815d60baf5f3187f1d667bce34bb50225dd26a2"
+    "integration/speed/presets/clover-q8-sm120-auto.json": "c8dda141a82c312598179d766fb0c0f30cea38b9e3f92b1ec6da2f291cd9bb5a"
   },
   "runtime_validation_scope": "Source HTTP/test license, all three modes, request recovery and existing Flash MTP OFF/ON and Qwen token-ID regression; device license and 5090 tuning remain separate"
 }
