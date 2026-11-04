@@ -87,14 +87,7 @@ def prepare(output, gguf, lock_path=LOCK):
     write(output/'sources.json', lock)
     shutil.copy2(ROOT/'NOTICE', output/'NOTICE')
     shutil.copy2(ROOT/'LICENSE', output/'LICENSE')
-    (output/'README.txt').write_text(
-        'Clover Q8 Speed resource directory\n'
-        'Copy this entire directory, keeping relative paths and manifest.json.\n'
-        'Requires the matching FreeToken Clover Q8 wheel/AOT and Speed adapter.\n'
-        'Three request modes: causal, selfspec (W8/16), denoise (W8/16/32).\n'
-        'Block modes require greedy sampling. Default: causal.\n'
-        'The 16/32GiB presets require hardware validation before deployment.\n'
-        'After transfer run: python tools/clover_bundle.py --verify <directory>\n', encoding='utf-8')
+    shutil.copy2(ROOT/'model-weights/clover-q8/README.md', output/'README.md')
     inventory = {}
     for path in sorted(output.rglob('*')):
         if path.is_file():
