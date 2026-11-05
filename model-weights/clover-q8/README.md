@@ -133,9 +133,23 @@ Speed 正式服务仍需正常的设备授权，本包不提供或绕过许可�
 
 当前自动档位使用2304个GPU专家槽、KV4096、prefill1024，单请求运行；
 5070 Ti 16GiB 已实机验收，5090 暂使用同一配置，尚未单独调优。
-主机建议64GiB内存，同时还要满足当前可用资源：显存预算14GiB另留512MiB，
-Windows可用commit门槛52.125GiB。物理内存容量不等于可用commit；其他进程或模型
+主机建议64GiB内存。采用统一FreeToken资源计划的配套Speed中，显存预算14GiB
+另留128MiB；Windows可用commit门槛为37.625GiB主机预算加14GiB显存预算，
+合计51.625GiB，不再额外叠加通用commit余量。物理内存容量不等于可用commit；其他进程或模型
 仍会影响准入。总上下文按该部署档位为4096 token。
+
+可用安装环境执行资源自检（`--weights`指向模型目录）：
+
+```powershell
+& 'C:\Program Files\Siltok\Speed\python\python.exe' -c `
+  'from silitok_speed.runtimes.freetoken.release import main; raise SystemExit(main())' `
+  resource-check --weights 'D:\SpeedModels\cloverq8-1'
+```
+
+输出区分锁页物理权重下限、主机预算、GPU的Windows commit预算及当前页面文件配置。
+只有物理锁页不足时才需要释放物理RAM；commit不足可释放其他提交或扩大页面文件。
+自动管理页面文件的未来增长不等于当前额度。旧版Speed若没有`resource-check`命令，
+仍按其自身加载合同准入，需要升级配套Speed才能使用上述规则；无需重做GGUF权重。
 
 先保持 `resource_profile="auto"`，不必填写 Flash Next 专用的 Q2 常驻/自适应参数。
 手工修改专家池、KV或预填充容量时，需要重新标定并显式提供GPU/主机预算。

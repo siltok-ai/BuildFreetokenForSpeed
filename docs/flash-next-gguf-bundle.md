@@ -86,7 +86,7 @@ flash-next-resources/
 
 ## 设备与使用限制
 
-当前 `sm120-auto` preset在两项入口声明 `engine.resource_profile: auto`，不写死专家池、prefill或准入预算，由Speed已有的硬件档位统一解析。5070 Ti的16GiB档OFF/ON驻留专家5248/4480、总槽7296/6528、GPU预算14.5GiB；32GiB档驻留9216、总槽11264、预算28GiB不变。两档KV8192、动态/staging各1024；ON使用紧凑MTP与 `paired_cjk`，启动限时600秒。建议64GiB主机内存，实际资源仍由正常准入检查决定。
+当前 `sm120-auto` preset在两项入口声明 `engine.resource_profile: auto`，不写死专家池、prefill或准入预算，由配套Speed的硬件档位统一解析。采用统一FreeToken资源计划的Speed中，5070 Ti的16GiB档OFF/ON驻留专家5248/4480、总槽7296/6528，已标定固定几何的GPU预算为14.125GiB、另留128MiB；旧版Speed可能仍采用14.5GiB预算。显式预算及自定义容量不继承较小标定值。32GiB档驻留9216、总槽11264、预算28GiB不变。两档KV8192、动态/staging各1024；ON使用紧凑MTP与 `paired_cjk`，启动限时600秒。建议64GiB主机内存，实际资源仍由正常准入检查决定。
 
 当前生成器已为 OFF/ON 启用 auto，不写入 `moe_q2_resident_experts`、`moe_cache_size`、`max_prefill_length`、`vram_estimate_bytes`、`host_commit_estimate_bytes` 五项固定覆盖值。部署时保留这一配置，并合并包内 NVML/0.25GiB 显存余量/4GiB commit 余量。
 
