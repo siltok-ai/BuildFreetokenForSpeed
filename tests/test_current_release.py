@@ -11,9 +11,21 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools'))
 from current_release import load_current
 from verify_current_release import verify
+from verify_portable_consumer import verify as verify_consumer
 
 
 class CurrentAcceptanceTests(unittest.TestCase):
+    def test_full_build_contract_rejects_historical_binary_reuse(self):
+        """完整构建合同不能借用缺少GGUF模块的历史复用材料。"""
+        contract = dict(kind='full_build_portable_resource_consumer',
+            profile='build/profiles/cloverq8.json', version='0.1.3+speed.cloverq8.2',
+            materials='artifacts/mtpdecode2-cp312-cu130-sm120')
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary)/'consumer.json'
+            path.write_text(json.dumps(contract), encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'Full build requires all native modules'):
+                verify_consumer(path)
+
     def test_speed_cli_rejects_incompatible_runtime_before_source_replay(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

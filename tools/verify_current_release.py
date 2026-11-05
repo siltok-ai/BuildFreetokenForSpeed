@@ -22,6 +22,12 @@ def verify():
             or len(source['gguf']['files']) != 2 or 'metadata' in source):
         raise ValueError('Current materials and model resource inputs disagree')
     result = verify_consumer(ROOT/current['consumer_contract'])
+    if 'clover_weight_source_lock' in current:
+        from verify_clover_candidate import verify as verify_clover
+        clover_preset = json.loads((ROOT/current['clover_speed_preset']).read_text(encoding='utf-8'))
+        if clover_preset['required_version'] != current['version']:
+            raise ValueError('Clover model inputs disagree with current materials')
+        verify_clover(materials=ROOT/current['materials'])
     return dict(status='verified', scope='offline_source_and_materials', version=current['version'],
                 profile=current['profile'], mtp_default_enabled=current['mtp_default_enabled'],
                 consumer=result, runtime_executed=False)

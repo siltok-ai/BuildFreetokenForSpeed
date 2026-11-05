@@ -11,7 +11,8 @@ from validate_python_revision import validate
 def verify(contract_path, speed_root=None):
     """Validate build inputs and ABI compatibility; this does not run a model."""
     contract = json.loads(Path(contract_path).read_text(encoding='utf-8'))
-    if contract.get('kind') != 'flash_next_portable_resource_consumer':
+    kind = contract.get('kind')
+    if kind not in ('flash_next_portable_resource_consumer', 'full_build_portable_resource_consumer'):
         raise ValueError('Unsupported current consumer kind')
     profile, _ = load_profile(ROOT/contract['profile'])
     if profile['custom_version'] != contract['version']:
@@ -36,7 +37,15 @@ def verify(contract_path, speed_root=None):
         if (release['mtp_runtime']['tensor_count'] != contract['mtp']['tensor_count']
                 or release['mtp_runtime']['tensor_bytes'] != contract['mtp']['runtime_bytes']):
             raise ValueError('Speed MTP layout differs')
-    validate(ROOT/contract['profile'], materials, ROOT/contract['base_profile'])
+    if kind == 'full_build_portable_resource_consumer':
+        record = json.loads((materials/'build-record.json').read_text(encoding='utf-8'))
+        expected_native = sorted('freetoken/kernel/'+name+'.cp312-win_amd64.pyd'
+                                 for name in profile['native_modules'])
+        if record.get('binary_reuse') or sorted(record['native_modules']) != expected_native:
+            raise ValueError('Full build requires all native modules compiled from this profile')
+        validate(ROOT/contract['profile'], materials)
+    else:
+        validate(ROOT/contract['profile'], materials, ROOT/contract['base_profile'])
     return dict(status='verified', scope='offline_materials_and_compatibility',
                 version=contract['version'], speed_contract_checked=speed_root is not None,
                 runtime_executed=False)
