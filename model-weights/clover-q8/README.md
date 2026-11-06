@@ -5,6 +5,10 @@
 运行所需的 FreeToken wheel、AOT 和 GGUF 原生模块随匹配的 Speed 安装包提供；
 接收机器需要 NVIDIA 驱动，不需要自行安装 MSVC 或 nvcc 来编译模型算子。
 
+接收方须使用包含 Clover 支持的 Speed，例如 `0.2.0+cloverq8.5` 系列安装包，
+或已经合入 Clover 支持的 dev 构建。旧版 Speed 不识别 `family: clover`；
+仅复制权重目录不会为旧版增加模型支持。
+
 ## 放在哪里
 
 模型放在 **Speed 安装向导选择的模型目录 `models_dir`**，不放到程序的
@@ -28,7 +32,7 @@ Select-String -Path "$ConfigDir\managed-base.yaml","$ConfigDir\operator.override
 可以把本包所在目录直接选为 `models_dir`。例如：
 
 ```text
-D:\SpeedModels\cloverq8-1\       <- 安装时选择这个目录
+D:\SpeedModels\clover-35b-a3b-q8\  <- 安装时选择这个目录
   manifest.json
   config.json
   Clover-35B-A3B-Preview-Q8_0.gguf
@@ -50,7 +54,7 @@ Speed 读取的是 **`models_dir\manifest.json` 这一份清单**，不会自动
 中的清单。只复制一个子文件夹并不足以注册模型。
 
 假设当前 `models_dir` 是 `D:\SpeedModels`，先把本包复制到
-`D:\SpeedModels\cloverq8-1`，然后将下面这个对象追加到根清单的 `models` 数组：
+`D:\SpeedModels\clover-35b-a3b-q8`，然后将下面这个对象追加到根清单的 `models` 数组：
 
 ```json
 {
@@ -67,7 +71,7 @@ Speed 读取的是 **`models_dir\manifest.json` 这一份清单**，不会自动
   },
   "artifacts": {
     "weights": {
-      "path": "cloverq8-1",
+      "path": "clover-35b-a3b-q8",
       "layout": "hf_model"
     }
   }
@@ -78,8 +82,8 @@ Speed 读取的是 **`models_dir\manifest.json` 这一份清单**，不会自动
 保留已有模型；若这个 ID 已存在，更新对应条目。不要把两个 JSON 文档直接拼接，
 也不要把整个根清单替换成只有 Clover 的清单。
 
-路径相对于 **根清单所在目录**。如果目录放在 `language/cloverq8-1`，就把上面的
-`path` 改为 `"language/cloverq8-1"`。这里虽然使用 `hf_model` 目录布局，实际推理
+路径相对于 **根清单所在目录**。如果目录放在 `language/clover-35b-a3b-q8`，就把上面的
+`path` 改为 `"language/clover-35b-a3b-q8"`。这里虽然使用 `hf_model` 目录布局，实际推理
 仍读取目录内的 GGUF；不要把 `weights.path` 改成单个 GGUF 文件路径。
 
 子目录里保留原始 `manifest.json` 和 `files.json`，方便单独搬迁和核验本包；
@@ -87,7 +91,9 @@ Speed 读取的是 **`models_dir\manifest.json` 这一份清单**，不会自动
 
 ## 生效与首次请求
 
-服务会检查根清单变化；需要立即重新加载目录配置时，在管理员 PowerShell 中运行：
+正式服务约每30秒检查当前模型目录的根清单；查询模型列表或请求缺失模型时也会刷新。
+修改 `models_dir` 配置后需要重启服务。只修改根清单时可以等待检测，或在管理员
+PowerShell 中立即重启：
 
 ```powershell
 Restart-Service SiltokSpeed
@@ -131,25 +137,36 @@ Speed 正式服务仍需正常的设备授权，本包不提供或绕过许可�
 大于0且小于1。不同模式的延迟和文本表现可能不同；建议先用默认 causal 确认接入。
 例如把请求中的模式改为 `"denoise"`，再加上 `clover_width=16`。
 
-当前自动档位使用2304个GPU专家槽、KV4096、prefill1024，单请求运行；
-5070 Ti 16GiB 已实机验收，5090 暂使用同一配置，尚未单独调优。
-主机建议64GiB内存。采用统一FreeToken资源计划的配套Speed中，显存预算14GiB
-另留128MiB；Windows可用commit门槛为37.625GiB主机预算加14GiB显存预算，
-合计51.625GiB，不再额外叠加通用commit余量。物理内存容量不等于可用commit；其他进程或模型
-仍会影响准入。总上下文按该部署档位为4096 token。
+`resource_profile="auto"` 按SM120显卡的总显存选择独立档位，单请求运行：
+16GiB档（如5070 Ti）为2304个GPU专家槽、KV4096、prefill1024；
+总显存至少30GiB时选择32GiB档（如5090），为6144槽、KV8192、prefill2048。
+5090不会沿用16GiB档的专家池和上下文容量。
+主机建议64GiB内存。两档主机预算均为37.625GiB；16GiB档显存预算14GiB，
+Windows可用commit门槛51.625GiB；32GiB档显存预算28GiB，commit门槛65.625GiB。
+显存预算另留128MiB，不再额外叠加通用commit余量。物理内存容量不等于可用commit；
+其他进程或模型仍会影响准入。请求的输入与最大输出合计需符合对应档位的KV容量。
+16GiB档已在RTX 5070 Ti上完整验收；32GiB档在RTX 5090上标定，只做过功能冒烟。
 
-可用安装环境执行资源自检（`--weights`指向模型目录）：
+可用安装环境执行资源自检。该命令不读取服务的模型清单，默认按16GiB档诊断；
+请按实际部署档位明确设置 `$Tier`，`$Weights` 指向模型目录。
+独立命令不继承服务的kernel cache设置，下面显式使用同一安装包的材料目录；
+若Speed装在其他位置，修改 `$Install`：
 
 ```powershell
-& 'C:\Program Files\Siltok\Speed\python\python.exe' -c `
-  'from silitok_speed.runtimes.freetoken.release import main; raise SystemExit(main())' `
-  resource-check --weights 'D:\SpeedModels\cloverq8-1'
+$Install = 'C:\Program Files\Siltok\Speed'
+$Weights = 'D:\SpeedModels\clover-35b-a3b-q8'
+$Tier = 'sm120-16g' # 5090等32GiB档改为sm120-32g
+$Python = Join-Path $Install 'python\python.exe'
+$KernelCache = Join-Path $Install 'runtime\kernel-cache'
+& $Python -I -X utf8 -B -c `
+  "import json,sys; from silitok_speed.runtimes.freetoken.release import main; raise SystemExit(main(['resource-check','--weights',sys.argv[1],'--extra-json',json.dumps(dict(clover_resource_profile=sys.argv[2],kernel_cache_dir=sys.argv[3]))]))" `
+  $Weights $Tier $KernelCache
 ```
 
 输出区分锁页物理权重下限、主机预算、GPU的Windows commit预算及当前页面文件配置。
 只有物理锁页不足时才需要释放物理RAM；commit不足可释放其他提交或扩大页面文件。
-自动管理页面文件的未来增长不等于当前额度。旧版Speed若没有`resource-check`命令，
-仍按其自身加载合同准入，需要升级配套Speed才能使用上述规则；无需重做GGUF权重。
+自动管理页面文件的未来增长不等于当前额度。若安装版没有`resource-check`命令，
+请先升级到包含Clover支持的配套Speed；无需重做GGUF权重。
 
 先保持 `resource_profile="auto"`，不必填写 Flash Next 专用的 Q2 常驻/自适应参数。
 手工修改专家池、KV或预填充容量时，需要重新标定并显式提供GPU/主机预算。
@@ -174,13 +191,13 @@ Speed 正式服务仍需正常的设备授权，本包不提供或绕过许可�
 BuildFreetokenForSpeed 工具环境时，可运行：
 
 ```powershell
-python tools/clover_bundle.py --verify 'D:\SpeedModels\cloverq8-1'
+python tools/clover_bundle.py --verify 'D:\SpeedModels\clover-35b-a3b-q8'
 ```
 
 仅有 Speed 安装包时，也可使用管理员或普通 PowerShell 对照 `files.json` 核验：
 
 ```powershell
-$Bundle = 'D:\SpeedModels\cloverq8-1'
+$Bundle = 'D:\SpeedModels\clover-35b-a3b-q8'
 $Inventory = Get-Content -LiteralPath "$Bundle\files.json" -Raw -Encoding UTF8 | ConvertFrom-Json
 foreach ($File in $Inventory.PSObject.Properties) {
   $Path = Join-Path $Bundle $File.Name
@@ -199,4 +216,4 @@ foreach ($File in $Inventory.PSObject.Properties) {
 FreeToken文本模型统一使用128MiB显存余量、0额外commit余量；全局余量只影响其他后端。
 16GiB档：2304专家槽、KV4096、prefill1024、GPU14GiB、主机37.625GiB、Windows commit51.625GiB。
 32GiB档：5090实测标定6144专家槽、KV8192、prefill2048、GPU28GiB、主机37.625GiB、Windows commit65.625GiB，预热宽度8/16/32。
-两档锁页权重下限约32.82GiB。0额外commit余量依赖足够大的页面文件；额度不足仍拒绝加载，resource-check可查看实际commit上限及页面文件配置。以本次重新生成、含更新files.json的新模型包为准。
+两档锁页权重下限约32.82GiB。Windows实际可用commit必须覆盖对应预算，额度不足仍拒绝加载；resource-check可查看实际commit上限及页面文件配置。
