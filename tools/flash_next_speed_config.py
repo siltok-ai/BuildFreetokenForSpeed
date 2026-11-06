@@ -11,6 +11,7 @@ from current_release import load_current
 from prepare_source import load_profile, sha256
 
 PRESETS = {
+    'sm120-auto-cloverq8': 'integration/speed/presets/flash-next-sm120-auto-cloverq8.json',
     'sm120-auto': 'integration/speed/presets/flash-next-sm120-auto.json',
     'sm120-16g-portable1': 'integration/speed/presets/flash-next-sm120-16g-portable1.json',
 }

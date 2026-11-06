@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -21,10 +22,10 @@ def sha256(path):
         return hashlib.file_digest(file, "sha256").hexdigest()
 
 
-def run(command, cwd, log):
+def run(command, cwd, log, environment=None):
     """每阶段独立日志；编译失败立即停止并保留已产生的诊断。"""
     with log.open("w", encoding="utf-8") as output:
-        subprocess.run(command, cwd=cwd, stdout=output, stderr=subprocess.STDOUT, check=True)
+        subprocess.run(command, cwd=cwd, env=environment, stdout=output, stderr=subprocess.STDOUT, check=True)
 
 
 def main():
@@ -77,7 +78,9 @@ def main():
     wheels.mkdir()
     print("building customized FreeToken wheel", flush=True)
     run([sys.executable, str(source / "tools/build_windows_extensions.py"), "bdist_wheel",
-         "--dist-dir", str(wheels)], source, logs / "wheel.log")
+         "--dist-dir", str(wheels)], source, logs / "wheel.log",
+        environment=dict(os.environ, TORCH_CUDA_ARCH_LIST=f"{int(inputs['sm'])//10}.{int(inputs['sm'])%10}",
+                         MAX_JOBS=str(args.jobs)))
     wheel = wheels / inputs["wheel_filename"]
     if not wheel.is_file():
         raise FileNotFoundError("custom wheel version/ABI differs from the frozen contract")
@@ -86,7 +89,7 @@ def main():
         if len(metadata) != 1 or BytesParser().parsebytes(archive.read(metadata[0]))["Version"] != inputs["custom_version"]:
             raise ValueError("wheel metadata differs from the custom version contract")
         native = sorted(name for name in archive.namelist() if name.endswith(".pyd"))
-        for module in ("_pinned_tensor", "_cpu_moe", "_row_store"):
+        for module in inputs.get('native_modules', ("_pinned_tensor", "_cpu_moe", "_row_store")):
             if not any(Path(name).name.startswith(module + ".") for name in native):
                 raise ValueError(f"custom wheel lacks native module {module}")
     cache = out / "kernel-cache"

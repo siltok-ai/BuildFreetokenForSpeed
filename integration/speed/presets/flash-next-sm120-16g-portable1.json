@@ -1,7 +1,7 @@
 {
   "format": 1,
   "name": "sm120-16g-portable1",
-  "scope": "RTX5070Ti 16GiB; unchanged perf9 resource budgets, GGUF-derived metadata and portable local paths; qualification recorded separately",
+  "scope": "RTX5070Ti 16GiB; unchanged perf9 resource budgets, GGUF-derived metadata and portable local paths; qualification recorded separately Global resource safety values apply only to other backends; FreeToken text models use 128MiB VRAM and zero additional commit margin.",
   "required_version": "0.1.3+speed.strataq2portable1",
   "startup_timeout_seconds": 600,
   "runtime_extra": {
