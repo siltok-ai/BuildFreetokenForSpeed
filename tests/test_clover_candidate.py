@@ -75,6 +75,9 @@ class CloverCandidateTests(unittest.TestCase):
                              (ROOT/'model-weights/clover-q8/NOTICE').read_bytes())
             self.assertNotIn('Model weights are not included',
                              (output/'NOTICE').read_text(encoding='utf-8'))
+            for name in ('LICENSE', 'ATTRIBUTIONS.md'):
+                self.assertEqual((output/name).read_bytes(),
+                                 (ROOT/'model-weights/clover-q8'/name).read_bytes())
             self.assertEqual((output/gguf.name).read_bytes(), gguf.read_bytes())
             self.assertEqual(verify_bundle(output)['status'], 'transfer_verified')
 

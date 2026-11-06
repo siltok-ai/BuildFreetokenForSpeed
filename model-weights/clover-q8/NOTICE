@@ -23,4 +23,10 @@ Chat template attribution, retained from the template header
   License: https://www.apache.org/licenses/LICENSE-2.0
   Modified for Clover: text-only content and simplified inference rendering.
 
-The accompanying LICENSE file contains the full Apache License, Version 2.0.
+LICENSE and ATTRIBUTIONS.md are copied without modification from upstream
+revision 32e22a02b885e173177b7ce7661ad13448b4f89e. LICENSE contains the Apache
+License, Version 2.0 and the upstream copyright statement.
+  LICENSE SHA-256:
+    50cbab8a892c5f2993b8c7351a99182507472def3b1374558308605d99b86b32
+  ATTRIBUTIONS.md SHA-256:
+    50fb7e4ff58d0a4bbcd02d681414014b47c79f65e92691869c48ce259387a3e2

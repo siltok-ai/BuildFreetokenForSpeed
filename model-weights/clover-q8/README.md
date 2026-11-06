@@ -213,4 +213,4 @@ foreach ($File in $Inventory.PSObject.Properties) {
 ```
 
 核验整个 GGUF 会读取约38GB数据，需等待完成。传输完整性通过不等于该机器已经
-通过GPU运行验收。许可与来源署名保留在 `LICENSE`、`NOTICE` 和 `sources.json`。
+通过GPU运行验收。许可与来源署名保留在 `LICENSE`、`ATTRIBUTIONS.md`、`NOTICE` 和 `sources.json`。
