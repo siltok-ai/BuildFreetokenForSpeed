@@ -146,6 +146,10 @@ Windows可用commit门槛51.625GiB；32GiB档显存预算28GiB，commit门槛65.
 显存预算另留128MiB，不再额外叠加通用commit余量。物理内存容量不等于可用commit；
 其他进程或模型仍会影响准入。请求的输入与最大输出合计需符合对应档位的KV容量。
 16GiB档已在RTX 5070 Ti上完整验收；32GiB档在RTX 5090上标定，只做过功能冒烟。
+两档锁页权重下限约32.82GiB。128MiB显存余量和0额外commit余量由本模型的资源合同
+固定，不采用运维配置中的全局余量；Windows实际可用commit不足时仍拒绝加载。
+
+### 资源自检
 
 可用安装环境执行资源自检。该命令不读取服务的模型清单，默认按16GiB档诊断；
 请按实际部署档位明确设置 `$Tier`，`$Weights` 指向模型目录。
@@ -210,10 +214,3 @@ foreach ($File in $Inventory.PSObject.Properties) {
 
 核验整个 GGUF 会读取约38GB数据，需等待完成。传输完整性通过不等于该机器已经
 通过GPU运行验收。许可与来源署名保留在 `LICENSE`、`NOTICE` 和 `sources.json`。
-
-## 资源合同
-
-FreeToken文本模型统一使用128MiB显存余量、0额外commit余量；全局余量只影响其他后端。
-16GiB档：2304专家槽、KV4096、prefill1024、GPU14GiB、主机37.625GiB、Windows commit51.625GiB。
-32GiB档：5090实测标定6144专家槽、KV8192、prefill2048、GPU28GiB、主机37.625GiB、Windows commit65.625GiB，预热宽度8/16/32。
-两档锁页权重下限约32.82GiB。Windows实际可用commit必须覆盖对应预算，额度不足仍拒绝加载；resource-check可查看实际commit上限及页面文件配置。

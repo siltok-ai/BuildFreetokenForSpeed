@@ -1,7 +1,9 @@
 """Clover 候选重放及 tokenizer 的 CPU 回归。"""
 import json
+import hashlib
 from pathlib import Path
 import shutil
+import struct
 import sys
 import tempfile
 import unittest
@@ -13,7 +15,69 @@ from verify_clover_candidate import verify
 from test_flash_next_gguf import metadata_fixture
 
 
+def write_clover_metadata_fixture(path):
+    """写入真实GGUF元数据和BPE字典，不伪造可供GPU推理的张量。"""
+    meta = metadata_fixture()
+    meta['general.architecture'] = 'clover_moe'
+    meta['tokenizer.ggml.tokens'].append('<|mask|>')
+    meta['tokenizer.ggml.token_type'].append(3)
+    meta['tokenizer.ggml.mask_token_id'] = 260
+    meta['tokenizer.ggml.tokens'].append('ab')
+    meta['tokenizer.ggml.token_type'].append(1)
+    meta['tokenizer.ggml.merges'] = ['a b']
+    for key in ('embedding_length', 'expert_feed_forward_length',
+                'expert_shared_feed_forward_length', 'attention.key_length', 'ssm.inner_size'):
+        meta['clover_moe.'+key] = 2
+    for key in ('block_count', 'attention.head_count', 'attention.head_count_kv',
+                'expert_count', 'expert_used_count', 'ssm.group_count',
+                'ssm.time_step_rank', 'ssm.state_size', 'ssm.conv_kernel'):
+        meta['clover_moe.'+key] = 1
+    meta['clover_moe.context_length'] = 4096
+    meta['clover_moe.attention.recurrent_layers'] = [True]
+
+    def string(value):
+        data = value.encode('utf-8')
+        return struct.pack('<Q', len(data))+data
+
+    def value(item):
+        if isinstance(item, str):
+            return 8, string(item)
+        if isinstance(item, bool):
+            return 7, struct.pack('<?', item)
+        if isinstance(item, int):
+            return 4, struct.pack('<I', item)
+        if isinstance(item, float):
+            return 6, struct.pack('<f', item)
+        encoded = [value(child) for child in item]
+        subtype = encoded[0][0] if encoded else 8
+        return 9, struct.pack('<IQ', subtype, len(encoded))+b''.join(data for _,data in encoded)
+
+    rows = []
+    for key, item in meta.items():
+        kind, data = value(item)
+        rows.append(string(key)+struct.pack('<I', kind)+data)
+    path.write_bytes(struct.pack('<4sIQQ', b'GGUF', 3, 0, len(rows))+b''.join(rows))
+
+
 class CloverCandidateTests(unittest.TestCase):
+    def test_generated_bundle_retains_model_notice_and_transfer_inventory(self):
+        """实际组包后核对模型署名及清单，防止误带不含权重的仓库NOTICE。"""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            gguf = root/'fixture.gguf'
+            write_clover_metadata_fixture(gguf)
+            lock = root/'source-lock.json'
+            lock.write_text(json.dumps(dict(filename=gguf.name, size=gguf.stat().st_size,
+                sha256=hashlib.sha256(gguf.read_bytes()).hexdigest())), encoding='utf-8')
+            output = root/'resource bundle'
+            prepare(output, gguf, lock)
+            self.assertEqual((output/'NOTICE').read_bytes(),
+                             (ROOT/'model-weights/clover-q8/NOTICE').read_bytes())
+            self.assertNotIn('Model weights are not included',
+                             (output/'NOTICE').read_text(encoding='utf-8'))
+            self.assertEqual((output/gguf.name).read_bytes(), gguf.read_bytes())
+            self.assertEqual(verify_bundle(output)['status'], 'transfer_verified')
+
     def test_same_length_transfer_corruption_is_rejected(self):
         import hashlib
         with tempfile.TemporaryDirectory() as directory:

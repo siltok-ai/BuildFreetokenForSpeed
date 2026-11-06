@@ -85,7 +85,7 @@ def prepare(output, gguf, lock_path=LOCK):
         artifacts=dict(weights=dict(path='.', layout='hf_model')))]
     write(output/'manifest.json', dict(schema='silitok.models/1', models=models))
     write(output/'sources.json', lock)
-    shutil.copy2(ROOT/'NOTICE', output/'NOTICE')
+    shutil.copy2(ROOT/'model-weights/clover-q8/NOTICE', output/'NOTICE')
     shutil.copy2(ROOT/'LICENSE', output/'LICENSE')
     shutil.copy2(ROOT/'model-weights/clover-q8/README.md', output/'README.md')
     inventory = {}
