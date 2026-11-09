@@ -1,6 +1,6 @@
 # Flash Next GGUF 资源包制作与部署
 
-本流程从 Build `main` 生成包含全部模型资源的目录，当前配套 FreeToken `0.1.3+speed.mtpdecode2`。Speed 在功能分支、dev、main 或 release 中均使用本仓库 `main`，并以其 release 合同检查配套关系。接收方取得此目录与匹配的 Speed 安装包后即可使用，无需 Python 转换。
+本流程从当前检出的 Build 修订生成包含全部模型资源的目录，当前配套 FreeToken `0.1.3+speed.cloverq8.2`。以两仓 release 合同检查配套关系，并记录实际材料 commit。Flash Next原有权重、MTP和OFF/ON运行参数保持不变；接收方无需 Python 转换。
 
 ## 获取完整资源包
 
@@ -71,7 +71,7 @@ flash-next-resources/
 
 ## 接收方部署
 
-1. 安装包含FreeToken `0.1.3+speed.mtpdecode2` 的配套Speed，复制整个资源包到例如 `D:\models\flash-next`。
+1. 安装包含FreeToken `0.1.3+speed.cloverq8.2` 的配套Speed，复制整个资源包到例如 `D:\models\flash-next`。
 2. 安装向导的模型目录（`/MODELSDIR`）填写**包含 manifest.json 的包根**。已安装服务在 `C:\ProgramData\Siltok\Speed\config\operator.override.yaml` 设置 `service.models_dir`，合并包内 `speed-config/config.yaml` 的 `resource` 段，保留已有设置。
 3. 重启服务，按 Speed 正常流程配置设备许可证和 API 授权。
 4. 查询 `GET /v1/models`，选择 `flash-next-strata-q2-off` 或 `flash-next-strata-q2-on`。
@@ -86,9 +86,9 @@ flash-next-resources/
 
 ## 设备与使用限制
 
-当前 `sm120-auto` preset在两项入口声明 `engine.resource_profile: auto`，不写死专家池、prefill或准入预算，由Speed已有的硬件档位统一解析。5070 Ti的16GiB档OFF/ON驻留专家5248/4480、总槽7296/6528、GPU预算14.5GiB；32GiB档驻留9216、总槽11264、预算28GiB不变。两档KV8192、动态/staging各1024；ON使用紧凑MTP与 `paired_cjk`，启动限时600秒。建议64GiB主机内存，实际资源仍由正常准入检查决定。
+当前 `sm120-auto` preset在两项入口声明 `engine.resource_profile: auto`，不写死专家池、prefill或准入预算，由配套Speed的硬件档位统一解析。采用统一FreeToken资源计划的Speed中，5070 Ti的16GiB档OFF/ON驻留专家5248/4480、总槽7296/6528，已标定固定几何的GPU预算为14.125GiB、另留128MiB；旧版Speed可能仍采用14.5GiB预算。显式预算及自定义容量不继承较小标定值。32GiB档驻留9216、总槽11264、预算28GiB不变。两档KV8192、动态/staging各1024；ON使用紧凑MTP与 `paired_cjk`，启动限时600秒。建议64GiB主机内存，实际资源仍由正常准入检查决定。
 
-当前生成器已为 OFF/ON 启用 auto，不写入 `moe_q2_resident_experts`、`moe_cache_size`、`max_prefill_length`、`vram_estimate_bytes`、`host_commit_estimate_bytes` 五项固定覆盖值。部署时保留这一配置，并合并包内 NVML/0.25GiB 显存余量/4GiB commit 余量。
+当前生成器已为 OFF/ON 启用 auto，不写入 `moe_q2_resident_experts`、`moe_cache_size`、`max_prefill_length`、`vram_estimate_bytes`、`host_commit_estimate_bytes` 五项固定覆盖值。部署时保留这一配置，并合并包内 NVML 配置。全局0.25GiB显存/4GiB commit余量仅影响其他后端；所有FreeToken文本模型使用128MiB显存余量、0额外commit余量。
 
 `flash_next_speed_config.py --root <资源根> --mode off|on --dry-run` 可预览当前单入口配置；默认选择当前 preset。
 

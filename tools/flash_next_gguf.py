@@ -10,7 +10,7 @@ SCALARS = {0: 'B', 1: 'b', 2: 'H', 3: 'h', 4: 'I', 5: 'i', 6: 'f',
            7: '?', 10: 'Q', 11: 'q', 12: 'd'}
 
 
-def read_metadata(path):
+def read_metadata(path, architecture='qwen4exp'):
     """只读 GGUF v3 元数据，不读取大张量，也不依赖 Strata 或 GPU。"""
     with Path(path).open('rb') as stream:
         def unpack(fmt):
@@ -34,8 +34,8 @@ def read_metadata(path):
         for _ in range(count):
             key = string()
             metadata[key] = value(unpack('I')[0])
-    if metadata.get('general.architecture') != 'qwen4exp':
-        raise ValueError('Flash Next requires qwen4exp GGUF metadata')
+    if metadata.get('general.architecture') != architecture:
+        raise ValueError('Unexpected GGUF architecture: '+str(metadata.get('general.architecture')))
     return metadata
 
 

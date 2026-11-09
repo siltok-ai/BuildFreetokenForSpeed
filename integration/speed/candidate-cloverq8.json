@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "kind": "clover_q8_candidate",
+  "status": "v2_full_build_runtime_validation_pending",
+  "version": "0.1.3+speed.cloverq8.2",
+  "profile": "build/profiles/cloverq8.json",
+  "materials": "artifacts/cloverq8-2-cp312-cu130-sm120",
+  "consumer_contract": "integration/speed/consumer-contract-cloverq8.json",
+  "weight_source_lock": "model-weights/clover-q8/source-lock.json",
+  "speed_preset": "integration/speed/presets/clover-q8-sm120-auto.json",
+  "engine_commit": "47b7677263604a5926d174e5f624a14ce2933d12",
+  "source_branch_snapshot": "47b7677263604a5926d174e5f624a14ce2933d12",
+  "input_sha256": {
+    "build/profiles/cloverq8.json": "a502392db612449f4016b0ef958e7783c9c6d7d5948619c9c9b69f0c908392fd",
+    "integration/speed/consumer-contract-cloverq8.json": "9469faaedfed87d3b5b6ed939b83c2274ad6a744a2aad00cf9c678b863e73b77",
+    "model-weights/clover-q8/source-lock.json": "26255fbd50199effe526ddae68db917de8e7a4593a2438fcfeec11e5c9656574",
+    "integration/speed/presets/clover-q8-sm120-auto.json": "e3d26ac00900043651144fcee6c4cd1170744ceccade74820c90c6c26527a613"
+  },
+  "runtime_validation_scope": "V2 source, materials and contract checks; promotion additionally requires the v2 Program Files installation, real device license, six Clover configurations, Flash OFF/ON and Qwen token-ID parity, H3 switching, and live KV-pressure fallback. Execution evidence is retained outside the repository.",
+  "scope": "Clover Q8 and existing Flash Next/Qwen; 16GiB unchanged, 5090 32GiB calibrated; v2 installation validation pending."
+}

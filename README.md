@@ -1,15 +1,18 @@
 # BuildFreetokenForSpeed
 
+当前交付提供 Clover Q8 和现有 Flash Next/Qwen 的配套材料，见
+[Clover 接入与构建](docs/clover-q8.md)。消费前按下述 release 合同核对 Speed 与材料版本。
+
 为 [Speed](https://github.com/siltok-ai/siltok-speed) 提供 FreeToken 定制补丁、Windows wheel/AOT 和 Flash Next 模型资源包制作工具。Speed 的服务、授权、HTTP 和安装器逻辑在 Speed 仓库维护。
 
-当前版本由 [current-release.json](integration/speed/current-release.json) 选择：`0.1.3+speed.mtpdecode2`，Windows x64、CPython 3.12、SM120，Torch 2.11.0+cu130。材料包含一个 wheel（3 个原生模块）和 27 项 AOT DLL。
+当前版本由 [current-release.json](integration/speed/current-release.json) 选择：`0.1.3+speed.cloverq8.2`，Windows x64、CPython 3.12、SM120，Torch 2.11.0+cu130。材料包含一个 wheel（4 个原生模块，包括预编译 GGUF 算子）和 34 项 AOT DLL。
 
-`main` 维护当前交付，默认材料、构建入口和消费校验均选择上述版本。Speed 无论使用功能分支、dev、main 或 release，只要其 release 合同匹配，都从本仓库 `main` 取得配套输入。可直接消费仓内材料，或按[构建步骤](build/README.md)在新目录重建。
+默认材料、构建入口和消费校验均读取当前检出修订的上述指针。选择与消费方 Speed release 合同匹配的仓库修订，并记录完整 commit。可直接消费仓内材料，或按[构建步骤](build/README.md)在新目录重建。
 
 ## 获取与使用
 
 ```powershell
-git clone --branch main https://github.com/siltok-ai/BuildFreetokenForSpeed.git
+git clone git@github.com:siltok-ai/BuildFreetokenForSpeed.git
 cd BuildFreetokenForSpeed
 ```
 

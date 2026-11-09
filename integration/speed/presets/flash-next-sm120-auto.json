@@ -1,7 +1,7 @@
 {
   "format": 1,
   "name": "sm120-auto",
-  "scope": "Speed selects its existing SM120 16GiB/32GiB tier from hardware; no fixed capacity overrides. OFF remains the recommended default.",
+  "scope": "Speed selects its existing SM120 16GiB/32GiB tier from hardware; no fixed capacity overrides. OFF remains the recommended default. Global resource safety values apply only to other backends; FreeToken text models use 128MiB VRAM and zero additional commit margin.",
   "required_version": "0.1.3+speed.mtpdecode2",
   "resource_profile": "auto",
   "startup_timeout_seconds": 600,

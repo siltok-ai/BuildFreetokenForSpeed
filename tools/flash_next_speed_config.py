@@ -9,14 +9,16 @@ from flash_next_weights import ROOT, LOCK, layout, read, verify_checkpoint, writ
 from flash_next_mtp import verify_runtime
 from current_release import load_current
 from prepare_source import load_profile, sha256
+from tool_call_manifest import enable_function_tools
 
 PRESETS = {
+    'sm120-auto-cloverq8': 'integration/speed/presets/flash-next-sm120-auto-cloverq8.json',
     'sm120-auto': 'integration/speed/presets/flash-next-sm120-auto.json',
     'sm120-16g-portable1': 'integration/speed/presets/flash-next-sm120-16g-portable1.json',
 }
 
 
-def configuration(mode, preset):
+def configuration(mode, preset, *, enable_tools=False):
     """将模型开关、专家预算和准入预算放在同一个明确的测试方案中。"""
     if mode not in preset['modes']:
         raise ValueError('Mode '+mode+' is not supported by preset '+preset['name'])
@@ -44,6 +46,8 @@ def configuration(mode, preset):
         engine=dict(pipeline='chat', backend='Qwen36Backend', offload=False, extra=extra), artifacts=artifacts)])
     if 'resource_profile' in preset:
         manifest['models'][0]['engine']['resource_profile'] = preset['resource_profile']
+    if enable_tools:
+        enable_function_tools(manifest["models"][0])
     return manifest, dict(resource=preset['resource'])
 
 
@@ -69,6 +73,11 @@ def main():
     parser.add_argument('--deployment-root', type=Path,
                         help='New configuration root sharing checkpoints from --root; defaults to --root')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument(
+        "--enable-tools",
+        action="store_true",
+        help="Declare function calling; requires a Speed version supporting qwen3_coder",
+    )
     parser.add_argument('--profile', type=Path,
                         help='Explicit version profile inside build/profiles; default uses current release')
     parser.add_argument('--source-lock', type=Path, default=LOCK)
@@ -88,7 +97,9 @@ def main():
                        profile=profile_path.relative_to(ROOT).as_posix())
     if preset.get('required_version', current['version']) != current['version']:
         raise ValueError('Preset and FreeToken version differ; select the matching --profile')
-    manifest, resource = configuration(args.mode, preset)
+    manifest, resource = configuration(
+        args.mode, preset, enable_tools=args.enable_tools
+    )
     lock = read(args.source_lock)
     paths = layout(args.root, lock)
     deployment = (args.deployment_root or paths['root']).resolve()
