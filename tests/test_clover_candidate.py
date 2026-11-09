@@ -60,6 +60,37 @@ def write_clover_metadata_fixture(path):
 
 
 class CloverCandidateTests(unittest.TestCase):
+
+    def test_tools_bundle_has_valid_transfer_inventory_and_keeps_weight_bytes(self):
+        """用真实最小GGUF制包，验证工具配置进入清单且不改变源文件。"""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            gguf = root / "fixture.gguf"
+            write_clover_metadata_fixture(gguf)
+            original = gguf.read_bytes()
+            lock = root / "source-lock.json"
+            lock.write_text(
+                json.dumps(
+                    dict(
+                        filename=gguf.name,
+                        size=len(original),
+                        sha256=hashlib.sha256(original).hexdigest(),
+                    )
+                ),
+                encoding="utf-8",
+            )
+            plain, tools = root / "plain", root / "tools"
+            prepare(plain, gguf, lock)
+            prepare(tools, gguf, lock, enable_tools=True)
+            self.assertEqual(verify_bundle(tools)["status"], "transfer_verified")
+            plain_entry = json.loads((plain / "manifest.json").read_text())["models"][0]
+            tools_entry = json.loads((tools / "manifest.json").read_text())["models"][0]
+            self.assertEqual(tools_entry.pop("tool_call_format"), "qwen3_coder")
+            self.assertEqual(tools_entry["features"].pop(), "tools")
+            self.assertEqual(tools_entry, plain_entry)
+            self.assertEqual((tools / gguf.name).read_bytes(), original)
+            self.assertEqual(gguf.read_bytes(), original)
+
     def test_generated_bundle_retains_model_notice_and_transfer_inventory(self):
         """实际组包后核对模型署名及清单，防止误带不含权重的仓库NOTICE。"""
         with tempfile.TemporaryDirectory() as directory:

@@ -59,3 +59,15 @@ $env:SILITOK_FREETOKEN_KERNEL_CACHE_DIR = Join-Path $app 'runtime/kernel-cache'
 ```
 
 安装器升级、依赖服务处理和设备授权属于 Speed。模型资源的独立制作与挂载步骤见 [资源包说明](flash-next-gguf-bundle.md)。
+## 可选函数调用部署
+
+支持函数调用的 Speed 应使用独立部署清单：Flash 配置命令
+`tools/flash_next_speed_config.py` 与 Clover 制包命令 `tools/clover_bundle.py`
+均可加 `--enable-tools`，生成 `features: ["chat", "tools"]` 和
+`tool_call_format: "qwen3_coder"`。默认不加该参数，保留现有聊天部署。
+
+工具清单要求 Speed `0.2.0+freetoken.tools1` 对应改动或后续包含它的版本。
+旧 Speed 不认识此格式，不能消费工具清单；升级时在新目录生成配置，保留旧包。
+FreeToken 仍为 `0.1.3+speed.cloverq8.2`，wheel/AOT/权重和模型模板不变。
+Speed 负责工具控制、XML 参数解析、标准 HTTP/SSE 输出及工具结果回传；
+外部 Agent 负责实际执行函数。部署说明及真实客户端验证入口见配套 Speed 文档。

@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 
 from flash_next_gguf import read_metadata
+from tool_call_manifest import enable_function_tools
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCK = ROOT/'model-weights/clover-q8/source-lock.json'
@@ -64,7 +65,7 @@ def export_tokenizer(output, meta):
             [raw['eos_token_id'], raw['padding_token_id']])), pad_token_id=raw['padding_token_id']))
 
 
-def prepare(output, gguf, lock_path=LOCK):
+def prepare(output, gguf, lock_path=LOCK, *, enable_tools=False):
     """流式验证固定来源后复制权重，生成不含制作机器绝对路径的资源包。"""
     output, gguf = Path(output).resolve(), Path(gguf).resolve()
     lock = json.loads(Path(lock_path).read_text(encoding='utf-8'))
@@ -83,6 +84,8 @@ def prepare(output, gguf, lock_path=LOCK):
         family='clover', features=['chat'], engine=dict(pipeline='chat', backend='FreeTokenBackend',
         offload=False, resource_profile='auto'),
         artifacts=dict(weights=dict(path='.', layout='hf_model')))]
+    if enable_tools:
+        enable_function_tools(models[0])
     write(output/'manifest.json', dict(schema='silitok.models/1', models=models))
     write(output/'sources.json', lock)
     shutil.copy2(ROOT/'model-weights/clover-q8/NOTICE', output/'NOTICE')
@@ -119,15 +122,22 @@ def main():
     parser.add_argument('--gguf', type=Path)
     parser.add_argument('--output', type=Path)
     parser.add_argument('--verify', type=Path)
+    parser.add_argument(
+        "--enable-tools",
+        action="store_true",
+        help="Declare function calling; requires a Speed version supporting qwen3_coder",
+    )
     args = parser.parse_args()
     if args.verify:
-        if args.gguf or args.output:
+        if args.gguf or args.output or args.enable_tools:
             parser.error('--verify cannot be combined with preparation options')
         print(json.dumps(verify_bundle(args.verify)))
     else:
         if not args.gguf or not args.output:
             parser.error('preparation requires --gguf and --output')
-        print(json.dumps(prepare(args.output, args.gguf)))
+        print(
+            json.dumps(prepare(args.output, args.gguf, enable_tools=args.enable_tools))
+        )
 
 
 if __name__ == '__main__':
